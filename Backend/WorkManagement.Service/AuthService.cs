@@ -1,0 +1,97 @@
+﻿using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+
+namespace WorkManagement.Service
+{
+    using BCrypt.Net;
+    using Microsoft.AspNet.Identity;
+    using Microsoft.AspNetCore.Identity;
+    using Microsoft.EntityFrameworkCore.Metadata.Internal;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.IdentityModel.Tokens;
+    using System.IdentityModel.Tokens.Jwt;
+    using System.Security.Claims;
+    using WorkManagement.Domain.Entity;
+    using WorkManagement.Service;
+    using WorkManagmentSolution.EFCore;
+
+    public class AuthService
+    {
+        private readonly IConfiguration _configuration;
+        private readonly Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> userManager;
+
+        public AuthService(IConfiguration configuration, Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> userManager)
+        {
+            _configuration = configuration;
+            this.userManager = userManager;
+        }
+
+
+        public string GenerateJwtToken(string email, string role)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_configuration["JWT:SecretKey"]);
+
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Name, email),
+                    new Claim(ClaimTypes.GivenName, email),
+                    new Claim(ClaimTypes.Role, role)
+                }),
+                IssuedAt = DateTime.UtcNow,
+                Issuer = _configuration["JWT:Issuer"],
+                Audience = _configuration["JWT:Audience"],
+                Expires = DateTime.UtcNow.AddMinutes(30),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
+
+        public bool ValidateToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_configuration["JWT:SecretKey"]);
+
+            try
+            {
+                tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false, // Set to true if you want to validate issuer
+                    ValidateAudience = false, // Set to true if you want to validate audience
+                    ClockSkew = TimeSpan.Zero // No tolerance for token expiration
+                }, out SecurityToken validatedToken);
+
+                // Token is valid
+                return true;
+            }
+            catch
+            {
+                // Token validation failed
+                return false;
+            }
+        }
+
+        public Tuple<string, string> DecodeJwtToken(string jwtToken)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(jwtToken);
+
+            // Now you can access token.Claims to retrieve user information
+            var userId = token.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+            var userName = token.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
+            var role = token.Claims.FirstOrDefault(c => c.Type == "role")?.Value;
+
+            // Do something with userId and userName (e.g., log them or use them in your application)
+            return new Tuple<string, string>(userName, role); // Return the user ID if needed
+        }
+
+    }
+}
