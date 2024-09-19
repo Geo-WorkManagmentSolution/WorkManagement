@@ -2,12 +2,13 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using WorkManagement.Domain.Models.Employee;
+using WorkManagement.Service.Services.Abstract;
 using WorkManagementSolution.Employee;
 using WorkManagmentSolution.EFCore;
 
 namespace WorkManagement.Service
 {
-    public class EmployeeService
+    public class EmployeeService : IEmployeeService
     {
         private readonly WorkManagementDbContext _dbContext;
         private readonly IMapper mapper;

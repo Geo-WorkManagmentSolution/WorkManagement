@@ -1,28 +1,34 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using WorkManagement.Domain.Models.Employee;
 using WorkManagement.Service;
+using WorkManagement.Service.Services.Abstract;
 using WorkManagementSolution.Employee;
 
 namespace WorkManagement.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class EmployeesController : ControllerBase
     {
-        private readonly EmployeeService employeeService;
+        private readonly IEmployeeService employeeService;
+        private IHttpContextAccessor _httpContextAccessor;
 
-        public EmployeesController(EmployeeService employeeService)
+        public EmployeesController(IEmployeeService employeeService, IHttpContextAccessor httpContextAccessor)
         {
             this.employeeService = employeeService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         // GET: api/employees
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EmployeeModel>>> GetEmployees()
         {
+            var user = _httpContextAccessor.HttpContext?.User;
             var employees = await employeeService.GetAllEmployeesAsync();
             return Ok(employees);
         }

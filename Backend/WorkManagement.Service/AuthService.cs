@@ -1,23 +1,15 @@
-﻿using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+﻿using System.Text;
 
 namespace WorkManagement.Service
 {
-    using BCrypt.Net;
-    using Microsoft.AspNet.Identity;
-    using Microsoft.AspNetCore.Identity;
-    using Microsoft.EntityFrameworkCore.Metadata.Internal;
     using Microsoft.Extensions.Configuration;
     using Microsoft.IdentityModel.Tokens;
     using System.IdentityModel.Tokens.Jwt;
     using System.Security.Claims;
     using WorkManagement.Domain.Entity;
-    using WorkManagement.Service;
-    using WorkManagmentSolution.EFCore;
+    using WorkManagement.Service.Services.Abstract;
 
-    public class AuthService
+    public class AuthService : IAuthService
     {
         private readonly IConfiguration _configuration;
         private readonly Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> userManager;
@@ -32,25 +24,37 @@ namespace WorkManagement.Service
         public string GenerateJwtToken(string email, string role)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_configuration["JWT:SecretKey"]);
 
-
-            var tokenDescriptor = new SecurityTokenDescriptor
+            try
             {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, email),
-                    new Claim(ClaimTypes.GivenName, email),
-                    new Claim(ClaimTypes.Role, role)
-                }),
-                IssuedAt = DateTime.UtcNow,
-                Issuer = _configuration["JWT:Issuer"],
-                Audience = _configuration["JWT:Audience"],
-                Expires = DateTime.UtcNow.AddMinutes(30),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
+                var key = Encoding.ASCII.GetBytes(_configuration["ApiSettings:JwtOptions:Secret"]);
+
+                var claimList = new List<Claim>
+            {
+                new Claim(JwtRegisteredClaimNames.Email,email),
+                new Claim(JwtRegisteredClaimNames.Name,email),
+                new Claim(ClaimTypes.Role,role)
             };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+
+
+
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(claimList),
+                    IssuedAt = DateTime.UtcNow,
+                    Issuer = _configuration["ApiSettings:JwtOptions:Issuer"],
+                    Audience = _configuration["ApiSettings:JwtOptions:Audience"],
+                    Expires = DateTime.UtcNow.AddMinutes(30),
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
+                };
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                return tokenHandler.WriteToken(token);
+            }
+            catch (Exception ex)
+            {
+                return "";
+            }
+
         }
 
         public bool ValidateToken(string token)
