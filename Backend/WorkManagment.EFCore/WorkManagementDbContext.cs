@@ -16,7 +16,7 @@ namespace WorkManagmentSolution.EFCore
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Employee>(entity =>
+           /* modelBuilder.Entity<Employee>(entity =>
             {
                 entity.ToTable("Employees");
             });
@@ -24,7 +24,7 @@ namespace WorkManagmentSolution.EFCore
             modelBuilder.Entity<EmployeePersonalDetailsModel>(entity =>
             {
                 entity.ToTable("EmployeePersonalDetails");
-            });
+            });*/
         }
 
     }
