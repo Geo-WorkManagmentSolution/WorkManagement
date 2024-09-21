@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using WorkManagement.Domain.Contracts;
 using WorkManagement.Domain.Models.Employee;
 using WorkManagement.Service;
-using WorkManagement.Service.Services.Abstract;
 using WorkManagementSolution.Employee;
 
 namespace WorkManagement.API.Controllers

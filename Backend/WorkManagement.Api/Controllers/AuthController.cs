@@ -14,8 +14,8 @@ using System.Text;
 using WorkManagement.Domain.Entity;
 using WorkManagement.Domain.Models;
 using WorkManagement.Service;
-using WorkManagement.Service.Services.Abstract;
 using WorkManagmentSolution.EFCore;
+using WorkManagement.Domain.Contracts;
 
 namespace WorkManagement.API.Controllers
 {
@@ -93,10 +93,10 @@ namespace WorkManagement.API.Controllers
                         var user = new ApplicationUser { UserName = model.Email, Email = model.Email, Shortcuts = new List<string>() };
                         var result = await userManager.CreateAsync(user, model.Password);
 
-                        if (!roleManager.RoleExistsAsync(role).GetAwaiter().GetResult())
+                        if (!await roleManager.RoleExistsAsync(role))
                         {
                             var newRole = new ApplicationRole { Name = role };
-                            roleManager.CreateAsync(newRole).GetAwaiter().GetResult();
+                            await roleManager.CreateAsync(newRole);
                         }
 
                         var roleResult = await userManager.AddToRoleAsync(user, role);

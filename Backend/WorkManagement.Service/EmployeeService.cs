@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using System;
+using WorkManagement.Domain.Contracts;
 using WorkManagement.Domain.Models.Employee;
-using WorkManagement.Service.Services.Abstract;
 using WorkManagementSolution.Employee;
 using WorkManagmentSolution.EFCore;
 

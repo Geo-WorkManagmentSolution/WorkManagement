@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.OpenApi.Models;
 using WorkManagmentSolution.EFCore;
-using WorkManagement.Service.Services.Abstract;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -13,6 +12,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using WorkManagement.Service;
 using WorkManagement.API.Extensions;
+using WorkManagement.Domain.Contracts;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -69,10 +69,7 @@ builder.Services.AddSwaggerGen(option =>
 builder.Services.AddTransient<EmployeeService>();
 builder.Services.AddAutoMapper(typeof(WorkManagement.Domain.AutoMapper.Profiles.EmployeeProfile).Assembly);
 
-builder.AddAppAuthetication();
-// Add JWT authentication
-builder.Services.AddAuthentication();
-
+builder.AddJWTAuthetication();
 var app = builder.Build();
 
 // Run pending migrations in DB
