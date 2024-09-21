@@ -8,9 +8,9 @@ namespace WorkManagement.Domain.Contracts
 {
     public interface IAuditableEntity
     {
-        public int CreatedBy { get; set; }
+        public Guid CreatedBy { get; set; }
         public DateTimeOffset CreatedOn { get; set; }
-        public int? LastModifiedBy { get; set; }
+        public Guid? LastModifiedBy { get; set; }
         public DateTimeOffset? LastModifiedOn { get; set; }
     }
 }
