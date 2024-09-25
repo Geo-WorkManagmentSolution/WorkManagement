@@ -80,7 +80,7 @@ function SignInPage() {
 						Documentation.
 					</Box>
 
-					<Tabs
+					{/* <Tabs
 						value={_.findIndex(tabs, { id: selectedTabId })}
 						variant="fullWidth"
 						className="w-full mt-24 mb-32"
@@ -112,11 +112,11 @@ function SignInPage() {
 								label={item.title}
 							/>
 						))}
-					</Tabs>
+					</Tabs> */}
 
-					{selectedTabId === 'jwt' && <JwtLoginTab />}
-					{selectedTabId === 'firebase' && <FirebaseSignInTab />}
-					{selectedTabId === 'aws' && <AwsSignInTab />}
+					<JwtLoginTab />
+					{/* {selectedTabId === 'firebase' && <FirebaseSignInTab />}
+					{selectedTabId === 'aws' && <AwsSignInTab />} */}
 				</CardContent>
 			</Paper>
 

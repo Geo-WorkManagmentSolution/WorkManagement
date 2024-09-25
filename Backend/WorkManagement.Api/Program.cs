@@ -33,12 +33,22 @@ var configuration = builder.Configuration.SetBasePath(AppDomain.CurrentDomain.Ba
 builder.Services.AddDbContext<WorkManagementDbContext>(options =>
     options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.Configure<IdentityOptions>(opts =>
+{
+    opts.Password.RequiredLength = 4; // Set the minimum required password length
+    opts.Password.RequireLowercase = false; // Require at least one lowercase character
+    opts.Password.RequireUppercase = false; // Require at least one uppercase character
+    opts.Password.RequireDigit = false; // Require at least one numeric digit
+    opts.Password.RequireNonAlphanumeric = false; // Require at least one non-alphanumeric character
+    opts.Password.RequiredUniqueChars = 0; // Set the minimum number of unique characters
+});
+
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
     .AddEntityFrameworkStores<WorkManagementDbContext>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
-
+builder.Services.AddCors();
 builder.Services.AddSwaggerGen(option =>
 {
     option.AddSecurityDefinition(name: JwtBearerDefaults.AuthenticationScheme, securityScheme: new OpenApiSecurityScheme
@@ -72,6 +82,7 @@ builder.Services.AddAutoMapper(typeof(WorkManagement.Domain.AutoMapper.Profiles.
 builder.AddJWTAuthetication();
 var app = builder.Build();
 
+
 // Run pending migrations in DB
 using (var scope = app.Services.CreateScope()) // this will use `IServiceScopeFactory` internally
 {
@@ -86,6 +97,8 @@ using (var scope = app.Services.CreateScope()) // this will use `IServiceScopeFa
     }
 }
 
+//should be changed in future
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -97,8 +110,10 @@ if (app.Environment.IsDevelopment())
 
 
 // Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
+    app.UseHttpsRedirection();
 
-app.UseHttpsRedirection();
+app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 
 app.UseAuthentication();
 app.UseAuthorization();

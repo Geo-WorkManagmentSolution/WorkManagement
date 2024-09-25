@@ -17,8 +17,10 @@ namespace WorkManagement.Domain.AutoMapper.Profiles
             AddGlobalIgnore("Item");
 
             CreateMap<ApplicationUser, UserModel>()
-                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
-                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
+                .ForMember(dest => dest.Uid, opt => opt.MapFrom(src => src.Id))
+                .ForPath(dest => dest.Data.DisplayName, opt => opt.MapFrom(src => src.UserName))
+                .ForPath(dest => dest.Data.Email, opt => opt.MapFrom(src => src.Email));
+
         }
     }
 

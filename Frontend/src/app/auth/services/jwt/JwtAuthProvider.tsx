@@ -214,9 +214,9 @@ function JwtAuthProvider(props: JwtAuthProviderProps) {
 		handleFailure: (T: AxiosError) => void
 	): Promise<User | AxiosError> => {
 		try {
-			const response: AxiosResponse<{ user: User; access_token: string }> = await axios.post(url, data);
+			const response: AxiosResponse<{ user: User; accessToken: string }> = await axios.post(url, data);
 			const userData = response?.data?.user;
-			const accessToken = response?.data?.access_token;
+			const accessToken = response?.data?.accessToken;
 
 			handleSuccess(userData, accessToken);
 

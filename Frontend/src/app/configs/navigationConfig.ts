@@ -13,12 +13,32 @@ i18next.addResourceBundle('ar', 'navigation', ar);
  */
 const navigationConfig: FuseNavItemType[] = [
 	{
-		id: 'example-component',
-		title: 'Example',
-		translate: 'EXAMPLE',
-		type: 'item',
-		icon: 'heroicons-outline:star',
-		url: 'example'
+		id: 'employeemanagement',
+		title: 'Employee Management',
+		subtitle: 'Manage your employee management',
+		type: 'group',
+		children: [
+			{
+				id: 'apps.employees',
+				title: 'Employee',
+				type: 'collapse',
+				icon: 'heroicons-outline:user-group',
+				children: [
+					{
+						id: 'apps.employees.search',
+						title: 'Search Employees',
+						type: 'item',
+						url: '/apps/employees'
+					},
+					{
+						id: 'apps.employees.new',
+						title: 'New Employee',
+						type: 'item',
+						url: '/apps/employees/employeesSearch/new'
+					}
+				]
+			}
+		]
 	}
 ];
 

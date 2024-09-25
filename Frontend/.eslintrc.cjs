@@ -110,6 +110,7 @@ module.exports = {
         "@typescript-eslint/explicit-module-boundary-types": "off",
         "@typescript-eslint/no-floating-promises": "off",
         "@typescript-eslint/no-misused-promises": "off",
+        "@typescript-eslint/no-unsafe-assignment": "warn",
         "@typescript-eslint/require-await": "off",
         "no-useless-constructor": "off",
         "no-tabs": "off",

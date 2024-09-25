@@ -15,8 +15,9 @@ namespace WorkManagementSolution.Employee
     public class Employee : FullyAuditableEntity
     {
         public string? PhotoURL { get; set; }
-        public int EmployeeNumber { get; set; }
-        public EmployeePersonalDetails EmployeeWorkInformation { get; set; }
+        public int? EmployeeNumber { get; set; }
+        public bool IsActive { get; set; }
+        public EmployeePersonalDetails? EmployeeWorkInformation { get; set; }
     }
 }
 

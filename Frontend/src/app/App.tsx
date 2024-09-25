@@ -7,18 +7,18 @@ import { CacheProvider } from '@emotion/react';
 import { selectCurrentLanguageDirection } from 'app/store/i18nSlice';
 import themeLayouts from 'app/theme-layouts/themeLayouts';
 import { selectMainTheme } from '@fuse/core/FuseSettings/fuseSettingsSlice';
-import MockAdapterProvider from '@mock-api/MockAdapterProvider';
+// import MockAdapterProvider from '@mock-api/MockAdapterProvider';
 import { useAppSelector } from 'app/store/hooks';
 import { useSelector } from 'react-redux';
 import { useMemo } from 'react';
+import axios from 'axios';
 import AuthenticationProvider from './auth/AuthenticationProvider';
 import withAppProviders from './withAppProviders';
 
-// import axios from 'axios';
 /**
  * Axios HTTP Request defaults
  */
-// axios.defaults.baseURL = "";
+axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
 // axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
 // axios.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded';
 
@@ -48,29 +48,27 @@ function App() {
 	);
 
 	return (
-		<MockAdapterProvider>
-			<CacheProvider value={cacheProviderValue}>
-				<FuseTheme
-					theme={mainTheme}
-					root
-				>
-					<AuthenticationProvider>
-						<SnackbarProvider
-							maxSnack={5}
-							anchorOrigin={{
-								vertical: 'bottom',
-								horizontal: 'right'
-							}}
-							classes={{
-								containerRoot: 'bottom-0 right-0 mb-52 md:mb-68 mr-8 lg:mr-80 z-99'
-							}}
-						>
-							<FuseLayout layouts={themeLayouts} />
-						</SnackbarProvider>
-					</AuthenticationProvider>
-				</FuseTheme>
-			</CacheProvider>
-		</MockAdapterProvider>
+		<CacheProvider value={cacheProviderValue}>
+			<FuseTheme
+				theme={mainTheme}
+				root
+			>
+				<AuthenticationProvider>
+					<SnackbarProvider
+						maxSnack={5}
+						anchorOrigin={{
+							vertical: 'bottom',
+							horizontal: 'right'
+						}}
+						classes={{
+							containerRoot: 'bottom-0 right-0 mb-52 md:mb-68 mr-8 lg:mr-80 z-99'
+						}}
+					>
+						<FuseLayout layouts={themeLayouts} />
+					</SnackbarProvider>
+				</AuthenticationProvider>
+			</FuseTheme>
+		</CacheProvider>
 	);
 }
 

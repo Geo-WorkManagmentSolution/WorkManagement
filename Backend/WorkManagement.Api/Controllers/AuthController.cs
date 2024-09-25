@@ -16,6 +16,8 @@ using WorkManagement.Domain.Models;
 using WorkManagement.Service;
 using WorkManagmentSolution.EFCore;
 using WorkManagement.Domain.Contracts;
+using Microsoft.AspNetCore.Authorization;
+using WorkManagementSolution.Employee;
 
 namespace WorkManagement.API.Controllers
 {
@@ -45,36 +47,74 @@ namespace WorkManagement.API.Controllers
             this.workManagementDbContext = workManagementDbContext;
             this.mapper = mapper;
         }
+        public class UserloginModel
+        {
+            public string Email { get; set; }
+            public string Password { get; set; }
+        }
 
+        public class Error
+        {
+            public string Type { get; set; }
+            public string Message { get; set; }
+        }
         [HttpPost("signIn")]
-        public async Task<IActionResult> SignIn(string username, string password)
+        public async Task<IActionResult> SignIn(UserloginModel userloginModel)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    if (IsValidUser(userloginModel.Email, userloginModel.Password).Result)
+                    {
+                        ApplicationUser? user = await workManagementDbContext.Users.FirstOrDefaultAsync(s => s.UserName == userloginModel.Email);
+                        var role = await userManager.GetRolesAsync(user);
+                        var token = _authService.GenerateJwtToken(userloginModel.Email, role.FirstOrDefault());
+                        var User = mapper.Map<UserModel>(user);
+                        User.Role = role.FirstOrDefault();
+
+                        //await SignInUser(token);
+
+                        return Ok(new { User = User, AccessToken = token });
+                    }
+                    else
+                    {
+                        return BadRequest(new List<Error> { new Error { Type = "email", Message = "Invalid Creds." } });
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                    return BadRequest(ex.Message);
+                }
+            }
+            else
+                return BadRequest(ModelState);
+
+        }
+
+
+        [HttpGet("user")]
+        [Authorize]
+        public async Task<IActionResult> GetUser()
         {
             try
             {
-                if (IsValidUser(username, password).Result)
-                {
-                    ApplicationUser? user = await workManagementDbContext.Users.FirstOrDefaultAsync(s => s.UserName == username);
-                    var role = await userManager.GetRolesAsync(user);
-                    var token = _authService.GenerateJwtToken(username, role.FirstOrDefault());
-                    var User = mapper.Map<UserModel>(user);
-                    User.Role = role.FirstOrDefault();
+                var Email = this.User.FindFirst(ClaimTypes.Email);
+                var Role = this.User.FindFirst(ClaimTypes.Role);
+                //var token = _authService.GenerateJwtToken(Email?.Value, Role?.Value);
 
-                    //await SignInUser(token);
+                var dbuser = await workManagementDbContext.Users.FirstAsync(x => x.Email == Email.Value);
+                var User = mapper.Map<UserModel>(dbuser);
+                User.Role = Role?.Value;
 
-                    return Ok(new { User = User, AccessToken = token });
-                }
-                else
-                {
-                    return Unauthorized("Invalid credentials");
-                }
-            }catch (Exception ex)
-            {
-
-                return BadRequest(ex.Message);
+                return Ok(User);
             }
-            
+            catch (Exception ex)
+            {
+                return Problem("Contact Customer Care");
+            }
 
-            
         }
 
 
@@ -84,7 +124,7 @@ namespace WorkManagement.API.Controllers
             if (ModelState.IsValid)
             {
                 if (await UserExists(model.Email))
-                    return Conflict("User already exists.");
+                    return BadRequest("The email address is already in use.");
                 else
                 {
                     try
@@ -106,18 +146,18 @@ namespace WorkManagement.API.Controllers
                             var userdata = await workManagementDbContext.Users.FirstOrDefaultAsync(s => s.Email == model.Email);
                             var User = mapper.Map<UserModel>(userdata);
                             User.Role = role;
-                            var token = _authService.GenerateJwtToken(User.Email, role);
+                            var token = _authService.GenerateJwtToken(User.Data.Email, role);
 
                             return Ok(new { User = User, AccessToken = token });
                         }
                         else
                             return Problem("Error while creating user.");
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         return Problem("Error while creating user.");
                     }
-                    
+
                 }
             }
             else
@@ -160,7 +200,7 @@ namespace WorkManagement.API.Controllers
             {
                 // Your user validation logic here
                 // Return true if valid, otherwise false
-                ApplicationUser? user = await workManagementDbContext.Users.FirstOrDefaultAsync(s=>s.UserName == username);
+                ApplicationUser? user = await workManagementDbContext.Users.FirstOrDefaultAsync(s => s.UserName == username);
 
                 if (user != null)
                 {
@@ -173,11 +213,12 @@ namespace WorkManagement.API.Controllers
                 }
                 else
                     return false;
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return false;
             }
-           
+
         }
 
         private async Task SignInUser(string? token)

@@ -47,6 +47,7 @@
     "src",
     "tailwind.config.js",
     "vite.config.mts",
-    "vite-env.d.ts"
+    "vite-env.d.ts",
+    "openapi-config.cts"
   ],
 }

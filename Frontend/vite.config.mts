@@ -53,7 +53,7 @@ export default defineConfig({
 		},
 	},
 	"optimizeDeps": {
-		"include": ['@mui/icons-material','@mui/material','@mui/base','@mui/styles','@mui/system','@mui/utils','@emotion/cache','@emotion/react','@emotion/styled','lodash'],
+		"include": [],
 		"exclude": [],
 		"esbuildOptions": {
 			"loader": {

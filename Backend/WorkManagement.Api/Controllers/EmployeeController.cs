@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,18 +18,19 @@ namespace WorkManagement.API.Controllers
     {
         private readonly IEmployeeService employeeService;
         private IHttpContextAccessor _httpContextAccessor;
+        private readonly IMapper mapper;
 
-        public EmployeesController(IEmployeeService employeeService, IHttpContextAccessor httpContextAccessor)
+        public EmployeesController(IEmployeeService employeeService, IHttpContextAccessor httpContextAccessor,IMapper mapper)
         {
             this.employeeService = employeeService;
             _httpContextAccessor = httpContextAccessor;
+            this.mapper = mapper;
         }
 
         // GET: api/employees
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EmployeeModel>>> GetEmployees()
         {
-            var user = _httpContextAccessor.HttpContext?.User;
             var employees = await employeeService.GetAllEmployeesAsync();
             return Ok(employees);
         }
@@ -47,21 +49,21 @@ namespace WorkManagement.API.Controllers
 
         // POST: api/employees
         [HttpPost]
-        public async Task<ActionResult<EmployeeModel>> CreateEmployee(Employee employee)
+        public async Task<ActionResult<EmployeeModel>> CreateEmployee(EmployeeModel employee)
         {
-            var createdEmployee = await employeeService.CreateEmployeeAsync(employee);
+            var createdEmployee = await employeeService.CreateEmployeeAsync(mapper.Map<Employee>(employee));
             return CreatedAtAction(nameof(GetEmployee), new { id = createdEmployee.Id }, createdEmployee);
         }
 
         // PUT: api/employees/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateEmployee(int id, Employee employee)
+        public async Task<IActionResult> UpdateEmployee(int id, EmployeeModel employee)
         {
             if (id != employee.Id)
             {
                 return BadRequest();
             }
-            await employeeService.UpdateEmployeeAsync(employee);
+            await employeeService.UpdateEmployeeAsync(mapper.Map<Employee>(employee));
             return NoContent();
         }
 
