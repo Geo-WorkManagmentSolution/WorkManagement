@@ -13,6 +13,7 @@ using Microsoft.IdentityModel.Tokens;
 using WorkManagement.Service;
 using WorkManagement.API.Extensions;
 using WorkManagement.Domain.Contracts;
+using WorkManagement.API.Middleware;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -77,6 +78,7 @@ builder.Services.AddSwaggerGen(option =>
 
 
 builder.Services.AddTransient<EmployeeService>();
+builder.Services.AddTransient<AdvanceSearchService>();
 builder.Services.AddAutoMapper(typeof(WorkManagement.Domain.AutoMapper.Profiles.EmployeeProfile).Assembly);
 
 builder.AddJWTAuthetication();
@@ -118,7 +120,9 @@ app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod(
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Other middleware configurations...
 app.MapControllers();
 
+app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.Run();

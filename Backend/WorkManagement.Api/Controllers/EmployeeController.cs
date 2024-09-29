@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using WorkManagement.Domain.Contracts;
+using WorkManagement.Domain.Models;
 using WorkManagement.Domain.Models.Employee;
 using WorkManagement.Service;
 using WorkManagementSolution.Employee;
@@ -17,12 +18,14 @@ namespace WorkManagement.API.Controllers
     public class EmployeesController : ControllerBase
     {
         private readonly IEmployeeService employeeService;
+        private readonly AdvanceSearchService advanceSearchService;
         private IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper mapper;
 
-        public EmployeesController(IEmployeeService employeeService, IHttpContextAccessor httpContextAccessor,IMapper mapper)
+        public EmployeesController(IEmployeeService employeeService,AdvanceSearchService AdvanceSearchService, IHttpContextAccessor httpContextAccessor, IMapper mapper)
         {
             this.employeeService = employeeService;
+            advanceSearchService = AdvanceSearchService;
             _httpContextAccessor = httpContextAccessor;
             this.mapper = mapper;
         }
@@ -49,10 +52,19 @@ namespace WorkManagement.API.Controllers
 
         // POST: api/employees
         [HttpPost]
-        public async Task<ActionResult<EmployeeModel>> CreateEmployee(EmployeeModel employee)
+        public async Task<ActionResult<EmployeeModel>> CreateEmployee([FromBody]EmployeeModel employee)
         {
             var createdEmployee = await employeeService.CreateEmployeeAsync(mapper.Map<Employee>(employee));
             return CreatedAtAction(nameof(GetEmployee), new { id = createdEmployee.Id }, createdEmployee);
+
+        }
+
+        [HttpPost]
+        [Route("Search")]
+        public async Task<ActionResult<List<EmployeeModel>>> SearchEmployees(List<Criterion> criterias)
+        {
+            var SearchResult = advanceSearchService.ApplySearch<Employee>(criterias).ToList();
+            return mapper.Map<List<EmployeeModel>>(SearchResult);
         }
 
         // PUT: api/employees/5

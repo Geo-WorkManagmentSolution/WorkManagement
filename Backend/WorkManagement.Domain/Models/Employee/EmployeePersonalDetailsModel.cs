@@ -11,21 +11,14 @@ using WorkManagementSolution.Employee;
 
 namespace WorkManagementSolution.Employee
 {
-    public class EmployeePersonalDetailsModel 
+    public class EmployeePersonalDetailsModel
     {
-        public required string FirstName { get; set; }
-        
-        public required string LastName { get; set; }
-        
-        [EmailAddress]
-        public required string Email { get; set; }
-        
         [DataType(DataType.Date)]
         public required DateTime DateOfBirth { get; set; }
-        
-        public required string Gender { get; set; }
-        
-        public required string MaritalStatus { get; set; }
+
+        public string Gender { get; set; }
+
+        public string MaritalStatus { get; set; }
     }
 }
 

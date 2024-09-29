@@ -11,6 +11,12 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.userloginModel,
       }),
     }),
+    getApiAuthUser: build.query<
+      GetApiAuthUserApiResponse,
+      GetApiAuthUserApiArg
+    >({
+      query: () => ({ url: `/api/Auth/user` }),
+    }),
     postApiAuthRegister: build.mutation<
       PostApiAuthRegisterApiResponse,
       PostApiAuthRegisterApiArg
@@ -39,6 +45,8 @@ export type PostApiAuthSignInApiResponse = unknown;
 export type PostApiAuthSignInApiArg = {
   userloginModel: UserloginModel;
 };
+export type GetApiAuthUserApiResponse = unknown;
+export type GetApiAuthUserApiArg = void;
 export type PostApiAuthRegisterApiResponse = unknown;
 export type PostApiAuthRegisterApiArg = {
   userRegistrationModel: UserRegistrationModel;
@@ -58,6 +66,7 @@ export type UserRegistrationModel = {
 };
 export const {
   usePostApiAuthSignInMutation,
+  useGetApiAuthUserQuery,
   usePostApiAuthRegisterMutation,
   usePostApiAuthAccesstokenMutation,
 } = injectedRtkApi;

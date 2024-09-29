@@ -10,7 +10,7 @@ const config: ConfigFile = {
 		},
 		'./src/app/auth/services/AuthApi.ts': {
 			filterEndpoints: [/Auth/i]
-		}
+		},
 	},
 	hooks: true
 };

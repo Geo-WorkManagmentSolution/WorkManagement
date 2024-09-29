@@ -15,9 +15,22 @@ namespace WorkManagement.Domain.Models.Employee
     public class EmployeeModel : BaseModel
     {
         public string? PhotoURL { get; set; }
-        public bool IsActive { get; set; }
         public int? EmployeeNumber { get; set; }
-        public EmployeePersonalDetailsModel EmployeeWorkInformation { get; set; }
+        public bool IsActive { get; set; }
+
+        public required string FirstName { get; set; }
+
+        public required string LastName { get; set; }
+
+        [EmailAddress]
+        public required string Email { get; set; }
+        [Phone]
+        public required string PhoneNumber { get; set; }
+
+        public required string Position { get; set; }
+
+        public required string Role { get; set; }
+        public EmployeePersonalDetailsModel EmployeePersonalDetails { get; set; }
     }
 }
 

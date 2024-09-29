@@ -19,7 +19,9 @@ namespace WorkManagement.Domain.AutoMapper.Profiles
             AddGlobalIgnore("Item");
 
             CreateMap<Employee, EmployeeModel>();
+            CreateMap<EmployeeModel, Employee>();
             CreateMap<EmployeePersonalDetails, EmployeePersonalDetailsModel>();
+            CreateMap<EmployeePersonalDetailsModel, EmployeePersonalDetails>();
 
         }
     }

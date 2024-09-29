@@ -12,43 +12,52 @@ import _ from '@lodash';
 import { FormProvider, useForm } from 'react-hook-form';
 import useThemeMediaQuery from '@fuse/hooks/useThemeMediaQuery';
 import * as React from 'react';
-import * as yup from 'yup';
 import FuseTabs from 'app/shared-components/tabs/FuseTabs';
 import FuseTab from 'app/shared-components/tabs/FuseTab';
 import { parseInt } from 'lodash';
-import { yupResolver } from '@hookform/resolvers/yup';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import EmployeeHeader from './EmployeeHeader';
 import BasicInfoTab from './tabs/BasicInfoTab';
 import { useGetApiEmployeesByIdQuery } from '../EmployeeApi';
+import PersonalInfoTab from './tabs/PersonalInfoTab';
 
 /**
  * Form Validation Schema
  */
 
-const schema = yup.object().shape({
-	id: yup.number().positive().integer(),
-	photoURL: yup.string().url('Must be a valid URL'),
-	isActive: yup.boolean(),
-	employeeNumber: yup.number().positive().integer().nullable(),
-	firstName: yup.string().required('First name is required'),
-	lastName: yup.string().required('Last name is required'),
-	email: yup.string().email('Must be a valid email').required('Email is required'),
-	dateOfBirth: yup
-		.date()
-		.required('Date of birth is required')
-		.max(new Date(), 'Date of birth cannot be in the future'),
-	gender: yup.string().required('Gender is required'),
-	maritalStatus: yup.string().required('Marital status is required')
+const employeePersonalDetailsSchema = z.object({
+	dateOfBirth: z.date({
+		required_error: 'Date of birth is required'
+	}),
+	gender: z.enum(['male', 'female', 'other'], {
+		required_error: 'Please select a gender'
+	}),
+	maritalStatus: z.enum(['single', 'married', 'divorced', 'widowed'], {
+		required_error: 'Please select a marital status'
+	})
 });
 
+const employeeSchema = z.object({
+	photoURL: z.string().url('Invalid URL').nullable().optional(),
+	isActive: z.boolean().optional(),
+	employeeNumber: z.string().nullable().optional(),
+	firstName: z.string().min(1, 'First name is required'),
+	lastName: z.string().min(1, 'Last name is required'),
+	email: z.string().email('Invalid email address'),
+	phoneNumber: z.string().nullable(),
+	position: z.string().nullable(),
+	role: z.enum(['admin', 'user'],{message:"Required Role"}),
+	employeePersonalDetails: employeePersonalDetailsSchema
+});
 /**
  * The product page.
  */
+type EmployeeFormValues = z.infer<typeof employeeSchema>;
+
 function Employee() {
 	const isMobile = useThemeMediaQuery((theme) => theme.breakpoints.down('lg'));
-
 	const routeParams = useParams();
-
 	const { employeeId } = routeParams as unknown;
 
 	const {
@@ -64,36 +73,25 @@ function Employee() {
 
 	const [tabValue, setTabValue] = useState('basic-info');
 
-	const methods = useForm({
+	const methods = useForm<EmployeeFormValues>({
 		mode: 'onChange',
-		resolver: yupResolver(schema),
-		defaultValues: {
-			id: 0,
-			photoURL: '',
-			isActive: false,
-			employeeNumber: null,
-			firstName: '',
-			lastName: '',
-			email: '',
-			dateOfBirth: null,
-			gender: '',
-			maritalStatus: ''
-		}
+		resolver: zodResolver(employeeSchema),
+		defaultValues: {}
 	});
 	const { reset, watch } = methods;
 	const form = watch();
 
-	// useEffect(() => {
-	// 	if (employeeId === 'new') {
-	// 		reset({});
-	// 	}
-	// }, [employeeId, reset]);
+	React.useEffect(() => {
+		if (employeeId === 'new') {
+			reset({ isActive: true });
+		}
+	}, [employeeId, reset]);
 
-	// useEffect(() => {
-	// 	if (employee) {
-	// 		reset({ ...employee });
-	// 	}
-	// }, [employee, reset]);
+	React.useEffect(() => {
+		if (employee) {
+			reset({ ...employee });
+		}
+	}, [employee, reset]);
 
 	/**
 	 * Tab Change
@@ -157,12 +155,12 @@ function Employee() {
 						>
 							<FuseTab
 								value="basic-info"
-								label="Basic Employee Info"
+								label="Employee Info"
 							/>
-							{/* <FuseTab
-								value="product-images"
-								label="Product Images"
-							/> */}
+							<FuseTab
+								value="basic-personal-info"
+								label="Personal Info"
+							/>
 							{/* <FuseTab
 								value="pricing"
 								label="Pricing"
@@ -179,6 +177,9 @@ function Employee() {
 						<div className="">
 							<div className={tabValue !== 'basic-info' ? 'hidden' : ''}>
 								<BasicInfoTab />
+							</div>
+							<div className={tabValue !== 'basic-personal-info' ? 'hidden' : ''}>
+								<PersonalInfoTab />
 							</div>
 							{/* 
 							<div className={tabValue !== 'product-images' ? 'hidden' : ''}>

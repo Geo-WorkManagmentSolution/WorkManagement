@@ -12,6 +12,7 @@ import {
 	useDeleteApiEmployeesByIdMutation,
 	usePutApiEmployeesByIdMutation
 } from '../EmployeeApi';
+import { useEffect } from 'react';
 
 /**
  * The product header.
@@ -26,24 +27,24 @@ function EmployeeHeader() {
 
 	const methods = useFormContext();
 	const { formState, watch, getValues } = methods;
-	const { isValid, dirtyFields } = formState;
+	const { errors, dirtyFields,isValid } = formState;
+
+	// const isValid = !Object.keys(errors).length;
+
 
 	const navigate = useNavigate();
 
-	const {
-		photoURL,
-		employeeNumber,
-	} = watch() as EmployeeModel;
+	const { photoURL,firstName,lastName } = watch() as EmployeeModel;
 
 	function handleUpdateProduct() {
 		updateEmployee({
 			id: parseInt(employeeId, 10),
-			employee: getValues() as EmployeeModel
+			employeeModel: getValues() as EmployeeModel
 		});
 	}
 
 	function handleCreateEmployee() {
-		createEmployee({ employee: getValues() as EmployeeModel })
+		createEmployee({ employeeModel: getValues() as EmployeeModel })
 			.unwrap()
 			.then((data) => {
 				navigate(`/apps/employess/employessSearch/${data.id}`);
@@ -84,13 +85,13 @@ function EmployeeHeader() {
 							<img
 								className="w-32 sm:w-48 rounded"
 								src={photoURL}
-								alt={`no image`}
+								alt="no image"
 							/>
 						) : (
 							<img
 								className="w-32 sm:w-48 rounded"
 								src="assets/images/apps/ecommerce/product-image-placeholder.png"
-								alt={`no image`}
+								alt="no image"
 							/>
 						)}
 					</motion.div>
@@ -100,7 +101,7 @@ function EmployeeHeader() {
 						animate={{ x: 0, transition: { delay: 0.3 } }}
 					>
 						<Typography className="text-15 sm:text-2xl truncate font-semibold">
-							{employeeNumber || 'New Employee'}
+							{`${firstName}` || 'New Employee'}
 						</Typography>
 						{/* <Typography
 							variant="caption"

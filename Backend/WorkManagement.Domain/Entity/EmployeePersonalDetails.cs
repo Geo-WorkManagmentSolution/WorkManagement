@@ -13,18 +13,12 @@ namespace WorkManagementSolution.Employee
 {
     public class EmployeePersonalDetails : Entity
     {
-        public required string FirstName { get; set; }
-        
-        public required string LastName { get; set; }
-        
-        [EmailAddress]
-        public required string Email { get; set; }
-        
+
         [DataType(DataType.Date)]
         public required DateTime DateOfBirth { get; set; }
-        
+
         public required string Gender { get; set; }
-        
+
         public required string MaritalStatus { get; set; }
     }
 }

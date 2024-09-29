@@ -9,7 +9,7 @@ const injectedRtkApi = api.injectEndpoints({
 			query: (queryArg) => ({
 				url: `/api/Employees`,
 				method: 'POST',
-				body: queryArg.employee
+				data: queryArg.employeeModel
 			})
 		}),
 		getApiEmployeesById: build.query<GetApiEmployeesByIdApiResponse, GetApiEmployeesByIdApiArg>({
@@ -19,7 +19,7 @@ const injectedRtkApi = api.injectEndpoints({
 			query: (queryArg) => ({
 				url: `/api/Employees/${queryArg.id}`,
 				method: 'PUT',
-				body: queryArg.employee
+				data: queryArg.employeeModel
 			})
 		}),
 		deleteApiEmployeesById: build.mutation<DeleteApiEmployeesByIdApiResponse, DeleteApiEmployeesByIdApiArg>({
@@ -36,7 +36,7 @@ export type GetApiEmployeesApiResponse = /** status 200 OK */ EmployeeModel[];
 export type GetApiEmployeesApiArg = void;
 export type PostApiEmployeesApiResponse = /** status 200 OK */ EmployeeModel;
 export type PostApiEmployeesApiArg = {
-	employee: Employee;
+	employeeModel: EmployeeModel;
 };
 export type GetApiEmployeesByIdApiResponse = /** status 200 OK */ EmployeeModel;
 export type GetApiEmployeesByIdApiArg = {
@@ -45,48 +45,29 @@ export type GetApiEmployeesByIdApiArg = {
 export type PutApiEmployeesByIdApiResponse = unknown;
 export type PutApiEmployeesByIdApiArg = {
 	id: number;
-	employee: Employee;
+	employeeModel: EmployeeModel;
 };
 export type DeleteApiEmployeesByIdApiResponse = unknown;
 export type DeleteApiEmployeesByIdApiArg = {
 	id: number;
 };
 export type EmployeePersonalDetailsModel = {
-	firstName: string | null;
-	lastName: string | null;
-	email: string | null;
 	dateOfBirth: string;
-	gender: string | null;
-	maritalStatus: string | null;
+	gender?: string | null;
+	maritalStatus?: string | null;
 };
 export type EmployeeModel = {
 	id?: number;
 	photoURL?: string | null;
-	isActive?: boolean;
 	employeeNumber?: number | null;
-	employeeWorkInformation?: EmployeePersonalDetailsModel;
-};
-export type EmployeePersonalDetails = {
-	id?: number;
-	isDeleted?: boolean;
+	isActive?: boolean;
 	firstName: string | null;
 	lastName: string | null;
 	email: string | null;
-	dateOfBirth: string;
-	gender: string | null;
-	maritalStatus: string | null;
-};
-export type Employee = {
-	id?: number;
-	createdBy?: string;
-	createdOn?: string;
-	lastModifiedBy?: string | null;
-	lastModifiedOn?: string | null;
-	isDeleted?: boolean;
-	photoURL?: string | null;
-	employeeNumber?: number | null;
-	isActive?: boolean;
-	employeeWorkInformation?: EmployeePersonalDetails;
+	phoneNumber: string | null;
+	position: string | null;
+	role: string | null;
+	employeeWorkInformation?: EmployeePersonalDetailsModel;
 };
 export const {
 	useGetApiEmployeesQuery,
