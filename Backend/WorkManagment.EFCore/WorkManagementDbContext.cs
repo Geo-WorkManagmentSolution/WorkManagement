@@ -24,7 +24,14 @@ namespace WorkManagmentSolution.EFCore
 
         public virtual DbSet<Employee> Employees { get; set; }
         public virtual DbSet<EmployeePersonalDetails> EmployeePersonalDetails { get; set; }
+<<<<<<< HEAD
         public IHttpContextAccessor HttpContextAccessor { get; }
+=======
+
+        public virtual DbSet<Project> Projects { get; set; }
+        public virtual DbSet<Company> Companies { get; set; }
+
+>>>>>>> 18cf6c7bb283a3194066197b8f44636e91781a9f
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

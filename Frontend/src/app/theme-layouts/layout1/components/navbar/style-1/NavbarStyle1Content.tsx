@@ -54,7 +54,7 @@ function NavbarStyle1Content(props: NavbarStyle1ContentProps) {
 				className="flex min-h-0 flex-1 flex-col"
 				option={{ suppressScrollX: true, wheelPropagation: false }}
 			>
-				<Navigation layout="vertical" />
+				<Navigation layout="vertical" /> Test
 
 				<div className="flex-0 flex items-center justify-center py-48 opacity-10">
 					<img

@@ -52,7 +52,7 @@ function SignInPage() {
 				<CardContent className="mx-auto w-full max-w-320 sm:mx-0 sm:w-320">
 					<img
 						className="w-48"
-						src="assets/images/logo/logo.svg"
+						src="assets/images/logo/geo_logo.svg"
 						alt="logo"
 					/>
 
@@ -60,13 +60,13 @@ function SignInPage() {
 						Sign in
 					</Typography>
 					<div className="mt-2 flex items-baseline font-medium">
-						<Typography>Don't have an account?</Typography>
-						<Link
+						<Typography>Don't have an account? Please contact system admin to create new one</Typography>
+						{/* <Link
 							className="ml-4"
 							to="/sign-up"
 						>
 							Sign up
-						</Link>
+						</Link> */}
 					</div>
 
 					<Box
@@ -76,8 +76,7 @@ function SignInPage() {
 							color: 'primary.dark'
 						}}
 					>
-						You are browsing <b>Fuse React Demo</b>. Click on the "Sign in" button to access the Demo and
-						Documentation.
+						Streamline maintenance, auidt, and operations with the world’s most intuitive <b>Work Management System</b>.
 					</Box>
 
 					{/* <Tabs
@@ -188,11 +187,10 @@ function SignInPage() {
 				<div className="relative z-10 w-full max-w-2xl">
 					<div className="text-7xl font-bold leading-none text-gray-100">
 						<div>Welcome to</div>
-						<div>our community</div>
+						<div>Geo Design & Research (P) Ltd</div>
 					</div>
 					<div className="mt-24 text-lg leading-6 tracking-tight text-gray-400">
-						Fuse helps developers to build organized and well coded dashboards full of beautiful and rich
-						modules. Join us and start building your application today.
+						Improving quality of life with an integrated unified approach from last 30 years.
 					</div>
 					<div className="mt-32 flex items-center">
 						<AvatarGroup

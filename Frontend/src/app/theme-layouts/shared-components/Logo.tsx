@@ -25,12 +25,12 @@ function Logo() {
 		<Root className="flex items-center space-x-8">
 			<img
 				className="logo-icon h-32 w-32"
-				src="assets/images/logo/logo.svg"
+				src="assets/images/logo/geo_logo.svg"
 				alt="logo"
 			/>
 			<div className="logo-text flex space-x-8 items-center">
-				<Typography className="text-2xl tracking-light font-semibold">FUSE</Typography>
-				<Box
+				<Typography className="text-2xl tracking-light font-semibold">WMS</Typography>
+				{/* <Box
 					className="badge flex items-center rounded space-x-6 px-8 py-4"
 					sx={{
 						backgroundColor: '#23272f',
@@ -44,7 +44,7 @@ function Logo() {
 						width="16"
 					/>
 					<span className="react-text text-md font-semibold">React</span>
-				</Box>
+				</Box> */}
 			</div>
 		</Root>
 	);

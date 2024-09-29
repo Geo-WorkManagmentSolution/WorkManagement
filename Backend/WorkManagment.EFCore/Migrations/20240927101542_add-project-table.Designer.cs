@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WorkManagmentSolution.EFCore;
 
@@ -11,9 +12,11 @@ using WorkManagmentSolution.EFCore;
 namespace WorkManagement.EFCore.Migrations
 {
     [DbContext(typeof(WorkManagementDbContext))]
-    partial class WorkManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240927101542_add-project-table")]
+    partial class addprojecttable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -371,19 +374,11 @@ namespace WorkManagement.EFCore.Migrations
                     b.Property<DateTimeOffset>("CreatedOn")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int?>("EmployeeNumber")
                         .HasColumnType("int");
 
-                    b.Property<int?>("EmployeePersonalDetailsId")
+                    b.Property<int?>("EmployeeWorkInformationId")
                         .HasColumnType("int");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -397,28 +392,12 @@ namespace WorkManagement.EFCore.Migrations
                     b.Property<DateTimeOffset?>("LastModifiedOn")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("PhotoURL")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Position")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Role")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EmployeePersonalDetailsId");
+                    b.HasIndex("EmployeeWorkInformationId");
 
                     b.ToTable("Employees");
                 });
@@ -434,12 +413,24 @@ namespace WorkManagement.EFCore.Migrations
                     b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Gender")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MaritalStatus")
                         .IsRequired()
@@ -523,11 +514,11 @@ namespace WorkManagement.EFCore.Migrations
 
             modelBuilder.Entity("WorkManagementSolution.Employee.Employee", b =>
                 {
-                    b.HasOne("WorkManagementSolution.Employee.EmployeePersonalDetails", "EmployeePersonalDetails")
+                    b.HasOne("WorkManagementSolution.Employee.EmployeePersonalDetails", "EmployeeWorkInformation")
                         .WithMany()
-                        .HasForeignKey("EmployeePersonalDetailsId");
+                        .HasForeignKey("EmployeeWorkInformationId");
 
-                    b.Navigation("EmployeePersonalDetails");
+                    b.Navigation("EmployeeWorkInformation");
                 });
 
             modelBuilder.Entity("WorkManagement.Domain.Entity.Company", b =>
