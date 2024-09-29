@@ -48,6 +48,7 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<IProjectService, ProjectServices>();
 builder.Services.AddCors();
 builder.Services.AddSwaggerGen(option =>
 {
@@ -77,6 +78,7 @@ builder.Services.AddSwaggerGen(option =>
 
 
 builder.Services.AddTransient<EmployeeService>();
+builder.Services.AddTransient<ProjectServices>();
 builder.Services.AddAutoMapper(typeof(WorkManagement.Domain.AutoMapper.Profiles.EmployeeProfile).Assembly);
 
 builder.AddJWTAuthetication();

@@ -13,6 +13,9 @@ namespace WorkManagmentSolution.EFCore
         public virtual DbSet<Employee> Employees { get; set; }
         public virtual DbSet<EmployeePersonalDetails> EmployeePersonalDetails { get; set; }
 
+        public virtual DbSet<Project> Projects { get; set; }
+        public virtual DbSet<Company> Companies { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
