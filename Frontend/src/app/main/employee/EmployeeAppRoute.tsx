@@ -41,7 +41,7 @@ const EmployeeAppRoute: FuseRouteItemType = {
 					element: <Employees />
 				},
 				{
-					path: ':employeeId/:handle?',
+					path: ':employeeId',
 					element: <Employee />
 				}
 			]

@@ -19,19 +19,9 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-const fields = [
-	{ name: 'title', type: 'text' },
-	{ name: 'description', type: 'text' },
-	{ name: 'author', type: 'text' },
-	{ name: 'category', type: 'select', options: ['Technology', 'Science', 'Arts', 'Business'] },
-	{ name: 'tags', type: 'multiselect', options: ['Frontend', 'Backend', 'Mobile', 'Web', 'AI', 'Database'] },
-	{ name: 'published_date', type: 'date' },
-	{ name: 'price', type: 'number' },
-	{ name: 'is_featured', type: 'boolean' }
-];
-
 const operators = {
-	text: ['contains', 'equals', 'starts_with', 'ends_with'],
+	blank: [],
+	string: ['contains', 'equals', 'starts_with', 'ends_with'],
 	date: ['equals', 'before', 'after'],
 	number: ['equals', 'greater_than', 'less_than'],
 	select: ['equals', 'not_equals'],
@@ -40,6 +30,12 @@ const operators = {
 };
 
 const validateValue = (type, value) => {
+	if (type === "blank") {
+		return true;
+	  }
+	  if (value === "" || value === null || value === undefined) {
+		return false;
+	  }
 	switch (type) {
 		case 'text':
 			return typeof value === 'string';
@@ -58,14 +54,54 @@ const validateValue = (type, value) => {
 	}
 };
 
-export default function AdvanceSearchCriteria() {
-	const [searchTerms, setSearchTerms] = useState([{ field: 'title', operator: 'contains', value: '', type: 'text' }]);
+// sample fields
+// const fields = [
+// 	{ name: 'title', type: 'text' },
+// 	{ name: 'description', type: 'text' },
+// 	{ name: 'author', type: 'text' },
+// 	{ name: 'category', type: 'select', options: ['Technology', 'Science', 'Arts', 'Business'] },
+// 	{ name: 'tags', type: 'multiselect', options: ['Frontend', 'Backend', 'Mobile', 'Web', 'AI', 'Database'] },
+// 	{ name: 'published_date', type: 'date' },
+// 	{ name: 'price', type: 'number' },
+// 	{ name: 'is_featured', type: 'boolean' }
+// ];
+
+// Function to convert the model into a list of objects
+// Define a generic function to convert the model
+// Define a generic function to convert the model
+export function convertModelToList<T>(model: T): { name: string; type: string }[] {
+	const result: { name: string; type: string }[] = [];
+
+	function processObject(obj: any, prefix = '') {
+		for (const key in obj) {
+			if (obj.hasOwnProperty(key)) {
+				const value = obj[key];
+				const name = prefix ? `${prefix}.${key}` : key;
+				const type = typeof value;
+
+				result.push({ name, type });
+
+				if (typeof value === 'object' && value !== null) {
+					processObject(value, name);
+				}
+			}
+		}
+	}
+
+	processObject(model);
+	result.push({ name: "", type: "blank" });
+	return result;
+}
+
+export default function AdvanceSearchCriteria({ fields,onSubmit }) {
+	const [searchTerms, setSearchTerms] = useState([{ field: "", operator: "", value: "", type: "blank" }]);
 	const [termOperators, setTermOperators] = useState([]);
 	const [query, setQuery] = useState('');
+	const [errors, setErrors] = useState([]);
 
 	const handleAddSearchTerm = () => {
-		setSearchTerms([...searchTerms, { field: 'title', operator: 'contains', value: '', type: 'text' }]);
-
+		setSearchTerms([...searchTerms, { field: "", operator: "", value: "", type: "blank" }]);
+		setErrors([...errors, ""]);
 		if (searchTerms.length > 0) {
 			setTermOperators([...termOperators, 'AND']);
 		}
@@ -74,28 +110,32 @@ export default function AdvanceSearchCriteria() {
 	const handleRemoveSearchTerm = (index) => {
 		const newSearchTerms = searchTerms.filter((_, i) => i !== index);
 		const newTermOperators = termOperators.filter((_, i) => i !== index - 1);
+		const newErrors = errors.filter((_, i) => i !== index);
 		setSearchTerms(newSearchTerms);
 		setTermOperators(newTermOperators);
-	};
+		setErrors(newErrors);
+	  };
 
-	const handleSearchTermChange = (index, field, value) => {
-		const newSearchTerms = [...searchTerms];
+const handleSearchTermChange = (index, field, value) => {
+    const newSearchTerms = [...searchTerms];
+    if (field === "field") {
+      const selectedField = fields.find(f => f.name === value);
+      newSearchTerms[index] = {
+        field: value,
+        operator: selectedField.type === "blank" ? "" : operators[selectedField.type][0],
+        value: selectedField.type === "multiselect" ? [] : "",
+        type: selectedField.type
+      };
+    } else {
+      newSearchTerms[index] = { ...newSearchTerms[index], [field]: value };
+    }
+    setSearchTerms(newSearchTerms);
 
-		if (field === 'field') {
-			const selectedField = fields.find((f) => f.name === value);
-			newSearchTerms[index] = {
-				field: value,
-				operator: operators[selectedField.type][0],
-				value: selectedField.type === 'multiselect' ? [] : '',
-				type: selectedField.type
-			};
-		} else {
-			newSearchTerms[index] = { ...newSearchTerms[index], [field]: value };
-		}
-
-		setSearchTerms(newSearchTerms);
-	};
-
+    // Clear error when user starts typing
+    const newErrors = [...errors];
+    newErrors[index] = "";
+    setErrors(newErrors);
+  };
 	const handleTermOperatorChange = (index, value) => {
 		const newTermOperators = [...termOperators];
 		newTermOperators[index] = value;
@@ -106,20 +146,21 @@ export default function AdvanceSearchCriteria() {
 		e.preventDefault();
 		const validSearchTerms = searchTerms.filter((term) => validateValue(term.type, term.value));
 
-		const queryObject = {
-			criteria: validSearchTerms.map((term, index) => ({
-				field: term.field,
-				operator: term.operator,
-				value: term.value,
-				...(index < validSearchTerms.length - 1 ? { nextOperator: termOperators[index] } : {})
-			}))
-		};
+		const queryArray = validSearchTerms.map((term, index) => ({
+			field: term.field,
+			operator: term.operator,
+			value: term.value,
+			...(index < validSearchTerms.length - 1 ? { nextOperator: termOperators[index] } : {})
+		  }));
+	  
 
-		setQuery(JSON.stringify(queryObject, null, 2));
+		onSubmit(JSON.stringify(queryArray, null, 2));
 	};
 
 	const renderValueInput = (term, index) => {
 		switch (term.type) {
+			case "blank":
+        return null;
 			case 'date':
 				return (
 					<TextField
@@ -222,15 +263,17 @@ export default function AdvanceSearchCriteria() {
 
 	return (
 		<Paper
+			className="flex flex-col flex-shrink shadow-1 rounded-t-lg overflow-auto rounded-b-0 w-full h-full"
 			elevation={3}
-			sx={{ p: 3, maxWidth: 800, mx: 'auto' }}
+			sx={{ p: 3, mb: '10px', mx: 'auto', width: '200px' }}
 		>
 			<Typography
-				variant="h4"
+				className="text-2xl font-extrabold leading-none tracking-tight"
 				gutterBottom
 			>
 				Advanced Search
 			</Typography>
+
 			<form onSubmit={handleSubmit}>
 				{searchTerms.map((term, index) => (
 					<Box
@@ -300,6 +343,13 @@ export default function AdvanceSearchCriteria() {
 								xs={12}
 								sm={2}
 							>
+								<IconButton
+									onClick={handleAddSearchTerm}
+									title="add"
+								>
+									<AddIcon />
+								</IconButton>
+
 								{index > 0 && (
 									<IconButton
 										onClick={() => handleRemoveSearchTerm(index)}
@@ -326,23 +376,13 @@ export default function AdvanceSearchCriteria() {
 						)}
 					</Box>
 				))}
-				<Box sx={{ mt: 2, mb: 2 }}>
-					<Button
-						variant="outlined"
-						startIcon={<AddIcon />}
-						onClick={handleAddSearchTerm}
-						fullWidth
-					>
-						Add Search Term
-					</Button>
-				</Box>
+
 				<Button
 					type="submit"
 					variant="contained"
 					color="primary"
-					fullWidth
 				>
-					Generate Query
+					Search
 				</Button>
 			</form>
 			{/* {query && (

@@ -12,7 +12,6 @@ import {
 	useDeleteApiEmployeesByIdMutation,
 	usePutApiEmployeesByIdMutation
 } from '../EmployeeApi';
-import { useEffect } from 'react';
 
 /**
  * The product header.

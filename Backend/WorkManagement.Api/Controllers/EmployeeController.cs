@@ -61,7 +61,7 @@ namespace WorkManagement.API.Controllers
 
         [HttpPost]
         [Route("Search")]
-        public async Task<ActionResult<List<EmployeeModel>>> SearchEmployees(List<Criterion> criterias)
+        public async Task<ActionResult<List<EmployeeModel>>> SearchEmployees([FromBody]List<Criterion> criterias)
         {
             var SearchResult = advanceSearchService.ApplySearch<Employee>(criterias).ToList();
             return mapper.Map<List<EmployeeModel>>(SearchResult);

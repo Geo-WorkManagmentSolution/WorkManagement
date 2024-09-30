@@ -12,7 +12,7 @@ const config: ConfigFile = {
 			filterEndpoints: [/Auth/i]
 		},
 	},
-	hooks: true
+	hooks: { queries: true, lazyQueries: true, mutations: true }
 };
 
 export default config;

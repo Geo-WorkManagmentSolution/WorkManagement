@@ -3,14 +3,12 @@ import { useMemo } from 'react';
 import { type MRT_ColumnDef } from 'material-react-table';
 import DataTable from 'app/shared-components/data-table/DataTable';
 import FuseLoading from '@fuse/core/FuseLoading';
-import { Chip, ListItemIcon, MenuItem, Paper } from '@mui/material';
+import {ListItemIcon, MenuItem, Paper } from '@mui/material';
 import * as React from 'react';
 import _ from '@lodash';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { Link } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
-import clsx from 'clsx';
-import Button from '@mui/material/Button';
 import { EmployeeModel, useDeleteApiEmployeesByIdMutation, useGetApiEmployeesQuery } from '../EmployeeApi';
 
 function EmployeesTable() {
@@ -19,11 +17,6 @@ function EmployeesTable() {
 
 	const columns = useMemo<MRT_ColumnDef<EmployeeModel>[]>(
 		() => [
-			{
-				accessorKey: 'employeeNumber',
-				header: 'Employee Number',
-				accessorFn: (row) => `${row.employeeNumber}`
-			},
 			{
 				accessorFn: (row) => row.photoURL,
 				id: 'photoURL',
@@ -51,24 +44,29 @@ function EmployeesTable() {
 				)
 			},
 			{
+				accessorKey: 'employeeNumber',
+				header: 'Employee Number',
+				accessorFn: (row) => `${row.employeeNumber}`
+			},
+			{
 				accessorKey: 'name',
 				header: 'Name',
 				Cell: ({ row }) => (
 					<Typography
 						component={Link}
-						to={`/apps/employees/employeesDetails/${row.original.id}}`}
+						to={`/apps/employees/employeesSearch/${row.original.id}`}
 						className="underline"
 						color="secondary"
 						role="button"
 					>
-						{row.original.employeeWorkInformation?.firstName + row.original.employeeWorkInformation?.lastName}
+						{`${row.original?.firstName}  ${row.original?.lastName}`}
 					</Typography>
 				)
 			},
 			{
 				accessorKey: 'email',
 				header: 'Email',
-				accessorFn: (row) => `${row.employeeWorkInformation?.email}`
+				accessorFn: (row) => `${row?.email}`
 			},
 			{
 				accessorKey: 'isActive',

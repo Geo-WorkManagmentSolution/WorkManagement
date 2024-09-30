@@ -59,7 +59,7 @@ function BasicInfoTab() {
 						onClick={() => fileInputRef.current?.click()}
 					>
 						<Avatar
-							src={value || undefined}
+							src={value || 'undefined'}
 							sx={{
 								width: '100%',
 								height: '100%',
@@ -97,8 +97,10 @@ function BasicInfoTab() {
 					render={({ field }) => (
 						<TextField
 							{...field}
+							value={field.value || ''}
 							label="Employee Number"
 							type="number"
+							required
 							margin="normal"
 							fullWidth
 							error={!!errors.employeeNumber}
@@ -130,6 +132,7 @@ function BasicInfoTab() {
 					render={({ field }) => (
 						<TextField
 							{...field}
+							value={field.value || ''}
 							className=" mx-4"
 							required
 							label="First Name"
@@ -147,6 +150,7 @@ function BasicInfoTab() {
 					render={({ field }) => (
 						<TextField
 							{...field}
+							value={field.value || ''}
 							required
 							className=" mx-4"
 							label="Last Name"
@@ -165,6 +169,7 @@ function BasicInfoTab() {
 					render={({ field }) => (
 						<TextField
 							{...field}
+							value={field.value || ''}
 							label="Email"
 							type="email"
 							required
@@ -183,6 +188,7 @@ function BasicInfoTab() {
 					render={({ field }) => (
 						<TextField
 							{...field}
+							value={field.value || ''}
 							label="Phone Number"
 							fullWidth
 							margin="normal"
@@ -200,6 +206,7 @@ function BasicInfoTab() {
 					render={({ field }) => (
 						<TextField
 							{...field}
+							value={field.value || ''}
 							label="Position"
 							fullWidth
 							className="mx-4"
@@ -227,6 +234,7 @@ function BasicInfoTab() {
 							renderInput={(params) => (
 								<TextField
 									{...params}
+									value={params.value || ''}
 									placeholder="Select role"
 									label="Role"
 									required

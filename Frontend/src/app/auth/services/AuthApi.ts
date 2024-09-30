@@ -67,6 +67,7 @@ export type UserRegistrationModel = {
 export const {
   usePostApiAuthSignInMutation,
   useGetApiAuthUserQuery,
+  useLazyGetApiAuthUserQuery,
   usePostApiAuthRegisterMutation,
   usePostApiAuthAccesstokenMutation,
 } = injectedRtkApi;

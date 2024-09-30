@@ -27,6 +27,13 @@ const injectedRtkApi = api.injectEndpoints({
 				url: `/api/Employees/${queryArg.id}`,
 				method: 'DELETE'
 			})
+		}),
+		postApiEmployeesSearch: build.mutation<PostApiEmployeesSearchApiResponse, PostApiEmployeesSearchApiArg>({
+			query: (queryArg) => ({
+				url: `/api/Employees/Search`,
+				method: 'POST',
+				data: queryArg.body
+			})
 		})
 	}),
 	overrideExisting: false
@@ -51,6 +58,10 @@ export type DeleteApiEmployeesByIdApiResponse = unknown;
 export type DeleteApiEmployeesByIdApiArg = {
 	id: number;
 };
+export type PostApiEmployeesSearchApiResponse = /** status 200 OK */ EmployeeModel[];
+export type PostApiEmployeesSearchApiArg = {
+	body: Criterion[];
+};
 export type EmployeePersonalDetailsModel = {
 	dateOfBirth: string;
 	gender?: string | null;
@@ -67,12 +78,21 @@ export type EmployeeModel = {
 	phoneNumber: string | null;
 	position: string | null;
 	role: string | null;
-	employeeWorkInformation?: EmployeePersonalDetailsModel;
+	employeePersonalDetails?: EmployeePersonalDetailsModel;
+};
+export type Criterion = {
+	field?: string | null;
+	operator?: string | null;
+	value?: any | null;
+	nextOperator?: string | null;
 };
 export const {
 	useGetApiEmployeesQuery,
+	useLazyGetApiEmployeesQuery,
 	usePostApiEmployeesMutation,
 	useGetApiEmployeesByIdQuery,
+	useLazyGetApiEmployeesByIdQuery,
 	usePutApiEmployeesByIdMutation,
-	useDeleteApiEmployeesByIdMutation
+	useDeleteApiEmployeesByIdMutation,
+	usePostApiEmployeesSearchMutation
 } = injectedRtkApi;
