@@ -26,13 +26,41 @@ const navigationConfig: FuseNavItemType[] = [
 				children: [
 					{
 						id: 'apps.employees.search',
-						title: 'Search Employees',
+						title: 'Employee Dashboard',
 						type: 'item',
 						url: '/apps/employees'
 					},
 					{
 						id: 'apps.employees.new',
-						title: 'New Employee',
+						title: 'Add Employee',
+						type: 'item',
+						url: '/apps/employees/employeesSearch/new'
+					}
+				]
+			}
+		]
+	},
+	{
+		id: 'projectmanagement',
+		title: 'Project Management',
+		subtitle: 'Manage your project management',
+		type: 'group',
+		children: [
+			{
+				id: 'apps.project',
+				title: 'Project',
+				type: 'collapse',
+				icon: 'heroicons-outline:building-office',
+				children: [
+					{
+						id: 'apps.project.search',
+						title: 'Project Dashboard',
+						type: 'item',
+						url: '/apps/projects'
+					},
+					{
+						id: 'apps.project.add',
+						title: 'Add Project',
 						type: 'item',
 						url: '/apps/employees/employeesSearch/new'
 					}

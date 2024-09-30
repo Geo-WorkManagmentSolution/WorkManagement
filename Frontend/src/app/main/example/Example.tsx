@@ -2,6 +2,7 @@ import DemoContent from '@fuse/core/DemoContent';
 import FusePageSimple from '@fuse/core/FusePageSimple';
 import { useTranslation } from 'react-i18next';
 import { styled } from '@mui/material/styles';
+import GeoDemoContent from './GeoDemoContent';
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
 	'& .FusePageSimple-header': {
@@ -29,7 +30,7 @@ function Example() {
 				<div className="p-24">
 					<h4>Content</h4>
 					<br />
-					<DemoContent />
+					<GeoDemoContent />
 				</div>
 			}
 		/>
