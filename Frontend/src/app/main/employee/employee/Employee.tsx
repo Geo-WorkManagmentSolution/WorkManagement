@@ -19,7 +19,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import EmployeeHeader from './EmployeeHeader';
 import BasicInfoTab from './tabs/BasicInfoTab';
-import { useGetApiEmployeesByIdQuery } from '../EmployeeApi';
+import { useGetApiEmployeesByIdQuery, useGetApiEmployeesCategoriesQuery } from '../EmployeeApi';
 import PersonalInfoTab from './tabs/PersonalInfoTab';
 
 /**
@@ -28,23 +28,26 @@ import PersonalInfoTab from './tabs/PersonalInfoTab';
 
 const employeePersonalDetailsSchema = yup.object({
 	dateOfBirth: yup.date().required('Date of birth is required'),
-	gender: yup.mixed().oneOf(['male', 'female', 'other'], 'Please select a gender').required('Please select a gender'),
-	maritalStatus: yup
-		.mixed()
-		.oneOf(['single', 'married', 'divorced', 'widowed'], 'Please select a marital status')
-		.required('Please select a marital status')
+	gender: yup.string().required('Please select a gender'),
+	maritalStatus: yup.mixed().required('Please select a marital status')
 });
 
 const employeeSchema = yup.object({
 	photoURL: yup.string().nullable(),
-	isActive: yup.boolean(),
-	employeeNumber: yup.number().min(4,'Number must be 4 digit long atleast').required(),
 	firstName: yup.string().min(1, 'First name is required').required(),
 	lastName: yup.string().min(1, 'Last name is required').required(),
-	email: yup.string().email('Invalid email address').required(),
-	phoneNumber: yup.number().nullable(),
-	position: yup.string().nullable(),
-	role: yup.mixed().oneOf(['admin', 'user'], 'Required Role').required('Required Role'),
+	email: yup.string().email('Invalid email address').required('Email required'),
+	phoneNumber: yup
+		.number()
+		.nullable()
+		// .test('phonenumber_digit', 'Invalid phone number format', (value) => {
+		// 	// Regular expression: allows letters, numbers, and underscores
+		// 	const regex = /^\+[1-9]\d{1,14}$/;
+		// 	return regex.test(value.toString());
+		// }),
+		,
+	position: yup.string().min(1,'Position required'),
+	roleId: yup.mixed().required('Role required'),
 	employeePersonalDetails: employeePersonalDetailsSchema
 });
 

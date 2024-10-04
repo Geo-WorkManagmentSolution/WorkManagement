@@ -171,9 +171,13 @@ export type ProjectModel = {
 };
 export const {
   useGetApiProjectGetAllCopaniesQuery,
+  useLazyGetApiProjectGetAllCopaniesQuery,
   useGetApiProjectGetCopanyByIdQuery,
+  useLazyGetApiProjectGetCopanyByIdQuery,
   useGetApiProjectGetAllProjectsQuery,
+  useLazyGetApiProjectGetAllProjectsQuery,
   useGetApiProjectGetProjectByIdQuery,
+  useLazyGetApiProjectGetProjectByIdQuery,
   usePostApiProjectSaveCompanyDataMutation,
   usePutApiProjectSaveCompanyDataMutation,
   usePostApiProjectSaveProjectDataMutation,

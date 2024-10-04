@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WorkManagement.Domain.Entity;
 using WorkManagement.Domain.Models.Employee;
 using WorkManagementSolution.Employee;
 
@@ -17,6 +18,8 @@ namespace WorkManagement.Domain.Contracts
         public Task<EmployeeModel> CreateEmployeeAsync(Employee employee);
 
         public Task<EmployeeModel> UpdateEmployeeAsync(Employee employee);
+        public Task<List<EmployeeCategory>> GetEmployeeCategories();
+
         public Task<bool> DeleteEmployeeAsync(int id);
     }
 }

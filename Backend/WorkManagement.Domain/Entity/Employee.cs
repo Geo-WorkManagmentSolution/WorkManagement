@@ -4,9 +4,11 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using WorkManagement.Domain.Contracts;
+using WorkManagement.Domain.Entity;
 using WorkManagement.Domain.Models;
 using WorkManagementSolution.Employee;
 
@@ -15,22 +17,33 @@ namespace WorkManagementSolution.Employee
     public class Employee : FullyAuditableEntity
     {
         public string? PhotoURL { get; set; }
-        public int? EmployeeNumber { get; set; }
-        public bool IsActive { get; set; }
+
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public int EmployeeNumber { get; set; }
 
         public required string FirstName { get; set; }
-
         public required string LastName { get; set; }
 
         [EmailAddress]
         public required string Email { get; set; }
         [Phone]
-        public required string PhoneNumber { get; set; }
-
+        public  int? PhoneNumber { get; set; }
         public required string Position { get; set; }
 
-        public required string Role  { get; set; }
+        [ForeignKey(nameof(ApplicationUser))]
+        public required Guid UserId { get; set; }
+        public ApplicationUser? ApplicationUser { get; set; }
 
+        [ForeignKey(nameof(ApplicationRole))]
+        public required Guid RoleId { get; set; }
+        public ApplicationRole? ApplicationRole { get; set; }
+
+        [ForeignKey(nameof(EmployeeCategory))]
+        public int? EmployeeCategoryId { get; set; }
+        public EmployeeCategory? EmployeeCategory { get; set; }
+
+        [ForeignKey(nameof(EmployeePersonalDetails))]
+        public int? EmployeePersonalDetailsId { get; set; }
         public EmployeePersonalDetails? EmployeePersonalDetails { get; set; }
     }
 }

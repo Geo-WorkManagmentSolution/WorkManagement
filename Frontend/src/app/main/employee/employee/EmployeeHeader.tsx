@@ -12,6 +12,8 @@ import {
 	useDeleteApiEmployeesByIdMutation,
 	usePutApiEmployeesByIdMutation
 } from '../EmployeeApi';
+import { showMessage } from '@fuse/core/FuseMessage/fuseMessageSlice';
+import { useAppDispatch } from 'app/store/hooks';
 
 /**
  * The product header.
@@ -19,6 +21,7 @@ import {
 function EmployeeHeader() {
 	const routeParams = useParams();
 	const { employeeId } = routeParams;
+	const dispatch = useAppDispatch();
 
 	const [createEmployee] = usePostApiEmployeesMutation();
 	const [updateEmployee] = usePutApiEmployeesByIdMutation();
@@ -26,27 +29,29 @@ function EmployeeHeader() {
 
 	const methods = useFormContext();
 	const { formState, watch, getValues } = methods;
-	const { errors, dirtyFields,isValid } = formState;
+	const { errors, dirtyFields, isValid } = formState;
 
 	// const isValid = !Object.keys(errors).length;
 
-
 	const navigate = useNavigate();
 
-	const { photoURL,firstName,lastName } = watch() as EmployeeModel;
+	const { photoURL, firstName, lastName } = watch() as EmployeeModel;
 
 	function handleUpdateProduct() {
 		updateEmployee({
 			id: parseInt(employeeId, 10),
 			employeeModel: getValues() as EmployeeModel
 		});
+		dispatch(showMessage({ message: "An employee updated successfully." }));
+
 	}
 
 	function handleCreateEmployee() {
 		createEmployee({ employeeModel: getValues() as EmployeeModel })
 			.unwrap()
 			.then((data) => {
-				navigate(`/apps/employess/employessSearch/${data.id}`);
+				dispatch(showMessage({ message: "An employee created successfully." }));
+				navigate(`/apps/employees/employeesSearch`);
 			});
 	}
 
@@ -54,7 +59,9 @@ function EmployeeHeader() {
 		deleteEmployee({
 			id: parseInt(employeeId, 10)
 		});
-		navigate('/apps/employess/employessSearch');
+		dispatch(showMessage({ message: "An employee deleted successfully." }));
+		navigate('/apps/employees/employeesSearch');
+
 	}
 
 	return (
@@ -100,7 +107,7 @@ function EmployeeHeader() {
 						animate={{ x: 0, transition: { delay: 0.3 } }}
 					>
 						<Typography className="text-15 sm:text-2xl truncate font-semibold">
-							{`${firstName}` || 'New Employee'}
+							{ firstName || 'New Employee'}
 						</Typography>
 						{/* <Typography
 							variant="caption"
@@ -137,15 +144,15 @@ function EmployeeHeader() {
 						</Button>
 					</>
 				) : (
-					<Button
-						className="whitespace-nowrap mx-4"
-						variant="contained"
-						color="secondary"
-						disabled={_.isEmpty(dirtyFields) || !isValid}
-						onClick={handleCreateEmployee}
-					>
-						Add
-					</Button>
+						<Button
+							className="whitespace-nowrap mx-4"
+							variant="contained"
+							color="secondary"
+							disabled={_.isEmpty(dirtyFields) || !isValid}
+							onClick={handleCreateEmployee}
+						>
+							Add
+						</Button>
 				)}
 			</motion.div>
 		</div>

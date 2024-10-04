@@ -18,6 +18,7 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { motion } from 'framer-motion';
 
 const operators = {
 	blank: [],
@@ -30,12 +31,14 @@ const operators = {
 };
 
 const validateValue = (type, value) => {
-	if (type === "blank") {
+	if (type === 'blank') {
 		return true;
-	  }
-	  if (value === "" || value === null || value === undefined) {
+	}
+
+	if (value === '' || value === null || value === undefined) {
 		return false;
-	  }
+	}
+
 	switch (type) {
 		case 'text':
 			return typeof value === 'string';
@@ -89,19 +92,20 @@ export function convertModelToList<T>(model: T): { name: string; type: string }[
 	}
 
 	processObject(model);
-	result.push({ name: "", type: "blank" });
+	result.push({ name: '', type: 'blank' });
 	return result;
 }
 
-export default function AdvanceSearchCriteria({ fields,onSubmit }) {
-	const [searchTerms, setSearchTerms] = useState([{ field: "", operator: "", value: "", type: "blank" }]);
+export default function AdvanceSearchCriteria({ fields, onSubmit }) {
+	const [searchTerms, setSearchTerms] = useState([{ field: '', operator: '', value: '', type: 'blank' }]);
 	const [termOperators, setTermOperators] = useState([]);
 	const [query, setQuery] = useState('');
 	const [errors, setErrors] = useState([]);
 
 	const handleAddSearchTerm = () => {
-		setSearchTerms([...searchTerms, { field: "", operator: "", value: "", type: "blank" }]);
-		setErrors([...errors, ""]);
+		setSearchTerms([...searchTerms, { field: '', operator: '', value: '', type: 'blank' }]);
+		setErrors([...errors, '']);
+
 		if (searchTerms.length > 0) {
 			setTermOperators([...termOperators, 'AND']);
 		}
@@ -114,28 +118,30 @@ export default function AdvanceSearchCriteria({ fields,onSubmit }) {
 		setSearchTerms(newSearchTerms);
 		setTermOperators(newTermOperators);
 		setErrors(newErrors);
-	  };
+	};
 
-const handleSearchTermChange = (index, field, value) => {
-    const newSearchTerms = [...searchTerms];
-    if (field === "field") {
-      const selectedField = fields.find(f => f.name === value);
-      newSearchTerms[index] = {
-        field: value,
-        operator: selectedField.type === "blank" ? "" : operators[selectedField.type][0],
-        value: selectedField.type === "multiselect" ? [] : "",
-        type: selectedField.type
-      };
-    } else {
-      newSearchTerms[index] = { ...newSearchTerms[index], [field]: value };
-    }
-    setSearchTerms(newSearchTerms);
+	const handleSearchTermChange = (index, field, value) => {
+		const newSearchTerms = [...searchTerms];
 
-    // Clear error when user starts typing
-    const newErrors = [...errors];
-    newErrors[index] = "";
-    setErrors(newErrors);
-  };
+		if (field === 'field') {
+			const selectedField = fields.find((f) => f.name === value);
+			newSearchTerms[index] = {
+				field: value,
+				operator: selectedField.type === 'blank' ? '' : operators[selectedField.type][0],
+				value: selectedField.type === 'multiselect' ? [] : '',
+				type: selectedField.type
+			};
+		} else {
+			newSearchTerms[index] = { ...newSearchTerms[index], [field]: value };
+		}
+
+		setSearchTerms(newSearchTerms);
+
+		// Clear error when user starts typing
+		const newErrors = [...errors];
+		newErrors[index] = '';
+		setErrors(newErrors);
+	};
 	const handleTermOperatorChange = (index, value) => {
 		const newTermOperators = [...termOperators];
 		newTermOperators[index] = value;
@@ -151,16 +157,15 @@ const handleSearchTermChange = (index, field, value) => {
 			operator: term.operator,
 			value: term.value,
 			...(index < validSearchTerms.length - 1 ? { nextOperator: termOperators[index] } : {})
-		  }));
-	  
+		}));
 
 		onSubmit(JSON.stringify(queryArray, null, 2));
 	};
 
 	const renderValueInput = (term, index) => {
 		switch (term.type) {
-			case "blank":
-        return null;
+			case 'blank':
+				return null;
 			case 'date':
 				return (
 					<TextField
@@ -262,130 +267,135 @@ const handleSearchTermChange = (index, field, value) => {
 	};
 
 	return (
-		<Paper
-			className="flex flex-col flex-shrink shadow-1 rounded-t-lg overflow-auto rounded-b-0 w-full h-full"
-			elevation={3}
-			sx={{ p: 3, mb: '10px', mx: 'auto', width: '200px' }}
+		<motion.div
+			className="flex flex-col flex-shrink rounded-lg"
+			initial={{ opacity: 0, x: 20 }}
+			animate={{ opacity: 1, x: 0, transition: { delay: 0.2 } }}
 		>
-			<Typography
-				className="text-2xl font-extrabold leading-none tracking-tight"
-				gutterBottom
+			<Paper
+				className="overflow-scroll rounded-b-0 w-full h-full max-h-240"
+				elevation={3}
+				sx={{ p: 3, mb: '10px', mx: 'auto', width: '200px' }}
 			>
-				Advanced Search
-			</Typography>
+				<Typography
+					className="text-2xl font-extrabold leading-none tracking-tight"
+					gutterBottom
+				>
+					Advanced Search
+				</Typography>
 
-			<form onSubmit={handleSubmit}>
-				{searchTerms.map((term, index) => (
-					<Box
-						key={index}
-						sx={{ mb: 2 }}
-					>
-						<Grid
-							container
-							spacing={2}
-							alignItems="center"
+				<form onSubmit={handleSubmit}>
+					{searchTerms.map((term, index) => (
+						<Box
+							key={index}
+							sx={{ mb: 2 }}
 						>
 							<Grid
-								item
-								xs={12}
-								sm={3}
+								container
+								spacing={2}
+								alignItems="center"
 							>
-								<FormControl fullWidth>
-									<InputLabel>Field</InputLabel>
-									<Select
-										value={term.field}
-										label="Field"
-										onChange={(e) => handleSearchTermChange(index, 'field', e.target.value)}
-									>
-										{fields.map((field) => (
-											<MenuItem
-												key={field.name}
-												value={field.name}
-											>
-												{field.name}
-											</MenuItem>
-										))}
-									</Select>
-								</FormControl>
-							</Grid>
-							<Grid
-								item
-								xs={12}
-								sm={3}
-							>
-								<FormControl fullWidth>
-									<InputLabel>Operator</InputLabel>
-									<Select
-										value={term.operator}
-										label="Operator"
-										onChange={(e) => handleSearchTermChange(index, 'operator', e.target.value)}
-									>
-										{operators[term.type].map((op) => (
-											<MenuItem
-												key={op}
-												value={op}
-											>
-												{op}
-											</MenuItem>
-										))}
-									</Select>
-								</FormControl>
-							</Grid>
-							<Grid
-								item
-								xs={12}
-								sm={4}
-							>
-								{renderValueInput(term, index)}
-							</Grid>
-							<Grid
-								item
-								xs={12}
-								sm={2}
-							>
-								<IconButton
-									onClick={handleAddSearchTerm}
-									title="add"
+								<Grid
+									item
+									xs={12}
+									sm={3}
 								>
-									<AddIcon />
-								</IconButton>
-
-								{index > 0 && (
+									<FormControl fullWidth>
+										<InputLabel>Field</InputLabel>
+										<Select
+											value={term.field}
+											label="Field"
+											onChange={(e) => handleSearchTermChange(index, 'field', e.target.value)}
+										>
+											{fields.map((field) => (
+												<MenuItem
+													key={field.name}
+													value={field.name}
+												>
+													{field.name}
+												</MenuItem>
+											))}
+										</Select>
+									</FormControl>
+								</Grid>
+								<Grid
+									item
+									xs={12}
+									sm={3}
+								>
+									<FormControl fullWidth>
+										<InputLabel>Operator</InputLabel>
+										<Select
+											value={term.operator}
+											label="Operator"
+											onChange={(e) => handleSearchTermChange(index, 'operator', e.target.value)}
+										>
+											{operators[term.type].map((op) => (
+												<MenuItem
+													key={op}
+													value={op}
+												>
+													{op}
+												</MenuItem>
+											))}
+										</Select>
+									</FormControl>
+								</Grid>
+								<Grid
+									item
+									xs={12}
+									sm={4}
+								>
+									{renderValueInput(term, index)}
+								</Grid>
+								<Grid
+									item
+									xs={12}
+									sm={2}
+								>
 									<IconButton
-										onClick={() => handleRemoveSearchTerm(index)}
-										color="error"
+										onClick={handleAddSearchTerm}
+										title="add"
 									>
-										<DeleteIcon />
+										<AddIcon />
 									</IconButton>
-								)}
-							</Grid>
-						</Grid>
-						{index < searchTerms.length - 1 && (
-							<Box sx={{ display: 'flex', justifyContent: 'center', my: 1 }}>
-								<FormControl>
-									<Select
-										value={termOperators[index]}
-										onChange={(e) => handleTermOperatorChange(index, e.target.value)}
-										displayEmpty
-									>
-										<MenuItem value="AND">AND</MenuItem>
-										<MenuItem value="OR">OR</MenuItem>
-									</Select>
-								</FormControl>
-							</Box>
-						)}
-					</Box>
-				))}
 
-				<Button
-					type="submit"
-					variant="contained"
-					color="primary"
-				>
-					Search
-				</Button>
-			</form>
-			{/* {query && (
+									{index > 0 && (
+										<IconButton
+											onClick={() => handleRemoveSearchTerm(index)}
+											color="error"
+										>
+											<DeleteIcon />
+										</IconButton>
+									)}
+								</Grid>
+							</Grid>
+							{index < searchTerms.length - 1 && (
+								<Box sx={{ display: 'flex', justifyContent: 'center', my: 1 }}>
+									<FormControl>
+										<Select
+											value={termOperators[index]}
+											onChange={(e) => handleTermOperatorChange(index, e.target.value)}
+											displayEmpty
+										>
+											<MenuItem value="AND">AND</MenuItem>
+											<MenuItem value="OR">OR</MenuItem>
+										</Select>
+									</FormControl>
+								</Box>
+							)}
+						</Box>
+					))}
+
+					<Button
+						type="submit"
+						variant="contained"
+						color="primary"
+					>
+						Search
+					</Button>
+				</form>
+				{/* {query && (
 				<Box sx={{ mt: 4 }}>
 					<Typography
 						variant="h6"
@@ -403,6 +413,7 @@ const handleSearchTermChange = (index, field, value) => {
 					</Paper>
 				</Box>
 			)} */}
-		</Paper>
+			</Paper>
+		</motion.div>
 	);
 }

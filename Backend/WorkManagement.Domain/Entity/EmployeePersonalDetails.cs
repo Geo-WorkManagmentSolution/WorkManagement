@@ -13,10 +13,8 @@ namespace WorkManagementSolution.Employee
 {
     public class EmployeePersonalDetails : Entity
     {
-
         [DataType(DataType.Date)]
         public required DateTime DateOfBirth { get; set; }
-
         public required string Gender { get; set; }
 
         public required string MaritalStatus { get; set; }

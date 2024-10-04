@@ -3,6 +3,8 @@
     using System;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc;
+    using Serilog;
 
     public class ErrorHandlingMiddleware
     {
@@ -21,6 +23,7 @@
             }
             catch (Exception ex)
             {
+                Log.Error(ex,context.Request.ToString());
                 context.Response.StatusCode = 500;
                 await context.Response.WriteAsync("Something went wrong. Please try again later.");
             }

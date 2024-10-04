@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using WorkManagement.Domain.Contracts;
+using WorkManagement.Domain.Entity;
 using WorkManagement.Domain.Models;
 using WorkManagementSolution.Employee;
 
@@ -16,21 +17,17 @@ namespace WorkManagement.Domain.Models.Employee
     {
         public string? PhotoURL { get; set; }
         public int? EmployeeNumber { get; set; }
-        public bool IsActive { get; set; }
-
         public required string FirstName { get; set; }
-
         public required string LastName { get; set; }
-
         [EmailAddress]
         public required string Email { get; set; }
-        [Phone]
-        public required string PhoneNumber { get; set; }
-
-        public required string Position { get; set; }
-
-        public required string Role { get; set; }
-        public EmployeePersonalDetailsModel EmployeePersonalDetails { get; set; }
+        public  string? PhoneNumber { get; set; } 
+        public  string? Position { get; set; }
+        public  Guid UserId { get; set; }
+        public required Guid RoleId { get; set; }
+        public required int EmployeeCategoryId { get; set; }
+        public int? EmployeePersonalDetailsId { get; set; }
+        public EmployeePersonalDetails? EmployeePersonalDetails { get; set; }
     }
 }
 

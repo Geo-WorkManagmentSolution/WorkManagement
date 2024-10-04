@@ -12,7 +12,7 @@ const config: ConfigFile = {
 			filterEndpoints: [/Auth/i]
 		},
 		'./src/app/main/project/ProjectApi.ts': {
-			filterEndpoints: [/Project/i]
+			filterEndpoints: [/Project/i],
 		}
 	},
 	hooks: { queries: true, lazyQueries: true, mutations: true }

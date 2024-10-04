@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using WorkManagement.Domain.Contracts;
+using WorkManagement.Domain.Entity;
 using WorkManagement.Domain.Models.Employee;
+using WorkManagement.Domain.Utility;
 using WorkManagementSolution.Employee;
 using WorkManagmentSolution.EFCore;
 
@@ -12,11 +15,18 @@ namespace WorkManagement.Service
     {
         private readonly WorkManagementDbContext _dbContext;
         private readonly IMapper mapper;
+        private readonly IAuthService authService;
+        private readonly UserManager<ApplicationUser> userManager;
+        private readonly RoleManager<ApplicationRole> roleManager;
 
-        public EmployeeService(WorkManagementDbContext dbContext, IMapper mapper)
+
+        public EmployeeService(WorkManagementDbContext dbContext, IMapper mapper, IAuthService authService, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
         {
             _dbContext = dbContext;
             this.mapper = mapper;
+            this.authService = authService;
+            this.userManager = userManager;
+            this.roleManager = roleManager;
         }
 
         public async Task<List<EmployeeModel>> GetAllEmployeesAsync()
@@ -25,17 +35,42 @@ namespace WorkManagement.Service
             return mapper.Map<List<EmployeeModel>>(Employee);
         }
 
+        public async Task<List<EmployeeCategory>> GetEmployeeCategories()
+        {
+            return await _dbContext.EmployeeCategories.ToListAsync();
+        }
+
         public async Task<EmployeeModel> GetEmployeeByIdAsync(int id)
         {
-            var Employee = await _dbContext.Employees.FindAsync(id);
-            return mapper.Map<EmployeeModel>(Employee);
+            var Employee = await _dbContext.Employees
+                .Include(x => x.EmployeePersonalDetails)
+                .SingleOrDefaultAsync(x => x.Id == id);
+            var EmployeeModel = mapper.Map<EmployeeModel>(Employee);
+            return EmployeeModel;
         }
 
         public async Task<EmployeeModel> CreateEmployeeAsync(Employee employee)
         {
-            _dbContext.Employees.Add(employee);
-            var Employee = await _dbContext.SaveChangesAsync();
-            return mapper.Map<EmployeeModel>(Employee);
+
+            var user = new ApplicationUser { UserName = employee.Email, Email = employee.Email, Shortcuts = new List<string>() };
+            var password = new PasswordGenerator().GenerateRandomPassword(6);
+            var userResult = await userManager.CreateAsync(
+                  user
+                , password
+                );
+
+            var role = await roleManager.Roles.FirstAsync(x => x.Id == employee.RoleId);
+            var roleResult = await userManager.AddToRoleAsync(user, role.Name);
+
+            if (roleResult.Succeeded && userResult.Succeeded)
+            {
+                employee.UserId = user.Id;
+                _dbContext.Employees.Add(employee);
+                await _dbContext.SaveChangesAsync();
+                return mapper.Map<EmployeeModel>(employee);
+            }
+            else
+                throw new InvalidOperationException("Somthing wrong while creating Users and Roles for employee");
         }
 
         public async Task<EmployeeModel> UpdateEmployeeAsync(Employee employee)

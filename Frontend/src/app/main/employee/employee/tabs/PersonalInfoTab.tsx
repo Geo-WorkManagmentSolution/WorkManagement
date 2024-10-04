@@ -4,11 +4,12 @@ import {
 	RadioGroup,
 	FormControl,
 	FormLabel,
-	Select,
-	MenuItem,
-	Typography
+	Typography,
+	Autocomplete,
+	TextField
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
+import { parseISO } from 'date-fns';
 import { Controller, useFormContext } from 'react-hook-form';
 
 /**
@@ -68,6 +69,39 @@ function PersonalInfoTab() {
 			<Controller
 				name="employeePersonalDetails.maritalStatus"
 				control={control}
+				defaultValue={[]}
+				render={({ field: { onChange, value } }) => (
+					<Autocomplete
+						className="mt-8 mb-16 "
+						freeSolo
+						fullWidth
+						options={['single', 'married', 'divorced']}
+						value={value}
+						onChange={(event, newValue) => {
+							onChange(newValue);
+						}}
+						renderInput={(params) => (
+							<TextField
+								{...params}
+								value={params.value || ''}
+								placeholder="Select Marital Status"
+								label="Marital Status"
+								required
+								variant="outlined"
+								InputLabelProps={{
+									shrink: true
+								}}
+							/>
+						)}
+					/>
+				)}
+			/>
+
+			{/* 			
+
+<Controller
+				name="employeePersonalDetails.maritalStatus"
+				control={control}
 				render={({ field }) => (
 					<FormControl
 						fullWidth
@@ -92,27 +126,27 @@ function PersonalInfoTab() {
 						)}
 					</FormControl>
 				)}
-			/>
+			/> */}
+
 			<Controller
 				name="employeePersonalDetails.dateOfBirth"
 				control={control}
 				render={({ field }) => (
 					<DatePicker
-						className='w-full mt-16 mb-16'
+						className="w-full mt-16 mb-16"
 						label="Date of Birth"
 						{...field}
 					/>
 				)}
 			/>
 			{errors.employeePersonalDetails?.dateOfBirth && (
-					<Typography
-						variant="caption"
-						color="error"
-					>
-						{errors.employeePersonalDetails.dateOfBirth.message}
-					</Typography>
-				)}
-
+				<Typography
+					variant="caption"
+					color="error"
+				>
+					{errors.employeePersonalDetails.dateOfBirth.message}
+				</Typography>
+			)}
 		</div>
 	);
 }

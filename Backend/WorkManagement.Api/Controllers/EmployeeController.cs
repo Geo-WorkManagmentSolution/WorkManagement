@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using WorkManagement.Domain.Contracts;
+using WorkManagement.Domain.Entity;
 using WorkManagement.Domain.Models;
 using WorkManagement.Domain.Models.Employee;
 using WorkManagement.Service;
@@ -22,7 +23,7 @@ namespace WorkManagement.API.Controllers
         private IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper mapper;
 
-        public EmployeesController(IEmployeeService employeeService,AdvanceSearchService AdvanceSearchService, IHttpContextAccessor httpContextAccessor, IMapper mapper)
+        public EmployeesController(IEmployeeService employeeService, AdvanceSearchService AdvanceSearchService, IHttpContextAccessor httpContextAccessor, IMapper mapper)
         {
             this.employeeService = employeeService;
             advanceSearchService = AdvanceSearchService;
@@ -36,6 +37,15 @@ namespace WorkManagement.API.Controllers
         {
             var employees = await employeeService.GetAllEmployeesAsync();
             return Ok(employees);
+        }
+
+
+        // GET: api/employees/categories
+        [HttpGet("categories")]
+        public async Task<ActionResult<IEnumerable<EmployeeCategory>>> GetEmployeeCategories()
+        {
+            var EmployeeCategories = await employeeService.GetEmployeeCategories();
+            return Ok(EmployeeCategories);
         }
 
         // GET: api/employees/5
@@ -52,16 +62,17 @@ namespace WorkManagement.API.Controllers
 
         // POST: api/employees
         [HttpPost]
-        public async Task<ActionResult<EmployeeModel>> CreateEmployee([FromBody]EmployeeModel employee)
+        public async Task<ActionResult<EmployeeModel>> CreateEmployee([FromBody] EmployeeModel employeeModel)
         {
-            var createdEmployee = await employeeService.CreateEmployeeAsync(mapper.Map<Employee>(employee));
+            var employee = mapper.Map<Employee>(employeeModel);
+            var createdEmployee = await employeeService.CreateEmployeeAsync(employee);
             return CreatedAtAction(nameof(GetEmployee), new { id = createdEmployee.Id }, createdEmployee);
 
         }
 
         [HttpPost]
         [Route("Search")]
-        public async Task<ActionResult<List<EmployeeModel>>> SearchEmployees([FromBody]List<Criterion> criterias)
+        public async Task<ActionResult<List<EmployeeModel>>> SearchEmployees([FromBody] List<Criterion> criterias)
         {
             var SearchResult = advanceSearchService.ApplySearch<Employee>(criterias).ToList();
             return mapper.Map<List<EmployeeModel>>(SearchResult);

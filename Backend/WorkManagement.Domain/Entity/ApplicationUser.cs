@@ -11,11 +11,6 @@ namespace WorkManagement.Domain.Entity
 {
     public class ApplicationUser : IdentityUser<Guid>
     {
-        public int? EmployeeId { get; set; }
-        //used to store shortcuts of the front end pages
         public List<string> Shortcuts { get; set; }
-
-        [ForeignKey(nameof(EmployeeId))]
-        public Employee? Employee { get; set; }
     }
 }

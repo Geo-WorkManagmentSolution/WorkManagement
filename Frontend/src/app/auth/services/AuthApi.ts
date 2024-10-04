@@ -37,6 +37,12 @@ const injectedRtkApi = api.injectEndpoints({
         params: { accesstoken: queryArg.accesstoken },
       }),
     }),
+    getApiAuthRoles: build.query<
+      GetApiAuthRolesApiResponse,
+      GetApiAuthRolesApiArg
+    >({
+      query: () => ({ url: `/api/Auth/roles` }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -55,6 +61,8 @@ export type PostApiAuthAccesstokenApiResponse = unknown;
 export type PostApiAuthAccesstokenApiArg = {
   accesstoken?: string;
 };
+export type GetApiAuthRolesApiResponse = /** status 200 OK */ ApplicationRole[];
+export type GetApiAuthRolesApiArg = void;
 export type UserloginModel = {
   email?: string | null;
   password?: string | null;
@@ -64,10 +72,18 @@ export type UserRegistrationModel = {
   displayName: string;
   password: string;
 };
+export type ApplicationRole = {
+  id?: string;
+  name?: string | null;
+  normalizedName?: string | null;
+  concurrencyStamp?: string | null;
+};
 export const {
   usePostApiAuthSignInMutation,
   useGetApiAuthUserQuery,
   useLazyGetApiAuthUserQuery,
   usePostApiAuthRegisterMutation,
   usePostApiAuthAccesstokenMutation,
+  useGetApiAuthRolesQuery,
+  useLazyGetApiAuthRolesQuery,
 } = injectedRtkApi;

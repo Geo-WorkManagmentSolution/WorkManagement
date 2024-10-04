@@ -2,12 +2,15 @@
 
 namespace WorkManagement.Service
 {
+    using AutoMapper;
     using Microsoft.Extensions.Configuration;
     using Microsoft.IdentityModel.Tokens;
     using System.IdentityModel.Tokens.Jwt;
     using System.Security.Claims;
     using WorkManagement.Domain.Contracts;
     using WorkManagement.Domain.Entity;
+    using WorkManagement.Domain.Models;
+    using WorkManagmentSolution.EFCore;
 
     public class AuthService : IAuthService
     {

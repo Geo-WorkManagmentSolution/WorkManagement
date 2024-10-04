@@ -18,7 +18,7 @@ const EmployeeModelClone = (data: PartialDeep<EmployeeModel>) =>
 		position: '',
 		role: '',
 		employeePersonalDetails: {
-			dateOfBirth: '',
+			dateOfBirth: null,
 			gender: '',
 			maritalStatus: ''
 		}

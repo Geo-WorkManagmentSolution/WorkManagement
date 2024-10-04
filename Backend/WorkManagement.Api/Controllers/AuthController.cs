@@ -118,6 +118,7 @@ namespace WorkManagement.API.Controllers
         }
 
 
+
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserRegistrationModel model)
         {
@@ -246,6 +247,13 @@ namespace WorkManagement.API.Controllers
         }
 
 
+
+        [HttpGet("roles")]
+        [Authorize]
+        public async Task<List<RoleModel>> GetRoles()
+        {
+            return await roleManager.Roles.Select(x => new RoleModel { Id = x.Id, Name = x.Name }).ToListAsync();
+        }
     }
 
 }

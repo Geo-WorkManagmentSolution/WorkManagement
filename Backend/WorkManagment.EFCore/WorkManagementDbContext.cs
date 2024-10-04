@@ -2,8 +2,12 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
+using System.Diagnostics.Metrics;
+using System.Linq.Expressions;
 using System.Net.Http;
 using System.Security.Claims;
+using System.Xml;
 using WorkManagement.Domain.Entity;
 using WorkManagement.Domain.Models;
 using WorkManagementSolution.Employee;
@@ -24,7 +28,7 @@ namespace WorkManagmentSolution.EFCore
 
         public virtual DbSet<Employee> Employees { get; set; }
         public virtual DbSet<EmployeePersonalDetails> EmployeePersonalDetails { get; set; }
-
+        public virtual DbSet<EmployeeCategory> EmployeeCategories { get; set; }
         public virtual DbSet<Project> Projects { get; set; }
         public virtual DbSet<Company> Companies { get; set; }
 
@@ -33,6 +37,29 @@ namespace WorkManagmentSolution.EFCore
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            
+            //Expression<Func<FullyAuditableEntity, bool>> filterExpr = bm => !bm.IsDeleted;
+            //foreach (var mutableEntityType in modelBuilder.Model.GetEntityTypes())
+            //{
+            //    // check if current entity type is child of BaseModel
+            //    if (mutableEntityType.ClrType.IsAssignableTo(typeof(FullyAuditableEntity)))
+            //    {
+            //        // modify expression to handle correct child type
+            //        var parameter = Expression.Parameter(mutableEntityType.ClrType);
+            //        var body = ReplacingExpressionVisitor.Replace(filterExpr.Parameters.First(), parameter, filterExpr.Body);
+            //        var lambdaExpression = Expression.Lambda(body, parameter);
+
+            //        // set filter
+            //        mutableEntityType.SetQueryFilter(lambdaExpression);
+            //    }
+            //}
+
+            modelBuilder.Entity<EmployeeCategory>().HasData(
+                     new EmployeeCategory { Id = 1, Name = "Full-Time" },
+                     new EmployeeCategory { Id = 2, Name = "Contractor" },
+                     new EmployeeCategory { Id = 3, Name = "Site" }
+            );
+
 
         }
 
@@ -67,11 +94,9 @@ namespace WorkManagmentSolution.EFCore
                     ((FullyAuditableEntity)entity.Entity).CreatedOn = DateTime.UtcNow;
                     ((FullyAuditableEntity)entity.Entity).CreatedBy = loggedinUser.Id;
                 }
-             ((FullyAuditableEntity)entity.Entity).LastModifiedOn = DateTime.UtcNow;
+                ((FullyAuditableEntity)entity.Entity).LastModifiedOn = DateTime.UtcNow;
                 ((FullyAuditableEntity)entity.Entity).LastModifiedBy = loggedinUser.Id;
             }
         }
-
-
     }
 }

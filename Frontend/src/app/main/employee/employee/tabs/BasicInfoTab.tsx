@@ -1,13 +1,18 @@
-import { Avatar, Box, Checkbox, FormControlLabel, Autocomplete } from '@mui/material';
+import { Avatar, Box, Autocomplete } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import { useRef } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
+import { useGetApiAuthRolesQuery } from 'src/app/auth/services/AuthApi';
+import { useGetApiEmployeesCategoriesQuery } from '../../EmployeeApi';
 
 /**
  * The basic info tab.
  */
 function BasicInfoTab() {
+	const { data: employeesCategoriesOptions = [] } = useGetApiEmployeesCategoriesQuery();
+	const { data: employeesRolesOptions = [] } = useGetApiAuthRolesQuery();
+
 	const methods = useFormContext();
 	const { control, formState } = methods;
 	const { errors } = formState;
@@ -92,35 +97,32 @@ function BasicInfoTab() {
 			/>
 			<div className="flex -mx-4">
 				<Controller
-					name="employeeNumber"
+					name="employeeCategoryId"
 					control={control}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							value={field.value || ''}
-							label="Employee Number"
-							type="number"
-							required
-							margin="normal"
+					render={({ field: { onChange, value } }) => (
+						<Autocomplete
+							className="mt-8 mb-16 mx-4"
 							fullWidth
-							error={!!errors.employeeNumber}
-							helperText={errors.employeeNumber?.message as string}
-						/>
-					)}
-				/>
-				<Controller
-					name="isActive"
-					control={control}
-					render={({ field }) => (
-						<FormControlLabel
-							control={
-								<Checkbox
-									{...field}
-									checked={field.value as boolean}
+							options={employeesCategoriesOptions}
+							getOptionLabel={(option) => option?.name}
+							isOptionEqualToValue={(option, value) => option.id === value}
+							value={employeesCategoriesOptions.find((c) => c.id === value) || null}
+							onChange={(_, newValue) => {
+								onChange(newValue ? newValue.id : null);
+							}}
+							renderInput={(params) => (
+								<TextField
+									{...params}
+									value={params.value || ''}
+									placeholder="Select Employee categories"
+									label="Category"
+									required
+									variant="outlined"
+									InputLabelProps={{
+										shrink: true
+									}}
 								/>
-							}
-							className="basis-1/4 mt-8 mx-4"
-							label="Is Active"
+							)}
 						/>
 					)}
 				/>
@@ -208,6 +210,7 @@ function BasicInfoTab() {
 							{...field}
 							value={field.value || ''}
 							label="Position"
+							required
 							fullWidth
 							className="mx-4"
 							margin="normal"
@@ -218,18 +221,18 @@ function BasicInfoTab() {
 				/>
 
 				<Controller
-					name="role"
+					name="roleId"
 					control={control}
-					defaultValue={[]}
 					render={({ field: { onChange, value } }) => (
 						<Autocomplete
 							className="mt-8 mb-16 mx-4"
-							freeSolo
 							fullWidth
-							options={['admin', 'user']}
-							value={value}
-							onChange={(event, newValue) => {
-								onChange(newValue);
+							getOptionLabel={(option) => option?.name}
+							options={employeesRolesOptions}
+							isOptionEqualToValue={(option, value) => option.id === value}
+							value={employeesRolesOptions.find((c) => c.id === value) || null}
+							onChange={(_, newValue) => {
+								onChange(newValue ? newValue.id : null);
 							}}
 							renderInput={(params) => (
 								<TextField

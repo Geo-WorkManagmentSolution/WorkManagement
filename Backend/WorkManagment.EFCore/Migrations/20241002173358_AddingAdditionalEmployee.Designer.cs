@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WorkManagmentSolution.EFCore;
 
@@ -11,9 +12,11 @@ using WorkManagmentSolution.EFCore;
 namespace WorkManagement.EFCore.Migrations
 {
     [DbContext(typeof(WorkManagementDbContext))]
-    partial class WorkManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241002173358_AddingAdditionalEmployee")]
+    partial class AddingAdditionalEmployee
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -173,6 +176,9 @@ namespace WorkManagement.EFCore.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("EmployeeId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -211,6 +217,8 @@ namespace WorkManagement.EFCore.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -261,7 +269,6 @@ namespace WorkManagement.EFCore.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTimeOffset>("CreatedOn")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetimeoffset");
 
                     b.Property<bool>("IsDeleted")
@@ -270,8 +277,7 @@ namespace WorkManagement.EFCore.Migrations
                     b.Property<Guid?>("LastModifiedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset>("LastModifiedOn")
-                        .ValueGeneratedOnAddOrUpdate()
+                    b.Property<DateTimeOffset?>("LastModifiedOn")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("PostalCode")
@@ -305,8 +311,20 @@ namespace WorkManagement.EFCore.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<Guid?>("LastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("LastModifiedOn")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -314,27 +332,7 @@ namespace WorkManagement.EFCore.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EmployeeCategories");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            IsDeleted = false,
-                            Name = "Full-Time"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            IsDeleted = false,
-                            Name = "Contractor"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            IsDeleted = false,
-                            Name = "Site"
-                        });
+                    b.ToTable("EmployeeCategory");
                 });
 
             modelBuilder.Entity("WorkManagement.Domain.Entity.Project", b =>
@@ -352,7 +350,6 @@ namespace WorkManagement.EFCore.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTimeOffset>("CreatedOn")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetimeoffset");
 
                     b.Property<DateTime?>("EndDate")
@@ -364,8 +361,7 @@ namespace WorkManagement.EFCore.Migrations
                     b.Property<Guid?>("LastModifiedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset>("LastModifiedOn")
-                        .ValueGeneratedOnAddOrUpdate()
+                    b.Property<DateTimeOffset?>("LastModifiedOn")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("ProjectIncharge")
@@ -404,11 +400,13 @@ namespace WorkManagement.EFCore.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("int");
+
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTimeOffset>("CreatedOn")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Email")
@@ -418,10 +416,6 @@ namespace WorkManagement.EFCore.Migrations
                     b.Property<int?>("EmployeeCategoryId")
                         .HasColumnType("int");
 
-                    b.Property<int>("EmployeeNumber")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("int");
-
                     b.Property<int?>("EmployeePersonalDetailsId")
                         .HasColumnType("int");
 
@@ -429,14 +423,16 @@ namespace WorkManagement.EFCore.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<Guid?>("LastModifiedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset>("LastModifiedOn")
-                        .ValueGeneratedOnAddOrUpdate()
+                    b.Property<DateTimeOffset?>("LastModifiedOn")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("LastName")
@@ -467,7 +463,8 @@ namespace WorkManagement.EFCore.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("Employees");
                 });
@@ -550,6 +547,15 @@ namespace WorkManagement.EFCore.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("WorkManagement.Domain.Entity.ApplicationUser", b =>
+                {
+                    b.HasOne("WorkManagementSolution.Employee.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId");
+
+                    b.Navigation("Employee");
+                });
+
             modelBuilder.Entity("WorkManagement.Domain.Entity.Project", b =>
                 {
                     b.HasOne("WorkManagement.Domain.Entity.Company", "Company")
@@ -578,8 +584,8 @@ namespace WorkManagement.EFCore.Migrations
                         .IsRequired();
 
                     b.HasOne("WorkManagement.Domain.Entity.ApplicationUser", "ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                        .WithOne()
+                        .HasForeignKey("WorkManagementSolution.Employee.Employee", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
