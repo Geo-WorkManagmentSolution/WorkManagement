@@ -3,13 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WorkManagement.Domain.Entity;
 using WorkManagement.Domain.Models;
 using WorkManagement.Domain.Models.Project;
+using WorkManagementSolution.Employee;
 
 namespace WorkManagement.Service
 {
     public interface IProjectService
     {
+
+
         public Task<ResponseModel> GetAllProjectsAsync(string user);
         public Task<ResponseModel> GetCompaniesAsync(string user);
 
@@ -26,6 +30,13 @@ namespace WorkManagement.Service
        
         public Task<ResponseModel> DeleteProjectAsync(string user, int id);
         public Task<ResponseModel> DeleteCompanyAsync(string user, int id);
+
+        public Task<List<Company>> GetProjectCompanyList();
+        public Task<List<Tender>> GetProjectTendersList();
+        public Task<List<Employee>> GetProjectEmployeeList();
+        public Task<List<Client>> GetProjectClientList();
+        public Task<List<Vendor>> GetProjectVendorList();
+        public Task<List<Param>> GetProjectParamList(string paramType);
 
 
     }
