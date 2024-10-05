@@ -4,17 +4,28 @@ using WorkManagementSolution.Employee;
 
 namespace WorkManagement.Domain.Models.Project
 {
-    public class ProjectModel : BaseModel
+    public class ProjectModel
     {
+        public int Id { get; set; }
         public string ProjectName { get; set; }
         public string ProjectNumber { get; set; }
         public string CompanyName { get; set; }
+        public int? CompanyId { get; set; }
         public string ProjectDescription { get; set; }
         public string ProjectLocation { get; set; }
         public string ProjectIncharge { get; set; }
         public string WorkOrderNumber { get; set; }
         public decimal WorkOrderAmount { get; set; }
-        public decimal WorkDescription { get; set; }
+        public string WorkDescription { get; set; }
+        public decimal PeriodOfWrokInMonths { get; set; }
+        public decimal EstimateManPower { get; set; }
+        public decimal EstimateDays { get; set; }
+        public decimal Qty { get; set; }
+        public decimal Rate { get; set; }
+        public decimal CGST { get; set; }
+        public decimal SGST { get; set; }
+        public decimal IGST { get; set; }
+        public decimal TotalCost { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public int? TenderId { get; set; }
@@ -33,8 +44,6 @@ namespace WorkManagement.Domain.Models.Project
         public string ServiceParamDecription { get; set; }
         public int? VendorId { get; set; }
         public string VendorName { get; set; }
-        public ProjectDetail ProjectDetail { get; set; }
-        public Company Company { get; set; }      
 
 
     }

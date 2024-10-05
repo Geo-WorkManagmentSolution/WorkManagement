@@ -80,214 +80,50 @@ namespace WorkManagement.API.Controllers
             return Ok(vendorList);
         }
 
-        //// GET: api/project/GetAllCopanies
-        //[HttpGet("GetAllCopanies")]
-        //public async Task<ActionResult<ResponseModel>> GetAllCopanies()
-        //{
-        //    var userClaim = _httpContextAccessor.HttpContext?.User;
-        //    var user = _userManager.GetUserName(userClaim);
+        // GET: api/projects
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ProjectModel>>> GetProjects()
+        {
+            var projects = await _projectService.GetAllProjectsAsync();
+            return Ok(projects);
+        }
 
-        //    user = "admin1@admin.com";
+        // POST: api/project
+        [HttpPost]
+        public async Task<ActionResult<EmployeeModel>> CreateProject([FromBody] ProjectModel projectModel)
+        {
+            var createdProject = await _projectService.CreateProjectAsync(projectModel);
+            return Ok(createdProject);
 
-        //    var response = await _projectService.GetCompaniesAsync(user);
+        }
 
-        //    if (response.Success)
-        //    {
-        //        return Ok(response);
-        //    }
-        //    else
-        //    {
-        //        return BadRequest(response);
-        //    }
-        //}
 
-        //// GET: api/project/GetAllCopanies
-        //[HttpGet("GetCopanyById")]
-        //public async Task<ActionResult<ResponseModel>> GetCopanyById(int companyId)
-        //{
-        //    var userClaim = _httpContextAccessor.HttpContext?.User;
-        //    var user = _userManager.GetUserName(userClaim);
+        // PUT: api/project/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateProject(int id, ProjectModel projectModel)
+        {
+            if (id != projectModel.Id)
+            {
+                return BadRequest();
+            }
 
-        //    user = "admin1@admin.com";
+            projectModel.Id = id;
 
-        //    var response = await _projectService.GetCompanyByIdAsync(user, companyId);
+            var updatedProject = await _projectService.UpdateProjectAsync(projectModel);
+            return Ok(updatedProject);
+        }
 
-        //    if (response.Success)
-        //    {
-        //        return Ok(response);
-        //    }
-        //    else
-        //    {
-        //        return BadRequest(response);
-        //    }
-        //}
 
-        //// GET: api/project/GetAllProjects
-        //[HttpGet("GetAllProjects")]
-        //public async Task<ActionResult<ResponseModel>> GetAllProjects()
-        //{
-        //    var userClaim = _httpContextAccessor.HttpContext?.User;
-        //    var user = _userManager.GetUserName(userClaim);
-
-        //    user = "admin1@admin.com";
-
-        //    var response = await _projectService.GetAllProjectsAsync(user);
-
-        //    if (response.Success)
-        //    {
-        //        return Ok(response);
-        //    }
-        //    else
-        //    {
-        //        return BadRequest(response);
-        //    }
-        //}
-
-        //// GET: api/project/GetAllProjects
-        //[HttpGet("GetProjectById")]
-        //public async Task<ActionResult<ResponseModel>> GetProjectById(int projectId)
-        //{
-        //    var userClaim = _httpContextAccessor.HttpContext?.User;
-        //    var user = _userManager.GetUserName(userClaim);
-
-        //    user = "admin1@admin.com";
-
-        //    var response = await _projectService.GetProjectByIdAsync(user, projectId);
-
-        //    if (response.Success)
-        //    {
-        //        return Ok(response);
-        //    }
-        //    else
-        //    {
-        //        return BadRequest(response);
-        //    }
-        //}
-
-        //// POST: api/project/SaveCompanyData
-        //[HttpPost("SaveCompanyData")]
-        //public async Task<ActionResult<ResponseModel>> PostCompanyData([FromBody] CompanyModel company)
-        //{
-        //    var userClaim = _httpContextAccessor.HttpContext?.User;
-        //    var user = _userManager.GetUserName(userClaim);
-
-        //    user = "admin1@admin.com";
-
-        //    var response = await _projectService.CreateCompanyAsync(user, company);
-
-        //    if (response.Success)
-        //    {
-        //        return Ok(response);
-        //    }
-        //    else
-        //    {
-        //        return BadRequest(response);
-        //    }
-        //}
-
-        //// POST: api/project/SaveCompanyData
-        //[HttpPut("SaveCompanyData")]
-        //public async Task<ActionResult<ResponseModel>> PutCompanyData([FromBody] CompanyModel company)
-        //{
-        //    var userClaim = _httpContextAccessor.HttpContext?.User;
-        //    var user = _userManager.GetUserName(userClaim);
-
-        //    user = "admin1@admin.com";
-
-        //    var response = await _projectService.UpdateCompanyAsync(user, company);
-
-        //    if (response.Success)
-        //    {
-        //        return Ok(response);
-        //    }
-        //    else
-        //    {
-        //        return BadRequest(response);
-        //    }
-        //}
-
-        //// GET: api/project/GetAllProjects
-        //[HttpPost("SaveProjectData")]
-        //public async Task<ActionResult<ResponseModel>> PostProjectData([FromBody] ProjectModel project)
-        //{
-        //    var userClaim = _httpContextAccessor.HttpContext?.User;
-        //    var user = _userManager.GetUserName(userClaim);
-
-        //    user = "admin1@admin.com";
-
-        //    var response = await _projectService.CreateProjectAsync(user, project);
-
-        //    if (response.Success)
-        //    {
-        //        return Ok(response);
-        //    }
-        //    else
-        //    {
-        //        return BadRequest(response);
-        //    }
-        //}
-
-        //// GET: api/project/GetAllProjects
-        //[HttpPut("SaveProjectData")]
-        //public async Task<ActionResult<ResponseModel>> PutProjectData([FromBody] ProjectModel project)
-        //{
-        //    var userClaim = _httpContextAccessor.HttpContext?.User;
-        //    var user = _userManager.GetUserName(userClaim);
-
-        //    user = "admin1@admin.com";
-
-        //    var response = await _projectService.UpdateProjectAsync(user, project);
-
-        //    if (response.Success)
-        //    {
-        //        return Ok(response);
-        //    }
-        //    else
-        //    {
-        //        return BadRequest(response);
-        //    }
-        //}
-
-        //// GET: api/project/GetAllProjects
-        //[HttpDelete("DeleteProjectById")]
-        //public async Task<ActionResult<ResponseModel>> DeleteProjectById(int projectId)
-        //{
-        //    var userClaim = _httpContextAccessor.HttpContext?.User;
-        //    var user = _userManager.GetUserName(userClaim);
-
-        //    user = "admin1@admin.com";
-
-        //    var response = await _projectService.DeleteProjectAsync(user, projectId);
-
-        //    if (response.Success)
-        //    {
-        //        return Ok(response);
-        //    }
-        //    else
-        //    {
-        //        return BadRequest(response);
-        //    }
-        //}
-
-        //// GET: api/project/GetAllProjects
-        //[HttpDelete("DeleteCompanyById")]
-        //public async Task<ActionResult<ResponseModel>> DeleteCompanyById(int companyId)
-        //{
-        //    var userClaim = _httpContextAccessor.HttpContext?.User;
-        //    var user = _userManager.GetUserName(userClaim);
-
-        //    user = "admin1@admin.com";
-
-        //    var response = await _projectService.DeleteCompanyAsync(user, companyId);
-
-        //    if (response.Success)
-        //    {
-        //        return Ok(response);
-        //    }
-        //    else
-        //    {
-        //        return BadRequest(response);
-        //    }
-        //}
+        // DELETE: api/project/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteProject(int id)
+        {
+            var deleted = await _projectService.DeleteProjectAsync(id);
+            if (!deleted)
+            {
+                return NotFound();
+            }
+            return NoContent();
+        }
     }
 }

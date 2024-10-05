@@ -1,11 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using WorkManagement.Domain.Entity;
-using WorkManagement.Domain.Models;
 using WorkManagement.Domain.Models.Project;
 using WorkManagementSolution.Employee;
 using WorkManagmentSolution.EFCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace WorkManagement.Service
 {
@@ -19,56 +17,6 @@ namespace WorkManagement.Service
         {
             _dbContext = dbContext;
             this.mapper = mapper;
-        }
-
-        public Task<ResponseModel> CreateCompanyAsync(string user, CompanyModel company)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ResponseModel> CreateProjectAsync(string user, ProjectModel project)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ResponseModel> DeleteCompanyAsync(string user, int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ResponseModel> DeleteProjectAsync(string user, int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ResponseModel> GetAllProjectsAsync(string user)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ResponseModel> GetCompaniesAsync(string user)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ResponseModel> GetCompanyByIdAsync(string user, int companyId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ResponseModel> GetProjectByIdAsync(string user, int projectId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ResponseModel> UpdateCompanyAsync(string user, CompanyModel company)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ResponseModel> UpdateProjectAsync(string user, ProjectModel project)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<List<Company>> GetProjectCompanyList()
@@ -93,13 +41,382 @@ namespace WorkManagement.Service
 
         public async Task<List<Param>> GetProjectParamList(string paramType)
         {
-            return await _dbContext.Params.Where(p=>p.ParamType == paramType).ToListAsync();
+            return await _dbContext.Params.Where(p => p.ParamType == paramType).ToListAsync();
         }
 
         public async Task<List<Vendor>> GetProjectVendorList()
         {
             return await _dbContext.Vendors.ToListAsync();
         }
+
+        public async Task<List<ProjectModel>> GetAllProjectsAsync()
+        {
+
+            try
+            {
+                var projects = (from p in _dbContext.Projects
+                                select new ProjectModel
+                                {
+                                    ProjectName = string.IsNullOrEmpty(p.ProjectName) ? "" : p.ProjectName.Trim(),
+                                    ProjectNumber = string.IsNullOrEmpty(p.ProjectNumber) ? "" : p.ProjectNumber.Trim(),
+                                    CompanyName = p.Company != null ? p.Company.CompanyName : "",
+                                    CompanyId = p.CompanyId,
+                                    ProjectDescription = string.IsNullOrEmpty(p.ProjectDescription) ? "" : p.ProjectDescription.Trim(),
+                                    ProjectLocation = string.IsNullOrEmpty(p.ProjectLocation) ? "" : p.ProjectLocation.Trim(),
+                                    ProjectIncharge = p.ProjectIncharge != null ? p.ProjectIncharge.FirstName + " " + p.ProjectIncharge.LastName : "",
+                                    ProjectInchargeId = p.ProjectInchargeId,
+                                    WorkOrderNumber = p.ProjectDetails != null ? p.ProjectDetails.WorkOrderNumber : "",
+                                    WorkOrderAmount = p.ProjectDetails != null ? p.ProjectDetails.WorkOrderAmount : 0,
+                                    PeriodOfWrokInMonths = p.ProjectDetails != null ? p.ProjectDetails.PeriodOfWrokInMonths : 0,
+                                    EstimateManPower = p.ProjectDetails != null ? p.ProjectDetails.EstimateManPower : 0,
+                                    EstimateDays = p.ProjectDetails != null ? p.ProjectDetails.EstimateDays : 0,
+                                    Qty = p.ProjectDetails != null ? p.ProjectDetails.Qty : 0,
+                                    Rate = p.ProjectDetails != null ? p.ProjectDetails.Rate : 0,
+                                    CGST = p.ProjectDetails != null ? p.ProjectDetails.CGST : 0,
+                                    IGST = p.ProjectDetails != null ? p.ProjectDetails.IGST : 0,
+                                    SGST = p.ProjectDetails != null ? p.ProjectDetails.SGST : 0,
+                                    TotalCost = p.ProjectDetails != null ? p.ProjectDetails.TotalCost : 0,
+                                    WorkDescription = p.ProjectDetails != null ? p.ProjectDetails.WorkDescription : "",
+                                    StartDate = p.StartDate,
+                                    EndDate = p.EndDate,
+                                    TenderId = p.TenderId,
+                                    TenderName = p.Tender != null ? p.Tender.Name : "",
+                                    FundingClientId = p.FundingClientId,
+                                    FundingClientName = p.FundingClient != null ? p.FundingClient.Name : "",
+                                    InchargeClientId = p.InchargeClientId,
+                                    InchargeClientName = p.InchargeClient != null ? p.InchargeClient.Name : "",
+                                    TaxModelParamId = p.TaxModelParamId,
+                                    TaxModelParamDecription = p.TaxModelParam != null ? p.TaxModelParam.Description : "",
+                                    ProjectItemTypePramId = p.ProjectItemTypePramId,
+                                    ProjectItemTypePramDecription = p.ProjectItemTypePram != null ? p.ProjectItemTypePram.Description : "",
+                                    ServiceParamId = p.ServiceParamId,
+                                    ServiceParamDecription = p.ServiceParam != null ? p.ServiceParam.Description : "",
+                                    VendorId = p.VendorId,
+                                    VendorName = p.Vendor != null ? p.Vendor.Name : "",
+
+                                }).ToList();
+
+                return projects;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+
+        }
+
+        public async Task<ProjectModel> GetProjectByIdAsync(int id)
+        {
+            try
+            {
+                var returnProject = new ProjectModel();
+                var projects = (from p in _dbContext.Projects.Where(p => p.Id == id)
+                                select new ProjectModel
+                                {
+                                    ProjectName = string.IsNullOrEmpty(p.ProjectName) ? "" : p.ProjectName.Trim(),
+                                    ProjectNumber = string.IsNullOrEmpty(p.ProjectNumber) ? "" : p.ProjectNumber.Trim(),
+                                    CompanyName = p.Company != null ? p.Company.CompanyName : "",
+                                    CompanyId = p.CompanyId,
+                                    ProjectDescription = string.IsNullOrEmpty(p.ProjectDescription) ? "" : p.ProjectDescription.Trim(),
+                                    ProjectLocation = string.IsNullOrEmpty(p.ProjectLocation) ? "" : p.ProjectLocation.Trim(),
+                                    ProjectIncharge = p.ProjectIncharge != null ? p.ProjectIncharge.FirstName + " " + p.ProjectIncharge.LastName : "",
+                                    ProjectInchargeId = p.ProjectInchargeId,
+                                    WorkOrderNumber = p.ProjectDetails != null ? p.ProjectDetails.WorkOrderNumber : "",
+                                    WorkOrderAmount = p.ProjectDetails != null ? p.ProjectDetails.WorkOrderAmount : 0,
+                                    PeriodOfWrokInMonths = p.ProjectDetails != null ? p.ProjectDetails.PeriodOfWrokInMonths : 0,
+                                    EstimateManPower = p.ProjectDetails != null ? p.ProjectDetails.EstimateManPower : 0,
+                                    EstimateDays = p.ProjectDetails != null ? p.ProjectDetails.EstimateDays : 0,
+                                    Qty = p.ProjectDetails != null ? p.ProjectDetails.Qty : 0,
+                                    Rate = p.ProjectDetails != null ? p.ProjectDetails.Rate : 0,
+                                    CGST = p.ProjectDetails != null ? p.ProjectDetails.CGST : 0,
+                                    IGST = p.ProjectDetails != null ? p.ProjectDetails.IGST : 0,
+                                    SGST = p.ProjectDetails != null ? p.ProjectDetails.SGST : 0,
+                                    TotalCost = p.ProjectDetails != null ? p.ProjectDetails.TotalCost : 0,
+                                    WorkDescription = p.ProjectDetails != null ? p.ProjectDetails.WorkDescription : "",
+                                    StartDate = p.StartDate,
+                                    EndDate = p.EndDate,
+                                    TenderId = p.TenderId,
+                                    TenderName = p.Tender != null ? p.Tender.Name : "",
+                                    FundingClientId = p.FundingClientId,
+                                    FundingClientName = p.FundingClient != null ? p.FundingClient.Name : "",
+                                    InchargeClientId = p.InchargeClientId,
+                                    InchargeClientName = p.InchargeClient != null ? p.InchargeClient.Name : "",
+                                    TaxModelParamId = p.TaxModelParamId,
+                                    TaxModelParamDecription = p.TaxModelParam != null ? p.TaxModelParam.Description : "",
+                                    ProjectItemTypePramId = p.ProjectItemTypePramId,
+                                    ProjectItemTypePramDecription = p.ProjectItemTypePram != null ? p.ProjectItemTypePram.Description : "",
+                                    ServiceParamId = p.ServiceParamId,
+                                    ServiceParamDecription = p.ServiceParam != null ? p.ServiceParam.Description : "",
+                                    VendorId = p.VendorId,
+                                    VendorName = p.Vendor != null ? p.Vendor.Name : "",
+
+                                }).FirstOrDefault();
+
+
+                return projects;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public async Task<ProjectModel> CreateProjectAsync(ProjectModel projectData)
+        {
+            try
+            {
+                var user = _dbContext.Users.FirstOrDefault(s => s.UserName == "admin1@admin.com");
+
+                projectData = UpdateProjectDropdownData(projectData);
+
+                Project project = new Project();
+
+                project.ProjectName = projectData.ProjectName;
+                project.ProjectNumber = projectData.ProjectNumber;
+                project.ProjectDescription = projectData.ProjectDescription;
+                project.ProjectLocation = projectData.ProjectLocation;
+                project.StartDate = projectData.StartDate;
+                project.EndDate = projectData.EndDate;
+                project.CompanyId = projectData.CompanyId;
+                project.TenderId = projectData.TenderId;
+                project.ProjectInchargeId = projectData.ProjectInchargeId;
+                project.FundingClientId = projectData.FundingClientId;
+                project.InchargeClientId = projectData.InchargeClientId;
+                project.TaxModelParamId = projectData.TaxModelParamId;
+                project.ProjectItemTypePramId = projectData.ProjectItemTypePramId;
+                project.ServiceParamId = projectData.ServiceParamId;
+                project.VendorId = projectData.VendorId;
+                project.CreatedBy = user.Id;
+                project.CreatedOn = DateTime.Now;
+                project.LastModifiedBy = user.Id;
+                project.LastModifiedOn = DateTime.Now;
+
+                ProjectDetail projectDetail = new ProjectDetail();
+                projectDetail.WorkOrderNumber = projectData.WorkOrderNumber;
+                projectDetail.WorkDescription = projectData.WorkDescription;
+                projectDetail.WorkOrderAmount = projectData.WorkOrderAmount;
+                projectDetail.PeriodOfWrokInMonths = projectData.PeriodOfWrokInMonths;
+                projectDetail.EstimateManPower = projectData.EstimateManPower;
+                projectDetail.EstimateDays = projectData.EstimateDays;
+                projectDetail.Qty = projectData.Qty;
+                projectDetail.Rate = projectData.Rate;
+                projectDetail.CGST = projectData.CGST;
+                projectDetail.SGST = projectData.SGST;
+                projectDetail.IGST = projectData.IGST;
+                projectDetail.TotalCost = projectData.TotalCost;
+                projectDetail.CreatedBy = user.Id;
+                projectDetail.CreatedOn = DateTime.Now;
+                projectDetail.LastModifiedBy = user.Id;
+                projectDetail.LastModifiedOn = DateTime.Now;
+
+                project.ProjectDetails = projectDetail;
+
+                _dbContext.Projects.Add(project);
+
+                _dbContext.SaveChanges();
+
+                projectData = GetProjectByName(projectData.ProjectName);
+
+                return projectData;
+
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public async Task<ProjectModel> UpdateProjectAsync(ProjectModel projectData)
+        {
+            try
+            {
+                projectData = UpdateProjectDropdownData(projectData);
+
+                var existingProject = _dbContext.Projects.FirstOrDefault(s => s.ProjectName == projectData.ProjectName);
+
+                existingProject.ProjectName = projectData.ProjectName;
+                existingProject.ProjectNumber = projectData.ProjectNumber;
+                existingProject.ProjectDescription = projectData.ProjectDescription;
+                existingProject.ProjectLocation = projectData.ProjectLocation;
+                existingProject.StartDate = projectData.StartDate;
+                existingProject.EndDate = projectData.EndDate;
+                existingProject.CompanyId = projectData.CompanyId;
+                existingProject.TenderId = projectData.TenderId;
+                existingProject.ProjectInchargeId = projectData.ProjectInchargeId;
+                existingProject.FundingClientId = projectData.FundingClientId;
+                existingProject.InchargeClientId = projectData.InchargeClientId;
+                existingProject.TaxModelParamId = projectData.TaxModelParamId;
+                existingProject.ProjectItemTypePramId = projectData.ProjectItemTypePramId;
+                existingProject.ServiceParamId = projectData.ServiceParamId;
+                existingProject.VendorId = projectData.VendorId;
+
+                ProjectDetail projectDetail = _dbContext.ProjectDetails.FirstOrDefault(s => s.Id == existingProject.ProjectDetailsId);
+                projectDetail.WorkOrderNumber = projectData.WorkOrderNumber;
+                projectDetail.WorkDescription = projectData.WorkDescription;
+                projectDetail.WorkOrderAmount = projectData.WorkOrderAmount;
+                projectDetail.PeriodOfWrokInMonths = projectData.PeriodOfWrokInMonths;
+                projectDetail.EstimateManPower = projectData.EstimateManPower;
+                projectDetail.EstimateDays = projectData.EstimateDays;
+                projectDetail.Qty = projectData.Qty;
+                projectDetail.Rate = projectData.Rate;
+                projectDetail.CGST = projectData.CGST;
+                projectDetail.SGST = projectData.SGST;
+                projectDetail.IGST = projectData.IGST;
+                projectDetail.TotalCost = projectData.TotalCost;
+
+
+
+                _dbContext.Projects.Update(existingProject);
+                _dbContext.ProjectDetails.Update(projectDetail);
+
+                _dbContext.SaveChanges();
+
+                projectData = GetProjectByName(projectData.ProjectName);
+
+                return projectData;
+
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public async Task<bool> DeleteProjectAsync(int id)
+        {
+            try
+            {
+                var project = await _dbContext.Projects.FindAsync(id);
+                if (project == null)
+                    return false;
+
+                _dbContext.Projects.Remove(project);
+                _dbContext.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+
+        }
+
+        #region Private Methods
+
+        private ProjectModel GetProjectByName(string projectName)
+        {
+            var projects = (from p in _dbContext.Projects.Where(p => p.ProjectName == projectName)
+                            select new ProjectModel
+                            {
+                                ProjectName = string.IsNullOrEmpty(p.ProjectName) ? "" : p.ProjectName.Trim(),
+                                ProjectNumber = string.IsNullOrEmpty(p.ProjectNumber) ? "" : p.ProjectNumber.Trim(),
+                                CompanyName = p.Company != null ? p.Company.CompanyName : "",
+                                CompanyId = p.CompanyId,
+                                ProjectDescription = string.IsNullOrEmpty(p.ProjectDescription) ? "" : p.ProjectDescription.Trim(),
+                                ProjectLocation = string.IsNullOrEmpty(p.ProjectLocation) ? "" : p.ProjectLocation.Trim(),
+                                ProjectIncharge = p.ProjectIncharge != null ? p.ProjectIncharge.FirstName + " " + p.ProjectIncharge.LastName : "",
+                                ProjectInchargeId = p.ProjectInchargeId,
+                                WorkOrderNumber = p.ProjectDetails != null ? p.ProjectDetails.WorkOrderNumber : "",
+                                WorkOrderAmount = p.ProjectDetails != null ? p.ProjectDetails.WorkOrderAmount : 0,
+                                PeriodOfWrokInMonths = p.ProjectDetails != null ? p.ProjectDetails.PeriodOfWrokInMonths : 0,
+                                EstimateManPower = p.ProjectDetails != null ? p.ProjectDetails.EstimateManPower : 0,
+                                EstimateDays = p.ProjectDetails != null ? p.ProjectDetails.EstimateDays : 0,
+                                Qty = p.ProjectDetails != null ? p.ProjectDetails.Qty : 0,
+                                Rate = p.ProjectDetails != null ? p.ProjectDetails.Rate : 0,
+                                CGST = p.ProjectDetails != null ? p.ProjectDetails.CGST : 0,
+                                IGST = p.ProjectDetails != null ? p.ProjectDetails.IGST : 0,
+                                SGST = p.ProjectDetails != null ? p.ProjectDetails.SGST : 0,
+                                TotalCost = p.ProjectDetails != null ? p.ProjectDetails.TotalCost : 0,
+                                WorkDescription = p.ProjectDetails != null ? p.ProjectDetails.WorkDescription : "",
+                                StartDate = p.StartDate,
+                                EndDate = p.EndDate,
+                                TenderId = p.TenderId,
+                                TenderName = p.Tender != null ? p.Tender.Name : "",
+                                FundingClientId = p.FundingClientId,
+                                FundingClientName = p.FundingClient != null ? p.FundingClient.Name : "",
+                                InchargeClientId = p.InchargeClientId,
+                                InchargeClientName = p.InchargeClient != null ? p.InchargeClient.Name : "",
+                                TaxModelParamId = p.TaxModelParamId,
+                                TaxModelParamDecription = p.TaxModelParam != null ? p.TaxModelParam.Description : "",
+                                ProjectItemTypePramId = p.ProjectItemTypePramId,
+                                ProjectItemTypePramDecription = p.ProjectItemTypePram != null ? p.ProjectItemTypePram.Description : "",
+                                ServiceParamId = p.ServiceParamId,
+                                ServiceParamDecription = p.ServiceParam != null ? p.ServiceParam.Description : "",
+                                VendorId = p.VendorId,
+                                VendorName = p.Vendor != null ? p.Vendor.Name : "",
+
+                            }).FirstOrDefault();
+
+
+            return projects;
+        }
+
+        private ProjectModel UpdateProjectDropdownData(ProjectModel projectModel)
+        {
+            if (!string.IsNullOrEmpty(projectModel.CompanyName))
+            {
+                var company = _dbContext.Companies.FirstOrDefault(s => s.CompanyName == projectModel.CompanyName);
+                projectModel.CompanyId = company?.Id;
+            }
+
+            if (!string.IsNullOrEmpty(projectModel.TenderName))
+            {
+                var tender = _dbContext.Tenders.FirstOrDefault(s => s.Name == projectModel.TenderName);
+                projectModel.TenderId = tender?.Id;
+            }
+
+            if (!string.IsNullOrEmpty(projectModel.TenderName))
+            {
+                var tender = _dbContext.Tenders.FirstOrDefault(s => s.Name == projectModel.TenderName);
+                projectModel.TenderId = tender?.Id;
+            }
+
+            if (!string.IsNullOrEmpty(projectModel.ProjectInchargeName))
+            {
+                var projectIncharge = _dbContext.Employees.FirstOrDefault(s => s.FirstName + " " + s.LastName == projectModel.ProjectInchargeName);
+                projectModel.ProjectInchargeId = projectIncharge?.Id;
+            }
+
+            if (!string.IsNullOrEmpty(projectModel.FundingClientName))
+            {
+                var fundingClient = _dbContext.Clients.FirstOrDefault(s => s.Name == projectModel.FundingClientName);
+                projectModel.FundingClientId = fundingClient?.Id;
+            }
+
+            if (!string.IsNullOrEmpty(projectModel.InchargeClientName))
+            {
+                var inchargeClient = _dbContext.Clients.FirstOrDefault(s => s.Name == projectModel.InchargeClientName);
+                projectModel.InchargeClientId = inchargeClient?.Id;
+            }
+
+            if (!string.IsNullOrEmpty(projectModel.TaxModelParamDecription))
+            {
+                var taxModelParam = _dbContext.Params.FirstOrDefault(s => s.Description == projectModel.TaxModelParamDecription && s.ParamType == "TAX_MODEL");
+                projectModel.TaxModelParamId = taxModelParam?.Id;
+            }
+
+            if (!string.IsNullOrEmpty(projectModel.ProjectItemTypePramDecription))
+            {
+                var projectItemTypePram = _dbContext.Params.FirstOrDefault(s => s.Description == projectModel.ProjectItemTypePramDecription && s.ParamType == "ITEM_TYPE_MODEL");
+                projectModel.ProjectItemTypePramId = projectItemTypePram?.Id;
+            }
+
+            if (!string.IsNullOrEmpty(projectModel.ServiceParamDecription))
+            {
+                var serviceParam = _dbContext.Params.FirstOrDefault(s => s.Description == projectModel.ServiceParamDecription && s.ParamType == "SERVICE_TYPE");
+                projectModel.ServiceParamId = serviceParam?.Id;
+            }
+
+            if (!string.IsNullOrEmpty(projectModel.VendorName))
+            {
+                var vendor = _dbContext.Vendors.FirstOrDefault(s => s.Name == projectModel.VendorName);
+                projectModel.VendorId = vendor?.Id;
+            }
+
+            return projectModel;
+        }
+
+        #endregion
 
         //public async Task<ResponseModel> CreateCompanyAsync(string user, CompanyModel company)
         //{
