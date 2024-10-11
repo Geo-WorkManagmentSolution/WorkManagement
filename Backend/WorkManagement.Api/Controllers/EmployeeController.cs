@@ -19,16 +19,18 @@ namespace WorkManagement.API.Controllers
     public class EmployeesController : ControllerBase
     {
         private readonly IEmployeeService employeeService;
+        private readonly IEmailService _emailService;
         private readonly AdvanceSearchService advanceSearchService;
         private IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper mapper;
 
-        public EmployeesController(IEmployeeService employeeService, AdvanceSearchService AdvanceSearchService, IHttpContextAccessor httpContextAccessor, IMapper mapper)
+        public EmployeesController(IEmployeeService employeeService, AdvanceSearchService AdvanceSearchService, IHttpContextAccessor httpContextAccessor, IMapper mapper, IEmailService emailService)
         {
             this.employeeService = employeeService;
             advanceSearchService = AdvanceSearchService;
             _httpContextAccessor = httpContextAccessor;
             this.mapper = mapper;
+            _emailService = emailService;
         }
 
         // GET: api/employees
@@ -68,6 +70,20 @@ namespace WorkManagement.API.Controllers
             var createdEmployee = await employeeService.CreateEmployeeAsync(employee);
             return CreatedAtAction(nameof(GetEmployee), new { id = createdEmployee.Id }, createdEmployee);
 
+        }
+
+        // POST: api/employees
+        [HttpPost("sendEmail")]
+        public async Task<ActionResult> SendEmail()
+        {
+            try
+            {
+                employeeService.SendEmail();
+                return Ok();
+            }catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost]
