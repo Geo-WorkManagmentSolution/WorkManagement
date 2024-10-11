@@ -58,6 +58,8 @@ namespace WorkManagement.Service
             var WelcomeModelCredentials = new WelcomeModel();
             WelcomeModelCredentials.Username = "snaupul@gmail.com";
             WelcomeModelCredentials.Password = "Test1234@";
+            WelcomeModelCredentials.FirstName = "Naupul";
+            WelcomeModelCredentials.LastName = "Shah";
 
             var emailModel = new EmailModel<WelcomeModel>();
             emailModel.From = "naupul30@gmail.com";
