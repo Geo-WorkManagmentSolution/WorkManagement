@@ -29,13 +29,7 @@ namespace WorkManagmentSolution.EFCore
         public virtual DbSet<Employee> Employees { get; set; }
         public virtual DbSet<EmployeePersonalDetails> EmployeePersonalDetails { get; set; }
         public virtual DbSet<EmployeeCategory> EmployeeCategories { get; set; }
-        public virtual DbSet<Company> Companies { get; set; }
         public virtual DbSet<Project> Projects { get; set; }
-        public virtual DbSet<Client> Clients { get; set; }
-        public virtual DbSet<Param> Params { get; set; }
-        public virtual DbSet<ProjectDetail> ProjectDetails { get; set; }
-        public virtual DbSet<Tender> Tenders { get; set; }
-        public virtual DbSet<Vendor> Vendors { get; set; }
 
         public IHttpContextAccessor HttpContextAccessor { get; }
 

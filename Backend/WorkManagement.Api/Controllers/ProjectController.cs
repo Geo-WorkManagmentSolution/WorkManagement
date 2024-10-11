@@ -31,55 +31,6 @@ namespace WorkManagement.API.Controllers
             _userManager = userManager;
         }
 
-        // GET: api/project/companyList
-        [HttpGet("companyList")]
-        public async Task<ActionResult<IEnumerable<Company>>> GetProjectCompanyList()
-        {
-            var companyList = await _projectService.GetProjectCompanyList();
-            return Ok(companyList);
-        }
-
-        // GET: api/project/tenderList
-        [HttpGet("tenderList")]
-        public async Task<ActionResult<IEnumerable<Tender>>> GetProjectTendersList()
-        {
-            var tenderList = await _projectService.GetProjectTendersList();
-            return Ok(tenderList);
-        }
-
-        // GET: api/project/employeeList
-        [HttpGet("employeeList")]
-        public async Task<ActionResult<IEnumerable<Employee>>> GetProjectEmployeeList()
-        {
-            var employeeList = await _projectService.GetProjectEmployeeList();
-            return Ok(mapper.Map<List<EmployeeModel>>(employeeList));
-        }
-
-
-        // GET: api/project/clientList
-        [HttpGet("clientList")]
-        public async Task<ActionResult<IEnumerable<Employee>>> GetProjectClientList()
-        {
-            var clientList = await _projectService.GetProjectClientList();
-            return Ok(clientList);
-        }
-
-        // GET: api/project/paramList
-        [HttpGet("paramList")]
-        public async Task<ActionResult<IEnumerable<Param>>> GetProjectParamList(string paramType)
-        {
-            var paramList = await _projectService.GetProjectParamList(paramType);
-            return Ok(paramList);
-        }
-
-        // GET: api/project/vendorList
-        [HttpGet("vendorList")]
-        public async Task<ActionResult<IEnumerable<Param>>> GetProjectVendorList()
-        {
-            var vendorList = await _projectService.GetProjectVendorList();
-            return Ok(vendorList);
-        }
-
         // GET: api/projects
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProjectModel>>> GetProjects()
