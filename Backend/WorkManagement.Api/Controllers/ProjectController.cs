@@ -39,6 +39,18 @@ namespace WorkManagement.API.Controllers
             return Ok(projects);
         }
 
+        // GET: api/project/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<ProjectModel>> GetProject(int id)
+        {
+            var project = await _projectService.GetProjectByIdAsync(id);
+            if (project == null)
+            {
+                return NotFound();
+            }
+            return Ok(project);
+        }
+
         // POST: api/project
         [HttpPost]
         public async Task<ActionResult<EmployeeModel>> CreateProject([FromBody] ProjectModel projectModel)

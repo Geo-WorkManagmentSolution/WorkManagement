@@ -27,6 +27,7 @@ namespace WorkManagement.Service
                 var projects = (from p in _dbContext.Projects
                                 select new ProjectModel
                                 {
+                                    Id = p.Id,
                                     ProjectName = string.IsNullOrEmpty(p.ProjectName) ? "" : p.ProjectName.Trim(),
                                     ProjectNumber = string.IsNullOrEmpty(p.ProjectNumber) ? "" : p.ProjectNumber.Trim(),
                                     ProjectDescription = string.IsNullOrEmpty(p.ProjectDescription) ? "" : p.ProjectDescription.Trim(),
@@ -51,6 +52,7 @@ namespace WorkManagement.Service
                 var projects = (from p in _dbContext.Projects.Where(p => p.Id == id)
                                 select new ProjectModel
                                 {
+                                    Id = p.Id,
                                     ProjectName = string.IsNullOrEmpty(p.ProjectName) ? "" : p.ProjectName.Trim(),
                                     ProjectNumber = string.IsNullOrEmpty(p.ProjectNumber) ? "" : p.ProjectNumber.Trim(),
                                     ProjectDescription = string.IsNullOrEmpty(p.ProjectDescription) ? "" : p.ProjectDescription.Trim(),
