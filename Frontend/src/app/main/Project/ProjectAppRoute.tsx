@@ -1,6 +1,7 @@
 import { lazy } from 'react';
 import { Navigate } from 'react-router-dom';
 import { FuseRouteItemType } from '@fuse/utils/FuseUtils';
+import Project from './Project/Project';
 
 const ProjectApp = lazy(() => import('./ProjectApp'));
 const Projects = lazy(() => import('./Projects/Projects'));
@@ -19,6 +20,10 @@ const ProjectAppRoute: FuseRouteItemType = {
 				{
 					path: '',
 					element: <Projects />
+				},
+				{
+					path: ':projectId',
+					element: <Project />
 				}
 			]
 		}
