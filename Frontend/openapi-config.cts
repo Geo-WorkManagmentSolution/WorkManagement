@@ -15,6 +15,7 @@ const config: ConfigFile = {
 			filterEndpoints: [/Project/i],
 		}
 	},
+	useEnumType:true,
 	hooks: { queries: true, lazyQueries: true, mutations: true }
 };
 

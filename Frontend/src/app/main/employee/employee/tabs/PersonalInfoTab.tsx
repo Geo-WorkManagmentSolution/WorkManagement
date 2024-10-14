@@ -6,10 +6,10 @@ import {
 	FormLabel,
 	Typography,
 	Autocomplete,
-	TextField
+	TextField,
+	MenuItem
 } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers';
-import { parseISO } from 'date-fns';
+import {RelationWithEmployee,BloodGroup} from '../../EmployeeApi'
 import { Controller, useFormContext } from 'react-hook-form';
 
 /**
@@ -97,6 +97,54 @@ function PersonalInfoTab() {
 				)}
 			/>
 
+			<Controller
+				name="employeePersonalDetails.bloodGroup"
+				control={control}
+				render={({ field }) => (
+					<TextField
+						{...field}
+						className="mt-8 mb-16 "
+						select
+						label="Blood Group"
+						fullWidth
+						error={!!errors.employeePersonalDetails?.bloodGroup}
+						helperText={errors.employeePersonalDetails?.bloodGroup?.message as string}
+					>
+						{Object.values(BloodGroup).map((group) => (
+							<MenuItem
+								key={group}
+								value={group}
+							>
+								{group}
+							</MenuItem>
+						))}
+					</TextField>
+				)}
+			/>
+			<Controller
+				name="employeePersonalDetails.relationWithEmployee"
+				control={control}
+				render={({ field }) => (
+					<TextField
+						{...field}
+						className="mt-8 mb-16 "
+						select
+						label="Relation with Employee"
+						fullWidth
+						error={!!errors.employeePersonalDetails?.relationWithEmployee}
+						helperText={errors.employeePersonalDetails?.relationWithEmployee?.message}
+					>
+						{Object.values(RelationWithEmployee).map((relation) => (
+							<MenuItem
+								key={relation}
+								value={relation}
+							>
+								{relation}
+							</MenuItem>
+						))}
+					</TextField>
+				)}
+			/>
 			{/* 			
 
 <Controller
@@ -128,7 +176,7 @@ function PersonalInfoTab() {
 				)}
 			/> */}
 
-			<Controller
+			{/* <Controller
 				name="employeePersonalDetails.dateOfBirth"
 				control={control}
 				render={({ field }) => (
@@ -138,15 +186,25 @@ function PersonalInfoTab() {
 						{...field}
 					/>
 				)}
+			/> */}
+
+			<Controller
+				name="employeePersonalDetails.dateOfBirth"
+				control={control}
+				rules={{ required: 'Date of Birth is required' }}
+				render={({ field, fieldState: { error } }) => (
+					<TextField
+						{...field}
+						label="Date of Birth"
+						className="mt-8 mb-16 "
+						type="date"
+						fullWidth
+						InputLabelProps={{ shrink: true }}
+						error={!!error}
+						helperText={error?.message}
+					/>
+				)}
 			/>
-			{errors.employeePersonalDetails?.dateOfBirth && (
-				<Typography
-					variant="caption"
-					color="error"
-				>
-					{errors.employeePersonalDetails.dateOfBirth.message}
-				</Typography>
-			)}
 		</div>
 	);
 }

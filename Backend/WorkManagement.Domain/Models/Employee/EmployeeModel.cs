@@ -28,6 +28,16 @@ namespace WorkManagement.Domain.Models.Employee
         public required int EmployeeCategoryId { get; set; }
         public int? EmployeePersonalDetailsId { get; set; }
         public EmployeePersonalDetails? EmployeePersonalDetails { get; set; }
+        public int? EmployeeWorkInformationId { get; set; }
+        public EmployeeWorkInformation? EmployeeWorkInformation { get; set; }
+        public int? EmployeeAddressId { get; set; }
+        public EmployeeAddress? EmployeeAddresses { get; set; }
+        public int? EmployeeIdentityInfoId { get; set; }
+        public EmployeeIdentityInfo? EmployeeIdentityInfos { get; set; }
+        public int? EmployeeEducationDetailIds { get; set; }
+        public List<EmployeeEducationDetail>? EmployeeEducationDetail { get; set; }
+        public int? EmployeeDocumentsIds { get; set; }
+        public List<EmployeeDocuments>? EmployeeDocuments { get; set; }
     }
 }
 

@@ -17,21 +17,23 @@ const navigationConfig: FuseNavItemType[] = [
 		title: 'Employee Management',
 		subtitle: 'Manage your employee management',
 		type: 'group',
+		translate: 'APPLICATIONS',
 		children: [
 			{
-				id: 'apps.employees',
+				id: 'employeemanagement.employees',
 				title: 'Employee',
 				type: 'collapse',
 				icon: 'heroicons-outline:user-group',
 				children: [
 					{
-						id: 'apps.employees.search',
+						id: 'employeemanagement.employees.search',
 						title: 'Employee Dashboard',
 						type: 'item',
-						url: '/apps/employees'
+						url: '/apps/employees',
+						end: true,
 					},
 					{
-						id: 'apps.employees.new',
+						id: 'employeemanagement.employees.new',
 						title: 'Add Employee',
 						type: 'item',
 						url: '/apps/employees/employeesSearch/new'

@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore.Query;
 using System.Diagnostics.Metrics;
 using System.Linq.Expressions;
 using System.Net.Http;
+using System.Reflection.Metadata;
 using System.Security.Claims;
 using System.Xml;
 using WorkManagement.Domain.Entity;
@@ -28,7 +29,12 @@ namespace WorkManagmentSolution.EFCore
 
         public virtual DbSet<Employee> Employees { get; set; }
         public virtual DbSet<EmployeePersonalDetails> EmployeePersonalDetails { get; set; }
+        public virtual DbSet<EmployeeWorkInformation> EmployeeWorkInformations { get; set; }
+        public virtual DbSet<EmployeeAddress> EmployeeAddresses { get; set; }
+        public virtual DbSet<EmployeeIdentityInfo> EmployeeIdentityInfos { get; set; }
+        public virtual DbSet<EmployeeEducationDetail> EmployeeEducationDetails { get; set; }
         public virtual DbSet<EmployeeCategory> EmployeeCategories { get; set; }
+        public virtual DbSet<EmployeeDocuments> EmployeeDocuments { get; set; }
         public virtual DbSet<Project> Projects { get; set; }
         public virtual DbSet<Company> Companies { get; set; }
 
@@ -37,7 +43,7 @@ namespace WorkManagmentSolution.EFCore
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            
+
             //Expression<Func<FullyAuditableEntity, bool>> filterExpr = bm => !bm.IsDeleted;
             //foreach (var mutableEntityType in modelBuilder.Model.GetEntityTypes())
             //{
@@ -59,8 +65,6 @@ namespace WorkManagmentSolution.EFCore
                      new EmployeeCategory { Id = 2, Name = "Contractor" },
                      new EmployeeCategory { Id = 3, Name = "Site" }
             );
-
-
         }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -86,7 +90,7 @@ namespace WorkManagmentSolution.EFCore
             var entities = ChangeTracker.Entries().Where(x => x.Entity is FullyAuditableEntity && (x.State == EntityState.Added || x.State == EntityState.Modified));
 
             var email = HttpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Email);
-            var loggedinUser= this.Users.FirstOrDefault(x => x.Email == email);
+            var loggedinUser = this.Users.FirstOrDefault(x => x.Email == email);
             foreach (var entity in entities)
             {
                 if (entity.State == EntityState.Added)

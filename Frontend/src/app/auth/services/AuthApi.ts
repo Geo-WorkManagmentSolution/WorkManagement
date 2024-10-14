@@ -61,7 +61,7 @@ export type PostApiAuthAccesstokenApiResponse = unknown;
 export type PostApiAuthAccesstokenApiArg = {
   accesstoken?: string;
 };
-export type GetApiAuthRolesApiResponse = /** status 200 OK */ ApplicationRole[];
+export type GetApiAuthRolesApiResponse = /** status 200 OK */ RoleModel[];
 export type GetApiAuthRolesApiArg = void;
 export type UserloginModel = {
   email?: string | null;
@@ -72,11 +72,9 @@ export type UserRegistrationModel = {
   displayName: string;
   password: string;
 };
-export type ApplicationRole = {
+export type RoleModel = {
   id?: string;
   name?: string | null;
-  normalizedName?: string | null;
-  concurrencyStamp?: string | null;
 };
 export const {
   usePostApiAuthSignInMutation,

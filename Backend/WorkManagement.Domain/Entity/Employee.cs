@@ -1,16 +1,10 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.FileIO;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Reflection;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
-using WorkManagement.Domain.Contracts;
 using WorkManagement.Domain.Entity;
 using WorkManagement.Domain.Models;
-using WorkManagementSolution.Employee;
 
 namespace WorkManagementSolution.Employee
 {
@@ -23,12 +17,13 @@ namespace WorkManagementSolution.Employee
 
         public required string FirstName { get; set; }
         public required string LastName { get; set; }
+        public required string Surname { get; set; }
+        public required string MotherName { get; set; }
 
         [EmailAddress]
         public required string Email { get; set; }
-        [Phone]
-        public  int? PhoneNumber { get; set; }
-        public required string Position { get; set; }
+        public int? PhoneNumber { get; set; }
+        public int? AlternateNumber { get; set; }
 
         [ForeignKey(nameof(ApplicationUser))]
         public required Guid UserId { get; set; }
@@ -38,6 +33,8 @@ namespace WorkManagementSolution.Employee
         public required Guid RoleId { get; set; }
         public ApplicationRole? ApplicationRole { get; set; }
 
+        public string DepartmentName { get; set; }
+
         [ForeignKey(nameof(EmployeeCategory))]
         public int? EmployeeCategoryId { get; set; }
         public EmployeeCategory? EmployeeCategory { get; set; }
@@ -45,133 +42,139 @@ namespace WorkManagementSolution.Employee
         [ForeignKey(nameof(EmployeePersonalDetails))]
         public int? EmployeePersonalDetailsId { get; set; }
         public EmployeePersonalDetails? EmployeePersonalDetails { get; set; }
+
+        [ForeignKey(nameof(EmployeeWorkInformation))]
+        public int? EmployeeWorkInformationId { get; set; }
+        public EmployeeWorkInformation? EmployeeWorkInformation { get; set; }
+
+        [ForeignKey(nameof(EmployeeAddresses))]
+        public int? EmployeeAddressId { get; set; }
+        public EmployeeAddress? EmployeeAddresses { get; set; }
+
+        [ForeignKey(nameof(EmployeeIdentityInfos))]
+        public int? EmployeeIdentityInfoId { get; set; }
+        public EmployeeIdentityInfo? EmployeeIdentityInfos { get; set; }
+
+        [ForeignKey(nameof(EmployeeEducationDetailIds))]
+        public int? EmployeeEducationDetailIds { get; set; }
+        public List<EmployeeEducationDetail>? EmployeeEducationDetail { get; set; }
+
+        [ForeignKey(nameof(EmployeeDocumentIds))]
+        public int? EmployeeDocumentIds { get; set; }
+        public List<EmployeeDocuments>? EmployeeDocuments { get; set; }
+
+    }
+
+    public class EmployeeDocuments : BaseEntity
+    {
+        public string FileName { get; set; }
+        public int FileSize { get; set; }
+        public byte[] FileContent { get; set; }
+        public FileType FileType { get; set; }
+
+    }
+    public enum FileType
+    {
+        PDF,
+        DOCX,
+        TXT,
+        ZIP,
+        XLSX,
+        CSV,
+        Other
+    }
+
+    public class EmployeePersonalDetails : BaseEntity
+    {
+        [DataType(DataType.Date)]
+        public required DateTime DateOfBirth { get; set; }
+        public required string Gender { get; set; }
+        public required string MaritalStatus { get; set; }
+        public BloodGroup? bloodGroup { get; set; }
+
+        public RelationWithEmployee? RelationWithEmployee { get; set; }
+    }
+
+    public class EmployeeWorkInformation : BaseEntity
+    {
+        public string? Designation { get; set; }
+        public SalaryType SalaryType { get; set; }
+
+        [DataType(DataType.Date)]
+        public DateTime HireDate { get; set; }
+        public decimal Salary { get; set; }
+        public string? Site { get; set; }
+        public decimal? Bond { get; set; }
+        [DataType(DataType.Date)]
+        public DateTime? PreviousDateOfJoiningInGDR { get; set; }
+        [DataType(DataType.Date)]
+        public DateTime? PreviousDateOfLeavingInGDR { get; set; }
+        public string? GRPHead { get; set; }
+    }
+
+    public class EmployeeAddress : BaseEntity
+    {
+        public string AddressLine1 { get; set; }
+        public string AddressLine2 { get; set; }
+        public string City { get; set; }
+        public string Country { get; set; }
+        public string State { get; set; }
+        public string PinCode { get; set; }
+        // Other address-related properties
+    }
+
+    public class EmployeeIdentityInfo : BaseEntity
+    {
+        public string? UID { get; set; } // Enum formatted as '0000 0000 0000'
+        public string? BankAccountNumber { get; set; } // BankAC No.
+        public string? BankName { get; set; }
+        public string? Branch { get; set; } // Enum formatted as 'AREA, CITY'
+        public string? IFSC { get; set; }
+        public string? AccountHolderName { get; set; } // ACHolder
+        public string? PAN { get; set; }
+        public string? ProvidentFundNumber { get; set; } // PFNO
+        public string? EmployeeStateInsuranceNumber { get; set; } // ESINO
+        public string? BiometricCode { get; set; } // BIOCODE
+
+    }
+
+    public class EmployeeEducationDetail : BaseEntity
+    {
+        public string Type { get; set; }
+        public string PassingYear { get; set; }
+        public string University { get; set; }
+        public string? grade { get; set; }
+
+    }
+
+    public enum SalaryType
+    {
+        M,
+        F
+    }
+    public enum RelationWithEmployee
+    {
+        Colleague,
+        Supervisor,
+        Subordinate,
+        Manager,
+        Mentor,
+        Friend,
+        FamilyMember,
+        Other
+    }
+    public enum BloodGroup
+    {
+        OPositive,
+        APositive,
+        BPositive,
+        ABPositive,
+        ABNegative,
+        ANegative,
+        BNegative,
+        ONegative
     }
 }
 
-//Employee Personal Details:
-//This model will represent personal information about employees.
-//C#
 
-//public class EmployeePersonalDetails
-//{
-//    public int EmployeeID { get; set; }
-//    public string FirstName { get; set; }
-//    public string LastName { get; set; }
-//    public string Email { get; set; }
-//    public DateTime DateOfBirth { get; set; }
-//    public string Gender { get; set; }
-//    public string MaritalStatus { get; set; }
-//    // Other personal details as needed
-//}
-//AI - generated code.Review and use carefully. More info on FAQ.
-//Employees Work Information:
-//This model will capture work-related details.
-//C#
 
-//public class EmployeeWorkInformation
-//{
-//    public int EmployeeID { get; set; }
-//    public int DepartmentID { get; set; }
-//    public string JobTitle { get; set; }
-//    public DateTime HireDate { get; set; }
-//    public decimal Salary { get; set; }
-//    // Other work-related properties
-//}
-//AI - generated code.Review and use carefully. More info on FAQ.
-//Employees Addresses:
-//A model for storing address information.
-//C#
-
-//public class EmployeeAddress
-//{
-//    public int AddressID { get; set; }
-//    public int EmployeeID { get; set; }
-//    public string AddressLine1 { get; set; }
-//    public string AddressLine2 { get; set; }
-//    public string City { get; set; }
-//    public string Country { get; set; }
-//    public string State { get; set; }
-//    public string PostalCode { get; set; }
-//    // Other address-related properties
-//}
-//AI - generated code.Review and use carefully. More info on FAQ.
-//Employees Departments:
-//A model to represent department details.
-//C#
-
-//public class EmployeeDepartment
-//{
-//    public int DepartmentID { get; set; }
-//    public string DepartmentName { get; set; }
-//    // Other department-related properties
-//}
-//AI - generated code.Review and use carefully. More info on FAQ.
-//Employees Identity Information:
-//Model for identity-related data (UAN, PAN, Aadhaar).
-//C#
-
-//public class EmployeeIdentityInfo
-//{
-//    public int EmployeeID { get; set; }
-//    public string UAN { get; set; }
-//    public string PAN { get; set; }
-//    public string Aadhaar { get; set; }
-//    // Other identity-related properties
-//}
-//AI - generated code.Review and use carefully. More info on FAQ.
-//Employees Contact Details:
-//Model for contact information (phone numbers, email).
-//C#
-
-//public class EmployeeContactDetails
-//{
-//    public int EmployeeID { get; set; }
-//    public string WorkPhoneNumber { get; set; }
-//    public string PersonalMobileNumber { get; set; }
-//    public string PersonalEmailAddress { get; set; }
-//    // Other contact-related properties
-//}
-//AI - generated code.Review and use carefully. More info on FAQ.
-//Employees Work Experience:
-//Model to track work experiences.
-//C#
-
-//public class EmployeeWorkExperience
-//{
-//    public int WorkExperienceID { get; set; }
-//    public int EmployeeID { get; set; }
-//    public string CompanyName { get; set; }
-//    public string JobDescription { get; set; }
-//    public DateTime FromDate { get; set; }
-//    public DateTime ToDate { get; set; }
-//    // Other work experience properties
-//}
-//AI - generated code.Review and use carefully. More info on FAQ.
-//Employees Education Details:
-//Model for education information.
-//C#
-
-//public class EmployeeEducation
-//{
-//    public int EducationID { get; set; }
-//    public int EmployeeID { get; set; }
-//    public string InstituteName { get; set; }
-//    public string Degree { get; set; }
-//    public string Specialization { get; set; }
-//    public DateTime DateOfCompletion { get; set; }
-//    // Other education-related properties
-//}
-//AI - generated code.Review and use carefully. More info on FAQ.
-//Employees Dependent Details:
-//Model for dependent information (e.g., family members).
-//C#
-
-//public class EmployeeDependent
-//{
-//    public int DependentID { get; set; }
-//    public int EmployeeID { get; set; }
-//    public string DependentName { get; set; }
-//    public string Relationship { get; set; }
-//    public DateTime DateOfBirth { get; set; }
-//    // Other dependent-related properties
-//}

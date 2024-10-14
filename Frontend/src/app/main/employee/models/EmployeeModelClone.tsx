@@ -1,6 +1,6 @@
 import _ from '@lodash';
 import { PartialDeep } from 'type-fest';
-import { EmployeeModel } from '../EmployeeApi';
+import { BloodGroup, EmployeeModel, RelationWithEmployee, SalaryType } from '../EmployeeApi';
 
 /**
  * The product model.
@@ -10,18 +10,66 @@ const EmployeeModelClone = (data: PartialDeep<EmployeeModel>) =>
 		id: 0,
 		photoURL: '',
 		employeeNumber: 0,
-		isActive: false,
 		firstName: '',
 		lastName: '',
 		email: '',
-		phoneNumber: 0,
+		phoneNumber: '',
 		position: '',
-		role: '',
+		userId: '',
+		roleId: '',
+		employeeCategoryId: 0,
+		employeePersonalDetailsId: 0,
 		employeePersonalDetails: {
-			dateOfBirth: null,
+			id: 0,
+			isDeleted: false,
+			dateOfBirth: '',
 			gender: '',
-			maritalStatus: ''
-		}
+			maritalStatus: '',
+			bloodGroup: '' as BloodGroup,
+			relationWithEmployee: '' as RelationWithEmployee
+		},
+		employeeWorkInformationId: 0,
+		employeeWorkInformation: {
+			id: 0,
+			isDeleted: false,
+			designation: '',
+			salaryType: '' as SalaryType,
+			hireDate: '',
+			salary: 0,
+			site: '',
+			bond: 0,
+			previousDateOfJoiningInGDR: '',
+			previousDateOfLeavingInGDR: '',
+			grpHead: ''
+		},
+		employeeAddressId: 0,
+		employeeAddresses: {
+			id: 0,
+			isDeleted: false,
+			addressLine1: '',
+			addressLine2: '',
+			city: '',
+			country: '',
+			state: '',
+			pinCode: ''
+		},
+		employeeIdentityInfoId: 0,
+		employeeIdentityInfos: {
+			id: 0,
+			isDeleted: false,
+			uid: '',
+			bankAccountNumber: '',
+			bankName: '',
+			branch: '',
+			ifsc: '',
+			accountHolderName: '',
+			pan: '',
+			providentFundNumber: '',
+			employeeStateInsuranceNumber: '',
+			biometricCode: ''
+		},
+		employeeEducationDetailIds: 0,
+		employeeEducationDetail: [{ type: '', university: '', year: '', grade: '' }]
 	});
 
 export default EmployeeModelClone;

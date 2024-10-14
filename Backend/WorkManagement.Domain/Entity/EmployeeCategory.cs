@@ -7,7 +7,7 @@ using WorkManagement.Domain.Models;
 
 namespace WorkManagement.Domain.Entity
 {
-    public class EmployeeCategory: WorkManagement.Domain.Models.Entity
+    public class EmployeeCategory: WorkManagement.Domain.Models.BaseEntity
     {
         public string Name { get; set; }
     }

@@ -14,6 +14,7 @@ using WorkManagement.API.Extensions;
 using WorkManagement.Domain.Contracts;
 using WorkManagement.API.Middleware;
 using Serilog;
+using System.Text.Json.Serialization;
 
 
 
@@ -100,6 +101,8 @@ try
     builder.Services.AddAutoMapper(typeof(WorkManagement.Domain.AutoMapper.Profiles.EmployeeProfile).Assembly);
 
     builder.AddJWTAuthetication();
+    builder.Services.AddControllers()
+    .AddJsonOptions(options => { options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
     var app = builder.Build();
 
 

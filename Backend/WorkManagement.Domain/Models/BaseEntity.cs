@@ -8,7 +8,7 @@ using WorkManagement.Domain.Contracts;
 
 namespace WorkManagement.Domain.Models
 {
-    public class Entity : ISoftDeleteEntity
+    public class BaseEntity : ISoftDeleteEntity
     {
         [Key]
         public int Id { get; set; }

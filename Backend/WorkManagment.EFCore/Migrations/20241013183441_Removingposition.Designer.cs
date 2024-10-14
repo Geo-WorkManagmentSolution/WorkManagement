@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WorkManagmentSolution.EFCore;
 
@@ -11,9 +12,11 @@ using WorkManagmentSolution.EFCore;
 namespace WorkManagement.EFCore.Migrations
 {
     [DbContext(typeof(WorkManagementDbContext))]
-    partial class WorkManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241013183441_Removingposition")]
+    partial class Removingposition
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -423,9 +426,6 @@ namespace WorkManagement.EFCore.Migrations
                     b.Property<int?>("EmployeeCategoryId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("EmployeeDocumentIds")
-                        .HasColumnType("int");
-
                     b.Property<int?>("EmployeeEducationDetailIds")
                         .HasColumnType("int");
 
@@ -536,41 +536,6 @@ namespace WorkManagement.EFCore.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("EmployeeAddresses");
-                });
-
-            modelBuilder.Entity("WorkManagementSolution.Employee.EmployeeDocuments", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("EmployeeId")
-                        .HasColumnType("int");
-
-                    b.Property<byte[]>("FileContent")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("FileName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("FileSize")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FileType")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.ToTable("EmployeeDocuments");
                 });
 
             modelBuilder.Entity("WorkManagementSolution.Employee.EmployeeEducationDetail", b =>
@@ -842,13 +807,6 @@ namespace WorkManagement.EFCore.Migrations
                     b.Navigation("EmployeeWorkInformation");
                 });
 
-            modelBuilder.Entity("WorkManagementSolution.Employee.EmployeeDocuments", b =>
-                {
-                    b.HasOne("WorkManagementSolution.Employee.Employee", null)
-                        .WithMany("EmployeeDocuments")
-                        .HasForeignKey("EmployeeId");
-                });
-
             modelBuilder.Entity("WorkManagementSolution.Employee.EmployeeEducationDetail", b =>
                 {
                     b.HasOne("WorkManagementSolution.Employee.Employee", null)
@@ -863,8 +821,6 @@ namespace WorkManagement.EFCore.Migrations
 
             modelBuilder.Entity("WorkManagementSolution.Employee.Employee", b =>
                 {
-                    b.Navigation("EmployeeDocuments");
-
                     b.Navigation("EmployeeEducationDetail");
                 });
 #pragma warning restore 612, 618
