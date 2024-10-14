@@ -223,6 +223,42 @@ namespace WorkManagement.EFCore.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("WorkManagement.Domain.Entity.Client", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("LastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("LastModifiedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Clients");
+                });
+
             modelBuilder.Entity("WorkManagement.Domain.Entity.Company", b =>
                 {
                     b.Property<int>("Id")
@@ -335,7 +371,7 @@ namespace WorkManagement.EFCore.Migrations
                         });
                 });
 
-            modelBuilder.Entity("WorkManagement.Domain.Entity.Project", b =>
+            modelBuilder.Entity("WorkManagement.Domain.Entity.Param", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -343,17 +379,15 @@ namespace WorkManagement.EFCore.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CompanyId")
-                        .HasColumnType("int");
-
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTimeOffset>("CreatedOn")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -364,7 +398,73 @@ namespace WorkManagement.EFCore.Migrations
                     b.Property<DateTimeOffset>("LastModifiedOn")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("ProjectIncharge")
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ParamType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ParamValue")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Params");
+                });
+
+            modelBuilder.Entity("WorkManagement.Domain.Entity.Project", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTime?>("EndDate")
+                        .IsRequired()
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("FundingClientId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("InchargeClientId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("LastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("LastModifiedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ProjectDescription")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ProjectDetailsId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ProjectInchargeId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ProjectItemTypePramId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProjectLocation")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -372,11 +472,103 @@ namespace WorkManagement.EFCore.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ProjectNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ServiceParamId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("WorkDescription")
+                    b.Property<int?>("TaxModelParamId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TenderId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("VendorId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
+
+                    b.HasIndex("FundingClientId");
+
+                    b.HasIndex("InchargeClientId");
+
+                    b.HasIndex("ProjectDetailsId");
+
+                    b.HasIndex("ProjectInchargeId");
+
+                    b.HasIndex("ProjectItemTypePramId");
+
+                    b.HasIndex("ServiceParamId");
+
+                    b.HasIndex("TaxModelParamId");
+
+                    b.HasIndex("TenderId");
+
+                    b.HasIndex("VendorId");
+
+                    b.ToTable("Projects");
+                });
+
+            modelBuilder.Entity("WorkManagement.Domain.Entity.ProjectDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("CGST")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<decimal>("EstimateDays")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("EstimateManPower")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("IGST")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("LastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("LastModifiedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<decimal>("PeriodOfWrokInMonths")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Qty")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Rate")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("SGST")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalCost")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("WorkDescription")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("WorkOrderAmount")
                         .HasColumnType("decimal(18,2)");
@@ -387,9 +579,79 @@ namespace WorkManagement.EFCore.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CompanyId");
+                    b.ToTable("ProjectDetails");
+                });
 
-                    b.ToTable("Projects");
+            modelBuilder.Entity("WorkManagement.Domain.Entity.Tender", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("LastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("LastModifiedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tenders");
+                });
+
+            modelBuilder.Entity("WorkManagement.Domain.Entity.Vendor", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("LastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("LastModifiedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Vendors");
                 });
 
             modelBuilder.Entity("WorkManagementSolution.Employee.Employee", b =>
@@ -786,11 +1048,63 @@ namespace WorkManagement.EFCore.Migrations
                 {
                     b.HasOne("WorkManagement.Domain.Entity.Company", "Company")
                         .WithMany("Projects")
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CompanyId");
+
+                    b.HasOne("WorkManagement.Domain.Entity.Client", "FundingClient")
+                        .WithMany()
+                        .HasForeignKey("FundingClientId");
+
+                    b.HasOne("WorkManagement.Domain.Entity.Client", "InchargeClient")
+                        .WithMany()
+                        .HasForeignKey("InchargeClientId");
+
+                    b.HasOne("WorkManagement.Domain.Entity.ProjectDetail", "ProjectDetails")
+                        .WithMany()
+                        .HasForeignKey("ProjectDetailsId");
+
+                    b.HasOne("WorkManagementSolution.Employee.Employee", "ProjectIncharge")
+                        .WithMany()
+                        .HasForeignKey("ProjectInchargeId");
+
+                    b.HasOne("WorkManagement.Domain.Entity.Param", "ProjectItemTypePram")
+                        .WithMany()
+                        .HasForeignKey("ProjectItemTypePramId");
+
+                    b.HasOne("WorkManagement.Domain.Entity.Param", "ServiceParam")
+                        .WithMany()
+                        .HasForeignKey("ServiceParamId");
+
+                    b.HasOne("WorkManagement.Domain.Entity.Param", "TaxModelParam")
+                        .WithMany()
+                        .HasForeignKey("TaxModelParamId");
+
+                    b.HasOne("WorkManagement.Domain.Entity.Tender", "Tender")
+                        .WithMany()
+                        .HasForeignKey("TenderId");
+
+                    b.HasOne("WorkManagement.Domain.Entity.Vendor", "Vendor")
+                        .WithMany()
+                        .HasForeignKey("VendorId");
 
                     b.Navigation("Company");
+
+                    b.Navigation("FundingClient");
+
+                    b.Navigation("InchargeClient");
+
+                    b.Navigation("ProjectDetails");
+
+                    b.Navigation("ProjectIncharge");
+
+                    b.Navigation("ProjectItemTypePram");
+
+                    b.Navigation("ServiceParam");
+
+                    b.Navigation("TaxModelParam");
+
+                    b.Navigation("Tender");
+
+                    b.Navigation("Vendor");
                 });
 
             modelBuilder.Entity("WorkManagementSolution.Employee.Employee", b =>

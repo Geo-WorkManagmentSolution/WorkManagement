@@ -1,5 +1,5 @@
-﻿@using static WorkManagement.Service.EmailService
-@model WelcomeModel
+﻿@using WorkManagement.Domain.Models.Email
+@model WelcomeModel 
 
 <!DOCTYPE html>
 <html lang='en'>
@@ -52,7 +52,7 @@
 </head>
 <body>
     <div class='container'>
-        <h1>Welcome to Our Service, @Model.Username!</h1>
+        <h1>Welcome to Our Service, @Model.FirstName @Model.LastName!</h1>
         <p>We're thrilled to have you on board. Your account has been created successfully.</p>
         <p>Here are your login credentials:</p>
         <ul>

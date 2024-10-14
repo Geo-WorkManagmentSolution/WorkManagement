@@ -1,17 +1,18 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using WorkManagement.Domain.Entity;
+using WorkManagementSolution.Employee;
 
 namespace WorkManagement.Domain.Models.Project
 {
-    public class ProjectModel : BaseModel
+    public class ProjectModel
     {
+        public int Id { get; set; }
         public string ProjectName { get; set; }
-        public string CompanyName { get; set; }
-        public string ProjectIncharge { get; set; }
-        public string WorkOrderNumber { get; set; }
-        public decimal WorkOrderAmount { get; set; }
-        public decimal WorkDescription { get; set; }
+        public string ProjectNumber { get; set; }
+        public string ProjectDescription { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime? EndDate { get; set; }
+
 
     }
 }

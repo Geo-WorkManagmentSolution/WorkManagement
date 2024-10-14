@@ -1,11 +1,11 @@
 import GlobalStyles from '@mui/material/GlobalStyles';
 import ProjectHeader from './ProjectsHeader';
 import ProjectTable from './ProjectsTable';
-
 /**
  * The products page. not
  */
-function ProjectDashboard() {
+
+function Projects() {
 	return (
 		<>
 			<GlobalStyles
@@ -15,13 +15,12 @@ function ProjectDashboard() {
 					}
 				})}
 			/>
-			<div className="w-full h-full flex flex-col px-16">
-				<ProjectHeader />
-				
-				<ProjectTable />
-			</div>
+
+			<ProjectHeader />
+
+			<ProjectTable />
 		</>
 	);
 }
 
-export default ProjectDashboard;
+export default Projects;

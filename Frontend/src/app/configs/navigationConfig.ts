@@ -59,12 +59,6 @@ const navigationConfig: FuseNavItemType[] = [
 						title: 'Project Dashboard',
 						type: 'item',
 						url: '/apps/projects'
-					},
-					{
-						id: 'apps.project.add',
-						title: 'Add Project',
-						type: 'item',
-						url: '/apps/employees/employeesSearch/new'
 					}
 				]
 			}

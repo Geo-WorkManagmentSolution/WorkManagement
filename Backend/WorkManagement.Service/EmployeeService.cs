@@ -4,10 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using WorkManagement.Domain.Contracts;
 using WorkManagement.Domain.Entity;
+using WorkManagement.Domain.Models.Email;
 using WorkManagement.Domain.Models.Employee;
 using WorkManagement.Domain.Utility;
 using WorkManagementSolution.Employee;
 using WorkManagmentSolution.EFCore;
+using static WorkManagement.Service.EmailService;
 
 namespace WorkManagement.Service
 {
@@ -16,17 +18,19 @@ namespace WorkManagement.Service
         private readonly WorkManagementDbContext _dbContext;
         private readonly IMapper mapper;
         private readonly IAuthService authService;
+        private readonly IEmailService _emailService;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<ApplicationRole> roleManager;
 
 
-        public EmployeeService(WorkManagementDbContext dbContext, IMapper mapper, IAuthService authService, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
+        public EmployeeService(WorkManagementDbContext dbContext, IMapper mapper, IAuthService authService, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, IEmailService emailService)
         {
             _dbContext = dbContext;
             this.mapper = mapper;
             this.authService = authService;
             this.userManager = userManager;
             this.roleManager = roleManager;
+            _emailService = emailService;
         }
 
         public async Task<List<EmployeeModel>> GetAllEmployeesAsync()
@@ -49,6 +53,23 @@ namespace WorkManagement.Service
             return EmployeeModel;
         }
 
+        public async Task SendEmail()
+        {
+            var WelcomeModelCredentials = new WelcomeModel();
+            WelcomeModelCredentials.Username = "snaupul@gmail.com";
+            WelcomeModelCredentials.Password = "Test1234@";
+            WelcomeModelCredentials.FirstName = "Naupul";
+            WelcomeModelCredentials.LastName = "Shah";
+
+            var emailModel = new EmailModel<WelcomeModel>();
+            emailModel.From = "naupul30@gmail.com";
+            emailModel.To = "snaupul@gmail.com";
+            emailModel.Subject = "Welcome to Geo!";
+            emailModel.repModel = WelcomeModelCredentials;
+
+            _emailService.SendWelcomeMail(emailModel);
+        }
+
         public async Task<EmployeeModel> CreateEmployeeAsync(Employee employee)
         {
 
@@ -67,6 +88,19 @@ namespace WorkManagement.Service
                 employee.UserId = user.Id;
                 _dbContext.Employees.Add(employee);
                 await _dbContext.SaveChangesAsync();
+
+                //var WelcomeModelCredentials = new WelcomeModel();
+                //WelcomeModelCredentials.Username = user.UserName;
+                //WelcomeModelCredentials.Password = password;
+
+                //var emailModel = new EmailModel<WelcomeModel>();
+                //emailModel.From = "naupul30@gmail.com";
+                //emailModel.To = user.UserName;
+                //emailModel.Subject = "Welcome to Geo!";
+                //emailModel.repModel = WelcomeModelCredentials;
+
+                //_emailService.SendWelcomeMail(emailModel);
+
                 return mapper.Map<EmployeeModel>(employee);
             }
             else

@@ -36,7 +36,6 @@ namespace WorkManagmentSolution.EFCore
         public virtual DbSet<EmployeeCategory> EmployeeCategories { get; set; }
         public virtual DbSet<EmployeeDocuments> EmployeeDocuments { get; set; }
         public virtual DbSet<Project> Projects { get; set; }
-        public virtual DbSet<Company> Companies { get; set; }
 
         public IHttpContextAccessor HttpContextAccessor { get; }
 

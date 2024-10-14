@@ -7,7 +7,7 @@ import useThemeMediaQuery from '@fuse/hooks/useThemeMediaQuery';
 import PageBreadcrumb from 'app/shared-components/PageBreadcrumb';
 
 /**
- * The products header.
+ * The Project header.
  */
 function ProjectsHeader() {
 	const isMobile = useThemeMediaQuery((theme) => theme.breakpoints.down('lg'));
@@ -35,7 +35,7 @@ function ProjectsHeader() {
 						variant="contained"
 						color="secondary"
 						component={NavLinkAdapter}
-						to="/apps/projects/createProject/new"
+						to="/apps/projects/projectSearch/new"
 						size={isMobile ? 'small' : 'medium'}
 					>
 						<FuseSvgIcon size={20}>heroicons-outline:plus</FuseSvgIcon>

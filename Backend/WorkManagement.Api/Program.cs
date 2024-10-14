@@ -14,6 +14,7 @@ using WorkManagement.API.Extensions;
 using WorkManagement.Domain.Contracts;
 using WorkManagement.API.Middleware;
 using Serilog;
+using WorkManagement.Domain.Models.Email;
 using System.Text.Json.Serialization;
 
 
@@ -61,12 +62,15 @@ try
         opts.Password.RequiredUniqueChars = 0; // Set the minimum number of unique characters
     });
 
+    builder.Services.Configure<SMTPSettings>(configuration.GetSection("GmailSMTPSettings"));
+
     builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
         .AddEntityFrameworkStores<WorkManagementDbContext>();
 
     builder.Services.AddScoped<IAuthService, AuthService>();
     builder.Services.AddScoped<IEmployeeService, EmployeeService>();
     builder.Services.AddScoped<IProjectService, ProjectServices>();
+    builder.Services.AddScoped<IEmailService, EmailService>();
     builder.Services.AddCors();
     builder.Services.AddSwaggerGen(option =>
     {
@@ -98,6 +102,7 @@ try
     builder.Services.AddTransient<EmployeeService>();
     builder.Services.AddTransient<AdvanceSearchService>();
     builder.Services.AddTransient<ProjectServices>();
+    builder.Services.AddTransient<EmailService>();
     builder.Services.AddAutoMapper(typeof(WorkManagement.Domain.AutoMapper.Profiles.EmployeeProfile).Assembly);
 
     builder.AddJWTAuthetication();
