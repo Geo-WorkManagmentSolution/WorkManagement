@@ -74,7 +74,6 @@ function BasicProjectInfoTab() {
 					name="startDate"
 					render={({ field: { value, onChange } }) => (
 						<DateTimePicker
-							
 							value={new Date(value)}
 							onChange={(val) => {
 								onChange(val?.toISOString());

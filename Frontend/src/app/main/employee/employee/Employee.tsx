@@ -59,19 +59,27 @@ import EmployeeModelClone from '../models/EmployeeModelClone';
 const educationDetailSchema = yup.object().shape({
 	type: yup.string().required('type is required'),
 	university: yup.string().required('university is required'),
-	passingYear:yup.string().required('passingYear is required'),
-	grade:yup.string().required('grade is required')
+	passingYear: yup.string().required('passingYear is required'),
+	grade: yup.string().required('grade is required')
 });
 
 const schema = yup.object({
 	firstName: yup.string().required('First Name is required'),
 	lastName: yup.string().required('Last Name is required'),
-	surname: yup.string().required('Surname is required'),
 	motherName: yup.string().required('Mother Name is required'),
 	email: yup.string().email('Must be a valid email').required('Email is required'),
 	roleId: yup.string().required('Role ID is required'),
 	employeePersonalDetails: yup.object().shape({
-		dateOfBirth: yup.date().required('Date of Birth is required'),
+		dateOfBirth: yup
+			.date()
+			.max(new Date(), 'Birth date cannot be in the future')
+			.required('Birth date is required')
+			.test('is-adult', 'You must be at least 18 years old', (value) => {
+				const today = new Date();
+				const eighteenYearsAgo = new Date(today);
+				eighteenYearsAgo.setFullYear(today.getFullYear() - 18);
+				return value <= eighteenYearsAgo;
+			}),
 		gender: yup.string().required('Gender is required'),
 		maritalStatus: yup.string().required('Marital Status is required')
 	}),

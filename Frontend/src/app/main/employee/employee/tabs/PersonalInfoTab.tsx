@@ -9,8 +9,9 @@ import {
 	TextField,
 	MenuItem
 } from '@mui/material';
-import {RelationWithEmployee,BloodGroup} from '../../EmployeeApi'
 import { Controller, useFormContext } from 'react-hook-form';
+import { DatePicker } from '@mui/x-date-pickers';
+import { RelationWithEmployee, BloodGroup } from '../../EmployeeApi';
 
 /**
  * The basic info tab.
@@ -121,7 +122,7 @@ function PersonalInfoTab() {
 					</TextField>
 				)}
 			/>
-			<Controller
+			{/* <Controller
 				name="employeePersonalDetails.relationWithEmployee"
 				control={control}
 				render={({ field }) => (
@@ -144,65 +145,33 @@ function PersonalInfoTab() {
 						))}
 					</TextField>
 				)}
-			/>
-			{/* 			
-
-<Controller
-				name="employeePersonalDetails.maritalStatus"
-				control={control}
-				render={({ field }) => (
-					<FormControl
-						fullWidth
-						required
-						margin="normal"
-						error={!!errors.employeePersonalDetails?.maritalStatus}
-					>
-						<FormLabel>Marital Status</FormLabel>
-						<Select {...field} >
-							<MenuItem value="single">Single</MenuItem>
-							<MenuItem value="married">Married</MenuItem>
-							<MenuItem value="divorced">Divorced</MenuItem>
-							<MenuItem value="widowed">Widowed</MenuItem>
-						</Select>
-						{errors.employeePersonalDetails?.maritalStatus && (
-							<Typography
-								variant="caption"
-								color="error"
-							>
-								{errors.employeePersonalDetails.maritalStatus.message}
-							</Typography>
-						)}
-					</FormControl>
-				)}
 			/> */}
-
-			{/* <Controller
-				name="employeePersonalDetails.dateOfBirth"
-				control={control}
-				render={({ field }) => (
-					<DatePicker
-						className="w-full mt-16 mb-16"
-						label="Date of Birth"
-						{...field}
-					/>
-				)}
-			/> */}
-
 			<Controller
-				name="employeePersonalDetails.dateOfBirth"
 				control={control}
-				rules={{ required: 'Date of Birth is required' }}
-				render={({ field, fieldState: { error } }) => (
-					<TextField
-						{...field}
-						label="Date of Birth"
-						className="mt-8 mb-16 "
-						type="date"
-						fullWidth
-						required
-						InputLabelProps={{ shrink: true }}
-						error={!!error}
-						helperText={error?.message}
+				name="employeePersonalDetails.dateOfBirth"
+				render={({ field: { value, onChange } }) => (
+					<DatePicker
+						value={new Date(value)}
+						onChange={(val) => {
+							onChange(val?.toISOString());
+						}}
+						className="mx-4"
+						slotProps={{
+							textField: {
+								label: 'Date of Birth',
+								InputLabelProps: {
+									shrink: true
+								},
+								fullWidth: true,
+								variant: 'outlined',
+								error: !!errors?.employeePersonalDetails?.dateOfBirth,
+								margin: 'normal',
+								helperText: errors?.employeePersonalDetails?.dateOfBirth?.message as string
+							},
+							actionBar: {
+								actions: ['clear']
+							}
+						}}
 					/>
 				)}
 			/>

@@ -206,6 +206,22 @@ function BasicInfoTab() {
 								)}
 							/>
 
+									<Controller
+										name="middleName"
+										control={control}
+										render={({ field }) => (
+											<TextField
+												{...field}
+												value={field.value || ''}
+												className="mx-4"
+												label="Middle Name"
+												fullWidth
+												margin="normal"
+												error={!!errors?.surname}
+												helperText={errors?.surname?.message as string}
+											/>
+										)}
+									/>
 							<Controller
 								name="lastName"
 								control={control}
@@ -220,23 +236,6 @@ function BasicInfoTab() {
 										margin="normal"
 										error={!!errors?.lastName}
 										helperText={errors?.lastName?.message as string}
-									/>
-								)}
-							/>
-							<Controller
-								name="surname"
-								control={control}
-								render={({ field }) => (
-									<TextField
-										{...field}
-										value={field.value || ''}
-										className=" mx-4"
-										required
-										label="Surname"
-										fullWidth
-										margin="normal"
-										error={!!errors?.surname}
-										helperText={errors?.surname?.message as string}
 									/>
 								)}
 							/>

@@ -34,6 +34,7 @@ namespace WorkManagmentSolution.EFCore
         public virtual DbSet<EmployeeIdentityInfo> EmployeeIdentityInfos { get; set; }
         public virtual DbSet<EmployeeEducationDetail> EmployeeEducationDetails { get; set; }
         public virtual DbSet<EmployeeCategory> EmployeeCategories { get; set; }
+        public virtual DbSet<EmployeeDepartment> EmployeeDepartments { get; set; }
         public virtual DbSet<EmployeeDocuments> EmployeeDocuments { get; set; }
         public virtual DbSet<Project> Projects { get; set; }
         public virtual DbSet<ProjectEmployee> ProjectEmployees { get; set; }
@@ -65,6 +66,13 @@ namespace WorkManagmentSolution.EFCore
                      new EmployeeCategory { Id = 2, Name = "Contractor" },
                      new EmployeeCategory { Id = 3, Name = "Site" }
             );
+
+            modelBuilder.Entity<EmployeeCategory>().HasData(
+                new EmployeeCategory { Id = 1, Name = "IT" },
+                new EmployeeCategory { Id = 2, Name = "Enginnering" },
+                new EmployeeCategory { Id = 3, Name = "Site" }
+);
+
         }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

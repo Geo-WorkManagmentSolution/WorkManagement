@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { TextField, MenuItem, InputAdornment, Typography } from '@mui/material';
+import { TextField, MenuItem, InputAdornment, Typography, Autocomplete } from '@mui/material';
 import { Controller, useFormContext } from 'react-hook-form';
-import { SalaryType } from '../../EmployeeApi';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
+import { SalaryType, useGetApiEmployeesDepartmentsQuery } from '../../EmployeeApi';
+import { DatePicker } from '@mui/x-date-pickers';
 
 /**
  * The basic info tab.
@@ -11,6 +12,7 @@ function WorkInfoTab() {
 	const methods = useFormContext();
 	const { control, formState } = methods;
 	const { errors } = formState;
+	const { data: employeesDepartmentsOptions = [] } = useGetApiEmployeesDepartmentsQuery();
 
 	return (
 		<div className="space-y-48">
@@ -55,7 +57,7 @@ function WorkInfoTab() {
 						/>
 					)}
 				/>
-								<Controller
+				<Controller
 					name="employeeWorkInformation.site"
 					control={control}
 					render={({ field }) => (
@@ -70,16 +72,31 @@ function WorkInfoTab() {
 				/>
 
 				<Controller
-					name="departmentName"
+					name="employeeDepartmentId"
 					control={control}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							label="Department Name"
+					render={({ field: { onChange, value } }) => (
+						<Autocomplete
 							fullWidth
-							required
-							error={!!errors.employeeDepartments?.departmentName}
-							helperText={errors.employeeDepartments?.departmentName?.message as string}
+							options={employeesDepartmentsOptions}
+							getOptionLabel={(option) => option?.name}
+							isOptionEqualToValue={(option, value) => option.id === value}
+							value={employeesDepartmentsOptions?.find((c) => c.id === value) || null}
+							onChange={(_, newValue) => {
+								onChange(newValue ? newValue.id : null);
+							}}
+							renderInput={(params) => (
+								<TextField
+									{...params}
+									value={params.value || ''}
+									placeholder="Select Employee Department"
+									label="Department"
+									required
+									variant="outlined"
+									InputLabelProps={{
+										shrink: true
+									}}
+								/>
+							)}
 						/>
 					)}
 				/>
@@ -109,54 +126,66 @@ function WorkInfoTab() {
 							label="Bond"
 							type="number"
 							fullWidth
+							InputProps={{
+								inputProps: {
+									min: 1
+								}
+							}}
 							error={!!errors.employeeWorkInformation?.bond}
 							helperText={errors.employeeWorkInformation?.bond?.message as string}
 						/>
 					)}
 				/>
-				<Controller
-					name="employeeWorkInformation.salaryType"
-					control={control}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							select
-							label="Salary Type"
-							fullWidth
-							required
-							error={!!errors.employeeWorkInformation?.salaryType}
-							helperText={errors.employeeWorkInformation?.salaryType?.message as string}
-						>
-							{Object.values(SalaryType).map((type) => (
-								<MenuItem
-									key={type}
-									value={type}
-								>
-									{type}
-								</MenuItem>
-							))}
-						</TextField>
-					)}
-				/>
+				<div className="flex -mx-4">
+					<Controller
+						name="employeeWorkInformation.salaryType"
+						control={control}
+						render={({ field }) => (
+							<TextField
+								{...field}
+								select
+								className="mx-4"
+								label="Salary Type"
+								fullWidth
+								required
+								error={!!errors.employeeWorkInformation?.salaryType}
+								helperText={errors.employeeWorkInformation?.salaryType?.message as string}
+							>
+								{Object.values(SalaryType).map((type) => (
+									<MenuItem
+										key={type}
+										value={type}
+									>
+										{type}
+									</MenuItem>
+								))}
+							</TextField>
+						)}
+					/>
 
-				<Controller
-					name="employeeWorkInformation.salary"
-					control={control}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							label="Salary"
-							type="number"
-							required
-							InputProps={{
-								startAdornment: <InputAdornment position="start">₹</InputAdornment>
-							}}
-							fullWidth
-							error={!!errors.employeeWorkInformation?.salary}
-							helperText={errors.employeeWorkInformation?.salary?.message as string}
-						/>
-					)}
-				/>
+					<Controller
+						name="employeeWorkInformation.salary"
+						control={control}
+						render={({ field }) => (
+							<TextField
+								{...field}
+								label="Salary"
+								type="number"
+								className="mx-4"
+								required
+								InputProps={{
+									inputProps: {
+										min: 1
+									},
+									startAdornment: <InputAdornment position="start">₹</InputAdornment>
+								}}
+								fullWidth
+								error={!!errors.employeeWorkInformation?.salary}
+								helperText={errors.employeeWorkInformation?.salary?.message as string}
+							/>
+						)}
+					/>
+				</div>
 			</div>
 
 			<div className="space-y-16">
@@ -176,52 +205,97 @@ function WorkInfoTab() {
 				</div>
 
 				<Controller
-					name="employeeWorkInformation.hireDate"
-					control={control}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							label="Hire Date"
-							type="date"
-							fullWidth
-							required
-							InputLabelProps={{ shrink: true }}
-							error={!!errors.employeeWorkInformation?.hireDate}
-							helperText={errors.employeeWorkInformation?.hireDate?.message as string}
-						/>
-					)}
-				/>
+				control={control}
+				name="employeeWorkInformation.hireDate"
+				render={({ field: { value, onChange } }) => (
+					<DatePicker
+						value={new Date(value)}
+						onChange={(val) => {
+							onChange(val?.toISOString());
+						}}
+						className="mx-4"
+						slotProps={{
+							textField: {
+								label: 'Hire Date',
+								InputLabelProps: {
+									shrink: true
+								},
+								fullWidth: true,
+								variant: 'outlined',
+								error :!!errors.employeeWorkInformation?.hireDate,
+								margin: 'normal',
+								helperText:errors.employeeWorkInformation?.hireDate?.message as string
+							},
+							actionBar: {
+								actions: ['clear']
+							}
+						}}
+					/>
+				)}
+			/>
 
-				<Controller
-					name="employeeWorkInformation.previousDateOfJoiningInGDR"
-					control={control}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							label="Previous Date of Joining in GDR"
-							type="date"
-							fullWidth
-							InputLabelProps={{ shrink: true }}
-							error={!!errors.employeeWorkInformation?.previousDateOfJoiningInGDR}
-							helperText={errors.employeeWorkInformation?.previousDateOfJoiningInGDR?.message as string}
-						/>
-					)}
-				/>
-				<Controller
-					name="employeeWorkInformation.previousDateOfLeavingInGDR"
-					control={control}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							label="Previous Date of Leaving in GDR"
-							type="date"
-							fullWidth
-							InputLabelProps={{ shrink: true }}
-							error={!!errors.employeeWorkInformation?.previousDateOfLeavingInGDR}
-							helperText={errors.employeeWorkInformation?.previousDateOfLeavingInGDR?.message as string}
-						/>
-					)}
-				/>
+
+<Controller
+				control={control}
+				name="employeeWorkInformation.previousDateOfJoiningInGDR"
+				render={({ field: { value, onChange } }) => (
+					<DatePicker
+						value={new Date(value)}
+						onChange={(val) => {
+							onChange(val?.toISOString());
+						}}
+						className="mx-4"
+						slotProps={{
+							textField: {
+								label: 'Previous Date of Joining in GDR',
+								InputLabelProps: {
+									shrink: true
+								},
+								fullWidth: true,
+								variant: 'outlined',
+								error :!!errors.employeeWorkInformation?.previousDateOfJoiningInGDR,
+								margin: 'normal',
+								helperText:errors.employeeWorkInformation?.previousDateOfJoiningInGDR?.message as string
+							},
+							actionBar: {
+								actions: ['clear']
+							}
+						}}
+					/>
+				)}
+			/>
+
+			
+<Controller
+				control={control}
+				name="employeeWorkInformation.previousDateOfLeavingInGDR"
+				render={({ field: { value, onChange } }) => (
+					<DatePicker
+						value={new Date(value)}
+						onChange={(val) => {
+							onChange(val?.toISOString());
+						}}
+						className="mx-4"
+						slotProps={{
+							textField: {
+								label: 'Previous Date of Leaving in GDR',
+								InputLabelProps: {
+									shrink: true
+								},
+								fullWidth: true,
+								variant: 'outlined',
+								error :!!errors.employeeWorkInformation?.previousDateOfLeavingInGDR,
+								margin: 'normal',
+								helperText:errors.employeeWorkInformation?.previousDateOfLeavingInGDR?.message as string
+							},
+							actionBar: {
+								actions: ['clear']
+							}
+						}}
+					/>
+				)}
+			/>
+
 			</div>
 		</div>
 	);

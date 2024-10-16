@@ -1,8 +1,11 @@
 ﻿using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 using WorkManagement.Domain.Entity;
 using WorkManagement.Domain.Models;
 
@@ -16,9 +19,13 @@ namespace WorkManagementSolution.Employee
         public int EmployeeNumber { get; set; }
 
         public required string FirstName { get; set; }
+        public string? MiddleName { get; set; }
         public required string LastName { get; set; }
-        public required string Surname { get; set; }
         public required string MotherName { get; set; }
+
+        [ForeignKey(nameof(EmployeeDepartmentId))]
+        public int? EmployeeDepartmentId { get; set; }
+        public EmployeeDepartment? EmployeeDepartment { get; set; }
 
         [EmailAddress]
         public required string Email { get; set; }
@@ -32,8 +39,6 @@ namespace WorkManagementSolution.Employee
         [ForeignKey(nameof(ApplicationRole))]
         public required Guid RoleId { get; set; }
         public ApplicationRole? ApplicationRole { get; set; }
-
-        public string DepartmentName { get; set; }
 
         [ForeignKey(nameof(EmployeeCategory))]
         public int? EmployeeCategoryId { get; set; }
@@ -72,6 +77,10 @@ namespace WorkManagementSolution.Employee
         public byte[] FileContent { get; set; }
         public FileType FileType { get; set; }
 
+    }
+    public class EmployeeDepartment : BaseEntity
+    {
+        public string? Name { get; set; }
     }
     public enum FileType
     {
@@ -163,17 +172,27 @@ namespace WorkManagementSolution.Employee
         FamilyMember,
         Other
     }
+
     public enum BloodGroup
     {
+        [EnumMember( Value = "O+")]
         OPositive,
+        [Display(Name = "A+")]
         APositive,
+        [Display(Name = "B+")]
         BPositive,
+        [Display(Name = "AB+")]
         ABPositive,
+        [Display(Name = "AB-")]
         ABNegative,
+        [Display(Name = "A-")]
         ANegative,
+        [Display(Name = "B-")]
         BNegative,
+        [Display(Name = "O-")]
         ONegative
     }
+
 }
 
 

@@ -41,12 +41,14 @@ function AddressInfoTab() {
 				)}
 			/>
 
+			<div className="flex -mx-4">
 			<Controller
 				name="employeeAddresses.city"
 				control={control}
 				render={({ field }) => (
 					<TextField
 						{...field}
+						className="mx-4"
 						label="City"
 						fullWidth
 						required
@@ -65,6 +67,7 @@ function AddressInfoTab() {
 						label="State"
 						fullWidth
 						required
+						className="mx-4"
 						error={!!errors.employeeAddresses?.state}
 						helperText={errors.employeeAddresses?.state?.message as string}
 					/>
@@ -79,6 +82,7 @@ function AddressInfoTab() {
 						{...field}
 						label="Country"
 						fullWidth
+						className="mx-4"
 						required
 						error={!!errors.employeeAddresses?.country}
 						helperText={errors.employeeAddresses?.country?.message as string}
@@ -86,6 +90,7 @@ function AddressInfoTab() {
 				)}
 			/>
 
+			</div>
 			<Controller
 				name="employeeAddresses.pinCode"
 				control={control}

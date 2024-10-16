@@ -21,6 +21,7 @@ namespace WorkManagement.Domain.Contracts
 
         public Task<EmployeeModel> UpdateEmployeeAsync(Employee employee);
         public Task<List<EmployeeCategory>> GetEmployeeCategories();
+        public Task<List<EmployeeDepartment>> GetEmployeeDepartments();
 
         public Task<bool> DeleteEmployeeAsync(int id);
     }

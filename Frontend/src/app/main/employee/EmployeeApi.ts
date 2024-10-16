@@ -23,6 +23,12 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: () => ({ url: `/api/Employees/categories` }),
     }),
+    getApiEmployeesDepartments: build.query<
+      GetApiEmployeesDepartmentsApiResponse,
+      GetApiEmployeesDepartmentsApiArg
+    >({
+      query: () => ({ url: `/api/Employees/departments` }),
+    }),
     getApiEmployeesById: build.query<
       GetApiEmployeesByIdApiResponse,
       GetApiEmployeesByIdApiArg
@@ -77,6 +83,9 @@ export type PostApiEmployeesApiArg = {
 export type GetApiEmployeesCategoriesApiResponse =
   /** status 200 OK */ EmployeeCategory[];
 export type GetApiEmployeesCategoriesApiArg = void;
+export type GetApiEmployeesDepartmentsApiResponse =
+  /** status 200 OK */ EmployeeCategory[];
+export type GetApiEmployeesDepartmentsApiArg = void;
 export type GetApiEmployeesByIdApiResponse = /** status 200 OK */ EmployeeModel;
 export type GetApiEmployeesByIdApiArg = {
   id: number;
@@ -96,6 +105,11 @@ export type PostApiEmployeesSearchApiResponse =
   /** status 200 OK */ EmployeeModel[];
 export type PostApiEmployeesSearchApiArg = {
   body: Criterion[];
+};
+export type EmployeeDepartment = {
+  id?: number;
+  isDeleted?: boolean;
+  name?: string | null;
 };
 export type EmployeePersonalDetails = {
   id?: number;
@@ -164,13 +178,18 @@ export type EmployeeModel = {
   photoURL?: string | null;
   employeeNumber?: number | null;
   firstName: string | null;
+  middleName?: string | null;
   lastName: string | null;
+  motherName: string | null;
   email: string | null;
-  phoneNumber?: string | null;
+  phoneNumber?: number | null;
+  alternateNumber?: number | null;
   position?: string | null;
   userId?: string;
   roleId: string;
   employeeCategoryId: number;
+  employeeDepartmentId?: number | null;
+  employeeDepartment?: EmployeeDepartment;
   employeePersonalDetailsId?: number | null;
   employeePersonalDetails?: EmployeePersonalDetails;
   employeeWorkInformationId?: number | null;
@@ -234,6 +253,8 @@ export const {
   usePostApiEmployeesMutation,
   useGetApiEmployeesCategoriesQuery,
   useLazyGetApiEmployeesCategoriesQuery,
+  useGetApiEmployeesDepartmentsQuery,
+  useLazyGetApiEmployeesDepartmentsQuery,
   useGetApiEmployeesByIdQuery,
   useLazyGetApiEmployeesByIdQuery,
   usePutApiEmployeesByIdMutation,

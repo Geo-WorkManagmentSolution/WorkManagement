@@ -70,6 +70,11 @@ export type ProjectModel = {
   startDate?: string;
   endDate?: string | null;
 };
+export type EmployeeDepartment = {
+  id?: number;
+  isDeleted?: boolean;
+  name?: string | null;
+};
 export type EmployeePersonalDetails = {
   id?: number;
   isDeleted?: boolean;
@@ -137,13 +142,18 @@ export type EmployeeModel = {
   photoURL?: string | null;
   employeeNumber?: number | null;
   firstName: string | null;
+  middleName?: string | null;
   lastName: string | null;
+  motherName: string | null;
   email: string | null;
-  phoneNumber?: string | null;
+  phoneNumber?: number | null;
+  alternateNumber?: number | null;
   position?: string | null;
   userId?: string;
   roleId: string;
   employeeCategoryId: number;
+  employeeDepartmentId?: number | null;
+  employeeDepartment?: EmployeeDepartment;
   employeePersonalDetailsId?: number | null;
   employeePersonalDetails?: EmployeePersonalDetails;
   employeeWorkInformationId?: number | null;

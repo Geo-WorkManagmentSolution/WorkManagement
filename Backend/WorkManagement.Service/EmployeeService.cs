@@ -44,6 +44,11 @@ namespace WorkManagement.Service
             return await _dbContext.EmployeeCategories.ToListAsync();
         }
 
+        public async Task<List<EmployeeDepartment>> GetEmployeeDepartments()
+        {
+            return await _dbContext.EmployeeDepartments.ToListAsync();
+        }
+
         public async Task<EmployeeModel> GetEmployeeByIdAsync(int id)
         {
             var Employee = await _dbContext.Employees
@@ -89,18 +94,23 @@ namespace WorkManagement.Service
                 _dbContext.Employees.Add(employee);
                 await _dbContext.SaveChangesAsync();
 
-                //var WelcomeModelCredentials = new WelcomeModel();
-                //WelcomeModelCredentials.Username = user.UserName;
-                //WelcomeModelCredentials.Password = password;
+                try
+                {
+                    var WelcomeModelCredentials = new WelcomeModel();
+                    WelcomeModelCredentials.Username = user.UserName;
+                    WelcomeModelCredentials.Password = password;
 
-                //var emailModel = new EmailModel<WelcomeModel>();
-                //emailModel.From = "naupul30@gmail.com";
-                //emailModel.To = user.UserName;
-                //emailModel.Subject = "Welcome to Geo!";
-                //emailModel.repModel = WelcomeModelCredentials;
-
-                //_emailService.SendWelcomeMail(emailModel);
-
+                    var emailModel = new EmailModel<WelcomeModel>();
+                    emailModel.From = "naupul30@gmail.com";
+                    emailModel.To = user.UserName;
+                    emailModel.Subject = "Welcome to Geo!";
+                    emailModel.repModel = WelcomeModelCredentials;
+                    await _emailService.SendWelcomeMail(emailModel);
+                }
+                catch (Exception e)
+                {
+                    // think about the exception later
+                }
                 return mapper.Map<EmployeeModel>(employee);
             }
             else

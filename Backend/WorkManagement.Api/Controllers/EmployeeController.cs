@@ -50,6 +50,14 @@ namespace WorkManagement.API.Controllers
             return Ok(EmployeeCategories);
         }
 
+        // GET: api/employees/departments
+        [HttpGet("departments")]
+        public async Task<ActionResult<IEnumerable<EmployeeCategory>>> GetEmployeeDepartments()
+        {
+            var EmployeeCategories = await employeeService.GetEmployeeDepartments();
+            return Ok(EmployeeCategories);
+        }
+
         // GET: api/employees/5
         [HttpGet("{id}")]
         public async Task<ActionResult<EmployeeModel>> GetEmployee(int id)
@@ -69,7 +77,6 @@ namespace WorkManagement.API.Controllers
             var employee = mapper.Map<Employee>(employeeModel);
             var createdEmployee = await employeeService.CreateEmployeeAsync(employee);
             return CreatedAtAction(nameof(GetEmployee), new { id = createdEmployee.Id }, createdEmployee);
-
         }
 
         // POST: api/employees
