@@ -67,10 +67,10 @@ namespace WorkManagmentSolution.EFCore
                      new EmployeeCategory { Id = 3, Name = "Site" }
             );
 
-            modelBuilder.Entity<EmployeeCategory>().HasData(
-                new EmployeeCategory { Id = 1, Name = "IT" },
-                new EmployeeCategory { Id = 2, Name = "Enginnering" },
-                new EmployeeCategory { Id = 3, Name = "Site" }
+            modelBuilder.Entity<EmployeeDepartment>().HasData(
+                new EmployeeDepartment { Id = 1, Name = "IT" },
+                new EmployeeDepartment { Id = 2, Name = "Enginnering" },
+                new EmployeeDepartment { Id = 3, Name = "Site" }
 );
 
         }
