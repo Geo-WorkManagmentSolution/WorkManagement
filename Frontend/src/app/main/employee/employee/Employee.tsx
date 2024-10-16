@@ -25,7 +25,7 @@ import WorkInfoTab from './tabs/WorkInfoTab';
 import AddressInfoTab from './tabs/AddressInfoTab';
 import EducationTab from './tabs/EducationTab';
 import IdentityInfoTab from './tabs/IdentityInfoTab';
- import FileUpload from './tabs/FileUpload';
+import FileUpload from './tabs/FileUpload';
 import EmployeeModelClone from '../models/EmployeeModelClone';
 
 /**
@@ -56,45 +56,39 @@ import EmployeeModelClone from '../models/EmployeeModelClone';
 // 	roleId: yup.mixed().required('Role required'),
 // 	employeePersonalDetails: employeePersonalDetailsSchema
 // });
+const educationDetailSchema = yup.object().shape({
+	type: yup.string().required('type is required'),
+	university: yup.string().required('university is required'),
+	passingYear:yup.string().required('passingYear is required'),
+	grade:yup.string().required('grade is required')
+});
 
 const schema = yup.object({
-	photoURL: yup.string().nullable(),
 	firstName: yup.string().required('First Name is required'),
 	lastName: yup.string().required('Last Name is required'),
 	surname: yup.string().required('Surname is required'),
 	motherName: yup.string().required('Mother Name is required'),
 	email: yup.string().email('Must be a valid email').required('Email is required'),
-	phoneNumber: yup.number().nullable(),
-	alternateNumber: yup.number().nullable(),
 	roleId: yup.string().required('Role ID is required'),
-	employeeCategoryId: yup.number().nullable(),
-	departmentName: yup.string().nullable(),
 	employeePersonalDetails: yup.object().shape({
 		dateOfBirth: yup.date().required('Date of Birth is required'),
 		gender: yup.string().required('Gender is required'),
-		maritalStatus: yup.string().required('Marital Status is required'),
-		bloodGroup: yup.string().nullable(),
-		relationWithEmployee: yup.string().nullable()
+		maritalStatus: yup.string().required('Marital Status is required')
 	}),
-		employeeWorkInformation: yup.object().shape({
-		designation: yup.string().nullable(),
+	employeeWorkInformation: yup.object().shape({
 		salaryType: yup.string().required('Salary Type is required'),
 		hireDate: yup.date().required('Hire Date is required'),
-		salary: yup.number().required('Salary is required').positive('Salary must be positive'),
-		site: yup.string().nullable(),
-		bond: yup.number().nullable().positive('Bond must be positive'),
-		previousDateOfJoiningInGDR: yup.date().nullable(),
-		previousDateOfLeavingInGDR: yup.date().nullable(),
-		grpHead: yup.string().nullable()
+		salary: yup.number().required('Salary is required')
 	}),
-	// employeeAddresses: yup.object().shape({
-	// 	addressLine1: yup.string().required('Address Line 1 is required'),
-	// 	addressLine2: yup.string().nullable(),
-	// 	city: yup.string().required('City is required'),
-	// 	country: yup.string().required('Country is required'),
-	// 	state: yup.string().required('State is required'),
-	// 	pinCode: yup.string().required('Pin Code is required')
-	// }),
+	employeeAddresses: yup.object().shape({
+		addressLine1: yup.string().required('Address Line 1 is required'),
+		city: yup.string().required('City is required'),
+		country: yup.string().required('Country is required'),
+		state: yup.string().required('State is required'),
+		pinCode: yup.string().required('Pin Code is required')
+	}),
+	employeeEducationDetail: yup.array().of(educationDetailSchema)
+
 	// employeeIdentityInfos: yup.object().shape({
 	// 	uid: yup.string().nullable(),
 	// 	bankAccountNumber: yup.string().nullable(),
@@ -110,7 +104,7 @@ const schema = yup.object({
 });
 
 // The product page.
- type EmployeeFormValues = yup.InferType<typeof schema>;
+type EmployeeFormValues = yup.InferType<typeof schema>;
 
 function Employee() {
 	const isMobile = useThemeMediaQuery((theme) => theme.breakpoints.down('lg'));

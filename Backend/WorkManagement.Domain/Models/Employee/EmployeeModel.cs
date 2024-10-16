@@ -19,10 +19,13 @@ namespace WorkManagement.Domain.Models.Employee
         public int? EmployeeNumber { get; set; }
         public required string FirstName { get; set; }
         public required string LastName { get; set; }
+        public required string Surname { get; set; }
+        public required string MotherName { get; set; }
         [EmailAddress]
         public required string Email { get; set; }
-        public  string? PhoneNumber { get; set; } 
-        public  string? Position { get; set; }
+        public int? PhoneNumber { get; set; }
+        public int? AlternateNumber { get; set; }
+        public string? Position { get; set; }
         public  Guid UserId { get; set; }
         public required Guid RoleId { get; set; }
         public required int EmployeeCategoryId { get; set; }

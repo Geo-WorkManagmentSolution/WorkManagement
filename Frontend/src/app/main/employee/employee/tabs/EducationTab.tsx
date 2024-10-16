@@ -64,13 +64,13 @@ export default function EducationTab() {
 								<Controller
 									name={`employeeEducationDetail.${index}.type`}
 									control={control}
-									rules={{ required: 'Education type is required' }}
 									render={({ field }) => (
 										<TextField
 											{...field}
 											select
 											fullWidth
 											label="Education Type"
+											required
 											error={!!errors.employeeEducationDetail?.[index]?.type}
 											helperText={errors.employeeEducationDetail?.[index]?.type?.message as string}
 										>
@@ -99,6 +99,7 @@ export default function EducationTab() {
 										<TextField
 											{...field}
 											fullWidth
+											required
 											label="University"
 											error={!!errors.employeeEducationDetail?.[index]?.university}
 											helperText={errors.employeeEducationDetail?.[index]?.university?.message}
@@ -112,17 +113,18 @@ export default function EducationTab() {
 								sm={6}
 							>
 								<Controller
-									name={`employeeEducationDetail.${index}.year`}
+									name={`employeeEducationDetail.${index}.passingYear`}
 									control={control}
 									rules={{ required: 'Year is required' }}
 									render={({ field }) => (
 										<TextField
 											{...field}
 											fullWidth
+											required
 											label="Year of Completion"
 											type="number"
-											error={!!errors.employeeEducationDetail?.[index]?.year}
-											helperText={errors.employeeEducationDetail?.[index]?.year?.message as string}
+											error={!!errors.employeeEducationDetail?.[index]?.passingYear}
+											helperText={errors.employeeEducationDetail?.[index]?.passingYear?.message as string}
 										/>
 									)}
 								/>
@@ -140,6 +142,7 @@ export default function EducationTab() {
 										<TextField
 											{...field}
 											fullWidth
+											required
 											label="Grade/Score"
 											error={!!errors.employeeEducationDetail?.[index]?.grade}
 											helperText={errors.employeeEducationDetail?.[index]?.grade?.message}
