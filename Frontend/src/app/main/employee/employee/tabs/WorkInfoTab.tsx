@@ -70,13 +70,14 @@ function WorkInfoTab() {
 				/>
 
 				<Controller
-					name="employeeDepartments.departmentName"
+					name="departmentName"
 					control={control}
 					render={({ field }) => (
 						<TextField
 							{...field}
 							label="Department Name"
 							fullWidth
+							required
 							error={!!errors.employeeDepartments?.departmentName}
 							helperText={errors.employeeDepartments?.departmentName?.message as string}
 						/>
@@ -122,10 +123,11 @@ function WorkInfoTab() {
 							select
 							label="Salary Type"
 							fullWidth
+							required
 							error={!!errors.employeeWorkInformation?.salaryType}
 							helperText={errors.employeeWorkInformation?.salaryType?.message as string}
 						>
-							{Object.values({ SalaryType }).map((type) => (
+							{Object.values(SalaryType).map((type) => (
 								<MenuItem
 									key={type}
 									value={type}
@@ -136,6 +138,7 @@ function WorkInfoTab() {
 						</TextField>
 					)}
 				/>
+
 				<Controller
 					name="employeeWorkInformation.salary"
 					control={control}
@@ -144,6 +147,7 @@ function WorkInfoTab() {
 							{...field}
 							label="Salary"
 							type="number"
+							required
 							InputProps={{
 								startAdornment: <InputAdornment position="start">₹</InputAdornment>
 							}}
@@ -180,6 +184,7 @@ function WorkInfoTab() {
 							label="Hire Date"
 							type="date"
 							fullWidth
+							required
 							InputLabelProps={{ shrink: true }}
 							error={!!errors.employeeWorkInformation?.hireDate}
 							helperText={errors.employeeWorkInformation?.hireDate?.message as string}

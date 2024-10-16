@@ -64,10 +64,8 @@ const schema = yup.object({
 	surname: yup.string().required('Surname is required'),
 	motherName: yup.string().required('Mother Name is required'),
 	email: yup.string().email('Must be a valid email').required('Email is required'),
-	phoneNumber: yup.number().nullable().typeError('Must be a number'),
-	alternateNumber: yup.number().nullable().typeError('Must be a number'),
-	position: yup.string().required('Position is required'),
-	userId: yup.string().required('User ID is required'),
+	phoneNumber: yup.number().nullable(),
+	alternateNumber: yup.number().nullable(),
 	roleId: yup.string().required('Role ID is required'),
 	employeeCategoryId: yup.number().nullable(),
 	departmentName: yup.string().nullable(),
@@ -78,43 +76,37 @@ const schema = yup.object({
 		bloodGroup: yup.string().nullable(),
 		relationWithEmployee: yup.string().nullable()
 	}),
-	employeeDepartments: yup.object().shape({
-		departmentName: yup.string().required('Department Name is required')
-	}),
-	employeeWorkInformation: yup.object().shape({
-		designation: yup.string(),
+		employeeWorkInformation: yup.object().shape({
+		designation: yup.string().nullable(),
 		salaryType: yup.string().required('Salary Type is required'),
 		hireDate: yup.date().required('Hire Date is required'),
 		salary: yup.number().required('Salary is required').positive('Salary must be positive'),
-		site: yup.string(),
+		site: yup.string().nullable(),
 		bond: yup.number().nullable().positive('Bond must be positive'),
 		previousDateOfJoiningInGDR: yup.date().nullable(),
 		previousDateOfLeavingInGDR: yup.date().nullable(),
-		grpHead: yup.string()
+		grpHead: yup.string().nullable()
 	}),
-	employeeAddresses: yup.object().shape({
-		addressLine1: yup.string().required('Address Line 1 is required'),
-		addressLine2: yup.string(),
-		city: yup.string().required('City is required'),
-		country: yup.string().required('Country is required'),
-		state: yup.string().required('State is required'),
-		pinCode: yup.string().required('Pin Code is required')
-	}),
-	employeeIdentityInfos: yup.object().shape({
-		uid: yup.string(),
-		bankAccountNumber: yup.string(),
-		bankName: yup.string(),
-		branch: yup.string(),
-		ifsc: yup.string(),
-		accountHolderName: yup.string(),
-		pan: yup.string(),
-		providentFundNumber: yup.string(),
-		employeeStateInsuranceNumber: yup.string(),
-		biometricCode: yup.string()
-	}),
-	employeeEducations: yup.object().shape({
-	
-	})
+	// employeeAddresses: yup.object().shape({
+	// 	addressLine1: yup.string().required('Address Line 1 is required'),
+	// 	addressLine2: yup.string().nullable(),
+	// 	city: yup.string().required('City is required'),
+	// 	country: yup.string().required('Country is required'),
+	// 	state: yup.string().required('State is required'),
+	// 	pinCode: yup.string().required('Pin Code is required')
+	// }),
+	// employeeIdentityInfos: yup.object().shape({
+	// 	uid: yup.string().nullable(),
+	// 	bankAccountNumber: yup.string().nullable(),
+	// 	bankName: yup.string().nullable(),
+	// 	branch: yup.string().nullable(),
+	// 	ifsc: yup.string().nullable(),
+	// 	accountHolderName: yup.string().nullable(),
+	// 	pan: yup.string().nullable(),
+	// 	providentFundNumber: yup.string().nullable(),
+	// 	employeeStateInsuranceNumber: yup.string().nullable(),
+	// 	biometricCode: yup.string().nullable()
+	// })
 });
 
 // The product page.

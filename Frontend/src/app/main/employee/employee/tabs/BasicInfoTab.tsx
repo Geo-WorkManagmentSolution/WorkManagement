@@ -295,9 +295,10 @@ function BasicInfoTab() {
 						render={({ field }) => (
 							<TextField
 								{...field}
-								value={field.value || ''}
+								value={field.value}
 								label="Phone Number"
 								fullWidth
+								type="number"
 								margin="normal"
 								variant="outlined"
 								placeholder="Phone Number"
@@ -321,8 +322,9 @@ function BasicInfoTab() {
 						render={({ field }) => (
 							<TextField
 								{...field}
-								value={field.value || ''}
+								value={field.value}
 								label="Alternate Number"
+								type="number"
 								className="mx-4"
 								variant="outlined"
 								placeholder="Phone Number"
@@ -349,6 +351,7 @@ function BasicInfoTab() {
 							{...field}
 							label="Mother Name"
 							fullWidth
+							required
 							error={!!errors.motherName}
 							helperText={errors.motherName?.message as string}
 						/>

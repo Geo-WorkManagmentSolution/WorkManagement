@@ -99,7 +99,7 @@ export default function EducationTab() {
 										<TextField
 											{...field}
 											fullWidth
-											label="university"
+											label="University"
 											error={!!errors.employeeEducationDetail?.[index]?.university}
 											helperText={errors.employeeEducationDetail?.[index]?.university?.message}
 										/>
@@ -170,7 +170,6 @@ export default function EducationTab() {
 									Remove
 								</Button>
 							)}
-							
 						</Box>
 					</Box>
 				))}

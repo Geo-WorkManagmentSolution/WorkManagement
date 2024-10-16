@@ -20,6 +20,7 @@ function AddressInfoTab() {
 						{...field}
 						label="Address Line 1"
 						fullWidth
+						required
 						error={!!errors.employeeAddresses?.addressLine1}
 						helperText={errors.employeeAddresses?.addressLine1?.message as string}
 					/>
@@ -48,6 +49,7 @@ function AddressInfoTab() {
 						{...field}
 						label="City"
 						fullWidth
+						required
 						error={!!errors.employeeAddresses?.city}
 						helperText={errors.employeeAddresses?.city?.message as string}
 					/>
@@ -62,6 +64,7 @@ function AddressInfoTab() {
 						{...field}
 						label="State"
 						fullWidth
+						required
 						error={!!errors.employeeAddresses?.state}
 						helperText={errors.employeeAddresses?.state?.message as string}
 					/>
@@ -76,6 +79,7 @@ function AddressInfoTab() {
 						{...field}
 						label="Country"
 						fullWidth
+						required
 						error={!!errors.employeeAddresses?.country}
 						helperText={errors.employeeAddresses?.country?.message as string}
 					/>
@@ -90,6 +94,7 @@ function AddressInfoTab() {
 						{...field}
 						label="Pin Code"
 						fullWidth
+						required
 						error={!!errors.employeeAddresses?.pinCode}
 						helperText={errors.employeeAddresses?.pinCode?.message as string}
 					/>

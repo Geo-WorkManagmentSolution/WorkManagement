@@ -7,20 +7,13 @@ import { BloodGroup, EmployeeModel, RelationWithEmployee, SalaryType } from '../
  */
 const EmployeeModelClone = (data: PartialDeep<EmployeeModel>) =>
 	_.defaults(data || {}, {
-		id: 0,
 		photoURL: '',
-		employeeNumber: 0,
 		firstName: '',
 		lastName: '',
 		email: '',
 		phoneNumber: '',
-		position: '',
-		userId: '',
 		roleId: '',
-		employeeCategoryId: 0,
-		employeePersonalDetailsId: 0,
 		employeePersonalDetails: {
-			id: 0,
 			isDeleted: false,
 			dateOfBirth: '',
 			gender: '',
@@ -28,9 +21,7 @@ const EmployeeModelClone = (data: PartialDeep<EmployeeModel>) =>
 			bloodGroup: '' as BloodGroup,
 			relationWithEmployee: '' as RelationWithEmployee
 		},
-		employeeWorkInformationId: 0,
 		employeeWorkInformation: {
-			id: 0,
 			isDeleted: false,
 			designation: '',
 			salaryType: '' as SalaryType,
@@ -42,9 +33,7 @@ const EmployeeModelClone = (data: PartialDeep<EmployeeModel>) =>
 			previousDateOfLeavingInGDR: '',
 			grpHead: ''
 		},
-		employeeAddressId: 0,
 		employeeAddresses: {
-			id: 0,
 			isDeleted: false,
 			addressLine1: '',
 			addressLine2: '',
@@ -53,9 +42,7 @@ const EmployeeModelClone = (data: PartialDeep<EmployeeModel>) =>
 			state: '',
 			pinCode: ''
 		},
-		employeeIdentityInfoId: 0,
 		employeeIdentityInfos: {
-			id: 0,
 			isDeleted: false,
 			uid: '',
 			bankAccountNumber: '',
@@ -68,7 +55,6 @@ const EmployeeModelClone = (data: PartialDeep<EmployeeModel>) =>
 			employeeStateInsuranceNumber: '',
 			biometricCode: ''
 		},
-		employeeEducationDetailIds: 0,
 		employeeEducationDetail: [{ type: '', university: '', year: '', grade: '' }]
 	});
 

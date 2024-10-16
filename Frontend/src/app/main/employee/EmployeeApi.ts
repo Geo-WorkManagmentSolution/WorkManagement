@@ -48,6 +48,12 @@ const injectedRtkApi = api.injectEndpoints({
         method: "DELETE",
       }),
     }),
+    postApiEmployeesSendEmail: build.mutation<
+      PostApiEmployeesSendEmailApiResponse,
+      PostApiEmployeesSendEmailApiArg
+    >({
+      query: () => ({ url: `/api/Employees/sendEmail`, method: "POST" }),
+    }),
     postApiEmployeesSearch: build.mutation<
       PostApiEmployeesSearchApiResponse,
       PostApiEmployeesSearchApiArg
@@ -84,6 +90,8 @@ export type DeleteApiEmployeesByIdApiResponse = unknown;
 export type DeleteApiEmployeesByIdApiArg = {
   id: number;
 };
+export type PostApiEmployeesSendEmailApiResponse = unknown;
+export type PostApiEmployeesSendEmailApiArg = void;
 export type PostApiEmployeesSearchApiResponse =
   /** status 200 OK */ EmployeeModel[];
 export type PostApiEmployeesSearchApiArg = {
@@ -143,6 +151,14 @@ export type EmployeeEducationDetail = {
   university?: string | null;
   grade?: string | null;
 };
+export type EmployeeDocuments = {
+  id?: number;
+  isDeleted?: boolean;
+  fileName?: string | null;
+  fileSize?: number;
+  fileContent?: string | null;
+  fileType?: FileType;
+};
 export type EmployeeModel = {
   id?: number;
   photoURL?: string | null;
@@ -165,6 +181,8 @@ export type EmployeeModel = {
   employeeIdentityInfos?: EmployeeIdentityInfo;
   employeeEducationDetailIds?: number | null;
   employeeEducationDetail?: EmployeeEducationDetail[] | null;
+  employeeDocumentsIds?: number | null;
+  employeeDocuments?: EmployeeDocuments[] | null;
 };
 export type EmployeeCategory = {
   id?: number;
@@ -201,6 +219,15 @@ export enum SalaryType {
   M = "M",
   F = "F",
 }
+export enum FileType {
+  Pdf = "PDF",
+  Docx = "DOCX",
+  Txt = "TXT",
+  Zip = "ZIP",
+  Xlsx = "XLSX",
+  Csv = "CSV",
+  Other = "Other",
+}
 export const {
   useGetApiEmployeesQuery,
   useLazyGetApiEmployeesQuery,
@@ -211,5 +238,6 @@ export const {
   useLazyGetApiEmployeesByIdQuery,
   usePutApiEmployeesByIdMutation,
   useDeleteApiEmployeesByIdMutation,
+  usePostApiEmployeesSendEmailMutation,
   usePostApiEmployeesSearchMutation,
 } = injectedRtkApi;

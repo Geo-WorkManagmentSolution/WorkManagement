@@ -199,6 +199,7 @@ function PersonalInfoTab() {
 						className="mt-8 mb-16 "
 						type="date"
 						fullWidth
+						required
 						InputLabelProps={{ shrink: true }}
 						error={!!error}
 						helperText={error?.message}
