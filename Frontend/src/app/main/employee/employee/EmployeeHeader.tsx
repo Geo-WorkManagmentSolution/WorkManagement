@@ -60,9 +60,12 @@ function EmployeeHeader() {
 	function handleDeleteEmployee() {
 		deleteEmployee({
 			id: parseInt(employeeId, 10)
-		});
-		dispatch(showMessage({ message: 'An employee deleted successfully.' }));
-		navigate('/apps/employees/employeesSearch');
+		})
+			.unwrap()
+			.then((data) => {
+				dispatch(showMessage({ message: 'An employee deleted successfully.' }));
+				navigate('/apps/employees/employeesSearch');
+			});
 	}
 
 	return (
