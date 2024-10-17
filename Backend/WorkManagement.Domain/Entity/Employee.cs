@@ -73,9 +73,9 @@ namespace WorkManagementSolution.Employee
         public byte[] FileContent { get; set; }
         public FileType FileType { get; set; }
 
-        public int EmployeeId { get; set; }
+        public int? EmployeeId { get; set; }
         [ForeignKey("EmployeeId")]
-        public Employee Employee { get; set; }
+        public Employee? Employee { get; set; }
 
 
     }
@@ -170,9 +170,9 @@ namespace WorkManagementSolution.Employee
         public string University { get; set; }
         public string? grade { get; set; }
        
-        public int EmployeeId { get; set; }
+        public int? EmployeeId { get; set; }
         [ForeignKey("EmployeeId")]
-        public Employee Employee { get; set; }
+        public Employee? Employee { get; set; }
 
     }
 

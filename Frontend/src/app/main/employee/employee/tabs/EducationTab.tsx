@@ -158,7 +158,7 @@ export default function EducationTab() {
 								variant="contained"
 								color="secondary"
 								size="small"
-								onClick={() => append({ type: '', university: '', year: '', grade: '' })}
+								onClick={() => append({ type: '', university: '', passingYear: '', grade: '' })}
 							>
 								<FuseSvgIcon size={20}>heroicons-outline:plus</FuseSvgIcon>
 								<span className="mx-4 sm:mx-8">Add Education</span>
