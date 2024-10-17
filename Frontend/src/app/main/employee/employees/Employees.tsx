@@ -22,14 +22,15 @@ function Employees() {
 					}
 				})}
 			/>
-			
+
 			<div className="w-full h-full flex flex-col px-16">
 				<EmployeesHeader handleSwitch={(e) => settoggleAdvanceSearch(e)} />
-				{toggleAdvanceSearch &&
-				(<AdvanceSearchCriteria
-					onSubmit={(json) => SearchEmployee({ body: json as Criterion[] })}
-					fields={convertModelToList<EmployeeModel>(EmployeeModelClone({}))}
-				/>)}
+				{toggleAdvanceSearch && (
+					<AdvanceSearchCriteria
+						onSubmit={(json) => SearchEmployee({ body: json as Criterion[] })}
+						fields={convertModelToList<EmployeeModel>(EmployeeModelClone({}))}
+					/>
+				)}
 				<EmployeesTable />
 			</div>
 		</>

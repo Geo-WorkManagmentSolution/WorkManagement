@@ -6,14 +6,14 @@ import { useNavigate, useParams } from 'react-router-dom';
 import _ from '@lodash';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import PageBreadcrumb from 'app/shared-components/PageBreadcrumb';
+import { showMessage } from '@fuse/core/FuseMessage/fuseMessageSlice';
+import { useAppDispatch } from 'app/store/hooks';
 import {
 	EmployeeModel,
 	usePostApiEmployeesMutation,
 	useDeleteApiEmployeesByIdMutation,
 	usePutApiEmployeesByIdMutation
 } from '../EmployeeApi';
-import { showMessage } from '@fuse/core/FuseMessage/fuseMessageSlice';
-import { useAppDispatch } from 'app/store/hooks';
 
 /**
  * The product header.
@@ -42,15 +42,16 @@ function EmployeeHeader() {
 			id: parseInt(employeeId, 10),
 			employeeModel: getValues() as EmployeeModel
 		});
-		dispatch(showMessage({ message: "An employee updated successfully." }));
-
+		dispatch(showMessage({ message: 'An employee updated successfully.' }));
 	}
 
 	function handleCreateEmployee() {
 		createEmployee({ employeeModel: getValues() as EmployeeModel })
 			.unwrap()
 			.then((data) => {
-				dispatch(showMessage({ message: "An employee created successfully and a welcome email sent to employee." }));
+				dispatch(
+					showMessage({ message: 'An employee created successfully and a welcome email sent to employee.' })
+				);
 				navigate(`/apps/employees/employeesSearch`);
 			});
 	}
@@ -59,9 +60,8 @@ function EmployeeHeader() {
 		deleteEmployee({
 			id: parseInt(employeeId, 10)
 		});
-		dispatch(showMessage({ message: "An employee deleted successfully." }));
+		dispatch(showMessage({ message: 'An employee deleted successfully.' }));
 		navigate('/apps/employees/employeesSearch');
-
 	}
 
 	return (
@@ -107,7 +107,7 @@ function EmployeeHeader() {
 						animate={{ x: 0, transition: { delay: 0.3 } }}
 					>
 						<Typography className="text-15 sm:text-2xl truncate font-semibold">
-							{ firstName || 'New Employee'}
+							{firstName || 'New Employee'}
 						</Typography>
 						{/* <Typography
 							variant="caption"
@@ -144,15 +144,15 @@ function EmployeeHeader() {
 						</Button>
 					</>
 				) : (
-						<Button
-							className="whitespace-nowrap mx-4"
-							variant="contained"
-							color="secondary"
-							disabled={_.isEmpty(dirtyFields) || !isValid}
-							onClick={handleCreateEmployee}
-						>
-							Add
-						</Button>
+					<Button
+						className="whitespace-nowrap mx-4"
+						variant="contained"
+						color="secondary"
+						disabled={_.isEmpty(dirtyFields) || !isValid}
+						onClick={handleCreateEmployee}
+					>
+						Add
+					</Button>
 				)}
 			</motion.div>
 		</div>

@@ -110,7 +110,7 @@ try
     builder.AddJWTAuthetication();
     builder.Services.AddControllers()
     .AddJsonOptions(options => {
-        options.JsonSerializerOptions.Converters.Add(new JsonNullableStringEnumConverter());
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         //options.SerializerSettings.Converters.Add(new JsonNullableStringEnumConverter());
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
         //options.JsonSerializerOptions.Converters.Add(new EmptyStringToNullableEnumConverter());

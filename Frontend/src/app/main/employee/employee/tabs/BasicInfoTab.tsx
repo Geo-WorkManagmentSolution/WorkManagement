@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Avatar, Box, Autocomplete, Typography, InputAdornment } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import { useRef } from 'react';
