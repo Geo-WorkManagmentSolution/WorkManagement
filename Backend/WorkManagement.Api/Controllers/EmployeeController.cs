@@ -126,6 +126,9 @@ namespace WorkManagement.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEmployee(int id)
         {
+            //delete one to many manually
+
+
             var deleted = await employeeService.DeleteEmployeeAsync(id);
             if (!deleted)
             {

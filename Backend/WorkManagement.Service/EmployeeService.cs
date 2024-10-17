@@ -65,8 +65,8 @@ namespace WorkManagement.Service
         }
         public async Task<bool> CheckEmailExists(string email)
         {
-            var user=await userManager.FindByEmailAsync(email);
-            return user != null ? true:false;
+            var user = await userManager.FindByEmailAsync(email);
+            return user != null ? true : false;
         }
         public async Task SendEmail()
         {
@@ -137,6 +137,8 @@ namespace WorkManagement.Service
 
         public async Task<bool> DeleteEmployeeAsync(int id)
         {
+            var edu = await _dbContext.EmployeeEducationDetails.Where(x => x.EmployeeId == id).ExecuteDeleteAsync();
+
             var employee = await _dbContext.Employees.FindAsync(id);
             if (employee == null)
                 return false;

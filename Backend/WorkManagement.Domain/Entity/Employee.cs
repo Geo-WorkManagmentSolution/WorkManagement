@@ -75,6 +75,7 @@ namespace WorkManagementSolution.Employee
 
         public int? EmployeeId { get; set; }
         [ForeignKey("EmployeeId")]
+        [InverseProperty("EmployeeDocuments")]
         public Employee? Employee { get; set; }
 
 
@@ -172,6 +173,7 @@ namespace WorkManagementSolution.Employee
        
         public int? EmployeeId { get; set; }
         [ForeignKey("EmployeeId")]
+        [InverseProperty("EmployeeEducationDetail")]
         public Employee? Employee { get; set; }
 
     }
