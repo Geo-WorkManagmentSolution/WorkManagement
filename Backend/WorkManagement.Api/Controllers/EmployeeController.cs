@@ -70,6 +70,15 @@ namespace WorkManagement.API.Controllers
             return Ok(employee);
         }
 
+        // GET: api/employees/checkEmail
+        [HttpGet]
+        [Route("CheckEmailExists")]
+        public async Task<ActionResult<bool>> CheckEmailExists(string email)
+        {
+            var result=await employeeService.CheckEmailExists(email);
+            return Ok(result);
+        }
+
         // POST: api/employees
         [HttpPost]
         public async Task<ActionResult<EmployeeModel>> CreateEmployee([FromBody] EmployeeModel employeeModel)

@@ -52,12 +52,22 @@ namespace WorkManagement.Service
         public async Task<EmployeeModel> GetEmployeeByIdAsync(int id)
         {
             var Employee = await _dbContext.Employees
+                .AsNoTracking()
                 .Include(x => x.EmployeePersonalDetails)
+                .Include(x => x.EmployeeWorkInformation)
+                .Include(x => x.EmployeeAddresses)
+                .Include(x => x.EmployeeIdentityInfos)
+                .Include(x => x.EmployeeEducationDetail)
+                .Include(x => x.EmployeeDocuments)
                 .SingleOrDefaultAsync(x => x.Id == id);
             var EmployeeModel = mapper.Map<EmployeeModel>(Employee);
             return EmployeeModel;
         }
-
+        public async Task<bool> CheckEmailExists(string email)
+        {
+            var user=await userManager.FindByEmailAsync(email);
+            return user != null ? true:false;
+        }
         public async Task SendEmail()
         {
             var WelcomeModelCredentials = new WelcomeModel();

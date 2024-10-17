@@ -16,6 +16,8 @@ using WorkManagement.API.Middleware;
 using Serilog;
 using WorkManagement.Domain.Models.Email;
 using System.Text.Json.Serialization;
+using WorkManagement.Domain;
+using Newtonsoft.Json.Converters;
 
 
 
@@ -107,7 +109,12 @@ try
 
     builder.AddJWTAuthetication();
     builder.Services.AddControllers()
-    .AddJsonOptions(options => { options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
+    .AddJsonOptions(options => {
+        options.JsonSerializerOptions.Converters.Add(new JsonNullableStringEnumConverter());
+        //options.SerializerSettings.Converters.Add(new JsonNullableStringEnumConverter());
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        //options.JsonSerializerOptions.Converters.Add(new EmptyStringToNullableEnumConverter());
+    });
     var app = builder.Build();
 
 
@@ -152,6 +159,8 @@ try
     app.UseMiddleware<ErrorHandlingMiddleware>();
 
     app.Run();
+
+
 }
 catch (Exception ex)
 {

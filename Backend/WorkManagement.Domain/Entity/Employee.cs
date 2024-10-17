@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Reflection.Metadata;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 using WorkManagement.Domain.Entity;
@@ -15,7 +16,6 @@ namespace WorkManagementSolution.Employee
     {
         public string? PhotoURL { get; set; }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public int EmployeeNumber { get; set; }
 
         public required string FirstName { get; set; }
@@ -29,8 +29,8 @@ namespace WorkManagementSolution.Employee
 
         [EmailAddress]
         public required string Email { get; set; }
-        public int? PhoneNumber { get; set; }
-        public int? AlternateNumber { get; set; }
+        public long? PhoneNumber { get; set; }
+        public long? AlternateNumber { get; set; }
 
         [ForeignKey(nameof(ApplicationUser))]
         public required Guid UserId { get; set; }
@@ -60,12 +60,8 @@ namespace WorkManagementSolution.Employee
         public int? EmployeeIdentityInfoId { get; set; }
         public EmployeeIdentityInfo? EmployeeIdentityInfos { get; set; }
 
-        [ForeignKey(nameof(EmployeeEducationDetailIds))]
-        public int? EmployeeEducationDetailIds { get; set; }
         public List<EmployeeEducationDetail>? EmployeeEducationDetail { get; set; }
 
-        [ForeignKey(nameof(EmployeeDocumentIds))]
-        public int? EmployeeDocumentIds { get; set; }
         public List<EmployeeDocuments>? EmployeeDocuments { get; set; }
 
     }
@@ -76,6 +72,11 @@ namespace WorkManagementSolution.Employee
         public int FileSize { get; set; }
         public byte[] FileContent { get; set; }
         public FileType FileType { get; set; }
+
+        public int EmployeeId { get; set; }
+        [ForeignKey("EmployeeId")]
+        public Employee Employee { get; set; }
+
 
     }
     public class EmployeeDepartment : BaseEntity
@@ -93,12 +94,27 @@ namespace WorkManagementSolution.Employee
         Other
     }
 
+    public enum MaritalStatus
+    {
+        Unknown,
+        Single,
+        Married,
+        Divorced,
+        Widowed,
+        Separated,
+        CommonLaw, // Common Law (Defacto)
+        CivilUnion,
+        DomesticPartnership,
+        Other
+    }
+
+
     public class EmployeePersonalDetails : BaseEntity
     {
         [DataType(DataType.Date)]
         public required DateTime DateOfBirth { get; set; }
         public required string Gender { get; set; }
-        public required string MaritalStatus { get; set; }
+        public required MaritalStatus MaritalStatus { get; set; }
         public BloodGroup? bloodGroup { get; set; }
 
         public RelationWithEmployee? RelationWithEmployee { get; set; }
@@ -124,11 +140,11 @@ namespace WorkManagementSolution.Employee
     public class EmployeeAddress : BaseEntity
     {
         public string AddressLine1 { get; set; }
-        public string AddressLine2 { get; set; }
+        public string? AddressLine2 { get; set; }
         public string City { get; set; }
         public string Country { get; set; }
         public string State { get; set; }
-        public string PinCode { get; set; }
+        public long PinCode { get; set; }
         // Other address-related properties
     }
 
@@ -153,6 +169,10 @@ namespace WorkManagementSolution.Employee
         public string PassingYear { get; set; }
         public string University { get; set; }
         public string? grade { get; set; }
+       
+        public int EmployeeId { get; set; }
+        [ForeignKey("EmployeeId")]
+        public Employee Employee { get; set; }
 
     }
 

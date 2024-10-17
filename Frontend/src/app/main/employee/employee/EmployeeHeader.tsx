@@ -50,7 +50,7 @@ function EmployeeHeader() {
 		createEmployee({ employeeModel: getValues() as EmployeeModel })
 			.unwrap()
 			.then((data) => {
-				dispatch(showMessage({ message: "An employee created successfully." }));
+				dispatch(showMessage({ message: "An employee created successfully and a welcome email sent to employee." }));
 				navigate(`/apps/employees/employeesSearch`);
 			});
 	}

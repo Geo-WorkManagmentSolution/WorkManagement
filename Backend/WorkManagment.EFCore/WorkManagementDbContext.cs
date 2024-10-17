@@ -60,6 +60,10 @@ namespace WorkManagmentSolution.EFCore
             //        mutableEntityType.SetQueryFilter(lambdaExpression);
             //    }
             //}
+            modelBuilder.HasSequence<int>("EmployeeNumber")
+            .StartsAt(1000)
+            .IncrementsBy(1);
+
 
             modelBuilder.Entity<EmployeeCategory>().HasData(
                      new EmployeeCategory { Id = 1, Name = "Full-Time" },

@@ -23,9 +23,10 @@ namespace WorkManagement.Domain.Models.Employee
         public required string MotherName { get; set; }
         [EmailAddress]
         public required string Email { get; set; }
-        public int? PhoneNumber { get; set; }
-        public int? AlternateNumber { get; set; }
+        public long? PhoneNumber { get; set; }
+        public long? AlternateNumber { get; set; }
         public string? Position { get; set; }
+        public bool? IsDeleted { get; set; }
         public Guid UserId { get; set; }
         public required Guid RoleId { get; set; }
         public required int EmployeeCategoryId { get; set; }

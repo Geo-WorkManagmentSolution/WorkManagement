@@ -2,8 +2,8 @@
 import { TextField, MenuItem, InputAdornment, Typography, Autocomplete } from '@mui/material';
 import { Controller, useFormContext } from 'react-hook-form';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
-import { SalaryType, useGetApiEmployeesDepartmentsQuery } from '../../EmployeeApi';
 import { DatePicker } from '@mui/x-date-pickers';
+import { SalaryType, useGetApiEmployeesDepartmentsQuery } from '../../EmployeeApi';
 
 /**
  * The basic info tab.
@@ -90,11 +90,14 @@ function WorkInfoTab() {
 									value={params.value || ''}
 									placeholder="Select Employee Department"
 									label="Department"
-									required
 									variant="outlined"
+									required
 									InputLabelProps={{
 										shrink: true
 									}}
+									error={!!errors.employeeDepartmentId}
+									helperText={errors.employeeDepartmentId?.message as string}
+		
 								/>
 							)}
 						/>
@@ -205,97 +208,96 @@ function WorkInfoTab() {
 				</div>
 
 				<Controller
-				control={control}
-				name="employeeWorkInformation.hireDate"
-				render={({ field: { value, onChange } }) => (
-					<DatePicker
-						value={new Date(value)}
-						onChange={(val) => {
-							onChange(val?.toISOString());
-						}}
-						className="mx-4"
-						slotProps={{
-							textField: {
-								label: 'Hire Date',
-								InputLabelProps: {
-									shrink: true
+					control={control}
+					name="employeeWorkInformation.hireDate"
+					render={({ field: { value, onChange } }) => (
+						<DatePicker
+							value={new Date(value)}
+							onChange={(val) => {
+								onChange(val?.toISOString());
+							}}
+							className="mx-4"
+							slotProps={{
+								textField: {
+									label: 'Hire Date',
+									required: true,
+									InputLabelProps: {
+										shrink: true
+									},
+									fullWidth: true,
+									variant: 'outlined',
+									error: !!errors.employeeWorkInformation?.hireDate,
+									margin: 'normal',
+									helperText: errors.employeeWorkInformation?.hireDate?.message as string
 								},
-								fullWidth: true,
-								variant: 'outlined',
-								error :!!errors.employeeWorkInformation?.hireDate,
-								margin: 'normal',
-								helperText:errors.employeeWorkInformation?.hireDate?.message as string
-							},
-							actionBar: {
-								actions: ['clear']
-							}
-						}}
-					/>
-				)}
-			/>
+								actionBar: {
+									actions: ['clear']
+								}
+							}}
+						/>
+					)}
+				/>
 
-
-<Controller
-				control={control}
-				name="employeeWorkInformation.previousDateOfJoiningInGDR"
-				render={({ field: { value, onChange } }) => (
-					<DatePicker
-						value={new Date(value)}
-						onChange={(val) => {
-							onChange(val?.toISOString());
-						}}
-						className="mx-4"
-						slotProps={{
-							textField: {
-								label: 'Previous Date of Joining in GDR',
-								InputLabelProps: {
-									shrink: true
+				<Controller
+					control={control}
+					name="employeeWorkInformation.previousDateOfJoiningInGDR"
+					render={({ field: { value, onChange } }) => (
+						<DatePicker
+							value={new Date(value)}
+							onChange={(val) => {
+								onChange(val?.toISOString());
+							}}
+							className="mx-4"
+							slotProps={{
+								textField: {
+									label: 'Previous Date of Joining in GDR',
+									InputLabelProps: {
+										shrink: true
+									},
+									fullWidth: true,
+									variant: 'outlined',
+									error: !!errors.employeeWorkInformation?.previousDateOfJoiningInGDR,
+									margin: 'normal',
+									helperText: errors.employeeWorkInformation?.previousDateOfJoiningInGDR?.message as string
 								},
-								fullWidth: true,
-								variant: 'outlined',
-								error :!!errors.employeeWorkInformation?.previousDateOfJoiningInGDR,
-								margin: 'normal',
-								helperText:errors.employeeWorkInformation?.previousDateOfJoiningInGDR?.message as string
-							},
-							actionBar: {
-								actions: ['clear']
-							}
-						}}
-					/>
-				)}
-			/>
+								actionBar: {
+									actions: ['clear']
+								}
+							}}
+						/>
+					)}
+				/>
 
-			
-<Controller
-				control={control}
-				name="employeeWorkInformation.previousDateOfLeavingInGDR"
-				render={({ field: { value, onChange } }) => (
-					<DatePicker
-						value={new Date(value)}
-						onChange={(val) => {
-							onChange(val?.toISOString());
-						}}
-						className="mx-4"
-						slotProps={{
-							textField: {
-								label: 'Previous Date of Leaving in GDR',
-								InputLabelProps: {
-									shrink: true
+				<Controller
+					control={control}
+					name="employeeWorkInformation.previousDateOfLeavingInGDR"
+					render={({ field: { value, onChange } }) => (
+						<DatePicker
+							value={new Date(value)}
+							onChange={(val) => {
+								onChange(val?.toISOString());
+							}}
+							className="mx-4"
+							slotProps={{
+								textField: {
+									label: 'Previous Date of Leaving in GDR',
+									InputLabelProps: {
+										shrink: true
+									},
+									fullWidth: true,
+									variant: 'outlined',
+									error: !!errors.employeeWorkInformation?.previousDateOfLeavingInGDR,
+									margin: 'normal',
+									helperText: errors.employeeWorkInformation?.previousDateOfLeavingInGDR
+										?.message as string
 								},
-								fullWidth: true,
-								variant: 'outlined',
-								error :!!errors.employeeWorkInformation?.previousDateOfLeavingInGDR,
-								margin: 'normal',
-								helperText:errors.employeeWorkInformation?.previousDateOfLeavingInGDR?.message as string
-							},
-							actionBar: {
-								actions: ['clear']
-							}
-						}}
-					/>
-				)}
-			/>
-
+								actionBar: {
+									actions: ['clear']
+								}
+							}}
+						/>
+					)}
+				/>
 			</div>
 		</div>
 	);

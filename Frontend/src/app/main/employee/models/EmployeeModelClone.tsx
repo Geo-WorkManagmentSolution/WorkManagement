@@ -18,19 +18,19 @@ const EmployeeModelClone = (data: PartialDeep<EmployeeModel>) =>
 			dateOfBirth: '',
 			gender: '',
 			maritalStatus: '',
-			bloodGroup: '' as BloodGroup,
-			relationWithEmployee: '' as RelationWithEmployee
+			bloodGroup: null as BloodGroup,
+			relationWithEmployee: null as RelationWithEmployee
 		},
 		employeeWorkInformation: {
 			isDeleted: false,
 			designation: '',
-			salaryType: '' as SalaryType,
-			hireDate: '',
-			salary: 0,
+			salaryType: null as SalaryType,
+			hireDate: null,
+			salary: null,
 			site: '',
-			bond: 0,
-			previousDateOfJoiningInGDR: '',
-			previousDateOfLeavingInGDR: '',
+			bond: null,
+			previousDateOfJoiningInGDR: null,
+			previousDateOfLeavingInGDR: null,
 			grpHead: ''
 		},
 		employeeAddresses: {

@@ -67,8 +67,9 @@ const schema = yup.object({
 	firstName: yup.string().required('First Name is required'),
 	lastName: yup.string().required('Last Name is required'),
 	motherName: yup.string().required('Mother Name is required'),
-	email: yup.string().email('Must be a valid email').required('Email is required'),
+	email: yup.string().required('Email is required').email('Invalid email address'),
 	roleId: yup.string().required('Role ID is required'),
+	employeeCategoryId: yup.string().required('Category is required'),
 	employeePersonalDetails: yup.object().shape({
 		dateOfBirth: yup
 			.date()
@@ -86,17 +87,21 @@ const schema = yup.object({
 	employeeWorkInformation: yup.object().shape({
 		salaryType: yup.string().required('Salary Type is required'),
 		hireDate: yup.date().required('Hire Date is required'),
-		salary: yup.number().required('Salary is required')
+		salary: yup
+			.number()
+			.required('Salary is required')
+			.typeError('Salary must be a number')
+			.positive('Salary must be greater than zero')
 	}),
 	employeeAddresses: yup.object().shape({
 		addressLine1: yup.string().required('Address Line 1 is required'),
 		city: yup.string().required('City is required'),
 		country: yup.string().required('Country is required'),
 		state: yup.string().required('State is required'),
-		pinCode: yup.string().required('Pin Code is required')
+		pinCode: yup.number().typeError('Pin Code must be a number').required('Pin Code is required')
 	}),
-	employeeEducationDetail: yup.array().of(educationDetailSchema)
-
+	employeeEducationDetail: yup.array().of(educationDetailSchema),
+	employeeDepartmentId: yup.string().required('Department Id is required')
 	// employeeIdentityInfos: yup.object().shape({
 	// 	uid: yup.string().nullable(),
 	// 	bankAccountNumber: yup.string().nullable(),

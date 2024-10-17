@@ -7,11 +7,10 @@ import {
 	Typography,
 	Autocomplete,
 	TextField,
-	MenuItem
 } from '@mui/material';
 import { Controller, useFormContext } from 'react-hook-form';
 import { DatePicker } from '@mui/x-date-pickers';
-import { RelationWithEmployee, BloodGroup } from '../../EmployeeApi';
+import { BloodGroup, MaritalStatus } from '../../EmployeeApi';
 
 /**
  * The basic info tab.
@@ -76,7 +75,7 @@ function PersonalInfoTab() {
 						className="mt-8 mb-16 "
 						freeSolo
 						fullWidth
-						options={['single', 'married', 'divorced']}
+						options={Object.values(MaritalStatus)}
 						value={value}
 						onChange={(event, newValue) => {
 							onChange(newValue);
@@ -89,6 +88,8 @@ function PersonalInfoTab() {
 								label="Marital Status"
 								required
 								variant="outlined"
+								error={!!errors.employeePersonalDetails?.maritalStatus}
+								helperText={errors.employeePersonalDetails?.maritalStatus?.message as string}
 								InputLabelProps={{
 									shrink: true
 								}}
@@ -101,27 +102,35 @@ function PersonalInfoTab() {
 			<Controller
 				name="employeePersonalDetails.bloodGroup"
 				control={control}
-				render={({ field }) => (
-					<TextField
-						{...field}
+				defaultValue={[]}
+				render={({ field: { onChange, value } }) => (
+					<Autocomplete
 						className="mt-8 mb-16 "
-						select
-						label="Blood Group"
+						freeSolo
 						fullWidth
-						error={!!errors.employeePersonalDetails?.bloodGroup}
-						helperText={errors.employeePersonalDetails?.bloodGroup?.message as string}
-					>
-						{Object.values(BloodGroup).map((group) => (
-							<MenuItem
-								key={group}
-								value={group}
-							>
-								{group}
-							</MenuItem>
-						))}
-					</TextField>
+						options={Object.values(BloodGroup)}
+						value={value}
+						onChange={(event, newValue) => {
+							onChange(newValue);
+						}}
+						renderInput={(params) => (
+							<TextField
+								{...params}
+								value={params.value || ''}
+								placeholder="Select Blood Group"
+								label="Blood Group"
+								variant="outlined"
+								InputLabelProps={{
+									shrink: true
+								}}
+								error={!!errors.employeePersonalDetails?.bloodGroup}
+								helperText={errors.employeePersonalDetails?.bloodGroup?.message as string}		
+							/>
+						)}
+					/>
 				)}
 			/>
+
 			{/* <Controller
 				name="employeePersonalDetails.relationWithEmployee"
 				control={control}
@@ -155,13 +164,13 @@ function PersonalInfoTab() {
 						onChange={(val) => {
 							onChange(val?.toISOString());
 						}}
-						className="mx-4"
 						slotProps={{
 							textField: {
 								label: 'Date of Birth',
 								InputLabelProps: {
 									shrink: true
 								},
+								required: true,
 								fullWidth: true,
 								variant: 'outlined',
 								error: !!errors?.employeePersonalDetails?.dateOfBirth,

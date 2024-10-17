@@ -54,6 +54,15 @@ const injectedRtkApi = api.injectEndpoints({
         method: "DELETE",
       }),
     }),
+    getApiEmployeesCheckEmailExists: build.query<
+      GetApiEmployeesCheckEmailExistsApiResponse,
+      GetApiEmployeesCheckEmailExistsApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/CheckEmailExists`,
+        params: { email: queryArg.email },
+      }),
+    }),
     postApiEmployeesSendEmail: build.mutation<
       PostApiEmployeesSendEmailApiResponse,
       PostApiEmployeesSendEmailApiArg
@@ -99,6 +108,11 @@ export type DeleteApiEmployeesByIdApiResponse = unknown;
 export type DeleteApiEmployeesByIdApiArg = {
   id: number;
 };
+export type GetApiEmployeesCheckEmailExistsApiResponse =
+  /** status 200 OK */ boolean;
+export type GetApiEmployeesCheckEmailExistsApiArg = {
+  email?: string;
+};
 export type PostApiEmployeesSendEmailApiResponse = unknown;
 export type PostApiEmployeesSendEmailApiArg = void;
 export type PostApiEmployeesSearchApiResponse =
@@ -116,7 +130,7 @@ export type EmployeePersonalDetails = {
   isDeleted?: boolean;
   dateOfBirth: string;
   gender: string | null;
-  maritalStatus: string | null;
+  maritalStatus: MaritalStatus;
   bloodGroup?: BloodGroup;
   relationWithEmployee?: RelationWithEmployee;
 };
@@ -141,7 +155,7 @@ export type EmployeeAddress = {
   city?: string | null;
   country?: string | null;
   state?: string | null;
-  pinCode?: string | null;
+  pinCode?: number;
 };
 export type EmployeeIdentityInfo = {
   id?: number;
@@ -214,6 +228,18 @@ export type Criterion = {
   value?: any | null;
   nextOperator?: string | null;
 };
+export enum MaritalStatus {
+  Unknown = "Unknown",
+  Single = "Single",
+  Married = "Married",
+  Divorced = "Divorced",
+  Widowed = "Widowed",
+  Separated = "Separated",
+  CommonLaw = "CommonLaw",
+  CivilUnion = "CivilUnion",
+  DomesticPartnership = "DomesticPartnership",
+  Other = "Other",
+}
 export enum BloodGroup {
   OPositive = "OPositive",
   APositive = "APositive",
@@ -259,6 +285,8 @@ export const {
   useLazyGetApiEmployeesByIdQuery,
   usePutApiEmployeesByIdMutation,
   useDeleteApiEmployeesByIdMutation,
+  useGetApiEmployeesCheckEmailExistsQuery,
+  useLazyGetApiEmployeesCheckEmailExistsQuery,
   usePostApiEmployeesSendEmailMutation,
   usePostApiEmployeesSearchMutation,
 } = injectedRtkApi;

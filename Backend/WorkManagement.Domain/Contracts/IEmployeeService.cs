@@ -24,5 +24,6 @@ namespace WorkManagement.Domain.Contracts
         public Task<List<EmployeeDepartment>> GetEmployeeDepartments();
 
         public Task<bool> DeleteEmployeeAsync(int id);
+        public Task<bool> CheckEmailExists(string email);
     }
 }

@@ -69,11 +69,11 @@ function EmployeesTable() {
 				accessorFn: (row) => `${row?.email}`
 			},
 			{
-				accessorKey: 'isActive',
+				accessorKey: 'isDeleted',
 				header: 'Active',
 				accessorFn: (row) => (
 					<div className="flex items-center">
-						{row.isActive ? (
+						{row.isDeleted ? (
 							<FuseSvgIcon
 								className="text-green"
 								size={20}

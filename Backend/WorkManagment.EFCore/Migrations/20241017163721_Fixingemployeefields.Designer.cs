@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WorkManagmentSolution.EFCore;
 
@@ -11,9 +12,11 @@ using WorkManagmentSolution.EFCore;
 namespace WorkManagement.EFCore.Migrations
 {
     [DbContext(typeof(WorkManagementDbContext))]
-    partial class WorkManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241017163721_Fixingemployeefields")]
+    partial class Fixingemployeefields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,9 +24,6 @@ namespace WorkManagement.EFCore.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.HasSequence<int>("EmployeeNumber")
-                .StartsAt(1000L);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
@@ -243,7 +243,7 @@ namespace WorkManagement.EFCore.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EmployeeCategories", (string)null);
+                    b.ToTable("EmployeeCategories");
 
                     b.HasData(
                         new
@@ -309,7 +309,7 @@ namespace WorkManagement.EFCore.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Projects", (string)null);
+                    b.ToTable("Projects");
                 });
 
             modelBuilder.Entity("WorkManagement.Domain.Entity.ProjectEmployee", b =>
@@ -347,7 +347,7 @@ namespace WorkManagement.EFCore.Migrations
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("ProjectEmployees", (string)null);
+                    b.ToTable("ProjectEmployees");
                 });
 
             modelBuilder.Entity("WorkManagementSolution.Employee.Employee", b =>
@@ -380,10 +380,17 @@ namespace WorkManagement.EFCore.Migrations
                     b.Property<int?>("EmployeeDepartmentId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("EmployeeDocumentIds")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("EmployeeEducationDetailIds")
+                        .HasColumnType("int");
+
                     b.Property<int?>("EmployeeIdentityInfoId")
                         .HasColumnType("int");
 
                     b.Property<int>("EmployeeNumber")
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("int");
 
                     b.Property<int?>("EmployeePersonalDetailsId")
@@ -446,7 +453,7 @@ namespace WorkManagement.EFCore.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Employees", (string)null);
+                    b.ToTable("Employees");
                 });
 
             modelBuilder.Entity("WorkManagementSolution.Employee.EmployeeAddress", b =>
@@ -484,7 +491,7 @@ namespace WorkManagement.EFCore.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EmployeeAddresses", (string)null);
+                    b.ToTable("EmployeeAddresses");
                 });
 
             modelBuilder.Entity("WorkManagementSolution.Employee.EmployeeDepartment", b =>
@@ -503,7 +510,7 @@ namespace WorkManagement.EFCore.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EmployeeDepartments", (string)null);
+                    b.ToTable("EmployeeDepartments");
 
                     b.HasData(
                         new
@@ -534,7 +541,7 @@ namespace WorkManagement.EFCore.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("EmployeeId")
+                    b.Property<int?>("EmployeeId")
                         .HasColumnType("int");
 
                     b.Property<byte[]>("FileContent")
@@ -558,7 +565,7 @@ namespace WorkManagement.EFCore.Migrations
 
                     b.HasIndex("EmployeeId");
 
-                    b.ToTable("EmployeeDocuments", (string)null);
+                    b.ToTable("EmployeeDocuments");
                 });
 
             modelBuilder.Entity("WorkManagementSolution.Employee.EmployeeEducationDetail", b =>
@@ -569,7 +576,7 @@ namespace WorkManagement.EFCore.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("EmployeeId")
+                    b.Property<int?>("EmployeeId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
@@ -594,7 +601,7 @@ namespace WorkManagement.EFCore.Migrations
 
                     b.HasIndex("EmployeeId");
 
-                    b.ToTable("EmployeeEducationDetails", (string)null);
+                    b.ToTable("EmployeeEducationDetails");
                 });
 
             modelBuilder.Entity("WorkManagementSolution.Employee.EmployeeIdentityInfo", b =>
@@ -640,7 +647,7 @@ namespace WorkManagement.EFCore.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EmployeeIdentityInfos", (string)null);
+                    b.ToTable("EmployeeIdentityInfos");
                 });
 
             modelBuilder.Entity("WorkManagementSolution.Employee.EmployeePersonalDetails", b =>
@@ -672,7 +679,7 @@ namespace WorkManagement.EFCore.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EmployeePersonalDetails", (string)null);
+                    b.ToTable("EmployeePersonalDetails");
                 });
 
             modelBuilder.Entity("WorkManagementSolution.Employee.EmployeeWorkInformation", b =>
@@ -715,7 +722,7 @@ namespace WorkManagement.EFCore.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EmployeeWorkInformations", (string)null);
+                    b.ToTable("EmployeeWorkInformations");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -845,24 +852,16 @@ namespace WorkManagement.EFCore.Migrations
 
             modelBuilder.Entity("WorkManagementSolution.Employee.EmployeeDocuments", b =>
                 {
-                    b.HasOne("WorkManagementSolution.Employee.Employee", "Employee")
+                    b.HasOne("WorkManagementSolution.Employee.Employee", null)
                         .WithMany("EmployeeDocuments")
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Employee");
+                        .HasForeignKey("EmployeeId");
                 });
 
             modelBuilder.Entity("WorkManagementSolution.Employee.EmployeeEducationDetail", b =>
                 {
-                    b.HasOne("WorkManagementSolution.Employee.Employee", "Employee")
+                    b.HasOne("WorkManagementSolution.Employee.Employee", null)
                         .WithMany("EmployeeEducationDetail")
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Employee");
+                        .HasForeignKey("EmployeeId");
                 });
 
             modelBuilder.Entity("WorkManagementSolution.Employee.Employee", b =>

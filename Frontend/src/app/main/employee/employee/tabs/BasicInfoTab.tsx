@@ -6,6 +6,7 @@ import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import { useGetApiAuthRolesQuery } from 'src/app/auth/services/AuthApi';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { useGetApiEmployeesCategoriesQuery } from '../../EmployeeApi';
+import EmailCheckerInput from '../EmailChecker';
 
 /**
  * The basic info tab.
@@ -143,6 +144,8 @@ function BasicInfoTab() {
 												InputLabelProps={{
 													shrink: true
 												}}
+												error={!!errors?.employeeCategoryId}
+												helperText={errors?.employeeCategoryId?.message as string}		
 											/>
 										)}
 									/>
@@ -180,6 +183,8 @@ function BasicInfoTab() {
 												InputLabelProps={{
 													shrink: true
 												}}
+												error={!!errors?.roleId}
+												helperText={errors?.roleId?.message as string}		
 											/>
 										)}
 									/>
@@ -260,7 +265,7 @@ function BasicInfoTab() {
 					</Typography>
 				</div>
 				<div className="flex -mx-4">
-					<Controller
+					{/* <Controller
 						name="email"
 						control={control}
 						render={({ field }) => (
@@ -286,8 +291,8 @@ function BasicInfoTab() {
 								helperText={errors?.email?.message as string}
 							/>
 						)}
-					/>
-
+					/> */}
+					<EmailCheckerInput></EmailCheckerInput>
 					<Controller
 						name="phoneNumber"
 						control={control}
