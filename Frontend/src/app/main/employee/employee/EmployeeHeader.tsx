@@ -1,3 +1,4 @@
+/* eslint-disable unused-imports/no-unused-vars */
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { motion } from 'framer-motion';

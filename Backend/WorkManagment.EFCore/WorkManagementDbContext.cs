@@ -64,6 +64,11 @@ namespace WorkManagmentSolution.EFCore
             .StartsAt(1000)
             .IncrementsBy(1);
 
+            modelBuilder.Entity<Employee>()
+                .Property(o => o.EmployeeNumber)
+                .HasDefaultValueSql("NEXT VALUE FOR EmployeeNumber");
+
+
 
             modelBuilder.Entity<EmployeeCategory>().HasData(
                      new EmployeeCategory { Id = 1, Name = "Full-Time" },

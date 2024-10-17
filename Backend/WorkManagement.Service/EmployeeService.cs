@@ -115,7 +115,7 @@ namespace WorkManagement.Service
                     emailModel.To = user.UserName;
                     emailModel.Subject = "Welcome to Geo!";
                     emailModel.repModel = WelcomeModelCredentials;
-                    await _emailService.SendWelcomeMail(emailModel);
+                    _emailService.SendWelcomeMail(emailModel);
                 }
                 catch (Exception e)
                 {
