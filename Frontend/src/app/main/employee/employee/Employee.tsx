@@ -56,33 +56,26 @@ import EmployeeModelClone from '../models/EmployeeModelClone';
 // 	roleId: yup.mixed().required('Role required'),
 // 	employeePersonalDetails: employeePersonalDetailsSchema
 // });
-const educationDetailSchema = yup.object().shape({
-	type: yup.string().required('type is required'),
-	university: yup.string().required('university is required'),
-	passingYear: yup.string().required('passingYear is required'),
-	grade: yup.string().required('grade is required')
-});
 
 const schema = yup.object({
 	firstName: yup.string().required('First Name is required'),
+	middleName: yup.string().required('Middle Name is required'),
 	lastName: yup.string().required('Last Name is required'),
-	motherName: yup.string().required('Mother Name is required'),
 	email: yup.string().required('Email is required').email('Invalid email address'),
-	roleId: yup.string().required('Role ID is required'),
+	roleId: yup.string().required('Employee role is required'),
 	employeeCategoryId: yup.string().required('Category is required'),
 	employeePersonalDetails: yup.object().shape({
 		dateOfBirth: yup
 			.date()
 			.max(new Date(), 'Birth date cannot be in the future')
-			.required('Birth date is required')
-			.test('is-adult', 'You must be at least 18 years old', (value) => {
+			.nullable()
+			.test('is-adult', 'You must be at least 16 years old', (value) => {
 				const today = new Date();
 				const eighteenYearsAgo = new Date(today);
-				eighteenYearsAgo.setFullYear(today.getFullYear() - 18);
+				eighteenYearsAgo.setFullYear(today.getFullYear() - 16);
 				return value <= eighteenYearsAgo;
 			}),
-		gender: yup.string().required('Gender is required'),
-		maritalStatus: yup.string().required('Marital Status is required')
+		gender: yup.string().required('Gender is required')
 	}),
 	employeeWorkInformation: yup.object().shape({
 		salaryType: yup.string().required('Salary Type is required'),
@@ -92,13 +85,6 @@ const schema = yup.object({
 			.required('Salary is required')
 			.typeError('Salary must be a number')
 			.positive('Salary must be greater than zero')
-	}),
-	employeeAddresses: yup.object().shape({
-		addressLine1: yup.string().required('Address Line 1 is required'),
-		city: yup.string().required('City is required'),
-		country: yup.string().required('Country is required'),
-		state: yup.string().required('State is required'),
-		pinCode: yup.number().typeError('Pin Code must be a number').required('Pin Code is required')
 	}),
 	employeeEducationDetail: yup.array().of(educationDetailSchema),
 	employeeDepartmentId: yup.string().required('Department Id is required')

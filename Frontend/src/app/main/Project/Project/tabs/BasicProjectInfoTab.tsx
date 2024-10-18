@@ -1,6 +1,7 @@
 import {
 	TextField
 } from '@mui/material';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { Controller, useFormContext } from 'react-hook-form';
 
@@ -73,7 +74,7 @@ function BasicProjectInfoTab() {
 					control={control}
 					name="startDate"
 					render={({ field: { value, onChange } }) => (
-						<DateTimePicker
+						<DatePicker
 							value={new Date(value)}
 							onChange={(val) => {
 								onChange(val?.toISOString());
@@ -103,8 +104,7 @@ function BasicProjectInfoTab() {
 					control={control}
 					name="endDate"
 					render={({ field: { value, onChange } }) => (
-						<DateTimePicker
-							
+						<DatePicker
 							value={new Date(value)}
 							onChange={(val) => {
 								onChange(val?.toISOString());

@@ -78,9 +78,9 @@ export type EmployeeDepartment = {
 export type EmployeePersonalDetails = {
   id?: number;
   isDeleted?: boolean;
-  dateOfBirth: string;
+  dateOfBirth?: string | null;
   gender: string | null;
-  maritalStatus: MaritalStatus;
+  maritalStatus?: MaritalStatus;
   bloodGroup?: BloodGroup;
   relationWithEmployee?: RelationWithEmployee;
 };
@@ -89,7 +89,7 @@ export type EmployeeWorkInformation = {
   isDeleted?: boolean;
   designation?: string | null;
   salaryType?: SalaryType;
-  hireDate?: string;
+  hireDate?: string | null;
   salary?: number;
   site?: string | null;
   bond?: number | null;
@@ -105,7 +105,7 @@ export type EmployeeAddress = {
   city?: string | null;
   country?: string | null;
   state?: string | null;
-  pinCode?: number;
+  pinCode?: string | null;
 };
 export type EmployeeIdentityInfo = {
   id?: number;
@@ -121,13 +121,34 @@ export type EmployeeIdentityInfo = {
   employeeStateInsuranceNumber?: string | null;
   biometricCode?: string | null;
 };
-export type EmployeeEducationDetail = {
+export type ApplicationUser = {
+  id?: string;
+  userName?: string | null;
+  normalizedUserName?: string | null;
+  email?: string | null;
+  normalizedEmail?: string | null;
+  emailConfirmed?: boolean;
+  passwordHash?: string | null;
+  securityStamp?: string | null;
+  concurrencyStamp?: string | null;
+  phoneNumber?: string | null;
+  phoneNumberConfirmed?: boolean;
+  twoFactorEnabled?: boolean;
+  lockoutEnd?: string | null;
+  lockoutEnabled?: boolean;
+  accessFailedCount?: number;
+  shortcuts?: string[] | null;
+};
+export type ApplicationRole = {
+  id?: string;
+  name?: string | null;
+  normalizedName?: string | null;
+  concurrencyStamp?: string | null;
+};
+export type EmployeeCategory = {
   id?: number;
   isDeleted?: boolean;
-  type?: string | null;
-  passingYear?: string | null;
-  university?: string | null;
-  grade?: string | null;
+  name?: string | null;
 };
 export type EmployeeDocuments = {
   id?: number;
@@ -136,6 +157,53 @@ export type EmployeeDocuments = {
   fileSize?: number;
   fileContent?: string | null;
   fileType?: FileType;
+  employeeId?: number | null;
+  employee?: Employee;
+};
+export type Employee = {
+  id?: number;
+  createdBy?: string;
+  createdOn?: string;
+  lastModifiedBy?: string | null;
+  lastModifiedOn?: string;
+  isDeleted?: boolean;
+  photoURL?: string | null;
+  employeeNumber?: number;
+  firstName: string | null;
+  middleName: string | null;
+  lastName: string | null;
+  motherName?: string | null;
+  employeeDepartmentId?: number | null;
+  employeeDepartment?: EmployeeDepartment;
+  email: string | null;
+  phoneNumber?: number | null;
+  alternateNumber?: number | null;
+  userId: string;
+  applicationUser?: ApplicationUser;
+  roleId: string;
+  applicationRole?: ApplicationRole;
+  employeeCategoryId?: number | null;
+  employeeCategory?: EmployeeCategory;
+  employeePersonalDetailsId?: number | null;
+  employeePersonalDetails?: EmployeePersonalDetails;
+  employeeWorkInformationId?: number | null;
+  employeeWorkInformation?: EmployeeWorkInformation;
+  employeeAddressId?: number | null;
+  employeeAddresses?: EmployeeAddress;
+  employeeIdentityInfoId?: number | null;
+  employeeIdentityInfos?: EmployeeIdentityInfo;
+  employeeEducationDetail?: EmployeeEducationDetail[] | null;
+  employeeDocuments?: EmployeeDocuments[] | null;
+};
+export type EmployeeEducationDetail = {
+  id?: number;
+  isDeleted?: boolean;
+  type?: string | null;
+  passingYear?: string | null;
+  university?: string | null;
+  grade?: string | null;
+  employeeId?: number | null;
+  employee?: Employee;
 };
 export type EmployeeModel = {
   id?: number;
@@ -149,6 +217,7 @@ export type EmployeeModel = {
   phoneNumber?: number | null;
   alternateNumber?: number | null;
   position?: string | null;
+  isDeleted?: boolean | null;
   userId?: string;
   roleId: string;
   employeeCategoryId: number;

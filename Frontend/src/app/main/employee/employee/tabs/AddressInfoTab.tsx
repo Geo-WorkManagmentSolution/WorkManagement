@@ -20,9 +20,6 @@ function AddressInfoTab() {
 							{...field}
 							label="Address Line 1"
 							fullWidth
-							required
-							error={!!errors.employeeAddresses?.addressLine1}
-							helperText={errors.employeeAddresses?.addressLine1?.message as string}
 						/>
 					)}
 				/>
@@ -35,8 +32,6 @@ function AddressInfoTab() {
 							{...field}
 							label="Address Line 2"
 							fullWidth
-							error={!!errors.employeeAddresses?.addressLine2}
-							helperText={errors.employeeAddresses?.addressLine2?.message as string}
 						/>
 					)}
 				/>
@@ -51,9 +46,6 @@ function AddressInfoTab() {
 								className="mx-4"
 								label="City"
 								fullWidth
-								required
-								error={!!errors.employeeAddresses?.city}
-								helperText={errors.employeeAddresses?.city?.message as string}
 							/>
 						)}
 					/>
@@ -66,10 +58,7 @@ function AddressInfoTab() {
 								{...field}
 								label="State"
 								fullWidth
-								required
 								className="mx-4"
-								error={!!errors.employeeAddresses?.state}
-								helperText={errors.employeeAddresses?.state?.message as string}
 							/>
 						)}
 					/>
@@ -83,9 +72,6 @@ function AddressInfoTab() {
 								label="Country"
 								fullWidth
 								className="mx-4"
-								required
-								error={!!errors.employeeAddresses?.country}
-								helperText={errors.employeeAddresses?.country?.message as string}
 							/>
 						)}
 					/>
@@ -98,10 +84,6 @@ function AddressInfoTab() {
 							{...field}
 							label="Pin Code"
 							fullWidth
-							required
-							type="number"
-							error={!!errors.employeeAddresses?.pinCode}
-							helperText={errors.employeeAddresses?.pinCode?.message as string}
 						/>
 					)}
 				/>
