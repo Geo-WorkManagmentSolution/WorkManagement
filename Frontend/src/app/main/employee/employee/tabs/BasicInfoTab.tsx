@@ -14,8 +14,8 @@ import EnhancedAutocomplete from '../EnhancedAutocomplete';
  * The basic info tab.
  */
 function BasicInfoTab() {
-	// const { data: employeesCategoriesOptions = [] } = useGetApiEmployeesCategoriesQuery();
-	const { data: employeesCategoriesOptions,refetch } = useGetApiEmployeesCategoriesQuery();
+	const { data: employeesCategoriesOptions = [] } = useGetApiEmployeesCategoriesQuery();
+	// const { data: employeesCategoriesOptions,refetch } = useGetApiEmployeesCategoriesQuery();
 
 	const { data: employeesRolesOptions = [] } = useGetApiAuthRolesQuery();
 	const [AddCategory] = usePostApiEmployeesAddNewCategoryMutation();
