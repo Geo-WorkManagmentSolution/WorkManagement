@@ -6,15 +6,29 @@ import { Controller, useFormContext } from 'react-hook-form';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import { useGetApiAuthRolesQuery } from 'src/app/auth/services/AuthApi';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
-import { useGetApiEmployeesCategoriesQuery } from '../../EmployeeApi';
+import { useGetApiEmployeesCategoriesQuery, usePostApiEmployeesAddNewCategoryMutation } from '../../EmployeeApi';
 import EmailCheckerInput from '../EmailChecker';
+import EnhancedAutocomplete from '../EnhancedAutocomplete';
 
 /**
  * The basic info tab.
  */
 function BasicInfoTab() {
-	const { data: employeesCategoriesOptions = [] } = useGetApiEmployeesCategoriesQuery();
+	// const { data: employeesCategoriesOptions = [] } = useGetApiEmployeesCategoriesQuery();
+	const { data: employeesCategoriesOptions,refetch } = useGetApiEmployeesCategoriesQuery();
+
 	const { data: employeesRolesOptions = [] } = useGetApiAuthRolesQuery();
+	const [AddCategory] = usePostApiEmployeesAddNewCategoryMutation();
+
+	const handleOptionAdd = async (newOption: Omit<Option, 'id'>) => {
+		try {
+			const result = await AddCategory({ employeeCategory: newOption }).unwrap();
+			return { ...newOption, id: result.id };
+		} catch (error) {
+			console.error('Failed to add new option:', error);
+			throw error;
+		}
+	};
 
 	const methods = useFormContext();
 	const { control, formState } = methods;
@@ -123,6 +137,44 @@ function BasicInfoTab() {
 							<Controller
 								name="employeeCategoryId"
 								control={control}
+								render={({ field }) => (
+									<EnhancedAutocomplete
+										{...field}
+										fullWidth
+										label="Select or add an category"
+										options={employeesCategoriesOptions}
+									    // value={employeesCategoriesOptions?.find((c) => c.id === field.value) || null}
+										// getOptionLabel={(option) => option?.name}
+										onChange={(_, newValue) => {
+											field.onChange(newValue ? newValue.id : null);
+										}}
+										 isOptionEqualToValue={(option, value) => option.id === value}
+										className="mt-8 mb-16 mx-4"
+										placeholder="Type to search or add"
+										renderInput={(params) => (
+											<TextField
+												{...params}
+												value={params.value || ''}
+												placeholder="Select or Add Employee categories"
+												label="Category"
+												required
+												variant="outlined"
+												InputLabelProps={{
+													shrink: true
+												}}
+												error={!!errors?.employeeCategoryId}
+												helperText={errors?.employeeCategoryId?.message as string}
+											/>
+										)}
+										attachedLabel="Category will be added to the database"
+										onOptionAdd={handleOptionAdd}
+									/>
+								)}
+							/>
+
+							{/* <Controller
+								name="employeeCategoryId"
+								control={control}
 								render={({ field: { onChange, value } }) => (
 									<Autocomplete
 										className="mt-8 mb-16 mx-4"
@@ -151,7 +203,7 @@ function BasicInfoTab() {
 										)}
 									/>
 								)}
-							/>
+							/> */}
 							<Controller
 								name="roleId"
 								control={control}
@@ -185,7 +237,7 @@ function BasicInfoTab() {
 													shrink: true
 												}}
 												error={!!errors?.roleId}
-												helperText={errors?.roleId?.message as string}		
+												helperText={errors?.roleId?.message as string}
 											/>
 										)}
 									/>
@@ -212,22 +264,22 @@ function BasicInfoTab() {
 								)}
 							/>
 
-									<Controller
-										name="middleName"
-										control={control}
-										render={({ field }) => (
-											<TextField
-												{...field}
-												value={field.value || ''}
-												className="mx-4"
-												label="Middle Name"
-												fullWidth
-												margin="normal"
-												error={!!errors?.surname}
-												helperText={errors?.surname?.message as string}
-											/>
-										)}
+							<Controller
+								name="middleName"
+								control={control}
+								render={({ field }) => (
+									<TextField
+										{...field}
+										value={field.value || ''}
+										className="mx-4"
+										label="Middle Name"
+										fullWidth
+										margin="normal"
+										error={!!errors?.surname}
+										helperText={errors?.surname?.message as string}
 									/>
+								)}
+							/>
 							<Controller
 								name="lastName"
 								control={control}
@@ -293,7 +345,7 @@ function BasicInfoTab() {
 							/>
 						)}
 					/> */}
-					<EmailCheckerInput></EmailCheckerInput>
+					<EmailCheckerInput />
 					<Controller
 						name="phoneNumber"
 						control={control}

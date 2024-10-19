@@ -99,6 +99,8 @@ export default function EmailCheckerInput() {
 					label="Email"
 					variant="outlined"
 					margin="normal"
+					required
+					placeholder='Email'
 					error={!!errors.email || emailExistsData}
 					helperText={getHelperText(errors.email?.message)}
 					color={getInputColor(errors.email?.message)}

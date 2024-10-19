@@ -12,6 +12,7 @@ const EmployeeModelClone = (data: PartialDeep<EmployeeModel>) =>
 		lastName: '',
 		email: '',
 		phoneNumber: '',
+		employeeCategoryId:1,
 		roleId: '',
 		employeePersonalDetails: {
 			isDeleted: false,
@@ -35,12 +36,23 @@ const EmployeeModelClone = (data: PartialDeep<EmployeeModel>) =>
 		},
 		employeeAddresses: {
 			isDeleted: false,
-			addressLine1: '',
-			addressLine2: '',
-			city: '',
-			country: '',
-			state: '',
-			pinCode: ''
+			userAddress: {
+				addressLine1: '',
+				addressLine2: '',
+				city: '',
+				state: '',
+				country: '',
+				pincode: null,
+			  },
+			  mailingAddress: {
+				addressLine1: '',
+				addressLine2: '',
+				city: '',
+				state: '',
+				country: '',
+				pincode: null,
+			  },
+			  useUserAddressForMailing: false,		
 		},
 		employeeIdentityInfos: {
 			isDeleted: false,

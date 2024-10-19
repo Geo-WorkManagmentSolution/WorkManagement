@@ -75,7 +75,7 @@ namespace WorkManagement.API.Controllers
         [Route("CheckEmailExists")]
         public async Task<ActionResult<bool>> CheckEmailExists(string email)
         {
-            var result=await employeeService.CheckEmailExists(email);
+            var result = await employeeService.CheckEmailExists(email);
             return Ok(result);
         }
 
@@ -96,7 +96,8 @@ namespace WorkManagement.API.Controllers
             {
                 employeeService.SendEmail();
                 return Ok();
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -135,6 +136,13 @@ namespace WorkManagement.API.Controllers
                 return NotFound();
             }
             return NoContent();
+        }
+        [HttpPost]
+        [Route("AddNewCategory")]
+        public async Task<IActionResult> AddNewCategory(EmployeeCategory employeeCategory)
+        {
+            var newOption = await employeeService.AddNewCategory(employeeCategory);
+            return Ok(newOption);
         }
     }
 

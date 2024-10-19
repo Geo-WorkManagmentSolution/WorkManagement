@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WorkManagmentSolution.EFCore;
 
@@ -11,9 +12,11 @@ using WorkManagmentSolution.EFCore;
 namespace WorkManagement.EFCore.Migrations
 {
     [DbContext(typeof(WorkManagementDbContext))]
-    partial class WorkManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241018220413_fixingEmpAddress")]
+    partial class fixingEmpAddress
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -371,7 +374,7 @@ namespace WorkManagement.EFCore.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("EmployeeAddressesId")
+                    b.Property<int?>("EmployeeAddressId")
                         .HasColumnType("int");
 
                     b.Property<int?>("EmployeeCategoryId")
@@ -380,10 +383,19 @@ namespace WorkManagement.EFCore.Migrations
                     b.Property<int?>("EmployeeDepartmentId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("EmployeeIdentityInfoId")
+                        .HasColumnType("int");
+
                     b.Property<int>("EmployeeNumber")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasDefaultValueSql("NEXT VALUE FOR EmployeeNumber");
+
+                    b.Property<int?>("EmployeePersonalDetailsId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("EmployeeWorkInformationId")
+                        .HasColumnType("int");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -423,11 +435,17 @@ namespace WorkManagement.EFCore.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EmployeeAddressesId");
+                    b.HasIndex("EmployeeAddressId");
 
                     b.HasIndex("EmployeeCategoryId");
 
                     b.HasIndex("EmployeeDepartmentId");
+
+                    b.HasIndex("EmployeeIdentityInfoId");
+
+                    b.HasIndex("EmployeePersonalDetailsId");
+
+                    b.HasIndex("EmployeeWorkInformationId");
 
                     b.HasIndex("RoleId");
 
@@ -450,11 +468,11 @@ namespace WorkManagement.EFCore.Migrations
                     b.Property<int?>("MailingAddressId")
                         .HasColumnType("int");
 
-                    b.Property<bool?>("UserAddressForMailing")
-                        .HasColumnType("bit");
-
                     b.Property<int?>("UserAddressId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("useUserAddressForMailing")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -598,9 +616,6 @@ namespace WorkManagement.EFCore.Migrations
                     b.Property<string>("Branch")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("EmployeeId")
-                        .HasColumnType("int");
-
                     b.Property<string>("EmployeeStateInsuranceNumber")
                         .HasColumnType("nvarchar(max)");
 
@@ -621,10 +636,6 @@ namespace WorkManagement.EFCore.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EmployeeId")
-                        .IsUnique()
-                        .HasFilter("[EmployeeId] IS NOT NULL");
-
                     b.ToTable("EmployeeIdentityInfos");
                 });
 
@@ -638,9 +649,6 @@ namespace WorkManagement.EFCore.Migrations
 
                     b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("datetime2");
-
-                    b.Property<int?>("EmployeeId")
-                        .HasColumnType("int");
 
                     b.Property<string>("Gender")
                         .IsRequired()
@@ -660,10 +668,6 @@ namespace WorkManagement.EFCore.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EmployeeId")
-                        .IsUnique()
-                        .HasFilter("[EmployeeId] IS NOT NULL");
-
                     b.ToTable("EmployeePersonalDetails");
                 });
 
@@ -680,9 +684,6 @@ namespace WorkManagement.EFCore.Migrations
 
                     b.Property<string>("Designation")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("EmployeeId")
-                        .HasColumnType("int");
 
                     b.Property<string>("GRPHead")
                         .HasColumnType("nvarchar(max)");
@@ -710,10 +711,6 @@ namespace WorkManagement.EFCore.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EmployeeId")
-                        .IsUnique()
-                        .HasFilter("[EmployeeId] IS NOT NULL");
-
                     b.ToTable("EmployeeWorkInformations");
                 });
 
@@ -726,24 +723,28 @@ namespace WorkManagement.EFCore.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AddressLine1")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("AddressLine2")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("City")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Country")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<long?>("PinCode")
+                    b.Property<long>("PinCode")
                         .HasColumnType("bigint");
 
                     b.Property<string>("State")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -825,7 +826,7 @@ namespace WorkManagement.EFCore.Migrations
                 {
                     b.HasOne("WorkManagementSolution.Employee.EmployeeAddress", "EmployeeAddresses")
                         .WithMany()
-                        .HasForeignKey("EmployeeAddressesId");
+                        .HasForeignKey("EmployeeAddressId");
 
                     b.HasOne("WorkManagement.Domain.Entity.EmployeeCategory", "EmployeeCategory")
                         .WithMany()
@@ -834,6 +835,18 @@ namespace WorkManagement.EFCore.Migrations
                     b.HasOne("WorkManagementSolution.Employee.EmployeeDepartment", "EmployeeDepartment")
                         .WithMany()
                         .HasForeignKey("EmployeeDepartmentId");
+
+                    b.HasOne("WorkManagementSolution.Employee.EmployeeIdentityInfo", "EmployeeIdentityInfos")
+                        .WithMany()
+                        .HasForeignKey("EmployeeIdentityInfoId");
+
+                    b.HasOne("WorkManagementSolution.Employee.EmployeePersonalDetails", "EmployeePersonalDetails")
+                        .WithMany()
+                        .HasForeignKey("EmployeePersonalDetailsId");
+
+                    b.HasOne("WorkManagementSolution.Employee.EmployeeWorkInformation", "EmployeeWorkInformation")
+                        .WithMany()
+                        .HasForeignKey("EmployeeWorkInformationId");
 
                     b.HasOne("WorkManagement.Domain.Entity.ApplicationRole", "ApplicationRole")
                         .WithMany()
@@ -856,6 +869,12 @@ namespace WorkManagement.EFCore.Migrations
                     b.Navigation("EmployeeCategory");
 
                     b.Navigation("EmployeeDepartment");
+
+                    b.Navigation("EmployeeIdentityInfos");
+
+                    b.Navigation("EmployeePersonalDetails");
+
+                    b.Navigation("EmployeeWorkInformation");
                 });
 
             modelBuilder.Entity("WorkManagementSolution.Employee.EmployeeAddress", b =>
@@ -891,42 +910,11 @@ namespace WorkManagement.EFCore.Migrations
                     b.Navigation("Employee");
                 });
 
-            modelBuilder.Entity("WorkManagementSolution.Employee.EmployeeIdentityInfo", b =>
-                {
-                    b.HasOne("WorkManagementSolution.Employee.Employee", "Employee")
-                        .WithOne("EmployeeIdentityInfos")
-                        .HasForeignKey("WorkManagementSolution.Employee.EmployeeIdentityInfo", "EmployeeId");
-
-                    b.Navigation("Employee");
-                });
-
-            modelBuilder.Entity("WorkManagementSolution.Employee.EmployeePersonalDetails", b =>
-                {
-                    b.HasOne("WorkManagementSolution.Employee.Employee", "Employee")
-                        .WithOne("EmployeePersonalDetails")
-                        .HasForeignKey("WorkManagementSolution.Employee.EmployeePersonalDetails", "EmployeeId");
-
-                    b.Navigation("Employee");
-                });
-
-            modelBuilder.Entity("WorkManagementSolution.Employee.EmployeeWorkInformation", b =>
-                {
-                    b.HasOne("WorkManagementSolution.Employee.Employee", null)
-                        .WithOne("EmployeeWorkInformation")
-                        .HasForeignKey("WorkManagementSolution.Employee.EmployeeWorkInformation", "EmployeeId");
-                });
-
             modelBuilder.Entity("WorkManagementSolution.Employee.Employee", b =>
                 {
                     b.Navigation("EmployeeDocuments");
 
                     b.Navigation("EmployeeEducationDetail");
-
-                    b.Navigation("EmployeeIdentityInfos");
-
-                    b.Navigation("EmployeePersonalDetails");
-
-                    b.Navigation("EmployeeWorkInformation");
                 });
 #pragma warning restore 612, 618
         }

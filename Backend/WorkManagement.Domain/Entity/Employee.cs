@@ -43,21 +43,12 @@ namespace WorkManagementSolution.Employee
         [ForeignKey(nameof(EmployeeCategory))]
         public int? EmployeeCategoryId { get; set; }
         public EmployeeCategory? EmployeeCategory { get; set; }
-
-        [ForeignKey(nameof(EmployeePersonalDetails))]
-        public int? EmployeePersonalDetailsId { get; set; }
         public EmployeePersonalDetails? EmployeePersonalDetails { get; set; }
 
-        [ForeignKey(nameof(EmployeeWorkInformation))]
-        public int? EmployeeWorkInformationId { get; set; }
         public EmployeeWorkInformation? EmployeeWorkInformation { get; set; }
 
-        [ForeignKey(nameof(EmployeeAddresses))]
-        public int? EmployeeAddressId { get; set; }
         public EmployeeAddress? EmployeeAddresses { get; set; }
 
-        [ForeignKey(nameof(EmployeeIdentityInfos))]
-        public int? EmployeeIdentityInfoId { get; set; }
         public EmployeeIdentityInfo? EmployeeIdentityInfos { get; set; }
 
         public List<EmployeeEducationDetail>? EmployeeEducationDetail { get; set; }
@@ -75,7 +66,6 @@ namespace WorkManagementSolution.Employee
 
         public int? EmployeeId { get; set; }
         [ForeignKey("EmployeeId")]
-        [InverseProperty("EmployeeDocuments")]
         public Employee? Employee { get; set; }
 
 
@@ -112,6 +102,9 @@ namespace WorkManagementSolution.Employee
 
     public class EmployeePersonalDetails : BaseEntity
     {
+        public int? EmployeeId { get; set; }
+        [ForeignKey("EmployeeId")]
+        public Employee? Employee { get; set; }
         [DataType(DataType.Date)]
         public required DateTime DateOfBirth { get; set; }
         public required string Gender { get; set; }
@@ -123,6 +116,9 @@ namespace WorkManagementSolution.Employee
 
     public class EmployeeWorkInformation : BaseEntity
     {
+        public int? EmployeeId { get; set; }
+        [ForeignKey("EmployeeId")]
+
         public string? Designation { get; set; }
         public SalaryType SalaryType { get; set; }
 
@@ -140,17 +136,29 @@ namespace WorkManagementSolution.Employee
 
     public class EmployeeAddress : BaseEntity
     {
-        public string AddressLine1 { get; set; }
+        [ForeignKey(nameof(UserAddress))]
+        public int? UserAddressId { get; set; }
+        public UserAddress? UserAddress { get; set; }
+        [ForeignKey(nameof(MailingAddress))]
+        public int? MailingAddressId { get; set; }
+        public UserAddress? MailingAddress { get; set; }
+        public bool? UserAddressForMailing { get; set; } = true;
+    }
+    public class UserAddress : BaseEntity
+    {
+        public string? AddressLine1 { get; set; }
         public string? AddressLine2 { get; set; }
-        public string City { get; set; }
-        public string Country { get; set; }
-        public string State { get; set; }
-        public long PinCode { get; set; }
-        // Other address-related properties
+        public string? City { get; set; }
+        public string? Country { get; set; }
+        public string? State { get; set; }
+        public long? PinCode { get; set; }
     }
 
     public class EmployeeIdentityInfo : BaseEntity
     {
+        public int? EmployeeId { get; set; }
+        [ForeignKey("EmployeeId")]
+        public Employee? Employee { get; set; }
         public string? UID { get; set; } // Enum formatted as '0000 0000 0000'
         public string? BankAccountNumber { get; set; } // BankAC No.
         public string? BankName { get; set; }
@@ -166,15 +174,14 @@ namespace WorkManagementSolution.Employee
 
     public class EmployeeEducationDetail : BaseEntity
     {
+        [ForeignKey("EmployeeId")]
+        public Employee? Employee { get; set; }
         public string Type { get; set; }
         public string PassingYear { get; set; }
         public string University { get; set; }
         public string? grade { get; set; }
-       
+
         public int? EmployeeId { get; set; }
-        [ForeignKey("EmployeeId")]
-        [InverseProperty("EmployeeEducationDetail")]
-        public Employee? Employee { get; set; }
 
     }
 
@@ -197,7 +204,7 @@ namespace WorkManagementSolution.Employee
 
     public enum BloodGroup
     {
-        [EnumMember( Value = "O+")]
+        [EnumMember(Value = "O+")]
         OPositive,
         [Display(Name = "A+")]
         APositive,

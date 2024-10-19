@@ -68,6 +68,13 @@ namespace WorkManagement.Service
             var user = await userManager.FindByEmailAsync(email);
             return user != null ? true : false;
         }
+
+        public async Task<EmployeeCategory> AddNewCategory(EmployeeCategory employeeCategory)
+        {
+            _dbContext.Entry(employeeCategory).State = EntityState.Added;
+            await _dbContext.SaveChangesAsync();
+            return employeeCategory;
+        }
         public async Task SendEmail()
         {
             var WelcomeModelCredentials = new WelcomeModel();
@@ -129,7 +136,7 @@ namespace WorkManagement.Service
 
         public async Task<EmployeeModel> UpdateEmployeeAsync(Employee employee)
         {
-            _dbContext.Entry(employee).State = EntityState.Modified;
+            _dbContext.Employees.Update(employee);
             await _dbContext.SaveChangesAsync();
             return mapper.Map<EmployeeModel>(employee);
             ;

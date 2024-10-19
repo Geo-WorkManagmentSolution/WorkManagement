@@ -42,8 +42,12 @@ function EmployeeHeader() {
 		updateEmployee({
 			id: parseInt(employeeId, 10),
 			employeeModel: getValues() as EmployeeModel
-		});
-		dispatch(showMessage({ message: 'An employee updated successfully.' }));
+		})
+			.unwrap()
+			.then((data) => {
+				dispatch(showMessage({ message: 'An employee updated successfully.' }));
+				navigate(`/apps/employees/employeesSearch`);
+			});
 	}
 
 	function handleCreateEmployee() {

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WorkManagmentSolution.EFCore;
 
@@ -11,9 +12,11 @@ using WorkManagmentSolution.EFCore;
 namespace WorkManagement.EFCore.Migrations
 {
     [DbContext(typeof(WorkManagementDbContext))]
-    partial class WorkManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241019123243_fixingAllEmpdetails")]
+    partial class fixingAllEmpdetails
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -371,9 +374,6 @@ namespace WorkManagement.EFCore.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("EmployeeAddressesId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("EmployeeCategoryId")
                         .HasColumnType("int");
 
@@ -423,8 +423,6 @@ namespace WorkManagement.EFCore.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EmployeeAddressesId");
-
                     b.HasIndex("EmployeeCategoryId");
 
                     b.HasIndex("EmployeeDepartmentId");
@@ -444,19 +442,26 @@ namespace WorkManagement.EFCore.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("EmployeeId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<int?>("MailingAddressId")
                         .HasColumnType("int");
 
-                    b.Property<bool?>("UserAddressForMailing")
-                        .HasColumnType("bit");
-
                     b.Property<int?>("UserAddressId")
                         .HasColumnType("int");
 
+                    b.Property<bool?>("useUserAddressForMailing")
+                        .HasColumnType("bit");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .IsUnique()
+                        .HasFilter("[EmployeeId] IS NOT NULL");
 
                     b.HasIndex("MailingAddressId");
 
@@ -823,10 +828,6 @@ namespace WorkManagement.EFCore.Migrations
 
             modelBuilder.Entity("WorkManagementSolution.Employee.Employee", b =>
                 {
-                    b.HasOne("WorkManagementSolution.Employee.EmployeeAddress", "EmployeeAddresses")
-                        .WithMany()
-                        .HasForeignKey("EmployeeAddressesId");
-
                     b.HasOne("WorkManagement.Domain.Entity.EmployeeCategory", "EmployeeCategory")
                         .WithMany()
                         .HasForeignKey("EmployeeCategoryId");
@@ -851,8 +852,6 @@ namespace WorkManagement.EFCore.Migrations
 
                     b.Navigation("ApplicationUser");
 
-                    b.Navigation("EmployeeAddresses");
-
                     b.Navigation("EmployeeCategory");
 
                     b.Navigation("EmployeeDepartment");
@@ -860,6 +859,10 @@ namespace WorkManagement.EFCore.Migrations
 
             modelBuilder.Entity("WorkManagementSolution.Employee.EmployeeAddress", b =>
                 {
+                    b.HasOne("WorkManagementSolution.Employee.Employee", "Employee")
+                        .WithOne("EmployeeAddresses")
+                        .HasForeignKey("WorkManagementSolution.Employee.EmployeeAddress", "EmployeeId");
+
                     b.HasOne("WorkManagementSolution.Employee.UserAddress", "MailingAddress")
                         .WithMany()
                         .HasForeignKey("MailingAddressId");
@@ -867,6 +870,8 @@ namespace WorkManagement.EFCore.Migrations
                     b.HasOne("WorkManagementSolution.Employee.UserAddress", "UserAddress")
                         .WithMany()
                         .HasForeignKey("UserAddressId");
+
+                    b.Navigation("Employee");
 
                     b.Navigation("MailingAddress");
 
@@ -918,6 +923,8 @@ namespace WorkManagement.EFCore.Migrations
 
             modelBuilder.Entity("WorkManagementSolution.Employee.Employee", b =>
                 {
+                    b.Navigation("EmployeeAddresses");
+
                     b.Navigation("EmployeeDocuments");
 
                     b.Navigation("EmployeeEducationDetail");
