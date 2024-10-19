@@ -15,10 +15,14 @@ function Projects() {
 					}
 				})}
 			/>
+			<div className="w-full h-full flex flex-col px-16">
+				<ProjectHeader />
 
-			<ProjectHeader />
+				<ProjectTable />
+			</div>
+		
 
-			<ProjectTable />
+
 		</>
 	);
 }

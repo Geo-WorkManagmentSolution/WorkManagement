@@ -76,7 +76,7 @@ function SignInPage() {
 							color: 'primary.dark'
 						}}
 					>
-						Streamline maintenance, auidt, and operations with the world’s most intuitive <b>Work Management System</b>.
+						Streamline maintenance, audit, and operations with the world’s most intuitive <b>Work Management System</b>.
 					</Box>
 
 					{/* <Tabs

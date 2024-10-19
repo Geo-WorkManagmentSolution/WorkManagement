@@ -13,52 +13,51 @@ i18next.addResourceBundle('ar', 'navigation', ar);
  */
 const navigationConfig: FuseNavItemType[] = [
 	{
-		id: 'employeemanagement',
+		id: 'applicationmanagement',
 		title: 'Employee Management',
-		subtitle: 'Manage your employee management',
+		subtitle: 'Manage your work management solution',
 		type: 'group',
 		translate: 'APPLICATIONS',
 		children: [
 			{
-				id: 'employeemanagement.employees',
+				id: 'applicationmanagement.employees',
 				title: 'Employee',
 				type: 'collapse',
 				icon: 'heroicons-outline:user-group',
 				children: [
 					{
-						id: 'employeemanagement.employees.search',
+						id: 'applicationmanagement.employees.search',
 						title: 'Employee Dashboard',
 						type: 'item',
 						url: '/apps/employees',
 						end: true,
 					},
 					{
-						id: 'employeemanagement.employees.new',
+						id: 'applicationmanagement.employees.new',
 						title: 'Add Employee',
 						type: 'item',
 						url: '/apps/employees/employeesSearch/new'
 					}
 				]
-			}
-		]
-	},
-	{
-		id: 'projectmanagement',
-		title: 'Project Management',
-		subtitle: 'Manage your project management',
-		type: 'group',
-		children: [
+			},
 			{
-				id: 'apps.project',
+				id: 'applicationmanagement.projects',
 				title: 'Project',
 				type: 'collapse',
 				icon: 'heroicons-outline:building-office',
 				children: [
 					{
-						id: 'apps.project.search',
+						id: 'applicationmanagement.projects.search',
 						title: 'Project Dashboard',
 						type: 'item',
-						url: '/apps/projects'
+						url: '/apps/projects',
+						end: true,
+					},
+					{
+						id: 'applicationmanagement.projects.new',
+						title: 'Add Project',
+						type: 'item',
+						url: '/apps/projects/projectSearch/new'
 					}
 				]
 			}

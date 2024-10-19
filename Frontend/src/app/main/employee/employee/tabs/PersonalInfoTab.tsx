@@ -86,10 +86,7 @@ function PersonalInfoTab() {
 								value={params.value || ''}
 								placeholder="Select Marital Status"
 								label="Marital Status"
-								required
 								variant="outlined"
-								error={!!errors.employeePersonalDetails?.maritalStatus}
-								helperText={errors.employeePersonalDetails?.maritalStatus?.message as string}
 								InputLabelProps={{
 									shrink: true
 								}}
@@ -170,7 +167,6 @@ function PersonalInfoTab() {
 								InputLabelProps: {
 									shrink: true
 								},
-								required: true,
 								fullWidth: true,
 								variant: 'outlined',
 								error: !!errors?.employeePersonalDetails?.dateOfBirth,

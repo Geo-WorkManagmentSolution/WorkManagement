@@ -19,9 +19,9 @@ namespace WorkManagementSolution.Employee
         public int EmployeeNumber { get; set; }
 
         public required string FirstName { get; set; }
-        public string? MiddleName { get; set; }
+        public required string MiddleName { get; set; }
         public required string LastName { get; set; }
-        public required string MotherName { get; set; }
+        public string? MotherName { get; set; }
 
         [ForeignKey(nameof(EmployeeDepartmentId))]
         public int? EmployeeDepartmentId { get; set; }
@@ -106,9 +106,9 @@ namespace WorkManagementSolution.Employee
         [ForeignKey("EmployeeId")]
         public Employee? Employee { get; set; }
         [DataType(DataType.Date)]
-        public required DateTime DateOfBirth { get; set; }
+        public DateTime? DateOfBirth { get; set; }
         public required string Gender { get; set; }
-        public required MaritalStatus MaritalStatus { get; set; }
+        public MaritalStatus? MaritalStatus { get; set; }
         public BloodGroup? bloodGroup { get; set; }
 
         public RelationWithEmployee? RelationWithEmployee { get; set; }
@@ -120,10 +120,10 @@ namespace WorkManagementSolution.Employee
         [ForeignKey("EmployeeId")]
 
         public string? Designation { get; set; }
-        public SalaryType SalaryType { get; set; }
+        public SalaryType? SalaryType { get; set; }
 
         [DataType(DataType.Date)]
-        public DateTime HireDate { get; set; }
+        public DateTime? HireDate { get; set; }
         public decimal Salary { get; set; }
         public string? Site { get; set; }
         public decimal? Bond { get; set; }
@@ -136,22 +136,13 @@ namespace WorkManagementSolution.Employee
 
     public class EmployeeAddress : BaseEntity
     {
-        [ForeignKey(nameof(UserAddress))]
-        public int? UserAddressId { get; set; }
-        public UserAddress? UserAddress { get; set; }
-        [ForeignKey(nameof(MailingAddress))]
-        public int? MailingAddressId { get; set; }
-        public UserAddress? MailingAddress { get; set; }
-        public bool? UserAddressForMailing { get; set; } = true;
-    }
-    public class UserAddress : BaseEntity
-    {
-        public string? AddressLine1 { get; set; }
+        public string AddressLine1 { get; set; }
         public string? AddressLine2 { get; set; }
-        public string? City { get; set; }
-        public string? Country { get; set; }
-        public string? State { get; set; }
-        public long? PinCode { get; set; }
+        public string City { get; set; }
+        public string Country { get; set; }
+        public string State { get; set; }
+        public long PinCode { get; set; }
+        // Other address-related properties
     }
 
     public class EmployeeIdentityInfo : BaseEntity
@@ -176,9 +167,9 @@ namespace WorkManagementSolution.Employee
     {
         [ForeignKey("EmployeeId")]
         public Employee? Employee { get; set; }
-        public string Type { get; set; }
-        public string PassingYear { get; set; }
-        public string University { get; set; }
+        public string? Type { get; set; }
+        public string? PassingYear { get; set; }
+        public string? University { get; set; }
         public string? grade { get; set; }
 
         public int? EmployeeId { get; set; }

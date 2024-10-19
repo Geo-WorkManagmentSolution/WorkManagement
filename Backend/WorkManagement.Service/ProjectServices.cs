@@ -24,7 +24,7 @@ namespace WorkManagement.Service
 
             try
             {
-                var projects = (from p in _dbContext.Projects
+                var projects = (from p in _dbContext.Projects.Where(s=>!s.IsDeleted)
                                 select new ProjectModel
                                 {
                                     Id = p.Id,
@@ -49,7 +49,7 @@ namespace WorkManagement.Service
             try
             {
                 var returnProject = new ProjectModel();
-                var projects = (from p in _dbContext.Projects.Where(p => p.Id == id)
+                var projects = (from p in _dbContext.Projects.Where(p => p.Id == id && !p.IsDeleted)
                                 select new ProjectModel
                                 {
                                     Id = p.Id,
@@ -107,13 +107,17 @@ namespace WorkManagement.Service
         {
             try
             {
-                var existingProject = _dbContext.Projects.FirstOrDefault(s => s.ProjectName == projectData.ProjectName);
+                var existingProject = _dbContext.Projects.FirstOrDefault(s => s.Id == projectData.Id);
+
+                var user = _dbContext.Users.FirstOrDefault(s => s.UserName == "admin1@admin.com");
 
                 existingProject.ProjectName = projectData.ProjectName;
                 existingProject.ProjectNumber = projectData.ProjectNumber;
                 existingProject.ProjectDescription = projectData.ProjectDescription;
                 existingProject.StartDate = projectData.StartDate;
                 existingProject.EndDate = projectData.EndDate;
+                existingProject.LastModifiedBy = user.Id;
+                existingProject.LastModifiedOn = DateTime.Now;
 
 
 
@@ -138,10 +142,22 @@ namespace WorkManagement.Service
             {
                 var project = await _dbContext.Projects.FindAsync(id);
                 if (project == null)
+                {
                     return false;
+                }
+                    
 
-                _dbContext.Projects.Remove(project);
+                var user = _dbContext.Users.FirstOrDefault(s => s.UserName == "admin1@admin.com");
+
+                project.IsDeleted = true;
+                project.LastModifiedBy = user.Id;
+                project.LastModifiedOn = DateTime.Now;
+
+
+                _dbContext.Projects.Update(project);
+
                 _dbContext.SaveChanges();
+
                 return true;
             }
             catch (Exception ex)

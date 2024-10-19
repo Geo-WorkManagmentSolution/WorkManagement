@@ -264,6 +264,24 @@ function BasicInfoTab() {
 								)}
 							/>
 
+
+								<Controller
+									name="middleName"
+									control={control}
+									render={({ field }) => (
+										<TextField
+											{...field}
+											value={field.value || ''}
+											className="mx-4"
+											label="Middle Name"
+											fullWidth
+											required
+											margin="normal"
+											error={!!errors?.middleName}
+											helperText={errors?.middleName?.message as string}
+										/>
+									)}
+								/>
 							<Controller
 								name="middleName"
 								control={control}
@@ -408,9 +426,7 @@ function BasicInfoTab() {
 							{...field}
 							label="Mother Name"
 							fullWidth
-							required
-							error={!!errors.motherName}
-							helperText={errors.motherName?.message as string}
+							
 						/>
 					)}
 				/>

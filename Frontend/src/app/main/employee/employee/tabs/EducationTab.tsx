@@ -70,9 +70,6 @@ export default function EducationTab() {
 											select
 											fullWidth
 											label="Education Type"
-											required
-											error={!!errors.employeeEducationDetail?.[index]?.type}
-											helperText={errors.employeeEducationDetail?.[index]?.type?.message as string}
 										>
 											{educationTypes.map((option) => (
 												<MenuItem
@@ -99,10 +96,7 @@ export default function EducationTab() {
 										<TextField
 											{...field}
 											fullWidth
-											required
 											label="University"
-											error={!!errors.employeeEducationDetail?.[index]?.university}
-											helperText={errors.employeeEducationDetail?.[index]?.university?.message}
 										/>
 									)}
 								/>
@@ -120,11 +114,8 @@ export default function EducationTab() {
 										<TextField
 											{...field}
 											fullWidth
-											required
 											label="Year of Completion"
 											type="number"
-											error={!!errors.employeeEducationDetail?.[index]?.passingYear}
-											helperText={errors.employeeEducationDetail?.[index]?.passingYear?.message as string}
 										/>
 									)}
 								/>
@@ -142,10 +133,7 @@ export default function EducationTab() {
 										<TextField
 											{...field}
 											fullWidth
-											required
 											label="Grade/Score"
-											error={!!errors.employeeEducationDetail?.[index]?.grade}
-											helperText={errors.employeeEducationDetail?.[index]?.grade?.message}
 										/>
 									)}
 								/>

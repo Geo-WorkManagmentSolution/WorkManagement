@@ -35,14 +35,19 @@ function EmployeeHeader() {
 
 	const { projectName } = watch() as ProjectModel;
 
-	function handleUpdateProduct() {
+
+	function handleUpdateProject() {
 		updateProject({
 			id: parseInt(projectId, 10),
 			projectModel: getValues() as ProjectModel
+		})
+		.unwrap()
+		.then((data) => {
+			dispatch(showMessage({ message: "A project updated successfully." }));
 		});
-		dispatch(showMessage({ message: "A project updated successfully." }));
-
 	}
+
+	
 
 	function handleCreateProject() {
 		createProject({ projectModel: getValues() as ProjectModel })
@@ -117,7 +122,7 @@ function EmployeeHeader() {
 							variant="contained"
 							color="secondary"
 							disabled={_.isEmpty(dirtyFields) || !isValid}
-							onClick={handleUpdateProduct}
+							onClick={handleUpdateProject}
 						>
 							Save
 						</Button>

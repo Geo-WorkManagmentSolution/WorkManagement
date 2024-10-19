@@ -271,8 +271,8 @@ export default function AddressInfoTab() {
 								fullWidth
 								className="mx-4"
 								label="City"
-								error={!!error}
-								helperText={error?.message}
+								error={!!errors.employeeAddresses?.city}
+								helperText={errors.employeeAddresses?.city?.message as string}
 							/>
 						)}
 					/>
@@ -286,8 +286,9 @@ export default function AddressInfoTab() {
 								fullWidth
 								className="mx-4"
 								label="State"
-								error={!!error}
-								helperText={error?.message}
+
+								error={!!errors.employeeAddresses?.state}
+								helperText={errors.employeeAddresses?.state?.message as string}
 							/>
 						)}
 					/>
@@ -301,8 +302,8 @@ export default function AddressInfoTab() {
 								fullWidth
 								className="mx-4"
 								label="Country"
-								error={!!error}
-								helperText={error?.message}
+								error={!!errors.employeeAddresses?.country}
+								helperText={errors.employeeAddresses?.country?.message as string}
 							/>
 						)}
 					/>
@@ -315,10 +316,11 @@ export default function AddressInfoTab() {
 						<TextField
 							{...field}
 							fullWidth
-							type='number'
+							required
 							label="Pincode"
-							error={!!error}
-							helperText={error?.message}
+							type="number"
+							error={!!errors.employeeAddresses?.pinCode}
+							helperText={errors.employeeAddresses?.pinCode?.message as string}
 						/>
 					)}
 				/>
