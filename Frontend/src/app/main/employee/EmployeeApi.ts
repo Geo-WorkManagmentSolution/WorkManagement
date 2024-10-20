@@ -79,6 +79,16 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.body,
       }),
     }),
+    postApiEmployeesAddNewCategory: build.mutation<
+      PostApiEmployeesAddNewCategoryApiResponse,
+      PostApiEmployeesAddNewCategoryApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/AddNewCategory`,
+        method: "POST",
+        body: queryArg.employeeCategory,
+      }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -120,56 +130,14 @@ export type PostApiEmployeesSearchApiResponse =
 export type PostApiEmployeesSearchApiArg = {
   body: Criterion[];
 };
+export type PostApiEmployeesAddNewCategoryApiResponse = unknown;
+export type PostApiEmployeesAddNewCategoryApiArg = {
+  employeeCategory: EmployeeCategory;
+};
 export type EmployeeDepartment = {
   id?: number;
   isDeleted?: boolean;
   name?: string | null;
-};
-export type EmployeePersonalDetails = {
-  id?: number;
-  isDeleted?: boolean;
-  dateOfBirth?: string | null;
-  gender: string | null;
-  maritalStatus?: MaritalStatus;
-  bloodGroup?: BloodGroup;
-  relationWithEmployee?: RelationWithEmployee;
-};
-export type EmployeeWorkInformation = {
-  id?: number;
-  isDeleted?: boolean;
-  designation?: string | null;
-  salaryType?: SalaryType;
-  hireDate?: string | null;
-  salary?: number;
-  site?: string | null;
-  bond?: number | null;
-  previousDateOfJoiningInGDR?: string | null;
-  previousDateOfLeavingInGDR?: string | null;
-  grpHead?: string | null;
-};
-export type EmployeeAddress = {
-  id?: number;
-  isDeleted?: boolean;
-  addressLine1?: string | null;
-  addressLine2?: string | null;
-  city?: string | null;
-  country?: string | null;
-  state?: string | null;
-  pinCode?: string | null;
-};
-export type EmployeeIdentityInfo = {
-  id?: number;
-  isDeleted?: boolean;
-  uid?: string | null;
-  bankAccountNumber?: string | null;
-  bankName?: string | null;
-  branch?: string | null;
-  ifsc?: string | null;
-  accountHolderName?: string | null;
-  pan?: string | null;
-  providentFundNumber?: string | null;
-  employeeStateInsuranceNumber?: string | null;
-  biometricCode?: string | null;
 };
 export type ApplicationUser = {
   id?: string;
@@ -199,6 +167,56 @@ export type EmployeeCategory = {
   id?: number;
   isDeleted?: boolean;
   name?: string | null;
+};
+export type EmployeeWorkInformation = {
+  id?: number;
+  isDeleted?: boolean;
+  employeeId?: number | null;
+  designation?: string | null;
+  salaryType?: SalaryType;
+  hireDate?: string | null;
+  salary?: number;
+  site?: string | null;
+  bond?: number | null;
+  previousDateOfJoiningInGDR?: string | null;
+  previousDateOfLeavingInGDR?: string | null;
+  grpHead?: string | null;
+};
+export type EmployeeAddress = {
+  id?: number;
+  isDeleted?: boolean;
+  addressLine1?: string | null;
+  addressLine2?: string | null;
+  city?: string | null;
+  country?: string | null;
+  state?: string | null;
+  pinCode?: number;
+};
+export type EmployeeIdentityInfo = {
+  id?: number;
+  isDeleted?: boolean;
+  employeeId?: number | null;
+  employee?: Employee;
+  uid?: string | null;
+  bankAccountNumber?: string | null;
+  bankName?: string | null;
+  branch?: string | null;
+  ifsc?: string | null;
+  accountHolderName?: string | null;
+  pan?: string | null;
+  providentFundNumber?: string | null;
+  employeeStateInsuranceNumber?: string | null;
+  biometricCode?: string | null;
+};
+export type EmployeeEducationDetail = {
+  id?: number;
+  isDeleted?: boolean;
+  employee?: Employee;
+  type?: string | null;
+  passingYear?: string | null;
+  university?: string | null;
+  grade?: string | null;
+  employeeId?: number | null;
 };
 export type EmployeeDocuments = {
   id?: number;
@@ -234,26 +252,23 @@ export type Employee = {
   applicationRole?: ApplicationRole;
   employeeCategoryId?: number | null;
   employeeCategory?: EmployeeCategory;
-  employeePersonalDetailsId?: number | null;
   employeePersonalDetails?: EmployeePersonalDetails;
-  employeeWorkInformationId?: number | null;
   employeeWorkInformation?: EmployeeWorkInformation;
-  employeeAddressId?: number | null;
   employeeAddresses?: EmployeeAddress;
-  employeeIdentityInfoId?: number | null;
   employeeIdentityInfos?: EmployeeIdentityInfo;
   employeeEducationDetail?: EmployeeEducationDetail[] | null;
   employeeDocuments?: EmployeeDocuments[] | null;
 };
-export type EmployeeEducationDetail = {
+export type EmployeePersonalDetails = {
   id?: number;
   isDeleted?: boolean;
-  type?: string | null;
-  passingYear?: string | null;
-  university?: string | null;
-  grade?: string | null;
   employeeId?: number | null;
   employee?: Employee;
+  dateOfBirth?: string | null;
+  gender: string | null;
+  maritalStatus?: MaritalStatus;
+  bloodGroup?: BloodGroup;
+  relationWithEmployee?: RelationWithEmployee;
 };
 export type EmployeeModel = {
   id?: number;
@@ -292,6 +307,19 @@ export type Criterion = {
   value?: any | null;
   nextOperator?: string | null;
 };
+export enum SalaryType {
+  M = "M",
+  F = "F",
+}
+export enum FileType {
+  Pdf = "PDF",
+  Docx = "DOCX",
+  Txt = "TXT",
+  Zip = "ZIP",
+  Xlsx = "XLSX",
+  Csv = "CSV",
+  Other = "Other",
+}
 export enum MaritalStatus {
   Unknown = "Unknown",
   Single = "Single",
@@ -324,19 +352,6 @@ export enum RelationWithEmployee {
   FamilyMember = "FamilyMember",
   Other = "Other",
 }
-export enum SalaryType {
-  M = "M",
-  F = "F",
-}
-export enum FileType {
-  Pdf = "PDF",
-  Docx = "DOCX",
-  Txt = "TXT",
-  Zip = "ZIP",
-  Xlsx = "XLSX",
-  Csv = "CSV",
-  Other = "Other",
-}
 export const {
   useGetApiEmployeesQuery,
   useLazyGetApiEmployeesQuery,
@@ -353,4 +368,5 @@ export const {
   useLazyGetApiEmployeesCheckEmailExistsQuery,
   usePostApiEmployeesSendEmailMutation,
   usePostApiEmployeesSearchMutation,
+  usePostApiEmployeesAddNewCategoryMutation,
 } = injectedRtkApi;

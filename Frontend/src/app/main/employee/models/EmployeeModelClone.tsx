@@ -12,7 +12,7 @@ const EmployeeModelClone = (data: PartialDeep<EmployeeModel>) =>
 		lastName: '',
 		email: '',
 		phoneNumber: '',
-		employeeCategoryId:1,
+		employeeCategoryId:null,
 		roleId: '',
 		employeePersonalDetails: {
 			isDeleted: false,

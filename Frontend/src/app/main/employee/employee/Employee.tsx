@@ -94,7 +94,7 @@ const schema = yup.object({
 		state: yup.string().required('State is required'),
 		pinCode: yup.number().typeError('Pin Code must be a number').required('Pin Code is required')
 	}),
-	employeeEducationDetail: yup.array().of(educationDetailSchema),
+	// employeeEducationDetail: yup.array().of(educationDetailSchema),
 	employeeDepartmentId: yup.string().required('Department Id is required')
 	// employeeIdentityInfos: yup.object().shape({
 	// 	uid: yup.string().nullable(),
