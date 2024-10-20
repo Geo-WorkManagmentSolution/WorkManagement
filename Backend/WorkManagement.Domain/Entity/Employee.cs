@@ -59,10 +59,10 @@ namespace WorkManagementSolution.Employee
 
     public class EmployeeDocuments : BaseEntity
     {
-        public string FileName { get; set; }
-        public int FileSize { get; set; }
-        public byte[] FileContent { get; set; }
-        public FileType FileType { get; set; }
+        public string? FileName { get; set; }
+        public int? FileSize { get; set; }
+        public byte[]? FileContent { get; set; }
+        public FileType? FileType { get; set; }
 
         public int? EmployeeId { get; set; }
         [ForeignKey("EmployeeId")]
@@ -136,12 +136,12 @@ namespace WorkManagementSolution.Employee
 
     public class EmployeeAddress : BaseEntity
     {
-        public string AddressLine1 { get; set; }
+        public string? AddressLine1 { get; set; }
         public string? AddressLine2 { get; set; }
-        public string City { get; set; }
-        public string Country { get; set; }
-        public string State { get; set; }
-        public long PinCode { get; set; }
+        public string? City { get; set; }
+        public string? Country { get; set; }
+        public string? State { get; set; }
+        public long? PinCode { get; set; }
         // Other address-related properties
     }
 

@@ -18,7 +18,7 @@ namespace WorkManagement.Domain.Models.Employee
         public string? PhotoURL { get; set; }
         public int? EmployeeNumber { get; set; }
         public required string FirstName { get; set; }
-        public string? MiddleName { get; set; }
+        public required string MiddleName { get; set; }
         public required string LastName { get; set; }
         public required string MotherName { get; set; }
         [EmailAddress]
@@ -27,22 +27,17 @@ namespace WorkManagement.Domain.Models.Employee
         public long? AlternateNumber { get; set; }
         public string? Position { get; set; }
         public bool? IsDeleted { get; set; }
-        public Guid UserId { get; set; }
+        public Guid? UserId { get; set; }
         public required Guid RoleId { get; set; }
         public required int EmployeeCategoryId { get; set; }
+        public EmployeeCategory? EmployeeCategory { get; set; }
         public int? EmployeeDepartmentId { get; set; }
         public EmployeeDepartment? EmployeeDepartment { get; set; }
-        public int? EmployeePersonalDetailsId { get; set; }
         public EmployeePersonalDetails? EmployeePersonalDetails { get; set; }
-        public int? EmployeeWorkInformationId { get; set; }
         public EmployeeWorkInformation? EmployeeWorkInformation { get; set; }
-        public int? EmployeeAddressId { get; set; }
         public EmployeeAddress? EmployeeAddresses { get; set; }
-        public int? EmployeeIdentityInfoId { get; set; }
         public EmployeeIdentityInfo? EmployeeIdentityInfos { get; set; }
-        public int? EmployeeEducationDetailIds { get; set; }
         public List<EmployeeEducationDetail>? EmployeeEducationDetail { get; set; }
-        public int? EmployeeDocumentsIds { get; set; }
         public List<EmployeeDocuments>? EmployeeDocuments { get; set; }
     }
 }
