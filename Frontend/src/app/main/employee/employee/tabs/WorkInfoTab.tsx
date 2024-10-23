@@ -207,97 +207,88 @@ function WorkInfoTab() {
 					</Typography>
 				</div>
 
-				<Controller
-					control={control}
-					name="employeeWorkInformation.hireDate"
-					render={({ field: { value, onChange } }) => (
-						<DatePicker
-							value={new Date(value)}
-							onChange={(val) => {
-								onChange(val?.toISOString());
-							}}
-							className="mx-4"
-							slotProps={{
-								textField: {
-									label: 'Hire Date',
-									required: true,
-									InputLabelProps: {
-										shrink: true
+				<div className="flex -mx-4">
+					<Controller
+						control={control}
+						name="employeeWorkInformation.hireDate"
+						render={({ field: { value, onChange } }) => (
+							<DatePicker
+								value={new Date(value)}
+								onChange={(val) => {
+									onChange(val?.toISOString());
+								}}
+								className="mx-4"
+								slotProps={{
+									textField: {
+										label: 'Hire Date',
+										required: true,
+										InputLabelProps: {
+											shrink: true
+										},
+										fullWidth: true,
+										variant: 'outlined',
+										error: !!errors.employeeWorkInformation?.hireDate,
+										margin: 'normal',
+										helperText: errors.employeeWorkInformation?.hireDate?.message as string
 									},
-									fullWidth: true,
-									variant: 'outlined',
-									error: !!errors.employeeWorkInformation?.hireDate,
-									margin: 'normal',
-									helperText: errors.employeeWorkInformation?.hireDate?.message as string
-								},
-								actionBar: {
-									actions: ['clear']
-								}
-							}}
-						/>
-					)}
-				/>
+									actionBar: {
+										actions: ['clear']
+									}
+								}}
+							/>
+						)}
+					/>
 
-				<Controller
-					control={control}
-					name="employeeWorkInformation.previousDateOfJoiningInGDR"
-					render={({ field: { value, onChange } }) => (
-						<DatePicker
-							value={new Date(value)}
-							onChange={(val) => {
-								onChange(val?.toISOString());
-							}}
-							className="mx-4"
-							slotProps={{
-								textField: {
-									label: 'Previous Date of Joining in GDR',
-									InputLabelProps: {
-										shrink: true
+					<Controller
+						control={control}
+						name="employeeWorkInformation.confirmationDate"
+						render={({ field: { value, onChange } }) => (
+							<DatePicker
+								value={new Date(value)}
+								onChange={(val) => {
+									onChange(val?.toISOString());
+								}}
+								className="mx-4"
+								slotProps={{
+									textField: {
+										label: 'Confirmation Date',
+										InputLabelProps: {
+											shrink: true
+										},
+										fullWidth: true,
+										variant: 'outlined',
+										error: !!errors.employeeWorkInformation?.confirmationDate,
+										margin: 'normal',
+										helperText: errors.employeeWorkInformation?.confirmationDate?.message as string
 									},
-									fullWidth: true,
-									variant: 'outlined',
-									error: !!errors.employeeWorkInformation?.previousDateOfJoiningInGDR,
-									margin: 'normal',
-									helperText: errors.employeeWorkInformation?.previousDateOfJoiningInGDR?.message as string
-								},
-								actionBar: {
-									actions: ['clear']
-								}
-							}}
-						/>
-					)}
-				/>
+									actionBar: {
+										actions: ['clear']
+									}
+								}}
+							/>
+						)}
+					/>
 
-				<Controller
-					control={control}
-					name="employeeWorkInformation.previousDateOfLeavingInGDR"
-					render={({ field: { value, onChange } }) => (
-						<DatePicker
-							value={new Date(value)}
-							onChange={(val) => {
-								onChange(val?.toISOString());
-							}}
-							className="mx-4"
-							slotProps={{
-								textField: {
-									label: 'Previous Date of Leaving in GDR',
-									InputLabelProps: {
-										shrink: true
-									},
-									fullWidth: true,
-									variant: 'outlined',
-									error: !!errors.employeeWorkInformation?.previousDateOfLeavingInGDR,
-									margin: 'normal',
-									helperText: errors.employeeWorkInformation?.previousDateOfLeavingInGDR
-										?.message as string
-								},
-								actionBar: {
-									actions: ['clear']
-								}
-							}}
-						/>
-					)}
-				/>
+					<Controller
+						name="employeeWorkInformation.totalPreviousExperience"
+						control={control}
+						render={({ field }) => (
+							<TextField
+								{...field}
+								value={field.value}
+								label="Total Years of Previous Experience"
+								fullWidth
+								type="number"
+								margin="normal"
+								variant="outlined"
+								placeholder="Total Years of Previous Experience"
+								className="mx-4"
+								error={!!errors.employeeWorkInformation?.totalPreviousExperience}
+								helperText={errors?.employeeWorkInformation?.totalPreviousExperience?.message as string}
+							/>
+						)}
+					/>
+				</div>
 			</div>
 		</div>
 	);

@@ -70,7 +70,17 @@ export type ProjectModel = {
   startDate?: string;
   endDate?: string | null;
 };
+export type EmployeeCategory = {
+  id?: number;
+  isDeleted?: boolean;
+  name?: string | null;
+};
 export type EmployeeDepartment = {
+  id?: number;
+  isDeleted?: boolean;
+  name?: string | null;
+};
+export type EmployeeDesignation = {
   id?: number;
   isDeleted?: boolean;
   name?: string | null;
@@ -99,11 +109,6 @@ export type ApplicationRole = {
   normalizedName?: string | null;
   concurrencyStamp?: string | null;
 };
-export type EmployeeCategory = {
-  id?: number;
-  isDeleted?: boolean;
-  name?: string | null;
-};
 export type EmployeeWorkInformation = {
   id?: number;
   isDeleted?: boolean;
@@ -111,6 +116,8 @@ export type EmployeeWorkInformation = {
   designation?: string | null;
   salaryType?: SalaryType;
   hireDate?: string | null;
+  confirmationDate?: string | null;
+  totalPreviousExperience?: number;
   salary?: number;
   site?: string | null;
   bond?: number | null;
@@ -118,15 +125,33 @@ export type EmployeeWorkInformation = {
   previousDateOfLeavingInGDR?: string | null;
   grpHead?: string | null;
 };
+export type EmployeeInsuranceDetail = {
+  id?: number;
+  isDeleted?: boolean;
+  employeeId?: number | null;
+  employee?: Employee;
+  employeeDesignationId?: number | null;
+  employeeDesignation?: EmployeeDesignation;
+  serialNumber: string | null;
+  dateOfJoining?: string | null;
+  dateOfBirth?: string | null;
+  age?: number;
+  grossSalary?: number;
+  totalSIWider?: number;
+  comprehensive?: number;
+  risk?: string | null;
+};
 export type EmployeeAddress = {
   id?: number;
   isDeleted?: boolean;
+  employeeId?: number | null;
+  employee?: Employee;
   addressLine1?: string | null;
   addressLine2?: string | null;
   city?: string | null;
   country?: string | null;
   state?: string | null;
-  pinCode?: number;
+  pinCode?: number | null;
 };
 export type EmployeeIdentityInfo = {
   id?: number;
@@ -150,15 +175,26 @@ export type EmployeeEducationDetail = {
   employee?: Employee;
   type?: string | null;
   passingYear?: string | null;
+  degreeCertificateDate?: string | null;
   university?: string | null;
   grade?: string | null;
   employeeId?: number | null;
+};
+export type EmployeeRelationshipDetail = {
+  id?: number;
+  isDeleted?: boolean;
+  employeeId?: number | null;
+  employee?: Employee;
+  relationshipType?: RelationshipType;
+  name: string | null;
+  email?: string | null;
+  phoneNumber?: string | null;
 };
 export type EmployeeDocuments = {
   id?: number;
   isDeleted?: boolean;
   fileName?: string | null;
-  fileSize?: number;
+  fileSize?: number | null;
   fileContent?: string | null;
   fileType?: FileType;
   employeeId?: number | null;
@@ -179,7 +215,10 @@ export type Employee = {
   motherName?: string | null;
   employeeDepartmentId?: number | null;
   employeeDepartment?: EmployeeDepartment;
+  employeeDesignationId?: number | null;
+  employeeDesignation?: EmployeeDesignation;
   email: string | null;
+  alternateEmail?: string | null;
   phoneNumber?: number | null;
   alternateNumber?: number | null;
   userId: string;
@@ -190,9 +229,11 @@ export type Employee = {
   employeeCategory?: EmployeeCategory;
   employeePersonalDetails?: EmployeePersonalDetails;
   employeeWorkInformation?: EmployeeWorkInformation;
+  employeeInsuranceDetails?: EmployeeInsuranceDetail;
   employeeAddresses?: EmployeeAddress;
   employeeIdentityInfos?: EmployeeIdentityInfo;
   employeeEducationDetail?: EmployeeEducationDetail[] | null;
+  employeeRelationshipDetails?: EmployeeRelationshipDetail[] | null;
   employeeDocuments?: EmployeeDocuments[] | null;
 };
 export type EmployeePersonalDetails = {
@@ -211,35 +252,42 @@ export type EmployeeModel = {
   photoURL?: string | null;
   employeeNumber?: number | null;
   firstName: string | null;
-  middleName?: string | null;
+  middleName: string | null;
   lastName: string | null;
   motherName: string | null;
   email: string | null;
+  alternateEmail?: string | null;
   phoneNumber?: number | null;
   alternateNumber?: number | null;
   position?: string | null;
   isDeleted?: boolean | null;
-  userId?: string;
+  userId?: string | null;
   roleId: string;
   employeeCategoryId: number;
+  employeeCategory?: EmployeeCategory;
   employeeDepartmentId?: number | null;
   employeeDepartment?: EmployeeDepartment;
-  employeePersonalDetailsId?: number | null;
+  employeeDesignationId?: number | null;
+  employeeDesignation?: EmployeeDesignation;
   employeePersonalDetails?: EmployeePersonalDetails;
-  employeeWorkInformationId?: number | null;
   employeeWorkInformation?: EmployeeWorkInformation;
-  employeeAddressId?: number | null;
+  employeeInsuranceDetails?: EmployeeInsuranceDetail;
   employeeAddresses?: EmployeeAddress;
-  employeeIdentityInfoId?: number | null;
   employeeIdentityInfos?: EmployeeIdentityInfo;
-  employeeEducationDetailIds?: number | null;
   employeeEducationDetail?: EmployeeEducationDetail[] | null;
-  employeeDocumentsIds?: number | null;
+  employeeRelationshipDetails?: EmployeeRelationshipDetail[] | null;
   employeeDocuments?: EmployeeDocuments[] | null;
 };
 export enum SalaryType {
   M = "M",
   F = "F",
+}
+export enum RelationshipType {
+  Parent = "Parent",
+  Spouse = "Spouse",
+  FamilyMember = "FamilyMember",
+  Friend = "Friend",
+  Other = "Other",
 }
 export enum FileType {
   Pdf = "PDF",

@@ -67,7 +67,8 @@ const EmployeeModelClone = (data: PartialDeep<EmployeeModel>) =>
 			employeeStateInsuranceNumber: '',
 			biometricCode: ''
 		},
-		employeeEducationDetail: [{ type: '', university: '', passingYear: '', grade: '' }]
+		employeeEducationDetail: [{ type: '', university: '', passingYear: '', grade: '' }],
+		employeeRelationshipDetails: [{ relationshipType: '', name: '', email: '', phoneNumber: ''}]
 	});
 
 export default EmployeeModelClone;

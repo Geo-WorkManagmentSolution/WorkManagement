@@ -29,6 +29,12 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: () => ({ url: `/api/Employees/departments` }),
     }),
+    getApiEmployeesDesignations: build.query<
+      GetApiEmployeesDesignationsApiResponse,
+      GetApiEmployeesDesignationsApiArg
+    >({
+      query: () => ({ url: `/api/Employees/designations` }),
+    }),
     getApiEmployeesById: build.query<
       GetApiEmployeesByIdApiResponse,
       GetApiEmployeesByIdApiArg
@@ -89,6 +95,26 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.employeeCategory,
       }),
     }),
+    postApiEmployeesAddNewDepartment: build.mutation<
+      PostApiEmployeesAddNewDepartmentApiResponse,
+      PostApiEmployeesAddNewDepartmentApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/AddNewDepartment`,
+        method: "POST",
+        body: queryArg.employeeDepartment,
+      }),
+    }),
+    postApiEmployeesAddNewDesignation: build.mutation<
+      PostApiEmployeesAddNewDesignationApiResponse,
+      PostApiEmployeesAddNewDesignationApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/AddNewDesignation`,
+        method: "POST",
+        body: queryArg.employeeDesignation,
+      }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -103,8 +129,11 @@ export type GetApiEmployeesCategoriesApiResponse =
   /** status 200 OK */ EmployeeCategory[];
 export type GetApiEmployeesCategoriesApiArg = void;
 export type GetApiEmployeesDepartmentsApiResponse =
-  /** status 200 OK */ EmployeeCategory[];
+  /** status 200 OK */ EmployeeDepartment[];
 export type GetApiEmployeesDepartmentsApiArg = void;
+export type GetApiEmployeesDesignationsApiResponse =
+  /** status 200 OK */ EmployeeDesignation[];
+export type GetApiEmployeesDesignationsApiArg = void;
 export type GetApiEmployeesByIdApiResponse = /** status 200 OK */ EmployeeModel;
 export type GetApiEmployeesByIdApiArg = {
   id: number;
@@ -134,7 +163,25 @@ export type PostApiEmployeesAddNewCategoryApiResponse = unknown;
 export type PostApiEmployeesAddNewCategoryApiArg = {
   employeeCategory: EmployeeCategory;
 };
+export type PostApiEmployeesAddNewDepartmentApiResponse = unknown;
+export type PostApiEmployeesAddNewDepartmentApiArg = {
+  employeeDepartment: EmployeeDepartment;
+};
+export type PostApiEmployeesAddNewDesignationApiResponse = unknown;
+export type PostApiEmployeesAddNewDesignationApiArg = {
+  employeeDesignation: EmployeeDesignation;
+};
+export type EmployeeCategory = {
+  id?: number;
+  isDeleted?: boolean;
+  name?: string | null;
+};
 export type EmployeeDepartment = {
+  id?: number;
+  isDeleted?: boolean;
+  name?: string | null;
+};
+export type EmployeeDesignation = {
   id?: number;
   isDeleted?: boolean;
   name?: string | null;
@@ -163,11 +210,6 @@ export type ApplicationRole = {
   normalizedName?: string | null;
   concurrencyStamp?: string | null;
 };
-export type EmployeeCategory = {
-  id?: number;
-  isDeleted?: boolean;
-  name?: string | null;
-};
 export type EmployeeWorkInformation = {
   id?: number;
   isDeleted?: boolean;
@@ -175,6 +217,8 @@ export type EmployeeWorkInformation = {
   designation?: string | null;
   salaryType?: SalaryType;
   hireDate?: string | null;
+  confirmationDate?: string | null;
+  totalPreviousExperience?: number;
   salary?: number;
   site?: string | null;
   bond?: number | null;
@@ -182,15 +226,33 @@ export type EmployeeWorkInformation = {
   previousDateOfLeavingInGDR?: string | null;
   grpHead?: string | null;
 };
+export type EmployeeInsuranceDetail = {
+  id?: number;
+  isDeleted?: boolean;
+  employeeId?: number | null;
+  employee?: Employee;
+  employeeDesignationId?: number | null;
+  employeeDesignation?: EmployeeDesignation;
+  serialNumber: string | null;
+  dateOfJoining?: string | null;
+  dateOfBirth?: string | null;
+  age?: number;
+  grossSalary?: number;
+  totalSIWider?: number;
+  comprehensive?: number;
+  risk?: string | null;
+};
 export type EmployeeAddress = {
   id?: number;
   isDeleted?: boolean;
+  employeeId?: number | null;
+  employee?: Employee;
   addressLine1?: string | null;
   addressLine2?: string | null;
   city?: string | null;
   country?: string | null;
   state?: string | null;
-  pinCode?: number;
+  pinCode?: number | null;
 };
 export type EmployeeIdentityInfo = {
   id?: number;
@@ -214,15 +276,26 @@ export type EmployeeEducationDetail = {
   employee?: Employee;
   type?: string | null;
   passingYear?: string | null;
+  degreeCertificateDate?: string | null;
   university?: string | null;
   grade?: string | null;
   employeeId?: number | null;
+};
+export type EmployeeRelationshipDetail = {
+  id?: number;
+  isDeleted?: boolean;
+  employeeId?: number | null;
+  employee?: Employee;
+  relationshipType?: RelationshipType;
+  name: string | null;
+  email?: string | null;
+  phoneNumber?: string | null;
 };
 export type EmployeeDocuments = {
   id?: number;
   isDeleted?: boolean;
   fileName?: string | null;
-  fileSize?: number;
+  fileSize?: number | null;
   fileContent?: string | null;
   fileType?: FileType;
   employeeId?: number | null;
@@ -243,7 +316,10 @@ export type Employee = {
   motherName?: string | null;
   employeeDepartmentId?: number | null;
   employeeDepartment?: EmployeeDepartment;
+  employeeDesignationId?: number | null;
+  employeeDesignation?: EmployeeDesignation;
   email: string | null;
+  alternateEmail?: string | null;
   phoneNumber?: number | null;
   alternateNumber?: number | null;
   userId: string;
@@ -254,9 +330,11 @@ export type Employee = {
   employeeCategory?: EmployeeCategory;
   employeePersonalDetails?: EmployeePersonalDetails;
   employeeWorkInformation?: EmployeeWorkInformation;
+  employeeInsuranceDetails?: EmployeeInsuranceDetail;
   employeeAddresses?: EmployeeAddress;
   employeeIdentityInfos?: EmployeeIdentityInfo;
   employeeEducationDetail?: EmployeeEducationDetail[] | null;
+  employeeRelationshipDetails?: EmployeeRelationshipDetail[] | null;
   employeeDocuments?: EmployeeDocuments[] | null;
 };
 export type EmployeePersonalDetails = {
@@ -275,30 +353,30 @@ export type EmployeeModel = {
   photoURL?: string | null;
   employeeNumber?: number | null;
   firstName: string | null;
-  middleName?: string | null;
+  middleName: string | null;
   lastName: string | null;
   motherName: string | null;
   email: string | null;
+  alternateEmail?: string | null;
   phoneNumber?: number | null;
   alternateNumber?: number | null;
   position?: string | null;
   isDeleted?: boolean | null;
-  userId?: string;
+  userId?: string | null;
   roleId: string;
   employeeCategoryId: number;
+  employeeCategory?: EmployeeCategory;
   employeeDepartmentId?: number | null;
   employeeDepartment?: EmployeeDepartment;
-  employeePersonalDetailsId?: number | null;
+  employeeDesignationId?: number | null;
+  employeeDesignation?: EmployeeDesignation;
   employeePersonalDetails?: EmployeePersonalDetails;
-  employeeWorkInformationId?: number | null;
   employeeWorkInformation?: EmployeeWorkInformation;
-  employeeAddressId?: number | null;
+  employeeInsuranceDetails?: EmployeeInsuranceDetail;
   employeeAddresses?: EmployeeAddress;
-  employeeIdentityInfoId?: number | null;
   employeeIdentityInfos?: EmployeeIdentityInfo;
-  employeeEducationDetailIds?: number | null;
   employeeEducationDetail?: EmployeeEducationDetail[] | null;
-  employeeDocumentsIds?: number | null;
+  employeeRelationshipDetails?: EmployeeRelationshipDetail[] | null;
   employeeDocuments?: EmployeeDocuments[] | null;
 };
 export type Criterion = {
@@ -310,6 +388,13 @@ export type Criterion = {
 export enum SalaryType {
   M = "M",
   F = "F",
+}
+export enum RelationshipType {
+  Parent = "Parent",
+  Spouse = "Spouse",
+  FamilyMember = "FamilyMember",
+  Friend = "Friend",
+  Other = "Other",
 }
 export enum FileType {
   Pdf = "PDF",
@@ -360,6 +445,8 @@ export const {
   useLazyGetApiEmployeesCategoriesQuery,
   useGetApiEmployeesDepartmentsQuery,
   useLazyGetApiEmployeesDepartmentsQuery,
+  useGetApiEmployeesDesignationsQuery,
+  useLazyGetApiEmployeesDesignationsQuery,
   useGetApiEmployeesByIdQuery,
   useLazyGetApiEmployeesByIdQuery,
   usePutApiEmployeesByIdMutation,
@@ -369,4 +456,6 @@ export const {
   usePostApiEmployeesSendEmailMutation,
   usePostApiEmployeesSearchMutation,
   usePostApiEmployeesAddNewCategoryMutation,
+  usePostApiEmployeesAddNewDepartmentMutation,
+  usePostApiEmployeesAddNewDesignationMutation,
 } = injectedRtkApi;

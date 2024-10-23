@@ -22,9 +22,12 @@ namespace WorkManagement.Domain.Contracts
         public Task<EmployeeModel> UpdateEmployeeAsync(Employee employee);
         public Task<List<EmployeeCategory>> GetEmployeeCategories();
         public Task<List<EmployeeDepartment>> GetEmployeeDepartments();
+        public Task<List<EmployeeDesignation>> GetEmployeeDesignations();
 
         public Task<bool> DeleteEmployeeAsync(int id);
         public Task<bool> CheckEmailExists(string email);
         public Task<EmployeeCategory> AddNewCategory(EmployeeCategory employeeCategory);
+        public Task<EmployeeDepartment> AddNewDepartment(EmployeeDepartment employeeDepartment);
+        public Task<EmployeeDesignation> AddNewDesignation(EmployeeDesignation employeeDesignation);
     }
 }

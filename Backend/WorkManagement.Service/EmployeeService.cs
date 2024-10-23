@@ -49,6 +49,27 @@ namespace WorkManagement.Service
             return await _dbContext.EmployeeDepartments.ToListAsync();
         }
 
+        public async Task<EmployeeDepartment> AddNewDepartment(EmployeeDepartment employeeDepartment)
+        {
+            _dbContext.Entry(employeeDepartment).State = EntityState.Added;
+            await _dbContext.SaveChangesAsync();
+            return employeeDepartment;
+        }
+
+        public async Task<List<EmployeeDesignation>> GetEmployeeDesignations()
+        {
+            return await _dbContext.EmployeeDesignations.ToListAsync();
+        }
+
+        public async Task<EmployeeDesignation> AddNewDesignation(EmployeeDesignation employeeDesignation)
+        {
+            _dbContext.Entry(employeeDesignation).State = EntityState.Added;
+            await _dbContext.SaveChangesAsync();
+            return employeeDesignation;
+        }
+
+
+
         public async Task<EmployeeModel> GetEmployeeByIdAsync(int id)
         {
             var Employee = await _dbContext.Employees

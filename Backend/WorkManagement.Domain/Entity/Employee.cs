@@ -23,12 +23,21 @@ namespace WorkManagementSolution.Employee
         public required string LastName { get; set; }
         public string? MotherName { get; set; }
 
-        [ForeignKey(nameof(EmployeeDepartmentId))]
+        [ForeignKey(nameof(EmployeeDepartment))]
         public int? EmployeeDepartmentId { get; set; }
         public EmployeeDepartment? EmployeeDepartment { get; set; }
 
+        [ForeignKey(nameof(EmployeeDesignation))]
+        public int? EmployeeDesignationId { get; set; }
+        public EmployeeDesignation? EmployeeDesignation { get; set; }
+
+        [ForeignKey(nameof(EmployeeDesignation))]
+        public int? EmployeeReportToId { get; set; }
+        public Employee? EmployeeReportTo { get; set; }
+
         [EmailAddress]
         public required string Email { get; set; }
+        public string AlternateEmail { get; set; }
         public long? PhoneNumber { get; set; }
         public long? AlternateNumber { get; set; }
 
@@ -46,12 +55,14 @@ namespace WorkManagementSolution.Employee
         public EmployeePersonalDetails? EmployeePersonalDetails { get; set; }
 
         public EmployeeWorkInformation? EmployeeWorkInformation { get; set; }
+        public EmployeeInsuranceDetail? EmployeeInsuranceDetails { get; set; }
 
         public EmployeeAddress? EmployeeAddresses { get; set; }
 
         public EmployeeIdentityInfo? EmployeeIdentityInfos { get; set; }
 
         public List<EmployeeEducationDetail>? EmployeeEducationDetail { get; set; }
+        public List<EmployeeRelationshipDetail>? EmployeeRelationshipDetails { get; set; }
 
         public List<EmployeeDocuments>? EmployeeDocuments { get; set; }
 
@@ -71,6 +82,11 @@ namespace WorkManagementSolution.Employee
 
     }
     public class EmployeeDepartment : BaseEntity
+    {
+        public string? Name { get; set; }
+    }
+
+    public class EmployeeDesignation : BaseEntity
     {
         public string? Name { get; set; }
     }
@@ -124,6 +140,9 @@ namespace WorkManagementSolution.Employee
 
         [DataType(DataType.Date)]
         public DateTime? HireDate { get; set; }
+        [DataType(DataType.Date)]
+        public DateTime? ConfirmationDate { get; set; }
+        public decimal TotalPreviousExperience { get; set; }
         public decimal Salary { get; set; }
         public string? Site { get; set; }
         public decimal? Bond { get; set; }
@@ -136,6 +155,9 @@ namespace WorkManagementSolution.Employee
 
     public class EmployeeAddress : BaseEntity
     {
+        public int? EmployeeId { get; set; }
+        [ForeignKey("EmployeeId")]
+        public Employee? Employee { get; set; }
         public string? AddressLine1 { get; set; }
         public string? AddressLine2 { get; set; }
         public string? City { get; set; }
@@ -163,12 +185,47 @@ namespace WorkManagementSolution.Employee
 
     }
 
+    public class EmployeeRelationshipDetail : BaseEntity
+    {
+        public int? EmployeeId { get; set; }
+        [ForeignKey("EmployeeId")]
+        public Employee? Employee { get; set; }
+
+        public RelationshipType? RelationshipType { get; set; }
+        public required string Name { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
+
+    }
+
+    public class EmployeeInsuranceDetail : BaseEntity
+    {
+        public int? EmployeeId { get; set; }
+
+        [ForeignKey("EmployeeId")]
+        public Employee? Employee { get; set; }
+
+        [ForeignKey(nameof(EmployeeDesignation))]
+        public int? EmployeeDesignationId { get; set; }
+        public EmployeeDesignation? EmployeeDesignation { get; set; }
+        public required string SerialNumber { get; set; }
+        public DateTime? DateOfJoining { get; set; }
+        public DateTime? DateOfBirth { get; set; }
+        public decimal Age { get; set; }
+        public decimal GrossSalary { get; set; }
+        public decimal TotalSIWider { get; set; }
+        public decimal Comprehensive { get; set; }
+        public string? Risk { get; set; }
+
+    }
+
     public class EmployeeEducationDetail : BaseEntity
     {
         [ForeignKey("EmployeeId")]
         public Employee? Employee { get; set; }
         public string? Type { get; set; }
         public string? PassingYear { get; set; }
+        public DateTime? DegreeCertificateDate { get; set; }
         public string? University { get; set; }
         public string? grade { get; set; }
 
@@ -190,6 +247,15 @@ namespace WorkManagementSolution.Employee
         Mentor,
         Friend,
         FamilyMember,
+        Other
+    }
+
+    public enum RelationshipType
+    {
+        Parent,
+        Spouse,
+        FamilyMember,
+        Friend,
         Other
     }
 

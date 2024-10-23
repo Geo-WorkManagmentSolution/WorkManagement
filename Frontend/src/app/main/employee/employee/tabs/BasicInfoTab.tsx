@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Avatar, Box, Autocomplete, Typography, InputAdornment } from '@mui/material';
+import { Avatar, Box, Autocomplete, Typography, InputAdornment, Grid, Button, MenuItem } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import { useRef } from 'react';
-import { Controller, useFormContext } from 'react-hook-form';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { Controller, useFieldArray, useFormContext } from 'react-hook-form';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import { useGetApiAuthRolesQuery } from 'src/app/auth/services/AuthApi';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
@@ -16,7 +17,7 @@ import EnhancedAutocomplete from '../EnhancedAutocomplete';
 function BasicInfoTab() {
 	const { data: employeesCategoriesOptions = [] } = useGetApiEmployeesCategoriesQuery();
 	// const { data: employeesCategoriesOptions,refetch } = useGetApiEmployeesCategoriesQuery();
-
+	const relationShipTypes = ['Parent', 'Spouse', 'Family', 'Friend', 'Other'];
 	const { data: employeesRolesOptions = [] } = useGetApiAuthRolesQuery();
 	const [AddCategory] = usePostApiEmployeesAddNewCategoryMutation();
 
@@ -57,6 +58,11 @@ function BasicInfoTab() {
 			reader.readAsDataURL(file);
 		}
 	};
+
+	const { fields, append, remove } = useFieldArray({
+		control,
+		name: 'employeeRelationshipDetails'
+	});
 
 	return (
 		<div className="space-y-48">
@@ -281,23 +287,7 @@ function BasicInfoTab() {
 											helperText={errors?.middleName?.message as string}
 										/>
 									)}
-								/>
-							<Controller
-								name="middleName"
-								control={control}
-								render={({ field }) => (
-									<TextField
-										{...field}
-										value={field.value || ''}
-										className="mx-4"
-										label="Middle Name"
-										fullWidth
-										margin="normal"
-										error={!!errors?.surname}
-										helperText={errors?.surname?.message as string}
-									/>
-								)}
-							/>
+								/>							
 							<Controller
 								name="lastName"
 								control={control}
@@ -365,6 +355,32 @@ function BasicInfoTab() {
 					/> */}
 					<EmailCheckerInput />
 					<Controller
+						name="alternateEmail"
+						control={control}
+						render={({ field }) => (
+							<TextField
+								{...field}
+								value={field.value}
+								label="Alternate Email"
+								fullWidth
+								type="email"
+								margin="normal"
+								variant="outlined"
+								placeholder="Alternate Email"
+								className="mx-4"
+								InputProps={{
+									startAdornment: (
+										<InputAdornment position="start">
+											<FuseSvgIcon size={20}>heroicons-solid:envelope</FuseSvgIcon>
+										</InputAdornment>
+									)
+								}}
+							/>
+						)}
+					/>
+				</div>
+				<div className="flex -mx-4">
+				<Controller
 						name="phoneNumber"
 						control={control}
 						render={({ field }) => (
@@ -418,7 +434,7 @@ function BasicInfoTab() {
 						)}
 					/>
 				</div>
-				<Controller
+				{/* <Controller
 					name="motherName"
 					control={control}
 					render={({ field }) => (
@@ -429,7 +445,128 @@ function BasicInfoTab() {
 							
 						/>
 					)}
-				/>
+				/> */}
+			</div>		
+			<div className="space-y-16">
+				{/* <form onSubmit={handleSubmit(onSubmit)}> */}
+				{fields.map((field, index) => (
+					<Box
+						key={field.id}
+						sx={{ mb: 4, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}
+					>
+						<Grid
+							container
+							spacing={2}
+						>
+							<Grid
+								item
+								xs={12}
+								sm={6}
+							>
+								<Controller
+									name={`employeeRelationshipDetails.${index}.relationshipType`}
+									control={control}
+									render={({ field }) => (
+										<TextField
+											{...field}
+											select
+											fullWidth
+											label="Relationship Type"
+										>
+											{relationShipTypes.map((option) => (
+												<MenuItem
+													key={option}
+													value={option}
+												>
+													{option}
+												</MenuItem>
+											))}
+										</TextField>
+									)}
+								/>
+							</Grid>
+							<Grid
+								item
+								xs={12}
+								sm={6}
+							>
+								<Controller
+									name={`employeeRelationshipDetails.${index}.name`}
+									control={control}
+									rules={{ required: 'Name is required' }}
+									render={({ field }) => (
+										<TextField
+											{...field}
+											fullWidth
+											label="Name"
+										/>
+									)}
+								/>
+							</Grid>
+							<Grid
+								item
+								xs={12}
+								sm={6}
+							>
+								<Controller
+									name={`employeeRelationshipDetails.${index}.email`}
+									control={control}
+									rules={{ required: 'Email is required' }}
+									render={({ field }) => (
+										<TextField
+											{...field}
+											fullWidth
+											label="Email"
+										/>
+									)}
+								/>
+							</Grid>
+							<Grid
+								item
+								xs={12}
+								sm={6}
+							>
+								<Controller
+									name={`employeeRelationshipDetails.${index}.phoneNumber`}
+									control={control}
+									rules={{ required: 'Phone Number is required' }}
+									render={({ field }) => (
+										<TextField
+											{...field}
+											fullWidth
+											label="Phone Number"
+										/>
+									)}
+								/>
+							</Grid>
+						</Grid>
+
+						<Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
+                        <Button
+								className=""
+								variant="contained"
+								color="secondary"
+								size="small"
+								onClick={() => append({ relationshipType: '', name: '', email: '', phoneNumber: '' })}
+							>
+								<FuseSvgIcon size={20}>heroicons-outline:plus</FuseSvgIcon>
+								<span className="mx-4 sm:mx-8">Add Contact</span>
+							</Button>
+							{index > 0 && (
+								<Button
+									variant="outlined"
+									color="error"
+									startIcon={<DeleteIcon />}
+									onClick={() => remove(index)}
+								>
+									Remove
+								</Button>
+							)}
+						</Box>
+					</Box>
+				))}
+
+				{/* </form> */}
 			</div>
 		</div>
 	);

@@ -33,8 +33,11 @@ namespace WorkManagmentSolution.EFCore
         public virtual DbSet<EmployeeAddress> EmployeeAddresses { get; set; }
         public virtual DbSet<EmployeeIdentityInfo> EmployeeIdentityInfos { get; set; }
         public virtual DbSet<EmployeeEducationDetail> EmployeeEducationDetails { get; set; }
+        public virtual DbSet<EmployeeRelationshipDetail> EmployeeRelationshipDetails { get; set; }
+        public virtual DbSet<EmployeeInsuranceDetail> EmployeeInsuranceDetails { get; set; }
         public virtual DbSet<EmployeeCategory> EmployeeCategories { get; set; }
         public virtual DbSet<EmployeeDepartment> EmployeeDepartments { get; set; }
+        public virtual DbSet<EmployeeDesignation> EmployeeDesignations { get; set; }
         public virtual DbSet<EmployeeDocuments> EmployeeDocuments { get; set; }
         public virtual DbSet<Project> Projects { get; set; }
         public virtual DbSet<ProjectEmployee> ProjectEmployees { get; set; }
@@ -80,7 +83,16 @@ namespace WorkManagmentSolution.EFCore
                 new EmployeeDepartment { Id = 1, Name = "IT" },
                 new EmployeeDepartment { Id = 2, Name = "Enginnering" },
                 new EmployeeDepartment { Id = 3, Name = "Site" }
-);
+            );
+
+            modelBuilder.Entity<EmployeeDesignation>().HasData(
+                new EmployeeDesignation { Id = 1, Name = "Manager" },
+                new EmployeeDesignation { Id = 2, Name = "Senior Manager" },
+                new EmployeeDesignation { Id = 3, Name = "Director" },
+                new EmployeeDesignation { Id = 4, Name = "Senior Director" },
+                new EmployeeDesignation { Id = 5, Name = "HR Head" },
+                new EmployeeDesignation { Id = 6, Name = "Engineer" }
+            );
 
         }
 

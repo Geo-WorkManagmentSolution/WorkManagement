@@ -23,6 +23,7 @@ namespace WorkManagement.Domain.Models.Employee
         public required string MotherName { get; set; }
         [EmailAddress]
         public required string Email { get; set; }
+        public string AlternateEmail { get; set; }
         public long? PhoneNumber { get; set; }
         public long? AlternateNumber { get; set; }
         public string? Position { get; set; }
@@ -33,11 +34,15 @@ namespace WorkManagement.Domain.Models.Employee
         public EmployeeCategory? EmployeeCategory { get; set; }
         public int? EmployeeDepartmentId { get; set; }
         public EmployeeDepartment? EmployeeDepartment { get; set; }
+        public int? EmployeeDesignationId { get; set; }
+        public EmployeeDesignation? EmployeeDesignation { get; set; }
         public EmployeePersonalDetails? EmployeePersonalDetails { get; set; }
         public EmployeeWorkInformation? EmployeeWorkInformation { get; set; }
+        public EmployeeInsuranceDetail? EmployeeInsuranceDetails { get; set; }
         public EmployeeAddress? EmployeeAddresses { get; set; }
         public EmployeeIdentityInfo? EmployeeIdentityInfos { get; set; }
         public List<EmployeeEducationDetail>? EmployeeEducationDetail { get; set; }
+        public List<EmployeeRelationshipDetail>? EmployeeRelationshipDetails { get; set; }
         public List<EmployeeDocuments>? EmployeeDocuments { get; set; }
     }
 }

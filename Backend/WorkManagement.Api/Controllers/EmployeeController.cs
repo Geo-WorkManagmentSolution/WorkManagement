@@ -52,10 +52,17 @@ namespace WorkManagement.API.Controllers
 
         // GET: api/employees/departments
         [HttpGet("departments")]
-        public async Task<ActionResult<IEnumerable<EmployeeCategory>>> GetEmployeeDepartments()
+        public async Task<ActionResult<IEnumerable<EmployeeDepartment>>> GetEmployeeDepartments()
         {
-            var EmployeeCategories = await employeeService.GetEmployeeDepartments();
-            return Ok(EmployeeCategories);
+            var EmployeeDepartments = await employeeService.GetEmployeeDepartments();
+            return Ok(EmployeeDepartments);
+        }
+
+        [HttpGet("designations")]
+        public async Task<ActionResult<IEnumerable<EmployeeDesignation>>> GetEmployeeDesignations()
+        {
+            var EmployeeDesignations = await employeeService.GetEmployeeDesignations();
+            return Ok(EmployeeDesignations);
         }
 
         // GET: api/employees/5
@@ -142,6 +149,22 @@ namespace WorkManagement.API.Controllers
         public async Task<IActionResult> AddNewCategory(EmployeeCategory employeeCategory)
         {
             var newOption = await employeeService.AddNewCategory(employeeCategory);
+            return Ok(newOption);
+        }
+
+        [HttpPost]
+        [Route("AddNewDepartment")]
+        public async Task<IActionResult> AddNewDepartment(EmployeeDepartment employeeDepartment)
+        {
+            var newOption = await employeeService.AddNewDepartment(employeeDepartment);
+            return Ok(newOption);
+        }
+
+        [HttpPost]
+        [Route("AddNewDesignation")]
+        public async Task<IActionResult> AddNewDesignation(EmployeeDesignation employeeDesignation)
+        {
+            var newOption = await employeeService.AddNewDesignation(employeeDesignation);
             return Ok(newOption);
         }
     }

@@ -24,6 +24,7 @@ import PersonalInfoTab from './tabs/PersonalInfoTab';
 import WorkInfoTab from './tabs/WorkInfoTab';
 import AddressInfoTab from './tabs/AddressInfoTab';
 import EducationTab from './tabs/EducationTab';
+import InsuranceTab from './tabs/InsuranceTab';
 import IdentityInfoTab from './tabs/IdentityInfoTab';
 import FileUpload from './tabs/FileUpload';
 import EmployeeModelClone from '../models/EmployeeModelClone';
@@ -62,8 +63,7 @@ const schema = yup.object({
 	middleName: yup.string().required('Middle Name is required'),
 	lastName: yup.string().required('Last Name is required'),
 	email: yup.string().required('Email is required').email('Invalid email address'),
-	roleId: yup.string().required('Role ID is required'),
-	 employeeCategoryId: yup.mixed().required('Category is required'),
+	employeeCategoryId: yup.mixed().required('Category is required'),
 	roleId: yup.string().required('Employee role is required'),
 	employeePersonalDetails: yup.object().shape({
 		dateOfBirth: yup
@@ -232,6 +232,10 @@ function Employee() {
 								label="Identity & Banking"
 							/>
 							<FuseTab
+								value="insurance-info"
+								label="Insurance Information"
+							/>
+							<FuseTab
 								value="education-info"
 								label="Education Information"
 							/>
@@ -268,6 +272,9 @@ function Employee() {
 							</div>
 							<div className={tabValue !== 'identity-info' ? 'hidden' : ''}>
 								<IdentityInfoTab />
+							</div>
+							<div className={tabValue !== 'insurance-info' ? 'hidden' : ''}>
+								<InsuranceTab />
 							</div>
 							<div className={tabValue !== 'education-info' ? 'hidden' : ''}>
 								<EducationTab />

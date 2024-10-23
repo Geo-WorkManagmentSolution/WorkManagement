@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WorkManagmentSolution.EFCore;
 
@@ -11,9 +12,11 @@ using WorkManagmentSolution.EFCore;
 namespace WorkManagement.EFCore.Migrations
 {
     [DbContext(typeof(WorkManagementDbContext))]
-    partial class WorkManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241022105834_add-employee-relation-table")]
+    partial class addemployeerelationtable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -537,44 +540,6 @@ namespace WorkManagement.EFCore.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("EmployeeDesignations");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            IsDeleted = false,
-                            Name = "Manager"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            IsDeleted = false,
-                            Name = "Senior Manager"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            IsDeleted = false,
-                            Name = "Director"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            IsDeleted = false,
-                            Name = "Senior Director"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            IsDeleted = false,
-                            Name = "HR Head"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            IsDeleted = false,
-                            Name = "Engineer"
-                        });
                 });
 
             modelBuilder.Entity("WorkManagementSolution.Employee.EmployeeDocuments", b =>

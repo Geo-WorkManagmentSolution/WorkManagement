@@ -16,7 +16,7 @@ import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 // 	employeeEducationDetail: EducationEntry[];
 // };
 
-const educationTypes = ['SSC', 'HSC', 'Diploma', 'Degree', 'Certification'];
+const educationTypes = ['SSC', 'HSC', 'Diploma', 'Degree', 'Certification', 'Master', 'PHD', 'Other'];
 
 export default function EducationTab() {
 	const methods = useFormContext();
