@@ -217,6 +217,8 @@ export type Employee = {
   employeeDepartment?: EmployeeDepartment;
   employeeDesignationId?: number | null;
   employeeDesignation?: EmployeeDesignation;
+  employeeReportToId?: number | null;
+  employeeReportTo?: Employee;
   email: string | null;
   alternateEmail?: string | null;
   phoneNumber?: number | null;

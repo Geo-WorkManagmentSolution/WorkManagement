@@ -117,6 +117,7 @@ try
     });
     var app = builder.Build();
 
+   
 
     // Run pending migrations in DB
     using (var scope = app.Services.CreateScope()) // this will use `IServiceScopeFactory` internally

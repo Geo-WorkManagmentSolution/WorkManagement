@@ -122,7 +122,7 @@ namespace WorkManagement.API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserRegistrationModel model)
         {
-            if (ModelState.IsValid)
+             if (ModelState.IsValid)
             {
                 if (await UserExists(model.Email))
                     return BadRequest("The email address is already in use.");

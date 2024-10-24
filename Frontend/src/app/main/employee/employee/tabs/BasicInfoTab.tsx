@@ -149,12 +149,12 @@ function BasicInfoTab() {
 										fullWidth
 										label="Select or add an category"
 										options={employeesCategoriesOptions}
-									    // value={employeesCategoriesOptions?.find((c) => c.id === field.value) || null}
+										// value={employeesCategoriesOptions?.find((c) => c.id === field.value) || null}
 										// getOptionLabel={(option) => option?.name}
 										onChange={(_, newValue) => {
 											field.onChange(newValue ? newValue.id : null);
 										}}
-										 isOptionEqualToValue={(option, value) => option.id === value}
+										isOptionEqualToValue={(option, value) => option.id === value}
 										className="mt-8 mb-16 mx-4"
 										placeholder="Type to search or add"
 										renderInput={(params) => (
@@ -270,24 +270,23 @@ function BasicInfoTab() {
 								)}
 							/>
 
-
-								<Controller
-									name="middleName"
-									control={control}
-									render={({ field }) => (
-										<TextField
-											{...field}
-											value={field.value || ''}
-											className="mx-4"
-											label="Middle Name"
-											fullWidth
-											required
-											margin="normal"
-											error={!!errors?.middleName}
-											helperText={errors?.middleName?.message as string}
-										/>
-									)}
-								/>							
+							<Controller
+								name="middleName"
+								control={control}
+								render={({ field }) => (
+									<TextField
+										{...field}
+										value={field.value || ''}
+										className="mx-4"
+										label="Middle Name"
+										fullWidth
+										required
+										margin="normal"
+										error={!!errors?.middleName}
+										helperText={errors?.middleName?.message as string}
+									/>
+								)}
+							/>
 							<Controller
 								name="lastName"
 								control={control}
@@ -380,7 +379,7 @@ function BasicInfoTab() {
 					/>
 				</div>
 				<div className="flex -mx-4">
-				<Controller
+					<Controller
 						name="phoneNumber"
 						control={control}
 						render={({ field }) => (
@@ -446,7 +445,7 @@ function BasicInfoTab() {
 						/>
 					)}
 				/> */}
-			</div>		
+			</div>
 			<div className="space-y-16">
 				{/* <form onSubmit={handleSubmit(onSubmit)}> */}
 				{fields.map((field, index) => (
@@ -542,7 +541,7 @@ function BasicInfoTab() {
 						</Grid>
 
 						<Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
-                        <Button
+							<Button
 								className=""
 								variant="contained"
 								color="secondary"

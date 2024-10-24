@@ -4,15 +4,23 @@ import { Controller, useFormContext } from 'react-hook-form';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { DatePicker } from '@mui/x-date-pickers';
 import { SalaryType, useGetApiEmployeesDepartmentsQuery } from '../../EmployeeApi';
+import EnhancedAutocomplete from '../EnhancedAutocomplete';
 
 /**
  * The basic info tab.
  */
+
+const employeeSiteOptions :string[]= ['site-1', 'site-2', 'site-3'];
+
 function WorkInfoTab() {
 	const methods = useFormContext();
 	const { control, formState } = methods;
 	const { errors } = formState;
 	const { data: employeesDepartmentsOptions = [] } = useGetApiEmployeesDepartmentsQuery();
+
+	const handleOptionAdd = () => {
+		alert('handled option');
+	};
 
 	return (
 		<div className="space-y-48">
@@ -57,7 +65,7 @@ function WorkInfoTab() {
 						/>
 					)}
 				/>
-				<Controller
+				{/* <Controller
 					name="employeeWorkInformation.site"
 					control={control}
 					render={({ field }) => (
@@ -67,6 +75,45 @@ function WorkInfoTab() {
 							fullWidth
 							error={!!errors.employeeWorkInformation?.site}
 							helperText={errors.employeeWorkInformation?.site?.message as string}
+						/>
+					)}
+				/> */}
+
+				<Controller
+					name="employeeWorkInformation.site"
+					control={control}
+					render={({ field }) => (
+						<EnhancedAutocomplete
+					
+							{...field}
+							fullWidth
+							label="Select or add a site"
+							options={employeeSiteOptions}
+							// value={employeeSiteOptions?.find((c) => c.id === field.value) || null}
+							getOptionLabel={(option) => option?.name}
+							onChange={(_, newValue) => {
+								field.onChange(newValue ? newValue.id : null);
+							}}
+							isOptionEqualToValue={(option, value) => option.id === value}
+							className="mt-8 mb-16 mx-4"
+							placeholder="Type to search or add"
+							renderInput={(params) => (
+								<TextField
+									{...params}
+									value={params.value || ''}
+									placeholder="Select or Add site categories"
+									label="Site"
+									required
+									variant="outlined"
+									InputLabelProps={{
+										shrink: true
+									}}
+									error={!!errors?.employeeWorkInformation?.site}
+									helperText={errors.employeeWorkInformation?.site?.message as string}
+								/>
+							)}
+							attachedLabel="Category will be added to the database"
+							onOptionAdd={handleOptionAdd}
 						/>
 					)}
 				/>
@@ -97,7 +144,6 @@ function WorkInfoTab() {
 									}}
 									error={!!errors.employeeDepartmentId}
 									helperText={errors.employeeDepartmentId?.message as string}
-		
 								/>
 							)}
 						/>
