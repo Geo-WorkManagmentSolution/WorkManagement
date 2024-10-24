@@ -17,32 +17,13 @@ const axiosBaseQuery =
 	async ({ url, method, data, params, body }) => {
 		try {
 			// Axios.defaults.baseURL = '/api';
-		
-
 			const result = await Axios({
 				url,
 				method,
 				data: body || data,
 				params
 			});
-
-			Axios.interceptors.response.use(
-				(response) => {
-					return response;
-				},
-				(error) => {
-					const axiosError = error as AxiosError;
-
-					if (axiosError?.response?.status === 500) {
-						// showMessage({ message: axiosError?.response ?? 'Server Error!!' });
-					}
-
-					return Promise.reject(axiosError);
-				}
-			);
 			return { data: result.data };
-
-			
 		} catch (axiosError) {
 			const error = axiosError as AxiosError;
 			return {

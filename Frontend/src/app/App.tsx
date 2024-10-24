@@ -9,9 +9,10 @@ import themeLayouts from 'app/theme-layouts/themeLayouts';
 import { selectMainTheme } from '@fuse/core/FuseSettings/fuseSettingsSlice';
 // import MockAdapterProvider from '@mock-api/MockAdapterProvider';
 import { useAppSelector } from 'app/store/hooks';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useMemo } from 'react';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
+import { showMessage } from '@fuse/core/FuseMessage/fuseMessageSlice';
 import AuthenticationProvider from './auth/AuthenticationProvider';
 import withAppProviders from './withAppProviders';
 
@@ -19,6 +20,7 @@ import withAppProviders from './withAppProviders';
  * Axios HTTP Request defaults
  */
 axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
+
 // axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
 // axios.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded';
 
@@ -41,7 +43,21 @@ const emotionCacheOptions = {
 function App() {
 	const langDirection = useAppSelector(selectCurrentLanguageDirection);
 	const mainTheme = useSelector(selectMainTheme);
+	const dispatch = useDispatch();
+	axios.interceptors.response.use(
+		(response) => {
+			return response;
+		},
+		(error) => {
+			const axiosError = error as AxiosError;
 
+			if (axiosError?.response?.status === 500 || axiosError?.response?.status === 400) {
+				dispatch(showMessage({ message:'Server Error! Contact customer care!',variant:'error' }));
+			}
+
+			return Promise.reject(axiosError);
+		}
+	);
 	const cacheProviderValue = useMemo(
 		() => createCache(emotionCacheOptions[langDirection] as Options),
 		[langDirection]
