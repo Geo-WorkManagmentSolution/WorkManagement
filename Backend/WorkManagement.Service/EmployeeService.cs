@@ -60,12 +60,22 @@ namespace WorkManagement.Service
         {
             return await _dbContext.EmployeeDesignations.ToListAsync();
         }
+        public async Task<List<Site>> GetSites()
+        {
+            return await _dbContext.Sites.ToListAsync();
+        }
 
         public async Task<EmployeeDesignation> AddNewDesignation(EmployeeDesignation employeeDesignation)
         {
             _dbContext.Entry(employeeDesignation).State = EntityState.Added;
             await _dbContext.SaveChangesAsync();
             return employeeDesignation;
+        }
+        public async Task<Site> AddNewSite(Site site)
+        {
+            _dbContext.Entry(site).State = EntityState.Added;
+            await _dbContext.SaveChangesAsync();
+            return site;
         }
 
 

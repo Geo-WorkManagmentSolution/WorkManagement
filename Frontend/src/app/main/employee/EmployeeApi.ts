@@ -35,6 +35,12 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: () => ({ url: `/api/Employees/designations` }),
     }),
+    getApiEmployeesSites: build.query<
+      GetApiEmployeesSitesApiResponse,
+      GetApiEmployeesSitesApiArg
+    >({
+      query: () => ({ url: `/api/Employees/sites` }),
+    }),
     getApiEmployeesById: build.query<
       GetApiEmployeesByIdApiResponse,
       GetApiEmployeesByIdApiArg
@@ -105,6 +111,16 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.employeeDepartment,
       }),
     }),
+    postApiEmployeesAddNewSite: build.mutation<
+      PostApiEmployeesAddNewSiteApiResponse,
+      PostApiEmployeesAddNewSiteApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/AddNewSite`,
+        method: "POST",
+        body: queryArg.site,
+      }),
+    }),
     postApiEmployeesAddNewDesignation: build.mutation<
       PostApiEmployeesAddNewDesignationApiResponse,
       PostApiEmployeesAddNewDesignationApiArg
@@ -134,6 +150,8 @@ export type GetApiEmployeesDepartmentsApiArg = void;
 export type GetApiEmployeesDesignationsApiResponse =
   /** status 200 OK */ EmployeeDesignation[];
 export type GetApiEmployeesDesignationsApiArg = void;
+export type GetApiEmployeesSitesApiResponse = /** status 200 OK */ Site[];
+export type GetApiEmployeesSitesApiArg = void;
 export type GetApiEmployeesByIdApiResponse = /** status 200 OK */ EmployeeModel;
 export type GetApiEmployeesByIdApiArg = {
   id: number;
@@ -166,6 +184,10 @@ export type PostApiEmployeesAddNewCategoryApiArg = {
 export type PostApiEmployeesAddNewDepartmentApiResponse = unknown;
 export type PostApiEmployeesAddNewDepartmentApiArg = {
   employeeDepartment: EmployeeDepartment;
+};
+export type PostApiEmployeesAddNewSiteApiResponse = unknown;
+export type PostApiEmployeesAddNewSiteApiArg = {
+  site: Site;
 };
 export type PostApiEmployeesAddNewDesignationApiResponse = unknown;
 export type PostApiEmployeesAddNewDesignationApiArg = {
@@ -210,6 +232,11 @@ export type ApplicationRole = {
   normalizedName?: string | null;
   concurrencyStamp?: string | null;
 };
+export type Site = {
+  id?: number;
+  isDeleted?: boolean;
+  name?: string | null;
+};
 export type EmployeeWorkInformation = {
   id?: number;
   isDeleted?: boolean;
@@ -220,7 +247,8 @@ export type EmployeeWorkInformation = {
   confirmationDate?: string | null;
   totalPreviousExperience?: number;
   salary?: number;
-  site?: string | null;
+  siteId?: number | null;
+  site?: Site;
   bond?: number | null;
   previousDateOfJoiningInGDR?: string | null;
   previousDateOfLeavingInGDR?: string | null;
@@ -449,6 +477,8 @@ export const {
   useLazyGetApiEmployeesDepartmentsQuery,
   useGetApiEmployeesDesignationsQuery,
   useLazyGetApiEmployeesDesignationsQuery,
+  useGetApiEmployeesSitesQuery,
+  useLazyGetApiEmployeesSitesQuery,
   useGetApiEmployeesByIdQuery,
   useLazyGetApiEmployeesByIdQuery,
   usePutApiEmployeesByIdMutation,
@@ -459,5 +489,6 @@ export const {
   usePostApiEmployeesSearchMutation,
   usePostApiEmployeesAddNewCategoryMutation,
   usePostApiEmployeesAddNewDepartmentMutation,
+  usePostApiEmployeesAddNewSiteMutation,
   usePostApiEmployeesAddNewDesignationMutation,
 } = injectedRtkApi;

@@ -23,11 +23,15 @@ namespace WorkManagement.Domain.Contracts
         public Task<List<EmployeeCategory>> GetEmployeeCategories();
         public Task<List<EmployeeDepartment>> GetEmployeeDepartments();
         public Task<List<EmployeeDesignation>> GetEmployeeDesignations();
-
+        public Task<List<Site>> GetSites();
+        
         public Task<bool> DeleteEmployeeAsync(int id);
         public Task<bool> CheckEmailExists(string email);
         public Task<EmployeeCategory> AddNewCategory(EmployeeCategory employeeCategory);
         public Task<EmployeeDepartment> AddNewDepartment(EmployeeDepartment employeeDepartment);
         public Task<EmployeeDesignation> AddNewDesignation(EmployeeDesignation employeeDesignation);
+
+        public Task<Site> AddNewSite(Site site);
+
     }
 }

@@ -109,6 +109,11 @@ export type ApplicationRole = {
   normalizedName?: string | null;
   concurrencyStamp?: string | null;
 };
+export type Site = {
+  id?: number;
+  isDeleted?: boolean;
+  name?: string | null;
+};
 export type EmployeeWorkInformation = {
   id?: number;
   isDeleted?: boolean;
@@ -119,7 +124,8 @@ export type EmployeeWorkInformation = {
   confirmationDate?: string | null;
   totalPreviousExperience?: number;
   salary?: number;
-  site?: string | null;
+  siteId?: number | null;
+  site?: Site;
   bond?: number | null;
   previousDateOfJoiningInGDR?: string | null;
   previousDateOfLeavingInGDR?: string | null;

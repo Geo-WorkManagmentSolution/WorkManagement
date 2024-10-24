@@ -65,6 +65,13 @@ namespace WorkManagement.API.Controllers
             return Ok(EmployeeDesignations);
         }
 
+        [HttpGet("sites")]
+        public async Task<ActionResult<IEnumerable<Site>>> GetSites()
+        {
+            var Sites = await employeeService.GetSites();
+            return Ok(Sites);
+        }
+
         // GET: api/employees/5
         [HttpGet("{id}")]
         public async Task<ActionResult<EmployeeModel>> GetEmployee(int id)
@@ -161,10 +168,18 @@ namespace WorkManagement.API.Controllers
         }
 
         [HttpPost]
-        [Route("AddNewDesignation")]
-        public async Task<IActionResult> AddNewDesignation(EmployeeDesignation employeeDesignation)
+        [Route("AddNewSite")]
+        public async Task<IActionResult> AddNewSite(Site site)
         {
-            var newOption = await employeeService.AddNewDesignation(employeeDesignation);
+            var newOption = await employeeService.AddNewSite(site);
+            return Ok(newOption);
+        }
+
+        [HttpPost]
+        [Route("AddNewDesignation")]
+        public async Task<IActionResult> AddNewDesignation(EmployeeDesignation site)
+        {
+            var newOption = await employeeService.AddNewDesignation(site);
             return Ok(newOption);
         }
     }

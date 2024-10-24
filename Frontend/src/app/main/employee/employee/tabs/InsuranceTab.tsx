@@ -1,8 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
-import { Autocomplete, TextField, Typography } from '@mui/material';
+import { TextField, Typography } from '@mui/material';
 import { Controller, useFormContext } from 'react-hook-form';
-import { useGetApiEmployeesDesignationsQuery } from '../../EmployeeApi';
 import { DatePicker } from '@mui/x-date-pickers';
+import { useGetApiEmployeesDesignationsQuery, usePostApiEmployeesAddNewDesignationMutation } from '../../EmployeeApi';
+import EnhancedAutocomplete from '../EnhancedAutocomplete';
 
 /**
  * The basic info tab.
@@ -12,6 +15,17 @@ function IdentityInfoTab() {
 	const { control, formState } = methods;
 	const { errors } = formState;
 	const { data: employeesDesignationsOptions = [] } = useGetApiEmployeesDesignationsQuery();
+	const [AddDesignation] = usePostApiEmployeesAddNewDesignationMutation();
+
+	const handleOptionAdd = async (newOption: Omit<Option, 'id'>) => {
+		try {
+			const result = await AddDesignation({ employeeDesignation: newOption }).unwrap();
+			return { ...newOption, id: result.id };
+		} catch (error) {
+			console.error('Failed to add new option:', error);
+			throw error;
+		}
+	};
 
 	return (
 		<div className="space-y-48">
@@ -30,36 +44,40 @@ function IdentityInfoTab() {
 						Insurance Information
 					</Typography>
 				</div>
-				
+
 				<div className="flex -mx-4">
 					<Controller
 						name="employeeInsuranceDetails.employeeDesignationId"
 						control={control}
-						render={({ field: { onChange, value } }) => (
-							<Autocomplete
+						render={({ field }) => (
+							<EnhancedAutocomplete
+								{...field}
 								fullWidth
+								label="Select or add Designation"
 								options={employeesDesignationsOptions}
-								getOptionLabel={(option) => option?.name}
-								isOptionEqualToValue={(option, value) => option.id === value}
-								value={employeesDesignationsOptions?.find((c) => c.id === value) || null}
 								onChange={(_, newValue) => {
-									onChange(newValue ? newValue.id : null);
+									field.onChange(newValue ? newValue.id : null);
 								}}
+								isOptionEqualToValue={(option, value) => option.id === value}
+								className="mt-8 mb-16 mx-4"
+								placeholder="Type to search or add"
 								renderInput={(params) => (
 									<TextField
 										{...params}
 										value={params.value || ''}
-										placeholder="Select Employee Designation"
-										label="Employee Designation"
+										placeholder="Select or Add Designation"
+										label="Designation"
+										required
 										variant="outlined"
 										InputLabelProps={{
 											shrink: true
 										}}
-										error={!!errors.employeeInsuranceDetails?.employeeDesignationId}
-										helperText={errors.employeeInsuranceDetails?.employeeDesignationId?.message as string}
-									
+										error={!!errors?.siteId}
+										helperText={errors?.siteId?.message as string}
 									/>
 								)}
+								attachedLabel="A Designation will be added to the database"
+								onOptionAdd={handleOptionAdd}
 							/>
 						)}
 					/>
@@ -71,7 +89,7 @@ function IdentityInfoTab() {
 							<TextField
 								{...field}
 								label="Serial Number"
-								className=" mx-4"						
+								className=" mx-4"
 								fullWidth
 								error={!!errors.employeeInsuranceDetails?.serialNumber}
 								helperText={errors.employeeInsuranceDetails?.serialNumber?.message as string}
@@ -162,7 +180,7 @@ function IdentityInfoTab() {
 				</div>
 
 				<div className="flex -mx-4">
-				<Controller
+					<Controller
 						name="employeeInsuranceDetails.grossSalary"
 						control={control}
 						render={({ field }) => (
@@ -222,7 +240,7 @@ function IdentityInfoTab() {
 						)}
 					/>
 
-<Controller
+					<Controller
 						name="employeeInsuranceDetails.risk"
 						control={control}
 						render={({ field }) => (

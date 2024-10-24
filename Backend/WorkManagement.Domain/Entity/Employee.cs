@@ -90,6 +90,11 @@ namespace WorkManagementSolution.Employee
     {
         public string? Name { get; set; }
     }
+
+    public class Site : BaseEntity
+    {
+        public string? Name { get; set; }
+    }
     public enum FileType
     {
         PDF,
@@ -144,7 +149,10 @@ namespace WorkManagementSolution.Employee
         public DateTime? ConfirmationDate { get; set; }
         public decimal TotalPreviousExperience { get; set; }
         public decimal Salary { get; set; }
-        public string? Site { get; set; }
+
+        [ForeignKey(nameof(Site))]
+        public int? SiteId { get; set; }
+        public Site? Site { get; set; }
         public decimal? Bond { get; set; }
         [DataType(DataType.Date)]
         public DateTime? PreviousDateOfJoiningInGDR { get; set; }

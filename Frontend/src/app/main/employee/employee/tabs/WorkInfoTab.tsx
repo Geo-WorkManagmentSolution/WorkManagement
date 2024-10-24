@@ -3,25 +3,31 @@ import { TextField, MenuItem, InputAdornment, Typography, Autocomplete } from '@
 import { Controller, useFormContext } from 'react-hook-form';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { DatePicker } from '@mui/x-date-pickers';
-import { SalaryType, useGetApiEmployeesDepartmentsQuery } from '../../EmployeeApi';
+import { SalaryType, useGetApiEmployeesDepartmentsQuery, useGetApiEmployeesSitesQuery, usePostApiEmployeesAddNewSiteMutation } from '../../EmployeeApi';
 import EnhancedAutocomplete from '../EnhancedAutocomplete';
 
 /**
  * The basic info tab.
  */
 
-const employeeSiteOptions :string[]= ['site-1', 'site-2', 'site-3'];
-
 function WorkInfoTab() {
 	const methods = useFormContext();
 	const { control, formState } = methods;
 	const { errors } = formState;
 	const { data: employeesDepartmentsOptions = [] } = useGetApiEmployeesDepartmentsQuery();
+	const { data: employeesSiteOptions = [] } = useGetApiEmployeesSitesQuery();
 
-	const handleOptionAdd = () => {
-		alert('handled option');
+	const [AddSite] = usePostApiEmployeesAddNewSiteMutation();
+
+	const handleOptionAdd = async (newOption: Omit<Option, 'id'>) => {
+		try {
+			const result = await AddSite({ site: newOption }).unwrap();
+			return { ...newOption, id: result.id };
+		} catch (error) {
+			console.error('Failed to add new option:', error);
+			throw error;
+		}
 	};
-
 	return (
 		<div className="space-y-48">
 			<div className="space-y-16">
@@ -80,17 +86,14 @@ function WorkInfoTab() {
 				/> */}
 
 				<Controller
-					name="employeeWorkInformation.site"
+					name="employeeWorkInformation.siteId"
 					control={control}
 					render={({ field }) => (
 						<EnhancedAutocomplete
-					
 							{...field}
 							fullWidth
-							label="Select or add a site"
-							options={employeeSiteOptions}
-							// value={employeeSiteOptions?.find((c) => c.id === field.value) || null}
-							getOptionLabel={(option) => option?.name}
+							label="Select or add Site"
+							options={employeesSiteOptions}
 							onChange={(_, newValue) => {
 								field.onChange(newValue ? newValue.id : null);
 							}}
@@ -101,19 +104,20 @@ function WorkInfoTab() {
 								<TextField
 									{...params}
 									value={params.value || ''}
-									placeholder="Select or Add site categories"
+									placeholder="Select or Add Site"
 									label="Site"
 									required
 									variant="outlined"
 									InputLabelProps={{
 										shrink: true
 									}}
-									error={!!errors?.employeeWorkInformation?.site}
-									helperText={errors.employeeWorkInformation?.site?.message as string}
+									error={!!errors?.siteId}
+									helperText={errors?.siteId?.message as string}
 								/>
 							)}
-							attachedLabel="Category will be added to the database"
+							attachedLabel="A site will be added to the database"
 							onOptionAdd={handleOptionAdd}
+
 						/>
 					)}
 				/>
@@ -341,3 +345,4 @@ function WorkInfoTab() {
 }
 
 export default WorkInfoTab;
+
