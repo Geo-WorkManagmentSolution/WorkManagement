@@ -31,7 +31,7 @@ namespace WorkManagementSolution.Employee
         public int? EmployeeDesignationId { get; set; }
         public EmployeeDesignation? EmployeeDesignation { get; set; }
 
-        [ForeignKey(nameof(EmployeeDesignation))]
+        [ForeignKey(nameof(EmployeeReportTo))]
         public int? EmployeeReportToId { get; set; }
         public Employee? EmployeeReportTo { get; set; }
 

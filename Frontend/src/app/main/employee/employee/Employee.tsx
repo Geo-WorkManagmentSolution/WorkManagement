@@ -28,6 +28,7 @@ import InsuranceTab from './tabs/InsuranceTab';
 import IdentityInfoTab from './tabs/IdentityInfoTab';
 import FileUpload from './tabs/FileUpload';
 import EmployeeModelClone from '../models/EmployeeModelClone';
+import TeamTab from './tabs/TeamTab';
 
 /**
  * Form Validation Schema
@@ -209,6 +210,7 @@ function Employee() {
 					<div className="p-16 sm:p-24 space-y-24">
 						<FuseTabs
 							value={tabValue}
+							scrollButtons={true}
 							onChange={handleTabChange}
 						>
 							<FuseTab
@@ -244,18 +246,10 @@ function Employee() {
 								label="Document Uploads"
 							/>
 
-							{/* <FuseTab
-								value="pricing"
-								label="Pricing"
-							/>
 							<FuseTab
-								value="inventory"
-								label="Inventory"
+								value="team-member"
+								label="Team Members"
 							/>
-							<FuseTab
-								value="shipping"
-								label="Shipping"
-							/> */}
 						</FuseTabs>
 						<div className="">
 							<div className={tabValue !== 'basic-info' ? 'hidden' : ''}>
@@ -282,7 +276,10 @@ function Employee() {
 							<div className={tabValue !== 'document-upload' ? 'hidden' : ''}>
 								<FileUpload />
 							</div>
-
+							<div className={tabValue !== 'team-member' ? 'hidden' : ''}>
+								<TeamTab />
+							</div>
+							
 							{/* 
 							<div className={tabValue !== 'product-images' ? 'hidden' : ''}>
 								<ProductImagesTab />
