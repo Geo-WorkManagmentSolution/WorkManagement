@@ -37,6 +37,12 @@ const navigationConfig: FuseNavItemType[] = [
 						title: 'Add Employee',
 						type: 'item',
 						url: '/apps/employees/employeesSearch/new'
+					},
+					{
+						id:'applicationmanagement.employees.leavemanagement',
+						title:'Leave Management',
+						type:'item',
+						url:'/apps/employees/leave-management'
 					}
 				]
 			},
