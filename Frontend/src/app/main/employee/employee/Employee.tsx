@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import FuseLoading from '@fuse/core/FuseLoading';
 import FusePageCarded from '@fuse/core/FusePageCarded';
+import FuseScrollbars from '@fuse/core/FuseScrollbars';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { motion } from 'framer-motion';
@@ -29,7 +30,6 @@ import IdentityInfoTab from './tabs/IdentityInfoTab';
 import FileUpload from './tabs/FileUpload';
 import EmployeeModelClone from '../models/EmployeeModelClone';
 import TeamTab from './tabs/TeamTab';
-
 /**
  * Form Validation Schema
  */
@@ -210,7 +210,7 @@ function Employee() {
 					<div className="p-16 sm:p-24 space-y-24">
 						<FuseTabs
 							value={tabValue}
-							scrollButtons={true}
+							scrollButtons
 							onChange={handleTabChange}
 						>
 							<FuseTab
@@ -253,7 +253,7 @@ function Employee() {
 						</FuseTabs>
 						<div className="">
 							<div className={tabValue !== 'basic-info' ? 'hidden' : ''}>
-								<BasicInfoTab />
+									<BasicInfoTab />
 							</div>
 							<div className={tabValue !== 'basic-personal-info' ? 'hidden' : ''}>
 								<PersonalInfoTab />
@@ -279,7 +279,7 @@ function Employee() {
 							<div className={tabValue !== 'team-member' ? 'hidden' : ''}>
 								<TeamTab />
 							</div>
-							
+
 							{/* 
 							<div className={tabValue !== 'product-images' ? 'hidden' : ''}>
 								<ProductImagesTab />
@@ -299,7 +299,6 @@ function Employee() {
 						</div>
 					</div>
 				}
-				scroll={isMobile ? 'normal' : 'content'}
 			/>
 		</FormProvider>
 	);

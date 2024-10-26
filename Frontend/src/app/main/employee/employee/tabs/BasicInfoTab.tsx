@@ -447,11 +447,25 @@ function BasicInfoTab() {
 				/> */}
 			</div>
 			<div className="space-y-16">
+			<div className="flex items-center border-b-1 space-x-8 pb-8">
+					<FuseSvgIcon
+						color="action"
+						size={24}
+					>
+						heroicons-outline:user-circle
+					</FuseSvgIcon>
+					<Typography
+						className="text-2xl"
+						color="text.secondary"
+					>
+						Relationship Information
+					</Typography>
+				</div>
 				{/* <form onSubmit={handleSubmit(onSubmit)}> */}
 				{fields.map((field, index) => (
 					<Box
 						key={field.id}
-						sx={{ mb: 4, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}
+						sx={{ mb: 4 }}
 					>
 						<Grid
 							container
@@ -471,6 +485,7 @@ function BasicInfoTab() {
 											select
 											fullWidth
 											label="Relationship Type"
+											SelectProps={{ MenuProps: { disableScrollLock: false,autoFocus: true } }}
 										>
 											{relationShipTypes.map((option) => (
 												<MenuItem
