@@ -15,25 +15,11 @@ namespace WorkManagementSolution.Employee
     public class Employee : FullyAuditableEntity
     {
         public string? PhotoURL { get; set; }
-
         public int EmployeeNumber { get; set; }
-
         public required string FirstName { get; set; }
         public required string MiddleName { get; set; }
         public required string LastName { get; set; }
         public string? MotherName { get; set; }
-
-        [ForeignKey(nameof(EmployeeDepartment))]
-        public int? EmployeeDepartmentId { get; set; }
-        public EmployeeDepartment? EmployeeDepartment { get; set; }
-
-        [ForeignKey(nameof(EmployeeDesignation))]
-        public int? EmployeeDesignationId { get; set; }
-        public EmployeeDesignation? EmployeeDesignation { get; set; }
-
-        [ForeignKey(nameof(EmployeeReportTo))]
-        public int? EmployeeReportToId { get; set; }
-        public Employee? EmployeeReportTo { get; set; }
 
         [EmailAddress]
         public required string Email { get; set; }
@@ -41,29 +27,53 @@ namespace WorkManagementSolution.Employee
         public long? PhoneNumber { get; set; }
         public long? AlternateNumber { get; set; }
 
+        #region Foreign Keys
+
+        [ForeignKey(nameof(EmployeeDepartment))]
+        public int? EmployeeDepartmentId { get; set; }
+
+        [ForeignKey(nameof(EmployeeDesignation))]
+        public int? EmployeeDesignationId { get; set; }
+
+        [ForeignKey(nameof(EmployeeReportTo))]
+        public int? EmployeeReportToId { get; set; }
+
         [ForeignKey(nameof(ApplicationUser))]
         public required Guid UserId { get; set; }
-        public ApplicationUser? ApplicationUser { get; set; }
 
         [ForeignKey(nameof(ApplicationRole))]
         public required Guid RoleId { get; set; }
-        public ApplicationRole? ApplicationRole { get; set; }
 
         [ForeignKey(nameof(EmployeeCategory))]
         public int? EmployeeCategoryId { get; set; }
+
+        [ForeignKey(nameof(EmployeePersonalDetails))]
+        public int? EmployeePersonalDetailsId { get; set; }
+        
+        [ForeignKey(nameof(EmployeeWorkInformation))]
+        public int? EmployeeWorkInformationId { get; set; }
+
+        [ForeignKey(nameof(EmployeeInsuranceDetails))]
+        public int? EmployeeInsuranceDetailsId { get; set; }
+
+        [ForeignKey(nameof(EmployeeAddresses))]
+        public int? EmployeeAddressesId { get; set; }
+
+        #endregion
+
+        public EmployeeDepartment? EmployeeDepartment { get; set; }             
+        public EmployeeDesignation? EmployeeDesignation { get; set; }        
+        public Employee? EmployeeReportTo { get; set; }
+        public ApplicationUser? ApplicationUser { get; set; }
+        public ApplicationRole? ApplicationRole { get; set; }        
         public EmployeeCategory? EmployeeCategory { get; set; }
         public EmployeePersonalDetails? EmployeePersonalDetails { get; set; }
-
         public EmployeeWorkInformation? EmployeeWorkInformation { get; set; }
         public EmployeeInsuranceDetail? EmployeeInsuranceDetails { get; set; }
-
         public EmployeeAddress? EmployeeAddresses { get; set; }
-
         public EmployeeIdentityInfo? EmployeeIdentityInfos { get; set; }
-
         public List<EmployeeEducationDetail>? EmployeeEducationDetail { get; set; }
         public List<EmployeeRelationshipDetail>? EmployeeRelationshipDetails { get; set; }
-
         public List<EmployeeDocuments>? EmployeeDocuments { get; set; }
 
     }
@@ -123,9 +133,6 @@ namespace WorkManagementSolution.Employee
 
     public class EmployeePersonalDetails : BaseEntity
     {
-        public int? EmployeeId { get; set; }
-        [ForeignKey("EmployeeId")]
-        public Employee? Employee { get; set; }
         [DataType(DataType.Date)]
         public DateTime? DateOfBirth { get; set; }
         public required string Gender { get; set; }
@@ -137,9 +144,6 @@ namespace WorkManagementSolution.Employee
 
     public class EmployeeWorkInformation : BaseEntity
     {
-        public int? EmployeeId { get; set; }
-        [ForeignKey("EmployeeId")]
-
         public string? Designation { get; set; }
         public SalaryType? SalaryType { get; set; }
 
@@ -163,9 +167,6 @@ namespace WorkManagementSolution.Employee
 
     public class EmployeeAddress : BaseEntity
     {
-        public int? EmployeeId { get; set; }
-        [ForeignKey("EmployeeId")]
-        public Employee? Employee { get; set; }
         public string? AddressLine1 { get; set; }
         public string? AddressLine2 { get; set; }
         public string? City { get; set; }
@@ -177,9 +178,6 @@ namespace WorkManagementSolution.Employee
 
     public class EmployeeIdentityInfo : BaseEntity
     {
-        public int? EmployeeId { get; set; }
-        [ForeignKey("EmployeeId")]
-        public Employee? Employee { get; set; }
         public string? UID { get; set; } // Enum formatted as '0000 0000 0000'
         public string? BankAccountNumber { get; set; } // BankAC No.
         public string? BankName { get; set; }
@@ -208,10 +206,6 @@ namespace WorkManagementSolution.Employee
 
     public class EmployeeInsuranceDetail : BaseEntity
     {
-        public int? EmployeeId { get; set; }
-
-        [ForeignKey("EmployeeId")]
-        public Employee? Employee { get; set; }
 
         [ForeignKey(nameof(EmployeeDesignation))]
         public int? EmployeeDesignationId { get; set; }
