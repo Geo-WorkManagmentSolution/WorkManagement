@@ -22,10 +22,11 @@ type CalendarHeaderProps = {
  * The calendar header.
  */
 function CalendarHeader(props: CalendarHeaderProps) {
-	const { calendarRef,
-		 currentDate,
-		//   onToggleLeftSidebar 
-		} = props;
+	const {
+		calendarRef,
+		currentDate
+		//   onToggleLeftSidebar
+	} = props;
 
 	const mainTheme = useSelector(selectMainTheme);
 	const calendarApi = () => calendarRef.current.getApi();

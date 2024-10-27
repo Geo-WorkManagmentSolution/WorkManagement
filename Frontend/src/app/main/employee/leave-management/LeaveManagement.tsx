@@ -1,7 +1,5 @@
-import CalendarApp from "./calendar/CalendarApp";
+import CalendarApp from './calendar/CalendarApp';
 
-export default function LeaveManagement (){
-  return (
-    <CalendarApp></CalendarApp>
-  )
+export default function LeaveManagement() {
+	return <CalendarApp />;
 }

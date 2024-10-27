@@ -1,29 +1,52 @@
-import { styled } from '@mui/material/styles';
-import { useEffect, useMemo, useRef, useState } from 'react';
+'use client';
+
+import { useState, useRef } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import FusePageSimple from '@fuse/core/FusePageSimple';
-import useThemeMediaQuery from '@fuse/hooks/useThemeMediaQuery';
-import { useAppDispatch, useAppSelector } from 'app/store/hooks';
 import {
 	DateSelectArg,
+	EventClickArg,
 	DatesSetArg,
 	EventAddArg,
 	EventChangeArg,
-	EventClickArg,
-	EventContentArg,
-	EventDropArg,
-	EventRemoveArg
+	EventContentArg
 } from '@fullcalendar/core';
-import FuseLoading from '@fuse/core/FuseLoading';
-import CalendarHeader from './CalendarHeader';
-import EventDialog from './dialogs/event/EventDialog';
-import { openEditEventDialog, openNewEventDialog, selectSelectedLabels } from './calendarAppSlice';
+import {
+	Button,
+	TextField,
+	Switch,
+	FormControlLabel,
+	Select,
+	MenuItem,
+	TextareaAutosize,
+	Popover
+} from '@mui/material';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { styled } from '@mui/material/styles';
+import FusePageSimple from '@fuse/core/FusePageSimple';
 
-import CalendarAppEventContent from './CalendarAppEventContent';
-import { event, useGetCalendarEventsQuery, useUpdateCalendarEventMutation } from './CalendarApi';
+// Hardcoded leave types
+const leaveTypes = ['Vacation', 'Sick Leave', 'Personal Leave', 'Work From Home'];
+
+// Event model
+type Event = {
+	id: string;
+	title: string;
+	start: Date;
+	end: Date;
+	allDay: boolean;
+	extendedProps: {
+		reason: string;
+		summary: string;
+		leaveType: string;
+		halfDay: boolean;
+		fullDay: boolean;
+	};
+};
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
 	'& .container': {
@@ -100,117 +123,286 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
 	}
 }));
 
-/**
- * The calendar app.
- */
-function CalendarApp() {
-	const [currentDate, setCurrentDate] = useState<DatesSetArg>();
-	const dispatch = useAppDispatch();
-	const { data, isLoading } = useGetCalendarEventsQuery();
-	const selectedLabels = useAppSelector(selectSelectedLabels);
-	const events = useMemo(
-		() => data?.filter?.((item) => selectedLabels.includes(item?.extendedProps?.label as string)),
-		[data, selectedLabels]
+function CalendarHeader({ calendarRef, currentDate }) {
+	return (
+		<div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 p-24">
+			<h1 className="text-2xl font-semibold">Calendar</h1>
+			<div className="flex items-center space-x-4">
+				<Button
+					variant="contained"
+					color="secondary"
+					onClick={() => {
+						calendarRef.current.getApi().today();
+					}}
+				>
+					Today
+				</Button>
+				<Button
+					variant="outlined"
+					color="secondary"
+					onClick={() => {
+						calendarRef.current.getApi().prev();
+					}}
+				>
+					Prev
+				</Button>
+				<Button
+					variant="outlined"
+					color="secondary"
+					onClick={() => {
+						calendarRef.current.getApi().next();
+					}}
+				>
+					Next
+				</Button>
+			</div>
+			<h2 className="text-xl">{currentDate?.view.title}</h2>
+		</div>
 	);
+}
+
+export default function CalendarApp() {
+	const [events, setEvents] = useState<Event[]>([]);
+	const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+	const [isNewEvent, setIsNewEvent] = useState(false);
+	const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+	const [currentDate, setCurrentDate] = useState<DatesSetArg | null>(null);
 	const calendarRef = useRef<FullCalendar>(null);
-	const isMobile = useThemeMediaQuery((theme) => theme.breakpoints.down('lg'));
-	const [updateEvent] = useUpdateCalendarEventMutation();
-
-	
-
-	// useEffect(() => {
-	// 	// Correct calendar dimentions after sidebar toggles
-	// 	setTimeout(() => {
-	// 		calendarRef.current?.getApi()?.updateSize();
-	// 	}, 300);
-	// }, [leftSidebarOpen]);
 
 	const handleDateSelect = (selectInfo: DateSelectArg) => {
-		dispatch(openNewEventDialog(selectInfo));
-	};
-
-	const handleEventDrop = (eventDropInfo: EventDropArg): void => {
-		const { id, title, allDay, start, end, extendedProps } = eventDropInfo.event;
-		updateEvent({
-			id,
-			title,
-			allDay,
-			start: start?.toISOString() ?? '',
-			end: end?.toISOString() ?? '',
-			extendedProps
+		setIsNewEvent(true);
+		setSelectedEvent({
+			id: String(Date.now()),
+			title: '',
+			start: selectInfo.start,
+			end: selectInfo.end,
+			allDay: selectInfo.allDay,
+			extendedProps: {
+				reason: '',
+				summary: '',
+				leaveType: leaveTypes[0],
+				halfDay: false,
+				fullDay: false
+			}
 		});
+		setAnchorEl(selectInfo.jsEvent.target as HTMLElement);
 	};
 
 	const handleEventClick = (clickInfo: EventClickArg) => {
-		clickInfo.jsEvent.preventDefault();
-		dispatch(openEditEventDialog(clickInfo));
+		setIsNewEvent(false);
+		setSelectedEvent(clickInfo.event.toPlainObject() as Event);
+		setAnchorEl(clickInfo.jsEvent.target as HTMLElement);
 	};
 
-	const handleDates = (rangeInfo: DatesSetArg) => {
-		setCurrentDate(rangeInfo);
+	const handleClosePopover = () => {
+		setAnchorEl(null);
+		setSelectedEvent(null);
 	};
 
-	const handleEventAdd = (addInfo: EventAddArg) => {
-		// eslint-disable-next-line no-console
-		console.info(addInfo);
+	const handleSaveEvent = () => {
+		if (selectedEvent) {
+			if (isNewEvent) {
+				setEvents([...events, selectedEvent]);
+			} else {
+				setEvents(events.map((event) => (event.id === selectedEvent.id ? selectedEvent : event)));
+			}
+
+			console.log('Event saved:', selectedEvent);
+			handleClosePopover();
+		}
 	};
 
-	const handleEventChange = (changeInfo: EventChangeArg) => {
-		// eslint-disable-next-line no-console
-		console.info(changeInfo);
+	const handleDeleteEvent = () => {
+		if (selectedEvent) {
+			setEvents(events.filter((event) => event.id !== selectedEvent.id));
+			console.log('Event deleted:', selectedEvent);
+			handleClosePopover();
+		}
 	};
 
-	const handleEventRemove = (removeInfo: EventRemoveArg) => {
-		// eslint-disable-next-line no-console
-		console.info(removeInfo);
+	const handleDatesSet = (arg: DatesSetArg) => {
+		setCurrentDate(arg);
 	};
 
+	const handleEventAdd = (arg: EventAddArg) => {
+		console.log('Event added:', arg.event.toPlainObject());
+	};
 
-	if (isLoading) {
-		return <FuseLoading />;
-	}
+	const handleEventChange = (arg: EventChangeArg) => {
+		console.log('Event changed:', arg.event.toPlainObject());
+	};
+
+	const handleEventContent = (arg: EventContentArg) => {
+		return (
+			<>
+				<b>{arg.timeText}</b>
+				<i>{arg.event.title}</i>
+			</>
+		);
+	};
 
 	return (
-		<>
+		<LocalizationProvider dateAdapter={AdapterDateFns}>
 			<Root
 				header={
 					<CalendarHeader
 						calendarRef={calendarRef}
 						currentDate={currentDate}
-						// onToggleLeftSidebar={handleToggleLeftSidebar}
 					/>
 				}
 				content={
-					<FullCalendar
-						plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-						headerToolbar={false}
-						initialView="dayGridMonth"
-						editable
-						selectable
-						selectMirror
-						dayMaxEvents
-						weekends
-						datesSet={handleDates}
-						select={handleDateSelect}
-						events={events}
-						// eslint-disable-next-line react/no-unstable-nested-components
-						eventContent={(eventInfo: EventContentArg & { event: Event }) => (
-							<CalendarAppEventContent eventInfo={eventInfo} />
-						)}
-						eventClick={handleEventClick}
-						eventAdd={handleEventAdd}
-						eventChange={handleEventChange}
-						eventRemove={handleEventRemove}
-						eventDrop={handleEventDrop}
-						initialDate={new Date(2022, 3, 1)}
-						ref={calendarRef}
-					/>
+					<div className="w-full">
+						<FullCalendar
+							plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+							headerToolbar={false}
+							initialView="dayGridMonth"
+							editable
+							selectable
+							selectMirror
+							dayMaxEvents
+							weekends
+							events={events}
+							select={handleDateSelect}
+							eventClick={handleEventClick}
+							datesSet={handleDatesSet}
+							eventAdd={handleEventAdd}
+							eventChange={handleEventChange}
+							eventContent={handleEventContent}
+							ref={calendarRef}
+						/>
+
+						<Popover
+							open={Boolean(anchorEl)}
+							anchorEl={anchorEl}
+							onClose={handleClosePopover}
+							anchorOrigin={{
+								vertical: 'bottom',
+								horizontal: 'left'
+							}}
+						>
+							{selectedEvent && (
+								<div className="p-4 space-y-4">
+									<TextField
+										label="Reason"
+										value={selectedEvent.extendedProps.reason}
+										onChange={(e) =>
+											setSelectedEvent({
+												...selectedEvent,
+												extendedProps: {
+													...selectedEvent.extendedProps,
+													reason: e.target.value
+												}
+											})
+										}
+										fullWidth
+									/>
+									<TextareaAutosize
+										placeholder="Summary"
+										value={selectedEvent.extendedProps.summary}
+										onChange={(e) =>
+											setSelectedEvent({
+												...selectedEvent,
+												extendedProps: {
+													...selectedEvent.extendedProps,
+													summary: e.target.value
+												}
+											})
+										}
+										minRows={3}
+										className="w-full p-2 border rounded"
+									/>
+									<Select
+										value={selectedEvent.extendedProps.leaveType}
+										onChange={(e) =>
+											setSelectedEvent({
+												...selectedEvent,
+												extendedProps: {
+													...selectedEvent.extendedProps,
+													leaveType: e.target.value
+												}
+											})
+										}
+										fullWidth
+									>
+										{leaveTypes.map((type) => (
+											<MenuItem
+												key={type}
+												value={type}
+											>
+												{type}
+											</MenuItem>
+										))}
+									</Select>
+									<div className="flex justify-between">
+										<FormControlLabel
+											control={
+												<Switch
+													checked={selectedEvent.extendedProps.halfDay}
+													onChange={(e) =>
+														setSelectedEvent({
+															...selectedEvent,
+															extendedProps: {
+																...selectedEvent.extendedProps,
+																halfDay: e.target.checked
+															}
+														})
+													}
+												/>
+											}
+											label="Half Day"
+										/>
+										<FormControlLabel
+											control={
+												<Switch
+													checked={selectedEvent.extendedProps.fullDay}
+													onChange={(e) =>
+														setSelectedEvent({
+															...selectedEvent,
+															extendedProps: {
+																...selectedEvent.extendedProps,
+																fullDay: e.target.checked
+															}
+														})
+													}
+												/>
+											}
+											label="Full Day"
+										/>
+									</div>
+									<DateTimePicker
+										label="From"
+										value={selectedEvent.start}
+										onChange={(date) => date && setSelectedEvent({ ...selectedEvent, start: date })}
+									/>
+									<DateTimePicker
+										label="To"
+										value={selectedEvent.end}
+										onChange={(date) => date && setSelectedEvent({ ...selectedEvent, end: date })}
+									/>
+									<div className="flex justify-between">
+										<Button
+											onClick={handleSaveEvent}
+											variant="contained"
+											color="primary"
+										>
+											{isNewEvent ? 'Add' : 'Save'}
+										</Button>
+										{!isNewEvent && (
+											<Button
+												onClick={handleDeleteEvent}
+												variant="contained"
+												color="secondary"
+											>
+												Delete
+											</Button>
+										)}
+									</div>
+								</div>
+							)}
+						</Popover>
+					</div>
 				}
-				
 			/>
-			<EventDialog />
-		</>
+		</LocalizationProvider>
 	);
 }
-
-export default CalendarApp;
