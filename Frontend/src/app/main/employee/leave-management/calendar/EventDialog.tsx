@@ -1,11 +1,24 @@
 import React from 'react';
-import { Button, TextField, Switch, FormControlLabel, TextareaAutosize, Popover } from '@mui/material';
-import { DateTimePicker } from '@mui/x-date-pickers';
+import {
+	Button,
+	TextField,
+	Switch,
+	FormControlLabel,
+	TextareaAutosize,
+	Popover,
+	Typography,
+	Box,
+	Collapse,
+	Alert,
+	IconButton
+} from '@mui/material';
+import { DatePicker } from '@mui/x-date-pickers';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
-import { Event } from './types';
+import { GridCloseIcon } from '@mui/x-data-grid';
+import { Event, LeaveBalance } from './types';
 import EventLabelSelect from './EventLabelSelect';
 
 interface EventDialogProps {
@@ -15,6 +28,10 @@ interface EventDialogProps {
 	onClose: () => void;
 	onSave: (event: Event) => void;
 	onDelete: (eventId: string) => void;
+	leaveBalance: LeaveBalance;
+	alertMessage: string;
+	setAlertOpen: (value: boolean) => void;
+	alertopen: boolean;
 }
 
 const eventSchema = z.object({
@@ -28,7 +45,18 @@ const eventSchema = z.object({
 	fullDay: z.boolean()
 });
 
-export default function EventDialog({ event, isNewEvent, anchorEl, onClose, onSave, onDelete }: EventDialogProps) {
+export default function EventDialog({
+	event,
+	isNewEvent,
+	anchorEl,
+	onClose,
+	onSave,
+	onDelete,
+	leaveBalance,
+	alertMessage,
+	alertopen,
+	setAlertOpen
+}: EventDialogProps) {
 	const {
 		control,
 		handleSubmit,
@@ -44,7 +72,7 @@ export default function EventDialog({ event, isNewEvent, anchorEl, onClose, onSa
 			end: new Date(),
 			reason: '',
 			summary: '',
-			leaveType: 'Vacation',
+			leaveType: 'Casual Leave',
 			halfDay: false,
 			fullDay: false
 		}
@@ -58,7 +86,7 @@ export default function EventDialog({ event, isNewEvent, anchorEl, onClose, onSa
 				end: new Date(),
 				reason: '',
 				summary: '',
-				leaveType: 'Vacation',
+				leaveType: 'Casual Leave',
 				halfDay: false,
 				fullDay: false
 			}
@@ -81,6 +109,7 @@ export default function EventDialog({ event, isNewEvent, anchorEl, onClose, onSa
 	const summaryValue = watch('summary');
 	const fullDay = watch('fullDay');
 	const halfDay = watch('halfDay');
+	const leaveType = watch('leaveType');
 
 	const isSaveButtonDisabled = !reasonValue || !summaryValue;
 
@@ -114,6 +143,31 @@ export default function EventDialog({ event, isNewEvent, anchorEl, onClose, onSa
 				horizontal: 'right'
 			}}
 		>
+			{alertMessage !== '' && (
+				<Box sx={{ position: 'absolute', width: 'full' }}>
+					<Collapse in={alertopen}>
+						<Alert
+							severity="error"
+							action={
+								<IconButton
+									aria-label="close"
+									color="error"
+									size="small"
+									onClick={() => {
+										setAlertOpen(false);
+									}}
+								>
+									<GridCloseIcon fontSize="medium" />
+								</IconButton>
+							}
+							sx={{ mb: 2 }}
+						>
+							{alertMessage}
+						</Alert>
+					</Collapse>
+				</Box>
+			)}
+
 			<form
 				onSubmit={handleSubmit(handleSave)}
 				className="flex flex-col max-w-full p-24 pt-32 sm:pt-40 sm:p-32 w-480"
@@ -131,7 +185,7 @@ export default function EventDialog({ event, isNewEvent, anchorEl, onClose, onSa
 								name="start"
 								control={control}
 								render={({ field }) => (
-									<DateTimePicker
+									<DatePicker
 										className="mt-8 mb-16 w-full"
 										label="From"
 										value={field.value}
@@ -143,7 +197,7 @@ export default function EventDialog({ event, isNewEvent, anchorEl, onClose, onSa
 								name="end"
 								control={control}
 								render={({ field }) => (
-									<DateTimePicker
+									<DatePicker
 										className="mt-8 mb-16 w-full"
 										label="To"
 										value={field.value}
@@ -252,6 +306,18 @@ export default function EventDialog({ event, isNewEvent, anchorEl, onClose, onSa
 					{errors?.summary && (
 						<span style={{ color: 'red', marginTop: '-15px' }}>{errors.summary?.message}</span>
 					)}
+				</div>
+				<div className="flex sm:space-x-24 mb-16">
+					<FuseSvgIcon
+						className="hidden sm:inline-flex "
+						color="action"
+					>
+						heroicons-outline:information-circle
+					</FuseSvgIcon>
+					<Typography>
+						Available {leaveType} Balance:{' '}
+						{leaveBalance && leaveBalance[leaveType] !== undefined ? leaveBalance[leaveType] : 'N/A'}
+					</Typography>
 				</div>
 				<div className="flex justify-between">
 					<Button

@@ -29,6 +29,10 @@ export const leaveTypes = [
 		id: uuidv4(),
 		leaveType: 'Holiday',
 		color: '#FFA500'
+	},{
+		id: uuidv4(),
+		leaveType: 'Leave without pay',
+		color: '#2b0047'
 	}
 ];
 

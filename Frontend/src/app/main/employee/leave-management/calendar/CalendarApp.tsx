@@ -1,4 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useAppDispatch, useAppSelector } from 'app/store/hooks';
+
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -11,6 +13,7 @@ import {
 	EventChangeArg,
 	EventContentArg
 } from '@fullcalendar/core';
+
 import { styled, useTheme } from '@mui/material/styles';
 import { Box, Typography } from '@mui/material';
 import clsx from 'clsx';
@@ -19,7 +22,14 @@ import CalendarHeader from './CalendarHeader';
 import EventDialog from './EventDialog';
 import { Event, holidays, leaveTypes } from './types';
 import LeaveTypeSelector from './LeaveTypeSelctor';
-import { string } from 'zod';
+import {
+	addLeave,
+	updateLeave,
+	cancelLeave,
+	setInitialEvents,
+	selectEvents,
+	selectLeaveBalance
+} from './LeaveManagementSlice';
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
 	'& .container': {
@@ -96,7 +106,9 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
 }));
 
 export default function CalendarApp() {
-	const [events, setEvents] = useState<Event[]>([]);
+	const dispatch = useAppDispatch();
+	const events = useAppSelector(selectEvents);
+	const leaveBalance = useAppSelector(selectLeaveBalance);
 	const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 	const [isNewEvent, setIsNewEvent] = useState(false);
 	const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -104,33 +116,46 @@ export default function CalendarApp() {
 	const [currentDate, setCurrentDate] = useState<DatesSetArg | null>(null);
 	const [selectedLabels, setSelectedLabels] = useState(leaveTypes.map((type) => type.leaveType));
 	// const [snackbarOpen, setSnackbarOpen] = useState(false);
-	// const [snackbarMessage, setSnackbarMessage] = useState('');
+	const [alertopen, setAlertOpen] = useState(false);
+
+	const [alertMessage, setAlertMessage] = useState('');
 	const calendarRef = useRef<FullCalendar>(null);
 	const theme = useTheme();
 
 	useEffect(() => {
-		const storedEvents = localStorage.getItem('calendarEvents');
+		const storedEvents: string = localStorage.getItem('calendarEvents');
 
 		if (storedEvents) {
-			setEvents(JSON.parse(storedEvents));
+			dispatch(setInitialEvents(JSON.parse(storedEvents)));
 		}
-	}, []);
+	}, [dispatch]);
 
 	useEffect(() => {
 		localStorage.setItem('calendarEvents', JSON.stringify(events));
 	}, [events]);
 
 	const handleDateSelect = (selectInfo: DateSelectArg) => {
+		const start = new Date(selectInfo.start);
+		let end = new Date(selectInfo.end);
+
+		// Adjust end date to be inclusive
+		end.setDate(end.getDate() - 1);
+
+		// If it's a single day selection, set both start and end to the same day
+		if (start.getTime() === end.getTime()) {
+			end = new Date(start);
+		}
+
 		setIsNewEvent(true);
 		setSelectedEvent({
 			id: String(Date.now()),
 			reason: '',
 			summary: '',
-			leaveType: 'Vacation',
+			leaveType: 'Casual Leave',
 			halfDay: false,
 			fullDay: false,
-			start: selectInfo.start,
-			end: selectInfo.end
+			start,
+			end
 		});
 		setAnchorEl(selectInfo.jsEvent.target as HTMLElement);
 	};
@@ -139,17 +164,17 @@ export default function CalendarApp() {
 		setIsNewEvent(false);
 		const eventData = clickInfo.event;
 		setSelectedEvent({
-		  id: eventData.id,
-		  reason: eventData.extendedProps.reason || '',
-		  summary: eventData.extendedProps.summary || '',
-		  leaveType: eventData.extendedProps.leaveType || 'Vacation',
-		  halfDay: eventData.extendedProps.halfDay || false,
-		  fullDay: eventData.extendedProps.fullDay || false,
-		  start: eventData.start || new Date(),
-		  end: eventData.end || new Date()
+			id: eventData.id,
+			reason: eventData.extendedProps.reason || '',
+			summary: eventData.extendedProps.summary || '',
+			leaveType: eventData.extendedProps.leaveType || 'Casual Leave',
+			halfDay: eventData.extendedProps.halfDay || false,
+			fullDay: eventData.extendedProps.fullDay || false,
+			start: clickInfo.event.start || new Date(),
+			end: eventData.end 
 		});
 		setAnchorEl(clickInfo.jsEvent.target as HTMLElement);
-	  };
+	};
 
 	const handleClosePopover = () => {
 		setAnchorEl(null);
@@ -160,27 +185,68 @@ export default function CalendarApp() {
 		setLeaveAnchor(null);
 	};
 
+	// const handleSaveEvent = (event: Event) => {
+	// 	const existingLeave = events.find((e) => e.start <= event.end && e.end >= event.start && e.id !== event.id);
+
+	// 	if (existingLeave) {
+	// 		setAlertMessage('A leave already exists for the selected date range.');
+	// 		setAlertOpen(true);
+	// 		return;
+	// 	}
+
+	// 	if (isNewEvent) {
+	// 		dispatch(addLeave(event));
+	// 	} else {
+	// 		dispatch(updateLeave(event));
+	// 	}
+
+	// 	handleClosePopover();
+	// };
+
+
 	const handleSaveEvent = (event: Event) => {
-		// const conflictingEvent = checkConflictingEvent(event);
-
-		// if (conflictingEvent) {
-		// 	setSnackbarMessage(
-		// 		`Conflicting leave: ${conflictingEvent.leaveType} from ${conflictingEvent.start.toLocaleString()} to ${conflictingEvent.end.toLocaleString()}`
-		// 	);
-		// 	setSnackbarOpen(true);
-		// } else {
-		if (isNewEvent) {
-			setEvents([...events, event]);
-		} else {
-			setEvents(events.map((e) => (e.id === event.id ? event : e)));
+		const existingLeave = events.find((e) => 
+		  (new Date(e.start) <= new Date(event.end) && 
+		   new Date(e.end) >= new Date(event.start) && 
+		   e.id !== event.id)
+		);
+	
+		if (existingLeave) {
+		  setAlertMessage('A leave already exists for the selected date range.');
+		  setAlertOpen(true);
+		  return;
 		}
-
+	
+		// Create a new event object with adjusted end date for rendering
+		const adjustedEvent = {
+		  ...event,
+		  // Add one day to end date for FullCalendar rendering
+		  displayEnd: new Date(new Date(event.end).setDate(new Date(event.end).getDate() + 1))
+		};
+	
+		if (isNewEvent) {
+		  dispatch(addLeave(event)); // Save original dates to store
+		} else {
+		  dispatch(updateLeave(event)); // Save original dates to store
+		}
+	
 		handleClosePopover();
-		// }
-	};
+	  };	
+
+
+
+
+
+
+
+
+
+
+
+
 
 	const handleDeleteEvent = (eventId: string) => {
-		setEvents(events.filter((e) => e.id !== eventId));
+		dispatch(cancelLeave(eventId));
 		handleClosePopover();
 	};
 
@@ -201,20 +267,20 @@ export default function CalendarApp() {
 	const handleEventContent = (arg: EventContentArg) => {
 		const leaveType = leaveTypes.find((leave) => leave.leaveType === arg.event.extendedProps.leaveType);
 		const backgroundColor = leaveType ? leaveType.color : '#808080';
-
+	
 		return (
-			<Box
-				sx={{
-					backgroundColor,
-					color: theme.palette.getContrastText(backgroundColor)
-				}}
-				className={clsx('flex items-center w-full rounded px-8 py-2 h-22 text-white')}
-			>
-				<Typography className="text-md font-semibold">{arg.event.extendedProps.leaveType}</Typography>
-				<Typography className="text-md px-4 truncate">{arg.event.extendedProps.reason}</Typography>
-			</Box>
+		  <Box
+			sx={{
+			  backgroundColor,
+			  color: theme.palette.getContrastText(backgroundColor)
+			}}
+			className={clsx('flex items-center w-full rounded px-8 py-2 h-22 text-white')}
+		  >
+			<Typography className="text-md font-semibold">{arg.event.extendedProps.leaveType}</Typography>
+			<Typography className="text-md px-4 truncate">{arg.event.extendedProps.reason}</Typography>
+		  </Box>
 		);
-	};
+	  };
 
 	const handleAddEventClick = () => {
 		setIsNewEvent(true);
@@ -236,15 +302,13 @@ export default function CalendarApp() {
 	};
 
 	const toggleSelectedLabels = (leaveType: string) => {
-    setSelectedLabels((prev) =>
-      prev.includes(leaveType) ? prev.filter((label) => label !== leaveType) : [...prev, leaveType]
-    );
-  };
+		setSelectedLabels((prev) =>
+			prev.includes(leaveType) ? prev.filter((label) => label !== leaveType) : [...prev, leaveType]
+		);
+	};
 
-  const allEvents = [...events, ...holidays];
-  const filteredEvents = allEvents.filter(
-    (event) => selectedLabels.includes(event.leaveType)
-  );
+	const allEvents = [...events, ...holidays];
+	const filteredEvents = allEvents.filter((event) => selectedLabels.includes(event.leaveType));
 	return (
 		<Root
 			header={
@@ -266,7 +330,11 @@ export default function CalendarApp() {
 						selectMirror
 						dayMaxEvents
 						weekends
-						events={filteredEvents}
+						events={filteredEvents.map(event => ({
+							...event,
+							// Adjust end date for display purposes
+							end: new Date(new Date(event.end).setDate(new Date(event.end).getDate() + 1))
+						  }))}
 						select={handleDateSelect}
 						eventClick={(clickInfo) => {
 							if (clickInfo.event.extendedProps.isHoliday) {
@@ -282,27 +350,26 @@ export default function CalendarApp() {
 						eventContent={handleEventContent}
 						ref={calendarRef}
 					/>
-					<EventDialog
-						event={selectedEvent}
-						isNewEvent={isNewEvent}
-						anchorEl={anchorEl}
-						onClose={handleClosePopover}
-						onSave={handleSaveEvent}
-						onDelete={handleDeleteEvent}
-						// events={events}
-					/>
+					{selectedEvent && (
+						<EventDialog
+							event={selectedEvent}
+							isNewEvent={isNewEvent}
+							anchorEl={anchorEl}
+							onClose={handleClosePopover}
+							onSave={handleSaveEvent}
+							onDelete={handleDeleteEvent}
+							leaveBalance={leaveBalance}
+							alertMessage={alertMessage}
+							alertopen={alertopen}
+							setAlertOpen={setAlertOpen}
+						/>
+					)}
 					<LeaveTypeSelector
 						anchorEl={leaveAnchor}
 						onClose={handleLeaveSelectorPopOver}
 						selectedLabels={selectedLabels}
 						toggleSelectedLabels={toggleSelectedLabels}
 					/>
-					{/* <Snackbar
-						open={snackbarOpen}
-						autoHideDuration={6000}
-						onClose={() => setSnackbarOpen(false)}
-						message={snackbarMessage}
-					/> */}
 				</>
 			}
 		/>
