@@ -1,3 +1,4 @@
+
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import { useSelector } from 'react-redux';
@@ -7,8 +8,8 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { forwardRef } from 'react';
 import Box from '@mui/material/Box';
 import { Typography } from '@mui/material';
-import { leaveTypes } from './types';
-import { selectLeaveBalance } from './LeaveManagementSlice';
+import { leaveTypes } from '../types';
+import { selectLeaveBalance } from '../../LeaveManagementSlice';
 
 export type EventLabelSelectProps = {
 	value: string;
@@ -39,29 +40,32 @@ const EventLabelSelect = forwardRef<HTMLElement, EventLabelSelectProps>((props, 
 				ref={ref}
 				classes={{ select: 'flex items-center space-x-12' }}
 			>
-				{leaveTypes.map((eachType) => (
-					<MenuItem
-						value={eachType.leaveType}
-						key={eachType.id}
-						className="space-x-12"
-					>
-						<Box
-							className="w-12 h-12 shrink-0 rounded-full"
-							sx={{ backgroundColor: eachType.color }}
-						/>
-						
-						<Typography component="div" className="flex justify-between items-center flex-1 leading-none">
-							<span>{eachType.leaveType}</span>
-							{eachType.leaveType !== 'Work From Home' &&
-							eachType.leaveType !== 'Holiday' &&
-							eachType.leaveType !== 'Leave without pay' &&
-							leaveBalance[eachType.leaveType] !== undefined && (
-								<span>[ Available Balance - {leaveBalance[eachType.leaveType]} ]</span>
-							)}
-						</Typography>
-					
-					</MenuItem>
-				))}
+				{leaveTypes.map(
+					(eachType) =>
+						eachType.leaveType !== 'Holiday' && (
+							<MenuItem
+								value={eachType.leaveType}
+								key={eachType.id}
+								className="space-x-12"
+							>
+								<Box
+									className="w-12 h-12 shrink-0 rounded-full"
+									sx={{ backgroundColor: eachType.color }}
+								/>
+								<Typography
+									component="div"
+									className="flex justify-between items-center flex-1 leading-none"
+								>
+									<span>{eachType.leaveType}</span>
+									{eachType.leaveType !== 'Work From Home' &&
+										eachType.leaveType !== 'Leave without pay' &&
+										leaveBalance[eachType.leaveType] !== undefined && (
+											<span>[ Available Balance - {leaveBalance[eachType.leaveType]} ]</span>
+										)}
+								</Typography>
+							</MenuItem>
+						)
+				)}
 			</Select>
 		</FormControl>
 	);

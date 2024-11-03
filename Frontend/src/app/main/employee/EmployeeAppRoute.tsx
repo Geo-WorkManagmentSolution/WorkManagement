@@ -1,7 +1,8 @@
 import { lazy } from 'react';
 import { Navigate } from 'react-router-dom';
 import { FuseRouteItemType } from '@fuse/utils/FuseUtils';
-import LeaveManagment from './leave-management/LeaveManagement';
+import LeaveApplication from './leave-management/leaveapplication/LeaveApplication';
+import LeaveSummury from './leave-management/leaveapplication/calendar/LeaveSummury';
 // import Employees from './employees/Employees';
 
 const EmployeeApp = lazy(() => import('./EmployeeApp'));
@@ -49,8 +50,9 @@ const EmployeeAppRoute: FuseRouteItemType = {
 		},
 		{
 			path:"leave-management",
-			element:<LeaveManagment/>
+			element:<LeaveApplication/>
 		}
+		
 	]
 };
 

@@ -4,8 +4,8 @@ import Popover from '@mui/material/Popover';
 import React from 'react';
 import { Box } from '@mui/system';
 import { FormLabel, Typography } from '@mui/material';
-import { leaveTypes } from './types';
-import { selectLeaveBalance } from './LeaveManagementSlice';
+import { leaveTypes } from '../types';
+import { selectLeaveBalance } from '../../LeaveManagementSlice';
 
 interface LeaveDetailsProps {
 	anchorEl: HTMLElement | null;
@@ -34,7 +34,7 @@ function LeaveTypeSelector({ anchorEl, onClose, selectedLabels, toggleSelectedLa
 				horizontal: 'right'
 			}}
 		>
-			<div className="flex flex-col flex-auto min-h-full w-full py-24 px-16">
+			<div className="flex flex-col p-20">
 				<div className="group flex items-center justify-between mb-12">
 					<Typography
 						className="text-lg font-600 leading-none"
@@ -62,7 +62,7 @@ function LeaveTypeSelector({ anchorEl, onClose, selectedLabels, toggleSelectedLa
 							className="w-12 h-12 shrink-0 rounded-full"
 							sx={{ backgroundColor: eachType.color }}
 						/>
-
+					<div className='flex flex-auto'>
 						<Typography
 							component="div"
 							className="flex justify-between items-center flex-1 leading-none"
@@ -75,6 +75,7 @@ function LeaveTypeSelector({ anchorEl, onClose, selectedLabels, toggleSelectedLa
 									<span>[ Available Balance - {leaveBalance[eachType.leaveType]} ]</span>
 								)}
 						</Typography>
+						</div>
 					</FormLabel>
 				))}
 			</div>

@@ -20,7 +20,7 @@ import clsx from 'clsx';
 import FusePageSimple from '@fuse/core/FusePageSimple';
 import CalendarHeader from './CalendarHeader';
 import EventDialog from './EventDialog';
-import { Event, holidays, leaveTypes } from './types';
+import { Event, holidays, leaveTypes } from '../types';
 import LeaveTypeSelector from './LeaveTypeSelctor';
 import {
 	addLeave,
@@ -29,11 +29,14 @@ import {
 	setInitialEvents,
 	selectEvents,
 	selectLeaveBalance
-} from './LeaveManagementSlice';
+} from '../../LeaveManagementSlice';
+import LeaveSummury from './LeaveSummury';
+
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
 	'& .container': {
-		maxWidth: '100%!important'
+		maxWidth: '100%!important',
+		
 	},
 	'& a': {
 		color: `${theme.palette.text.primary}!important`,
@@ -43,6 +46,10 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
 		minHeight: '100%',
 		width: '100%'
 	},
+	'& .fc': {
+        height: '800px',
+		
+    },
 	'& .fc-scrollgrid, & .fc-theme-standard td, & .fc-theme-standard th': {
 		borderColor: `${theme.palette.divider}!important`
 	},
@@ -115,12 +122,29 @@ export default function CalendarApp() {
 	const [leaveAnchor, setLeaveAnchor] = useState<HTMLElement | null>(null);
 	const [currentDate, setCurrentDate] = useState<DatesSetArg | null>(null);
 	const [selectedLabels, setSelectedLabels] = useState(leaveTypes.map((type) => type.leaveType));
-	// const [snackbarOpen, setSnackbarOpen] = useState(false);
-	const [alertopen, setAlertOpen] = useState(false);
-
+	const [tabValue, setTabValue] = useState('Calendar View');
 	const [alertMessage, setAlertMessage] = useState('');
+	const [alertOpen, setAlertOpen] = useState(false);
 	const calendarRef = useRef<FullCalendar>(null);
 	const theme = useTheme();
+
+	const openEventDialoge = (event: Event) => {
+		
+		setIsNewEvent(false);
+		setSelectedEvent({
+			id: event.id,
+			reason: event.reason || '',
+			summary: event.summary || '',
+			leaveType: event.leaveType || 'Casual Leave',
+			halfDay: event.halfDay || false,
+			fullDay: event.fullDay || false,
+			start:  new Date(event.start) || new Date(),
+			end: new Date(event.end),
+			isApproved:event.isApproved
+		});
+
+		setAnchorEl(document.body);
+	};
 
 	useEffect(() => {
 		const storedEvents: string = localStorage.getItem('calendarEvents');
@@ -155,7 +179,8 @@ export default function CalendarApp() {
 			halfDay: false,
 			fullDay: false,
 			start,
-			end
+			end,
+			isApproved:false
 		});
 		setAnchorEl(selectInfo.jsEvent.target as HTMLElement);
 	};
@@ -171,7 +196,8 @@ export default function CalendarApp() {
 			halfDay: eventData.extendedProps.halfDay || false,
 			fullDay: eventData.extendedProps.fullDay || false,
 			start: clickInfo.event.start || new Date(),
-			end: eventData.end 
+			end: eventData.end,
+			isApproved:eventData.extendedProps.isApproved 
 		});
 		setAnchorEl(clickInfo.jsEvent.target as HTMLElement);
 	};
@@ -185,65 +211,30 @@ export default function CalendarApp() {
 		setLeaveAnchor(null);
 	};
 
-	// const handleSaveEvent = (event: Event) => {
-	// 	const existingLeave = events.find((e) => e.start <= event.end && e.end >= event.start && e.id !== event.id);
-
-	// 	if (existingLeave) {
-	// 		setAlertMessage('A leave already exists for the selected date range.');
-	// 		setAlertOpen(true);
-	// 		return;
-	// 	}
-
-	// 	if (isNewEvent) {
-	// 		dispatch(addLeave(event));
-	// 	} else {
-	// 		dispatch(updateLeave(event));
-	// 	}
-
-	// 	handleClosePopover();
-	// };
-
+	const refreshCalendar = () => {
+		if (calendarRef.current) {
+			calendarRef.current.getApi().render();
+		}
+	};
 
 	const handleSaveEvent = (event: Event) => {
-		const existingLeave = events.find((e) => 
-		  (new Date(e.start) <= new Date(event.end) && 
-		   new Date(e.end) >= new Date(event.start) && 
-		   e.id !== event.id)
-		);
-	
-		if (existingLeave) {
-		  setAlertMessage('A leave already exists for the selected date range.');
-		  setAlertOpen(true);
-		  return;
+		try {
+			if (isNewEvent) {
+				dispatch(addLeave(event));
+			} else {
+				dispatch(updateLeave(event));
+			}
+
+			handleClosePopover();
+		} catch (error) {
+			console.log('error is comming');
+
+			if (error instanceof Error) {
+				setAlertMessage(error.message);
+				setAlertOpen(true);
+			}
 		}
-	
-		// Create a new event object with adjusted end date for rendering
-		const adjustedEvent = {
-		  ...event,
-		  // Add one day to end date for FullCalendar rendering
-		  displayEnd: new Date(new Date(event.end).setDate(new Date(event.end).getDate() + 1))
-		};
-	
-		if (isNewEvent) {
-		  dispatch(addLeave(event)); // Save original dates to store
-		} else {
-		  dispatch(updateLeave(event)); // Save original dates to store
-		}
-	
-		handleClosePopover();
-	  };	
-
-
-
-
-
-
-
-
-
-
-
-
+	};
 
 	const handleDeleteEvent = (eventId: string) => {
 		dispatch(cancelLeave(eventId));
@@ -266,21 +257,21 @@ export default function CalendarApp() {
 
 	const handleEventContent = (arg: EventContentArg) => {
 		const leaveType = leaveTypes.find((leave) => leave.leaveType === arg.event.extendedProps.leaveType);
-		const backgroundColor = leaveType ? leaveType.color : '#808080';
-	
+		const backgroundColor = leaveType ? leaveType.color : '#0dc8e0';
+
 		return (
-		  <Box
-			sx={{
-			  backgroundColor,
-			  color: theme.palette.getContrastText(backgroundColor)
-			}}
-			className={clsx('flex items-center w-full rounded px-8 py-2 h-22 text-white')}
-		  >
-			<Typography className="text-md font-semibold">{arg.event.extendedProps.leaveType}</Typography>
-			<Typography className="text-md px-4 truncate">{arg.event.extendedProps.reason}</Typography>
-		  </Box>
+			<Box
+				sx={{
+					backgroundColor,
+					color: theme.palette.getContrastText(backgroundColor)
+				}}
+				className={clsx('flex items-center w-full rounded px-8 py-2 h-22 text-white')}
+			>
+				<Typography className="text-md font-semibold">{arg.event.extendedProps.leaveType} - </Typography>
+				<Typography className="text-md px-4 font-extrabold">{arg.event.extendedProps.reason}</Typography>
+			</Box>
 		);
-	  };
+	};
 
 	const handleAddEventClick = () => {
 		setIsNewEvent(true);
@@ -292,7 +283,8 @@ export default function CalendarApp() {
 			halfDay: false,
 			fullDay: false,
 			start: new Date(),
-			end: new Date()
+			end: new Date(),
+			isApproved:false
 		});
 		setAnchorEl(document.body);
 	};
@@ -309,6 +301,16 @@ export default function CalendarApp() {
 
 	const allEvents = [...events, ...holidays];
 	const filteredEvents = allEvents.filter((event) => selectedLabels.includes(event.leaveType));
+
+	function showCalender() {
+		setTabValue('Calendar View');
+		setTimeout(refreshCalendar, 0); // Ensure render after state change
+	}
+
+	function showSummury() {
+		setTabValue('Summury View');
+	}
+
 	return (
 		<Root
 			header={
@@ -317,39 +319,53 @@ export default function CalendarApp() {
 					calendarRef={calendarRef}
 					onAddEventClick={handleAddEventClick}
 					onShowLeaveSelectorDetails={handleLeaveSelectorDetails}
+					showCalander={showCalender}
+					showLeaveSummury={showSummury}
 				/>
 			}
 			content={
 				<>
-					<FullCalendar
-						plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-						headerToolbar={false}
-						initialView="dayGridMonth"
-						editable
-						selectable
-						selectMirror
-						dayMaxEvents
-						weekends
-						events={filteredEvents.map(event => ({
-							...event,
-							// Adjust end date for display purposes
-							end: new Date(new Date(event.end).setDate(new Date(event.end).getDate() + 1))
-						  }))}
-						select={handleDateSelect}
-						eventClick={(clickInfo) => {
-							if (clickInfo.event.extendedProps.isHoliday) {
-								// Prevent editing for holiday events
-								return;
-							}
+					<div className={`${tabValue !== 'Calendar View' ? 'hidden' : ''} w-full`}>
+						<FullCalendar
+						
+							plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+							headerToolbar={false}
+							initialView="dayGridMonth"
+							editable
+							selectable
+							selectMirror
+							dayMaxEvents
+							weekends
+							// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+							events={filteredEvents.map((event) => ({
+								...event,
+								// Adjust end date for display purposes
+								end: new Date(new Date(event.end).setDate(new Date(event.end).getDate() + 1))
+							}))}
+							select={handleDateSelect}
+							eventClick={(clickInfo) => {
+								if (clickInfo.event.extendedProps.isHoliday) {
+									// Prevent editing for holiday events
+									return;
+								}
 
-							handleEventClick(clickInfo);
-						}}
-						datesSet={handleDatesSet}
-						eventAdd={handleEventAdd}
-						eventChange={handleEventChange}
-						eventContent={handleEventContent}
-						ref={calendarRef}
-					/>
+								handleEventClick(clickInfo);
+							}}
+							datesSet={handleDatesSet}
+							eventAdd={handleEventAdd}
+							eventChange={handleEventChange}
+							eventContent={handleEventContent}
+							ref={calendarRef}
+						/>
+					</div>
+					<div className={`${tabValue !== 'Summury View' ? 'hidden' : ''} w-full`}>
+						<LeaveSummury
+							events={events}
+							holidays={holidays}
+							openDialoge={openEventDialoge}
+						/>
+					</div>
+
 					{selectedEvent && (
 						<EventDialog
 							event={selectedEvent}
@@ -360,7 +376,7 @@ export default function CalendarApp() {
 							onDelete={handleDeleteEvent}
 							leaveBalance={leaveBalance}
 							alertMessage={alertMessage}
-							alertopen={alertopen}
+							alertOpen={alertOpen}
 							setAlertOpen={setAlertOpen}
 						/>
 					)}

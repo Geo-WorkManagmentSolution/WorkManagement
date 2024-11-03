@@ -1,5 +1,7 @@
 import React, { MutableRefObject } from 'react';
 import IconButton from '@mui/material/IconButton';
+import Button from '@mui/material/Button';
+import ButtonGroup from '@mui/material/ButtonGroup';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { selectMainTheme } from '@fuse/core/FuseSettings/fuseSettingsSlice';
@@ -15,14 +17,14 @@ type CalendarHeaderProps = {
 	currentDate: DatesSetArg;
 	onAddEventClick: () => void;
 	onShowLeaveSelectorDetails: () => void;
-
+	showLeaveSummury: () => void;
+	showCalander: () => void;
 };
 
 function CalendarHeader(props: CalendarHeaderProps) {
-	const { currentDate, onAddEventClick, calendarRef, onShowLeaveSelectorDetails } = props;
+	const { currentDate, onAddEventClick, calendarRef, onShowLeaveSelectorDetails,showCalander,showLeaveSummury } = props;
 	const calendarApi = () => calendarRef.current.getApi();
 	const mainTheme = useSelector(selectMainTheme);
-
 
 	function handleViewChange(viewType: string) {
 		calendarApi().changeView(viewType);
@@ -32,7 +34,7 @@ function CalendarHeader(props: CalendarHeaderProps) {
 		<div className="flex w-full p-12 justify-between z-10 container">
 			<div className="flex items-center justify-between space-x-8">
 				<div className="flex items-center space-x-8">
-					<Typography className="hidden sm:flex text-2xl font-semibold tracking-tight whitespace-nowrap">
+					<Typography className=" sm:flex text-2xl font-semibold tracking-tight whitespace-nowrap">
 						{currentDate?.view.title}
 					</Typography>
 				</div>
@@ -85,6 +87,26 @@ function CalendarHeader(props: CalendarHeaderProps) {
 						</div>
 					</Tooltip>
 				</div>
+			</div>
+
+			<div>
+				<ButtonGroup>
+					<Button
+						variant="outlined"
+						color="inherit"
+						onClick={showLeaveSummury}
+					>
+						
+						<FuseSvgIcon size={20}>heroicons-solid:queue-list</FuseSvgIcon>
+					</Button>
+					<Button
+						variant="outlined"
+						color="inherit"
+						onClick={showCalander}
+					>
+						<FuseSvgIcon size={20}>heroicons-solid:calendar-days</FuseSvgIcon>
+					</Button>
+				</ButtonGroup>
 			</div>
 
 			<motion.div

@@ -1,6 +1,7 @@
 import { WithSlice, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { rootReducer } from 'app/store/lazyLoadedSlices';
-import { Event, LeaveBalance } from './types';
+import { Event, LeaveBalance ,holidays} from './leaveapplication/types';
+
 
 export interface LeaveManagementState {
 	events: Event[];
@@ -39,32 +40,121 @@ export const leaveManagementSlice = createSlice({
 	name: 'leaveManagement',
 	initialState,
 	reducers: {
+		// addLeave: (state, action: PayloadAction<Event>) => {
+		// 	const newLeave = action.payload;
+	  
+		// 	// Validation 1: Check if leave already exists for the date range
+		// 	const existingLeave = state.events.find(
+		// 	  (event) =>
+		// 		new Date(event.start) <= new Date(newLeave.end) && 
+		// 		new Date(event.end) >= new Date(newLeave.start)
+		// 	);
+	  
+		// 	if (existingLeave) {
+		// 	  throw new Error('A leave already exists for the selected date range.');
+		// 	  console.log("error on existing leave");
+
+		// 	}
+	  
+		// 	// Validation 2: Check if leave balance is sufficient
+		// 	if (state.leaveBalance[newLeave.leaveType] !== undefined && 
+		// 		state.leaveBalance[newLeave.leaveType] <= 0) {
+		// 			console.log("error on balance");
+					
+		// 	  throw new Error(`You don't have enough ${newLeave.leaveType} balance.`);
+		// 	}
+	  
+		// 	// Validation 3: Check if leave is applied on a holiday
+		// 	const isHoliday = holidays.some(
+		// 	  (holiday) => 
+		// 		new Date(holiday.start).toDateString() === new Date(newLeave.start).toDateString() ||
+		// 		new Date(holiday.end).toDateString() === new Date(newLeave.end).toDateString()
+		// 	);
+	  
+		// 	if (isHoliday) {
+		// 		console.log("error on holiday");
+
+		// 	  throw new Error('You cannot apply leave on a holiday.');
+		// 	}
+	  
+		// 	// If all validations pass, add the leave
+		// 	state.events.push(newLeave);
+	  
+		// 	if (state.leaveBalance[newLeave.leaveType] !== undefined) {
+		// 	  const leaveDays = calculateLeaveDays(new Date(newLeave.start), new Date(newLeave.end));
+		// 	  const daysToSubtract = newLeave.halfDay ? leaveDays / 2 : leaveDays;
+		// 	  state.leaveBalance[newLeave.leaveType] -= daysToSubtract;
+		// 	}
+		//   }
+		
+		
+		
 		addLeave: (state, action: PayloadAction<Event>) => {
 			const newLeave = action.payload;
-
-      if (state.leaveBalance[newLeave.leaveType] === 0) {
-        // Return early if leave balance is zero
-        return;
-    }
-
+		
+			// Validation 1: Check if leave already exists for the date range
 			const existingLeave = state.events.find(
 				(event) =>
-					new Date(event.start) <= new Date(newLeave.end) && new Date(event.end) >= new Date(newLeave.start)
+					new Date(event.start) <= new Date(newLeave.end) &&
+					new Date(event.end) >= new Date(newLeave.start)
 			);
-
+		
 			if (existingLeave) {
-				// Handle existing leave (you might want to throw an error or return a value)
-				return;
+				console.error("Error: A leave already exists for the selected date range.");
+				throw new Error("A leave already exists for the selected date range.");
 			}
-
+		
+			// Calculate the number of leave days
+			const leaveDays = calculateLeaveDays(new Date(newLeave.start), new Date(newLeave.end));
+			const daysToSubtract = newLeave.halfDay ? leaveDays / 2 : leaveDays;
+			console.log(`Requested leave days: ${leaveDays}, Days to subtract: ${daysToSubtract}`);
+		
+			// Validation 2: Check if leave balance is sufficient and ensure it won't go negative
+			const availableBalance = state.leaveBalance[newLeave.leaveType];
+			if (availableBalance !== undefined) {
+				if (availableBalance < daysToSubtract) {
+					console.error(`Error: Insufficient ${newLeave.leaveType} balance.`);
+					throw new Error(`You don't have enough ${newLeave.leaveType} balance.`);
+				}
+			}
+		
+			// Validation 3: Check if leave is applied on a holiday
+			const isHoliday = holidays.some(
+				(holiday) =>
+					new Date(holiday.start).toDateString() === new Date(newLeave.start).toDateString() ||
+					new Date(holiday.end).toDateString() === new Date(newLeave.end).toDateString()
+			);
+		
+			if (isHoliday) {
+				console.error("Error: Leave cannot be applied on a holiday.");
+				throw new Error("You cannot apply leave on a holiday.");
+			}
+		
+			// If all validations pass, add the leave
 			state.events.push(newLeave);
-
-			if (state.leaveBalance[newLeave.leaveType] !== undefined) {
-				const leaveDays = calculateLeaveDays(new Date(newLeave.start), new Date(newLeave.end));
-				const daysToSubtract = newLeave.halfDay ? leaveDays / 2 : leaveDays;
+		
+			// Deduct leave balance
+			if (availableBalance !== undefined) {
 				state.leaveBalance[newLeave.leaveType] -= daysToSubtract;
+				console.log(`Updated ${newLeave.leaveType} balance: ${state.leaveBalance[newLeave.leaveType]}`);
 			}
-		},
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		,
 		updateLeave: (state, action: PayloadAction<Event>) => {
 			const updatedLeave = action.payload;
 			const index = state.events.findIndex((event) => event.id === updatedLeave.id);

@@ -30,7 +30,7 @@ const navigationConfig: FuseNavItemType[] = [
 						title: 'Employee Dashboard',
 						type: 'item',
 						url: '/apps/employees',
-						end: true,
+						end: true
 					},
 					{
 						id: 'applicationmanagement.employees.new',
@@ -43,6 +43,7 @@ const navigationConfig: FuseNavItemType[] = [
 						title:'Leave Management',
 						type:'item',
 						url:'/apps/employees/leave-management'
+
 					}
 				]
 			},

@@ -18,7 +18,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { GridCloseIcon } from '@mui/x-data-grid';
-import { Event, LeaveBalance } from './types';
+import { Event, LeaveBalance } from '../types';
 import EventLabelSelect from './EventLabelSelect';
 
 interface EventDialogProps {
@@ -54,8 +54,8 @@ export default function EventDialog({
 	onDelete,
 	leaveBalance,
 	alertMessage,
-	alertopen,
-	setAlertOpen
+  alertOpen,
+  setAlertOpen
 }: EventDialogProps) {
 	const {
 		control,
@@ -111,7 +111,7 @@ export default function EventDialog({
 	const halfDay = watch('halfDay');
 	const leaveType = watch('leaveType');
 
-	const isSaveButtonDisabled = !reasonValue || !summaryValue;
+	const isSaveButtonDisabled = !reasonValue || !summaryValue || (!fullDay && !halfDay);
 
 	const handleFullDayChange = (checked: boolean) => {
 		setValue('fullDay', checked);
@@ -143,30 +143,30 @@ export default function EventDialog({
 				horizontal: 'right'
 			}}
 		>
-			{alertMessage !== '' && (
-				<Box sx={{ position: 'absolute', width: 'full' }}>
-					<Collapse in={alertopen}>
-						<Alert
-							severity="error"
-							action={
-								<IconButton
-									aria-label="close"
-									color="error"
-									size="small"
-									onClick={() => {
-										setAlertOpen(false);
-									}}
-								>
-									<GridCloseIcon fontSize="medium" />
-								</IconButton>
-							}
-							sx={{ mb: 2 }}
-						>
-							{alertMessage}
-						</Alert>
-					</Collapse>
-				</Box>
-			)}
+			{alertMessage && (
+        <Box sx={{ position: 'absolute', width: 'full' }}>
+          <Collapse in={alertOpen}>
+            <Alert
+              severity="error"
+              action={
+                <IconButton
+                  aria-label="close"
+                  color="error"
+                  size="small"
+                  onClick={() => {
+                    setAlertOpen(false);
+                  }}
+                >
+                  <GridCloseIcon fontSize="medium" />
+                </IconButton>
+              }
+              sx={{ mb: 2 }}
+            >
+              {alertMessage}
+            </Alert>
+          </Collapse>
+        </Box>
+      )}
 
 			<form
 				onSubmit={handleSubmit(handleSave)}
