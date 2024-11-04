@@ -13,6 +13,8 @@ namespace WorkManagement.Domain.Contracts
     {
         public Task<List<EmployeeModel>> GetAllEmployeesAsync();
 
+        public Task<List<EmployeeLeaveSummary>> GetEmployeeLeaves(int employeeId);
+        
         public Task<EmployeeModel> GetEmployeeByIdAsync(int id);
 
         public Task SendEmail();
@@ -32,6 +34,8 @@ namespace WorkManagement.Domain.Contracts
         public Task<EmployeeDesignation> AddNewDesignation(EmployeeDesignation employeeDesignation);
 
         public Task<Site> AddNewSite(Site site);
-
+        public Task<EmployeeLeave> AddLeave(EmployeeLeave employeeLeave,string loggedUserId);
+        public Task CancelLeave(int employeeLeaveId);
+        public Task<EmployeeLeave> UpdateLeave(EmployeeLeave employeeLeave);
     }
 }

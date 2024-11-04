@@ -23,6 +23,8 @@ namespace WorkManagementSolution.Employee
         public required string LastName { get; set; }
         public string? MotherName { get; set; }
 
+        #region Keys
+
         [ForeignKey(nameof(EmployeeDepartment))]
         public int? EmployeeDepartmentId { get; set; }
         public EmployeeDepartment? EmployeeDepartment { get; set; }
@@ -51,6 +53,20 @@ namespace WorkManagementSolution.Employee
 
         [ForeignKey(nameof(EmployeeCategory))]
         public int? EmployeeCategoryId { get; set; }
+
+        [ForeignKey(nameof(EmployeePersonalDetails))]
+        public int? EmployeePersonalDetailsId { get; set; }
+
+        [ForeignKey(nameof(EmployeeWorkInformation))]
+        public int? EmployeeWorkInformationId { get; set; }
+
+        [ForeignKey(nameof(EmployeeInsuranceDetails))]
+        public int? EmployeeInsuranceDetailsId { get; set; }
+
+        [ForeignKey(nameof(EmployeeAddresses))]
+        public int? EmployeeAddressesId { get; set; }
+
+        #endregion
         public EmployeeCategory? EmployeeCategory { get; set; }
         public EmployeePersonalDetails? EmployeePersonalDetails { get; set; }
 
@@ -66,6 +82,76 @@ namespace WorkManagementSolution.Employee
 
         public List<EmployeeDocuments>? EmployeeDocuments { get; set; }
 
+        public List<EmployeeLeaveSummary> EmployeeLeaves { get; set; }
+    }
+
+    public class EmployeeLeaveSummary : EmployeeDefaultLeaveSummary
+    {
+        public int EmployeeId { get; set; }
+     
+        [ForeignKey(nameof(EmployeeId))]
+        public Employee? employee { get; set; }
+        public double RemainingLeaves { get; set; }
+    }
+
+
+    public class EmployeeDefaultLeaveSummary : BaseEntity
+    {
+        [ForeignKey(nameof(EmployeeLeaveType))]
+        public int? EmployeeLeaveTypeId { get; set; }
+        public EmployeeLeaveType EmployeeLeaveTypes { get; set; }
+        public int TotalLeaves { get; set; }
+    }
+
+    public class EmployeeLeaveType : BaseEntity
+    {
+        public string Name { get; set; }
+        public bool IsPaid { get; set; }
+    }
+
+
+    public class EmployeeHoliday : BaseEntity
+    {
+
+        public string Name { get; set; }
+        public bool IsFloater { get; set; }
+
+        [DataType(DataType.Date)]
+        public DateTime StartDate { get; set; }
+
+        [DataType(DataType.Date)]
+        public DateTime EndDate { get; set; }
+    }
+
+    public class EmployeeLeave : BaseEntity
+    {
+        public int EmployeeId { get; set; }
+
+        [ForeignKey(nameof(EmployeeId))]
+        public Employee? employee { get; set; }
+
+        public LeaveStatus Status { get; set; }
+        public string? Description { get; set; }
+        public string? Reason { get; set; }
+
+        [DataType(DataType.Date)]
+        public DateTime StartDate { get; set; }
+
+        [DataType(DataType.Date)]
+        public DateTime EndDate { get; set; }
+        public double LeaveDays { get; set; }
+
+        [ForeignKey(nameof(EmployeeLeaveType))]
+        public int? EmployeeLeaveTypeId { get; set; }
+        public EmployeeLeaveType EmployeeLeaveTypes { get; set; }
+
+    }
+
+    public enum LeaveStatus
+    {
+        Approved,
+        Pending,
+        Rejected
     }
 
     public class EmployeeDocuments : BaseEntity

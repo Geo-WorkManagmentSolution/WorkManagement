@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -38,6 +39,7 @@ namespace WorkManagement.Service
             var Employee = await _dbContext.Employees.ToListAsync();
             return mapper.Map<List<EmployeeModel>>(Employee);
         }
+
 
         public async Task<List<EmployeeCategory>> GetEmployeeCategories()
         {
@@ -184,6 +186,45 @@ namespace WorkManagement.Service
             _dbContext.Employees.Remove(employee);
             await _dbContext.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<List<EmployeeLeaveSummary>> GetEmployeeLeaves(int employeeId)
+        {
+            var defaultLeaves = await _dbContext.EmployeeDefaultLeave.ToListAsync();
+            var defaultLeaveSummary = mapper.Map<List<EmployeeLeaveSummary>>(defaultLeaves);
+
+            return  _dbContext.EmployeeLeaveSummary.Where(x => x.EmployeeId == employeeId)?.ToList()?? defaultLeaveSummary;
+        }
+
+
+        public async Task<EmployeeLeave> AddLeave(EmployeeLeave employeeLeave, string loggedUserId)
+        {
+            //add validation in future
+            _dbContext.EmployeeLeaves.Add(employeeLeave);
+
+            var EmployeeId = _dbContext.Employees.First(x => x.UserId == Guid.Parse(loggedUserId)).Id;
+            var leaveSummary = await _dbContext.EmployeeLeaveSummary.FirstAsync(x => x.EmployeeId == EmployeeId && x.EmployeeLeaveTypeId == employeeLeave.EmployeeLeaveTypeId);
+            leaveSummary.RemainingLeaves = leaveSummary.RemainingLeaves - employeeLeave.LeaveDays;
+            _dbContext.EmployeeLeaveSummary.Update(leaveSummary);
+
+            await _dbContext.SaveChangesAsync();
+            return employeeLeave;
+        }
+
+        public async Task CancelLeave(int employeeLeaveId)
+        {
+            var QuarableCancel = _dbContext.EmployeeLeaves.Where(x => x.Id == employeeLeaveId);
+            var cancelLeaves = await QuarableCancel.FirstAsync();
+            var leaveSummary = await _dbContext.EmployeeLeaveSummary.FirstAsync(x => x.EmployeeId == cancelLeaves.EmployeeId && x.EmployeeLeaveTypeId == cancelLeaves.EmployeeLeaveTypeId);
+            leaveSummary.RemainingLeaves += cancelLeaves.LeaveDays;
+            await QuarableCancel.ExecuteDeleteAsync();
+        }
+
+        public async Task<EmployeeLeave> UpdateLeave(EmployeeLeave employeeLeave)
+        {
+            _dbContext.EmployeeLeaves.Update(employeeLeave);
+            await _dbContext.SaveChangesAsync();
+            return employeeLeave;
         }
     }
 }

@@ -131,6 +131,43 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.employeeDesignation,
       }),
     }),
+    getApiEmployeesByEmployeeIdLeavesCurrent: build.query<
+      GetApiEmployeesByEmployeeIdLeavesCurrentApiResponse,
+      GetApiEmployeesByEmployeeIdLeavesCurrentApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/${queryArg.employeeId}/leaves/current`,
+      }),
+    }),
+    putApiEmployeesByEmployeeIdLeavesAddLeave: build.mutation<
+      PutApiEmployeesByEmployeeIdLeavesAddLeaveApiResponse,
+      PutApiEmployeesByEmployeeIdLeavesAddLeaveApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/${queryArg.employeeId}/leaves/addLeave`,
+        method: "PUT",
+        body: queryArg.employeeLeave,
+      }),
+    }),
+    deleteApiEmployeesByEmployeeIdLeavesCancelLeave: build.mutation<
+      DeleteApiEmployeesByEmployeeIdLeavesCancelLeaveApiResponse,
+      DeleteApiEmployeesByEmployeeIdLeavesCancelLeaveApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/${queryArg.employeeId}/leaves/cancelLeave`,
+        method: "DELETE",
+        params: { employeeLeaveId: queryArg.employeeLeaveId },
+      }),
+    }),
+    getApiEmployeesByEmployeeIdLeavesUpdateLeave: build.query<
+      GetApiEmployeesByEmployeeIdLeavesUpdateLeaveApiResponse,
+      GetApiEmployeesByEmployeeIdLeavesUpdateLeaveApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/${queryArg.employeeId}/leaves/updateLeave`,
+        body: queryArg.employeeLeave,
+      }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -192,6 +229,29 @@ export type PostApiEmployeesAddNewSiteApiArg = {
 export type PostApiEmployeesAddNewDesignationApiResponse = unknown;
 export type PostApiEmployeesAddNewDesignationApiArg = {
   employeeDesignation: EmployeeDesignation;
+};
+export type GetApiEmployeesByEmployeeIdLeavesCurrentApiResponse =
+  /** status 200 OK */ EmployeeLeaveSummary[];
+export type GetApiEmployeesByEmployeeIdLeavesCurrentApiArg = {
+  employeeId: number;
+};
+export type PutApiEmployeesByEmployeeIdLeavesAddLeaveApiResponse =
+  /** status 200 OK */ EmployeeLeave;
+export type PutApiEmployeesByEmployeeIdLeavesAddLeaveApiArg = {
+  employeeId: string;
+  employeeLeave: EmployeeLeave;
+};
+export type DeleteApiEmployeesByEmployeeIdLeavesCancelLeaveApiResponse =
+  /** status 200 OK */ boolean;
+export type DeleteApiEmployeesByEmployeeIdLeavesCancelLeaveApiArg = {
+  employeeLeaveId?: number;
+  employeeId: string;
+};
+export type GetApiEmployeesByEmployeeIdLeavesUpdateLeaveApiResponse =
+  /** status 200 OK */ EmployeeLeave;
+export type GetApiEmployeesByEmployeeIdLeavesUpdateLeaveApiArg = {
+  employeeId: string;
+  employeeLeave: EmployeeLeave;
 };
 export type EmployeeCategory = {
   id?: number;
@@ -329,6 +389,22 @@ export type EmployeeDocuments = {
   employeeId?: number | null;
   employee?: Employee;
 };
+export type EmployeeLeaveType = {
+  id?: number;
+  isDeleted?: boolean;
+  name?: string | null;
+  isPaid?: boolean;
+};
+export type EmployeeLeaveSummary = {
+  id?: number;
+  isDeleted?: boolean;
+  employeeLeaveTypeId?: number | null;
+  employeeLeaveTypes?: EmployeeLeaveType;
+  totalLeaves?: number;
+  employeeId?: number;
+  employee?: Employee;
+  remainingLeaves?: number;
+};
 export type Employee = {
   id?: number;
   createdBy?: string;
@@ -357,6 +433,10 @@ export type Employee = {
   roleId: string;
   applicationRole?: ApplicationRole;
   employeeCategoryId?: number | null;
+  employeePersonalDetailsId?: number | null;
+  employeeWorkInformationId?: number | null;
+  employeeInsuranceDetailsId?: number | null;
+  employeeAddressesId?: number | null;
   employeeCategory?: EmployeeCategory;
   employeePersonalDetails?: EmployeePersonalDetails;
   employeeWorkInformation?: EmployeeWorkInformation;
@@ -366,6 +446,7 @@ export type Employee = {
   employeeEducationDetail?: EmployeeEducationDetail[] | null;
   employeeRelationshipDetails?: EmployeeRelationshipDetail[] | null;
   employeeDocuments?: EmployeeDocuments[] | null;
+  employeeLeaves?: EmployeeLeaveSummary[] | null;
 };
 export type EmployeePersonalDetails = {
   id?: number;
@@ -414,6 +495,20 @@ export type Criterion = {
   operator?: string | null;
   value?: any | null;
   nextOperator?: string | null;
+};
+export type EmployeeLeave = {
+  id?: number;
+  isDeleted?: boolean;
+  employeeId?: number;
+  employee?: Employee;
+  status?: LeaveStatus;
+  description?: string | null;
+  reason?: string | null;
+  startDate?: string;
+  endDate?: string;
+  leaveDays?: number;
+  employeeLeaveTypeId?: number | null;
+  employeeLeaveTypes?: EmployeeLeaveType;
 };
 export enum SalaryType {
   M = "M",
@@ -467,6 +562,11 @@ export enum RelationWithEmployee {
   FamilyMember = "FamilyMember",
   Other = "Other",
 }
+export enum LeaveStatus {
+  Approved = "Approved",
+  Pending = "Pending",
+  Rejected = "Rejected",
+}
 export const {
   useGetApiEmployeesQuery,
   useLazyGetApiEmployeesQuery,
@@ -491,4 +591,10 @@ export const {
   usePostApiEmployeesAddNewDepartmentMutation,
   usePostApiEmployeesAddNewSiteMutation,
   usePostApiEmployeesAddNewDesignationMutation,
+  useGetApiEmployeesByEmployeeIdLeavesCurrentQuery,
+  useLazyGetApiEmployeesByEmployeeIdLeavesCurrentQuery,
+  usePutApiEmployeesByEmployeeIdLeavesAddLeaveMutation,
+  useDeleteApiEmployeesByEmployeeIdLeavesCancelLeaveMutation,
+  useGetApiEmployeesByEmployeeIdLeavesUpdateLeaveQuery,
+  useLazyGetApiEmployeesByEmployeeIdLeavesUpdateLeaveQuery,
 } = injectedRtkApi;

@@ -31,12 +31,11 @@ import {
 	selectLeaveBalance
 } from '../../LeaveManagementSlice';
 import LeaveSummury from './LeaveSummury';
-
+import { useGetApiLeavesHolidaysQuery } from '../../LeavesApi';
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
 	'& .container': {
-		maxWidth: '100%!important',
-		
+		maxWidth: '100%!important'
 	},
 	'& a': {
 		color: `${theme.palette.text.primary}!important`,
@@ -47,9 +46,8 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
 		width: '100%'
 	},
 	'& .fc': {
-        height: '800px',
-		
-    },
+		height: '800px'
+	},
 	'& .fc-scrollgrid, & .fc-theme-standard td, & .fc-theme-standard th': {
 		borderColor: `${theme.palette.divider}!important`
 	},
@@ -126,10 +124,14 @@ export default function CalendarApp() {
 	const [alertMessage, setAlertMessage] = useState('');
 	const [alertOpen, setAlertOpen] = useState(false);
 	const calendarRef = useRef<FullCalendar>(null);
+	const {
+		data: holidaysData,
+		isLoading,
+		isError
+	} = useGetApiLeavesHolidaysQuery();
 	const theme = useTheme();
 
 	const openEventDialoge = (event: Event) => {
-		
 		setIsNewEvent(false);
 		setSelectedEvent({
 			id: event.id,
@@ -138,9 +140,9 @@ export default function CalendarApp() {
 			leaveType: event.leaveType || 'Casual Leave',
 			halfDay: event.halfDay || false,
 			fullDay: event.fullDay || false,
-			start:  new Date(event.start) || new Date(),
+			start: new Date(event.start) || new Date(),
 			end: new Date(event.end),
-			isApproved:event.isApproved
+			isApproved: event.isApproved
 		});
 
 		setAnchorEl(document.body);
@@ -180,7 +182,7 @@ export default function CalendarApp() {
 			fullDay: false,
 			start,
 			end,
-			isApproved:false
+			isApproved: false
 		});
 		setAnchorEl(selectInfo.jsEvent.target as HTMLElement);
 	};
@@ -197,7 +199,7 @@ export default function CalendarApp() {
 			fullDay: eventData.extendedProps.fullDay || false,
 			start: clickInfo.event.start || new Date(),
 			end: eventData.end,
-			isApproved:eventData.extendedProps.isApproved 
+			isApproved: eventData.extendedProps.isApproved
 		});
 		setAnchorEl(clickInfo.jsEvent.target as HTMLElement);
 	};
@@ -284,7 +286,7 @@ export default function CalendarApp() {
 			fullDay: false,
 			start: new Date(),
 			end: new Date(),
-			isApproved:false
+			isApproved: false
 		});
 		setAnchorEl(document.body);
 	};
@@ -327,7 +329,6 @@ export default function CalendarApp() {
 				<>
 					<div className={`${tabValue !== 'Calendar View' ? 'hidden' : ''} w-full`}>
 						<FullCalendar
-						
 							plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
 							headerToolbar={false}
 							initialView="dayGridMonth"
@@ -337,10 +338,18 @@ export default function CalendarApp() {
 							dayMaxEvents
 							weekends
 							// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-							events={filteredEvents.map((event) => ({
-								...event,
-								// Adjust end date for display purposes
-								end: new Date(new Date(event.end).setDate(new Date(event.end).getDate() + 1))
+							// events={filteredEvents.map((event) => ({
+							// 	...event,
+							// 	// Adjust end date for display purposes
+							// 	end: new Date(new Date(event.end).setDate(new Date(event.end).getDate() + 1))
+							// }))}
+							events={holidaysData?.map((event) => ({
+								id:event.id.toString(),
+								start:event.startDate,
+								end:event.endDate,
+								reason: event.name,
+								summary: event.name,					
+								extendedProps:{isHoliday:true}
 							}))}
 							select={handleDateSelect}
 							eventClick={(clickInfo) => {

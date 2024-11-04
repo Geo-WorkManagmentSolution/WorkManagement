@@ -73,6 +73,8 @@ try
     builder.Services.AddScoped<IEmployeeService, EmployeeService>();
     builder.Services.AddScoped<IProjectService, ProjectServices>();
     builder.Services.AddScoped<IEmailService, EmailService>();
+    builder.Services.AddScoped<ILeavesService, LeavesService>();
+
     builder.Services.AddCors();
     builder.Services.AddSwaggerGen(option =>
     {
@@ -105,6 +107,8 @@ try
     builder.Services.AddTransient<AdvanceSearchService>();
     builder.Services.AddTransient<ProjectServices>();
     builder.Services.AddTransient<EmailService>();
+    builder.Services.AddTransient<LeavesService>();
+
     builder.Services.AddAutoMapper(typeof(WorkManagement.Domain.AutoMapper.Profiles.EmployeeProfile).Assembly);
 
     builder.AddJWTAuthetication();

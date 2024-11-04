@@ -23,6 +23,9 @@ namespace WorkManagement.Domain.AutoMapper.Profiles
             CreateMap<EmployeePersonalDetails, EmployeePersonalDetailsModel>();
             CreateMap<EmployeePersonalDetailsModel, EmployeePersonalDetails>();
 
+
+            CreateMap<EmployeeDefaultLeaveSummary, EmployeeLeaveSummary>()
+                .ForMember(dest=>dest.RemainingLeaves,src=>src.MapFrom(x=>x.TotalLeaves));
         }
     }
 

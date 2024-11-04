@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -182,6 +183,42 @@ namespace WorkManagement.API.Controllers
             var newOption = await employeeService.AddNewDesignation(site);
             return Ok(newOption);
         }
+
+        // GET api/employee/1/leaves/current
+        [HttpGet("{employeeId}/leaves/current")]
+        public async Task<ActionResult<IEnumerable<EmployeeLeaveSummary>>> GetEmployeeLeaves(int employeeId)
+        {
+            var leaves = await employeeService.GetEmployeeLeaves(employeeId);
+            return Ok(leaves);
+        }
+
+
+        // GET api/employee/1/leaves/addLeave
+        [HttpPut("{employeeId}/leaves/addLeave")]
+        public async Task<ActionResult<EmployeeLeave>> AddLeave(EmployeeLeave employeeLeave)
+        {
+            var leaves = await employeeService.AddLeave(employeeLeave, User.Identity.GetUserId());
+            return Ok(leaves);
+        }
+
+
+        // GET api/employee/1/leaves/CancelLeave
+        [HttpDelete("{employeeId}/leaves/cancelLeave")]
+        public async Task<ActionResult<bool>> CancelLeave(int employeeLeaveId)
+        {
+            await employeeService.CancelLeave(employeeLeaveId);
+            return Ok(true);
+        }
+
+        // GET api/employee/1/leaves/CancelLeave
+        [HttpGet("{employeeId}/leaves/updateLeave")]
+        public async Task<ActionResult<EmployeeLeave>> UpdateLeave(EmployeeLeave employeeLeave)
+        {
+            var leaves = await employeeService.UpdateLeave(employeeLeave);
+            return Ok(leaves);
+        }
+
+
     }
 
 }

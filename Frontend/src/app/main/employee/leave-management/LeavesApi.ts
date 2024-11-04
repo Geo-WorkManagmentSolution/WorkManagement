@@ -1,79 +1,93 @@
 import { apiService as api } from "app/store/apiService";
 const injectedRtkApi = api.injectEndpoints({
   endpoints: (build) => ({
-    getApiProject: build.query<GetApiProjectApiResponse, GetApiProjectApiArg>({
-      query: () => ({ url: `/api/Project` }),
-    }),
-    postApiProject: build.mutation<
-      PostApiProjectApiResponse,
-      PostApiProjectApiArg
+    getApiEmployeesByEmployeeIdLeavesCurrent: build.query<
+      GetApiEmployeesByEmployeeIdLeavesCurrentApiResponse,
+      GetApiEmployeesByEmployeeIdLeavesCurrentApiArg
     >({
       query: (queryArg) => ({
-        url: `/api/Project`,
-        method: "POST",
-        body: queryArg.projectModel,
+        url: `/api/Employees/${queryArg.employeeId}/leaves/current`,
       }),
     }),
-    getApiProjectById: build.query<
-      GetApiProjectByIdApiResponse,
-      GetApiProjectByIdApiArg
-    >({
-      query: (queryArg) => ({ url: `/api/Project/${queryArg.id}` }),
-    }),
-    putApiProjectById: build.mutation<
-      PutApiProjectByIdApiResponse,
-      PutApiProjectByIdApiArg
+    putApiEmployeesByEmployeeIdLeavesAddLeave: build.mutation<
+      PutApiEmployeesByEmployeeIdLeavesAddLeaveApiResponse,
+      PutApiEmployeesByEmployeeIdLeavesAddLeaveApiArg
     >({
       query: (queryArg) => ({
-        url: `/api/Project/${queryArg.id}`,
+        url: `/api/Employees/${queryArg.employeeId}/leaves/addLeave`,
         method: "PUT",
-        body: queryArg.projectModel,
+        body: queryArg.employeeLeave,
       }),
     }),
-    deleteApiProjectById: build.mutation<
-      DeleteApiProjectByIdApiResponse,
-      DeleteApiProjectByIdApiArg
+    deleteApiEmployeesByEmployeeIdLeavesCancelLeave: build.mutation<
+      DeleteApiEmployeesByEmployeeIdLeavesCancelLeaveApiResponse,
+      DeleteApiEmployeesByEmployeeIdLeavesCancelLeaveApiArg
     >({
       query: (queryArg) => ({
-        url: `/api/Project/${queryArg.id}`,
+        url: `/api/Employees/${queryArg.employeeId}/leaves/cancelLeave`,
         method: "DELETE",
+        params: { employeeLeaveId: queryArg.employeeLeaveId },
       }),
+    }),
+    getApiEmployeesByEmployeeIdLeavesUpdateLeave: build.query<
+      GetApiEmployeesByEmployeeIdLeavesUpdateLeaveApiResponse,
+      GetApiEmployeesByEmployeeIdLeavesUpdateLeaveApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/${queryArg.employeeId}/leaves/updateLeave`,
+        body: queryArg.employeeLeave,
+      }),
+    }),
+    getApiLeavesHolidays: build.query<
+      GetApiLeavesHolidaysApiResponse,
+      GetApiLeavesHolidaysApiArg
+    >({
+      query: () => ({ url: `/api/Leaves/holidays` }),
+    }),
+    getApiLeavesLeavesHistory: build.query<
+      GetApiLeavesLeavesHistoryApiResponse,
+      GetApiLeavesLeavesHistoryApiArg
+    >({
+      query: () => ({ url: `/api/Leaves/leaves/history` }),
     }),
   }),
   overrideExisting: false,
 });
 export { injectedRtkApi as enhancedApi };
-export type GetApiProjectApiResponse = /** status 200 OK */ ProjectModel[];
-export type GetApiProjectApiArg = void;
-export type PostApiProjectApiResponse = /** status 200 OK */ EmployeeModel;
-export type PostApiProjectApiArg = {
-  projectModel: ProjectModel;
+export type GetApiEmployeesByEmployeeIdLeavesCurrentApiResponse =
+  /** status 200 OK */ EmployeeLeaveSummary[];
+export type GetApiEmployeesByEmployeeIdLeavesCurrentApiArg = {
+  employeeId: number;
 };
-export type GetApiProjectByIdApiResponse = /** status 200 OK */ ProjectModel;
-export type GetApiProjectByIdApiArg = {
-  id: number;
+export type PutApiEmployeesByEmployeeIdLeavesAddLeaveApiResponse =
+  /** status 200 OK */ EmployeeLeave;
+export type PutApiEmployeesByEmployeeIdLeavesAddLeaveApiArg = {
+  employeeId: string;
+  employeeLeave: EmployeeLeave;
 };
-export type PutApiProjectByIdApiResponse = unknown;
-export type PutApiProjectByIdApiArg = {
-  id: number;
-  projectModel: ProjectModel;
+export type DeleteApiEmployeesByEmployeeIdLeavesCancelLeaveApiResponse =
+  /** status 200 OK */ boolean;
+export type DeleteApiEmployeesByEmployeeIdLeavesCancelLeaveApiArg = {
+  employeeLeaveId?: number;
+  employeeId: string;
 };
-export type DeleteApiProjectByIdApiResponse = unknown;
-export type DeleteApiProjectByIdApiArg = {
-  id: number;
+export type GetApiEmployeesByEmployeeIdLeavesUpdateLeaveApiResponse =
+  /** status 200 OK */ EmployeeLeave;
+export type GetApiEmployeesByEmployeeIdLeavesUpdateLeaveApiArg = {
+  employeeId: string;
+  employeeLeave: EmployeeLeave;
 };
-export type ProjectModel = {
-  id?: number;
-  projectName?: string | null;
-  projectNumber?: string | null;
-  projectDescription?: string | null;
-  startDate?: string;
-  endDate?: string | null;
-};
-export type EmployeeCategory = {
+export type GetApiLeavesHolidaysApiResponse =
+  /** status 200 OK */ EmployeeHoliday[];
+export type GetApiLeavesHolidaysApiArg = void;
+export type GetApiLeavesLeavesHistoryApiResponse =
+  /** status 200 OK */ EmployeeLeave[];
+export type GetApiLeavesLeavesHistoryApiArg = void;
+export type EmployeeLeaveType = {
   id?: number;
   isDeleted?: boolean;
   name?: string | null;
+  isPaid?: boolean;
 };
 export type EmployeeDepartment = {
   id?: number;
@@ -108,6 +122,22 @@ export type ApplicationRole = {
   name?: string | null;
   normalizedName?: string | null;
   concurrencyStamp?: string | null;
+};
+export type EmployeeCategory = {
+  id?: number;
+  isDeleted?: boolean;
+  name?: string | null;
+};
+export type EmployeePersonalDetails = {
+  id?: number;
+  isDeleted?: boolean;
+  employeeId?: number | null;
+  employee?: Employee;
+  dateOfBirth?: string | null;
+  gender: string | null;
+  maritalStatus?: MaritalStatus;
+  bloodGroup?: BloodGroup;
+  relationWithEmployee?: RelationWithEmployee;
 };
 export type Site = {
   id?: number;
@@ -206,22 +236,6 @@ export type EmployeeDocuments = {
   employeeId?: number | null;
   employee?: Employee;
 };
-export type EmployeeLeaveType = {
-  id?: number;
-  isDeleted?: boolean;
-  name?: string | null;
-  isPaid?: boolean;
-};
-export type EmployeeLeaveSummary = {
-  id?: number;
-  isDeleted?: boolean;
-  employeeLeaveTypeId?: number | null;
-  employeeLeaveTypes?: EmployeeLeaveType;
-  totalLeaves?: number;
-  employeeId?: number;
-  employee?: Employee;
-  remainingLeaves?: number;
-};
 export type Employee = {
   id?: number;
   createdBy?: string;
@@ -265,68 +279,38 @@ export type Employee = {
   employeeDocuments?: EmployeeDocuments[] | null;
   employeeLeaves?: EmployeeLeaveSummary[] | null;
 };
-export type EmployeePersonalDetails = {
+export type EmployeeLeaveSummary = {
   id?: number;
   isDeleted?: boolean;
-  employeeId?: number | null;
+  employeeLeaveTypeId?: number | null;
+  employeeLeaveTypes?: EmployeeLeaveType;
+  totalLeaves?: number;
+  employeeId?: number;
   employee?: Employee;
-  dateOfBirth?: string | null;
-  gender: string | null;
-  maritalStatus?: MaritalStatus;
-  bloodGroup?: BloodGroup;
-  relationWithEmployee?: RelationWithEmployee;
+  remainingLeaves?: number;
 };
-export type EmployeeModel = {
+export type EmployeeLeave = {
   id?: number;
-  photoURL?: string | null;
-  employeeNumber?: number | null;
-  firstName: string | null;
-  middleName: string | null;
-  lastName: string | null;
-  motherName: string | null;
-  email: string | null;
-  alternateEmail?: string | null;
-  phoneNumber?: number | null;
-  alternateNumber?: number | null;
-  position?: string | null;
-  isDeleted?: boolean | null;
-  userId?: string | null;
-  roleId: string;
-  employeeCategoryId: number;
-  employeeCategory?: EmployeeCategory;
-  employeeDepartmentId?: number | null;
-  employeeDepartment?: EmployeeDepartment;
-  employeeDesignationId?: number | null;
-  employeeDesignation?: EmployeeDesignation;
-  employeePersonalDetails?: EmployeePersonalDetails;
-  employeeWorkInformation?: EmployeeWorkInformation;
-  employeeInsuranceDetails?: EmployeeInsuranceDetail;
-  employeeAddresses?: EmployeeAddress;
-  employeeIdentityInfos?: EmployeeIdentityInfo;
-  employeeEducationDetail?: EmployeeEducationDetail[] | null;
-  employeeRelationshipDetails?: EmployeeRelationshipDetail[] | null;
-  employeeDocuments?: EmployeeDocuments[] | null;
+  isDeleted?: boolean;
+  employeeId?: number;
+  employee?: Employee;
+  status?: LeaveStatus;
+  description?: string | null;
+  reason?: string | null;
+  startDate?: string;
+  endDate?: string;
+  leaveDays?: number;
+  employeeLeaveTypeId?: number | null;
+  employeeLeaveTypes?: EmployeeLeaveType;
 };
-export enum SalaryType {
-  M = "M",
-  F = "F",
-}
-export enum RelationshipType {
-  Parent = "Parent",
-  Spouse = "Spouse",
-  FamilyMember = "FamilyMember",
-  Friend = "Friend",
-  Other = "Other",
-}
-export enum FileType {
-  Pdf = "PDF",
-  Docx = "DOCX",
-  Txt = "TXT",
-  Zip = "ZIP",
-  Xlsx = "XLSX",
-  Csv = "CSV",
-  Other = "Other",
-}
+export type EmployeeHoliday = {
+  id?: number;
+  isDeleted?: boolean;
+  name?: string | null;
+  isFloater?: boolean;
+  startDate?: string;
+  endDate?: string;
+};
 export enum MaritalStatus {
   Unknown = "Unknown",
   Single = "Single",
@@ -359,12 +343,40 @@ export enum RelationWithEmployee {
   FamilyMember = "FamilyMember",
   Other = "Other",
 }
+export enum SalaryType {
+  M = "M",
+  F = "F",
+}
+export enum RelationshipType {
+  Parent = "Parent",
+  Spouse = "Spouse",
+  FamilyMember = "FamilyMember",
+  Friend = "Friend",
+  Other = "Other",
+}
+export enum FileType {
+  Pdf = "PDF",
+  Docx = "DOCX",
+  Txt = "TXT",
+  Zip = "ZIP",
+  Xlsx = "XLSX",
+  Csv = "CSV",
+  Other = "Other",
+}
+export enum LeaveStatus {
+  Approved = "Approved",
+  Pending = "Pending",
+  Rejected = "Rejected",
+}
 export const {
-  useGetApiProjectQuery,
-  useLazyGetApiProjectQuery,
-  usePostApiProjectMutation,
-  useGetApiProjectByIdQuery,
-  useLazyGetApiProjectByIdQuery,
-  usePutApiProjectByIdMutation,
-  useDeleteApiProjectByIdMutation,
+  useGetApiEmployeesByEmployeeIdLeavesCurrentQuery,
+  useLazyGetApiEmployeesByEmployeeIdLeavesCurrentQuery,
+  usePutApiEmployeesByEmployeeIdLeavesAddLeaveMutation,
+  useDeleteApiEmployeesByEmployeeIdLeavesCancelLeaveMutation,
+  useGetApiEmployeesByEmployeeIdLeavesUpdateLeaveQuery,
+  useLazyGetApiEmployeesByEmployeeIdLeavesUpdateLeaveQuery,
+  useGetApiLeavesHolidaysQuery,
+  useLazyGetApiLeavesHolidaysQuery,
+  useGetApiLeavesLeavesHistoryQuery,
+  useLazyGetApiLeavesLeavesHistoryQuery,
 } = injectedRtkApi;
