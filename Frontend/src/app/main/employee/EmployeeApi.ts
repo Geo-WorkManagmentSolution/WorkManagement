@@ -131,20 +131,18 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.employeeDesignation,
       }),
     }),
-    getApiEmployeesByEmployeeIdLeavesCurrent: build.query<
-      GetApiEmployeesByEmployeeIdLeavesCurrentApiResponse,
-      GetApiEmployeesByEmployeeIdLeavesCurrentApiArg
+    getApiEmployeesLeavesCurrent: build.query<
+      GetApiEmployeesLeavesCurrentApiResponse,
+      GetApiEmployeesLeavesCurrentApiArg
     >({
-      query: (queryArg) => ({
-        url: `/api/Employees/${queryArg.employeeId}/leaves/current`,
-      }),
+      query: () => ({ url: `/api/Employees/leaves/current` }),
     }),
-    putApiEmployeesByEmployeeIdLeavesAddLeave: build.mutation<
-      PutApiEmployeesByEmployeeIdLeavesAddLeaveApiResponse,
-      PutApiEmployeesByEmployeeIdLeavesAddLeaveApiArg
+    putApiEmployeesLeavesAddLeave: build.mutation<
+      PutApiEmployeesLeavesAddLeaveApiResponse,
+      PutApiEmployeesLeavesAddLeaveApiArg
     >({
       query: (queryArg) => ({
-        url: `/api/Employees/${queryArg.employeeId}/leaves/addLeave`,
+        url: `/api/Employees/leaves/addLeave`,
         method: "PUT",
         body: queryArg.employeeLeave,
       }),
@@ -230,15 +228,12 @@ export type PostApiEmployeesAddNewDesignationApiResponse = unknown;
 export type PostApiEmployeesAddNewDesignationApiArg = {
   employeeDesignation: EmployeeDesignation;
 };
-export type GetApiEmployeesByEmployeeIdLeavesCurrentApiResponse =
-  /** status 200 OK */ EmployeeLeaveSummary[];
-export type GetApiEmployeesByEmployeeIdLeavesCurrentApiArg = {
-  employeeId: number;
-};
-export type PutApiEmployeesByEmployeeIdLeavesAddLeaveApiResponse =
+export type GetApiEmployeesLeavesCurrentApiResponse =
+  /** status 200 OK */ EmployeeLeaveSummaryModel[];
+export type GetApiEmployeesLeavesCurrentApiArg = void;
+export type PutApiEmployeesLeavesAddLeaveApiResponse =
   /** status 200 OK */ EmployeeLeave;
-export type PutApiEmployeesByEmployeeIdLeavesAddLeaveApiArg = {
-  employeeId: string;
+export type PutApiEmployeesLeavesAddLeaveApiArg = {
   employeeLeave: EmployeeLeave;
 };
 export type DeleteApiEmployeesByEmployeeIdLeavesCancelLeaveApiResponse =
@@ -496,6 +491,12 @@ export type Criterion = {
   value?: any | null;
   nextOperator?: string | null;
 };
+export type EmployeeLeaveSummaryModel = {
+  id?: number;
+  employeeLeaveType?: string | null;
+  totalLeaves?: number;
+  remainingLeaves?: number;
+};
 export type EmployeeLeave = {
   id?: number;
   isDeleted?: boolean;
@@ -591,9 +592,9 @@ export const {
   usePostApiEmployeesAddNewDepartmentMutation,
   usePostApiEmployeesAddNewSiteMutation,
   usePostApiEmployeesAddNewDesignationMutation,
-  useGetApiEmployeesByEmployeeIdLeavesCurrentQuery,
-  useLazyGetApiEmployeesByEmployeeIdLeavesCurrentQuery,
-  usePutApiEmployeesByEmployeeIdLeavesAddLeaveMutation,
+  useGetApiEmployeesLeavesCurrentQuery,
+  useLazyGetApiEmployeesLeavesCurrentQuery,
+  usePutApiEmployeesLeavesAddLeaveMutation,
   useDeleteApiEmployeesByEmployeeIdLeavesCancelLeaveMutation,
   useGetApiEmployeesByEmployeeIdLeavesUpdateLeaveQuery,
   useLazyGetApiEmployeesByEmployeeIdLeavesUpdateLeaveQuery,

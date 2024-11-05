@@ -10,7 +10,9 @@ import {
 	Box,
 	Collapse,
 	Alert,
-	IconButton
+	IconButton,
+	Select,
+	MenuItem
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import { Controller, useForm } from 'react-hook-form';
@@ -19,30 +21,33 @@ import { z } from 'zod';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { GridCloseIcon } from '@mui/x-data-grid';
 import { Event, LeaveBalance } from '../types';
+import {useGetApiEmployeesLeavesCurrentQuery, EmployeeLeave, EmployeeLeaveType, LeaveStatus } from '../../LeavesApi';
 import EventLabelSelect from './EventLabelSelect';
+import { data } from 'autoprefixer';
 
 interface EventDialogProps {
-	event: Event | null;
+	event: EmployeeLeave | null;
 	isNewEvent: boolean;
 	anchorEl: HTMLElement | null;
 	onClose: () => void;
-	onSave: (event: Event) => void;
-	onDelete: (eventId: string) => void;
-	leaveBalance: LeaveBalance;
+	onSave: (event: EmployeeLeave) => void;
+	onDelete: (eventId: number) => void;
+	leaveBalance: Record<string, number>;
 	alertMessage: string;
 	setAlertOpen: (value: boolean) => void;
 	alertopen: boolean;
 }
 
 const eventSchema = z.object({
-	id: z.string(),
-	start: z.date(),
-	end: z.date(),
-	reason: z.string().nonempty({ message: 'Reason is required' }),
-	summary: z.string().nonempty({ message: 'Summary is required' }),
-	leaveType: z.string(),
-	halfDay: z.boolean(),
-	fullDay: z.boolean()
+  id: z.number(),
+  startDate: z.string(),
+  endDate: z.string(),
+  reason: z.string().nonempty({ message: 'Reason is required' }),
+  description: z.string().nonempty({ message: 'Description is required' }),
+  employeeLeaveTypeId: z.number(),
+  status: z.nativeEnum(LeaveStatus),
+  leaveDays: z.number().min(0.5),
+  employeeId: z.number()
 });
 
 export default function EventDialog({
@@ -52,66 +57,68 @@ export default function EventDialog({
 	onClose,
 	onSave,
 	onDelete,
-	leaveBalance,
 	alertMessage,
-  alertOpen,
-  setAlertOpen
-}: EventDialogProps) {
+	alertOpen,
+	setAlertOpen
+  }: EventDialogProps) {
 	const {
-		control,
-		handleSubmit,
-		reset,
-		watch,
-		setValue,
-		formState: { errors }
-	} = useForm<Event>({
-		resolver: zodResolver(eventSchema),
-		defaultValues: event || {
-			id: '',
-			start: new Date(),
-			end: new Date(),
-			reason: '',
-			summary: '',
-			leaveType: 'Casual Leave',
-			halfDay: false,
-			fullDay: false
-		}
+	  control,
+	  handleSubmit,
+	  reset,
+	  watch,
+	  setValue,
+	  formState: { errors }
+	} = useForm<EmployeeLeave>({
+	  resolver: zodResolver(eventSchema),
+	  defaultValues: event || {
+		id: 0,
+		startDate: new Date().toISOString(),
+		endDate: new Date().toISOString(),
+		reason: '',
+		description: '',
+		employeeLeaveTypeId: 1,
+		status: LeaveStatus.Pending,
+		leaveDays: 1,
+		employeeId: 1 // Replace with actual employee ID
+	  }
 	});
 
 	React.useEffect(() => {
-		reset(
-			event || {
-				id: '',
-				start: new Date(),
-				end: new Date(),
-				reason: '',
-				summary: '',
-				leaveType: 'Casual Leave',
-				halfDay: false,
-				fullDay: false
-			}
-		);
-	}, [event, reset]);
+		reset(event || {
+		  id: 0,
+		  startDate: new Date().toISOString(),
+		  endDate: new Date().toISOString(),
+		  reason: '',
+		  description: '',
+		  employeeLeaveTypeId: 1,
+		  status: LeaveStatus.Pending,
+		  leaveDays: 1,			
+		
+		});
+	  }, [event, reset]);
+	  const {data:EmployeeLeaveSummary}=useGetApiEmployeesLeavesCurrentQuery();
 
-	const handleSave = (data: Event) => {
+
+
+	const handleSave = (data: EmployeeLeave) => {
 		onSave(data);
 	};
 
 	const handleDelete = () => {
 		if (event) {
-			onDelete(event.id);
+		  onDelete(event.id);
 		}
-
 		onClose();
-	};
+	  };
 
-	const reasonValue = watch('reason');
-	const summaryValue = watch('summary');
+	  const reasonValue = watch('reason');
+	  const descriptionValue = watch('description');
+	  const employeeLeaveTypeId = watch('employeeLeaveTypeId');
 	const fullDay = watch('fullDay');
 	const halfDay = watch('halfDay');
-	const leaveType = watch('leaveType');
+	
 
-	const isSaveButtonDisabled = !reasonValue || !summaryValue || (!fullDay && !halfDay);
+	const isSaveButtonDisabled = !reasonValue || !descriptionValue || (!fullDay && !halfDay);
 
 	const handleFullDayChange = (checked: boolean) => {
 		setValue('fullDay', checked);
@@ -174,7 +181,7 @@ export default function EventDialog({
 			>
 				<div className="flex sm:space-x-24 mb-16">
 					<FuseSvgIcon
-						className="hidden sm:inline-flex mt-16"
+						className="sm:inline-flex mt-16"
 						color="action"
 					>
 						heroicons-outline:calendar
@@ -182,27 +189,27 @@ export default function EventDialog({
 					<div className="w-full">
 						<div className="flex flex-column sm:flex-row w-full items-center space-x-16">
 							<Controller
-								name="start"
+								 name="startDate"
 								control={control}
 								render={({ field }) => (
 									<DatePicker
 										className="mt-8 mb-16 w-full"
 										label="From"
-										value={field.value}
-										onChange={(date) => field.onChange(date)}
-									/>
+										value={new Date(field.value)}
+										onChange={(date) => field.onChange(date?.toISOString())}
+										/>
 								)}
 							/>
 							<Controller
-								name="end"
+								 name="endDate"
 								control={control}
 								render={({ field }) => (
 									<DatePicker
 										className="mt-8 mb-16 w-full"
 										label="To"
-										value={field.value}
-										onChange={(date) => field.onChange(date)}
-									/>
+										value={new Date(field.value)}
+										onChange={(date) => field.onChange(date?.toISOString())}
+										/>
 								)}
 							/>
 						</div>
@@ -241,13 +248,13 @@ export default function EventDialog({
 				</div>
 				<div className="flex sm:space-x-24 mb-16">
 					<FuseSvgIcon
-						className="hidden sm:inline-flex mt-16"
+						className=" sm:inline-flex mt-16"
 						color="action"
 					>
 						heroicons-outline:tag
 					</FuseSvgIcon>
-					<Controller
-						name="leaveType"
+					{/* <Controller
+						 name="employeeLeaveTypeId"
 						control={control}
 						render={({ field }) => (
 							<EventLabelSelect
@@ -255,11 +262,33 @@ export default function EventDialog({
 								value={field.value}
 							/>
 						)}
-					/>
+					/> */}
+					  <Controller
+          name="employeeLeaveTypeId"
+          control={control}
+          rules={{ required: 'Leave type is required' }}
+          render={({ field }) => (
+            <Select
+              {...field}
+              className="mt-8 mb-16 w-full"
+              label="Leave Type"
+              error={!!errors.employeeLeaveTypeId}
+            >
+              {EmployeeLeaveSummary.map((type) => (
+                <MenuItem key={type.id} value={type.id}>
+                  {type.employeeLeaveType}
+                </MenuItem>
+              ))}
+            </Select>
+          )}
+        />
+        {errors.employeeLeaveTypeId && (
+          <Typography color="error">{errors.employeeLeaveTypeId.message}</Typography>
+        )}
 				</div>
 				<div className="flex sm:space-x-24 mb-16">
 					<FuseSvgIcon
-						className="hidden sm:inline-flex mt-16"
+						className="sm:inline-flex mt-16"
 						color="action"
 					>
 						heroicons-outline:pencil-square
@@ -284,40 +313,41 @@ export default function EventDialog({
 				</div>
 				<div className="flex sm:space-x-24 mb-16">
 					<FuseSvgIcon
-						className="hidden sm:inline-flex mt-16"
+						className=" sm:inline-flex mt-16"
 						color="action"
 					>
 						heroicons-outline:bars-3-bottom-left
 					</FuseSvgIcon>
 					<Controller
-						name="summary"
-						control={control}
-						render={({ field }) => (
-							<TextareaAutosize
-								placeholder="Summary"
-								className="mt-8 mb-16 w-full p-2 border rounded bg-inherit"
-								minRows={3}
-								autoFocus
-								required
-								{...field}
-							/>
-						)}
-					/>
-					{errors?.summary && (
-						<span style={{ color: 'red', marginTop: '-15px' }}>{errors.summary?.message}</span>
-					)}
+            name="description"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                className="mt-8 mb-16"
+                label="Description"
+                variant="outlined"
+                multiline
+                rows={3}
+                fullWidth
+                error={!!errors.description}
+                helperText={errors.description?.message}
+                required
+              />
+            )}
+          />
 				</div>
 				<div className="flex sm:space-x-24 mb-16">
 					<FuseSvgIcon
-						className="hidden sm:inline-flex "
+						className="sm:inline-flex "
 						color="action"
 					>
 						heroicons-outline:information-circle
 					</FuseSvgIcon>
 					<Typography>
-						Available {leaveType} Balance:{' '}
-						{leaveBalance && leaveBalance[leaveType] !== undefined ? leaveBalance[leaveType] : 'N/A'}
-					</Typography>
+            Available {EmployeeLeaveSummary.find(t => t.id === employeeLeaveTypeId)?.employeeLeaveType} Balance:
+            {EmployeeLeaveSummary.find(t => t.id === employeeLeaveTypeId)?.remainingLeaves || ''}
+          </Typography>
 				</div>
 				<div className="flex justify-between">
 					<Button
@@ -326,7 +356,7 @@ export default function EventDialog({
 						variant="contained"
 						color="primary"
 					>
-						{isNewEvent ? 'Add' : 'Update'}
+						{isNewEvent ? 'Apply' : 'Update'}
 					</Button>
 					{!isNewEvent && (
 						<Button

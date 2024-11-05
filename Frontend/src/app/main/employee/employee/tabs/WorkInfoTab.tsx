@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { TextField, MenuItem, InputAdornment, Typography, Autocomplete } from '@mui/material';
-import { Controller, useFormContext } from 'react-hook-form';
+import { TextField, MenuItem, InputAdornment, Typography, Autocomplete, FormControlLabel, Checkbox } from '@mui/material';
+import { Controller, useFieldArray, useFormContext } from 'react-hook-form';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { DatePicker } from '@mui/x-date-pickers';
-import { SalaryType, useGetApiEmployeesDepartmentsQuery, useGetApiEmployeesSitesQuery, usePostApiEmployeesAddNewSiteMutation } from '../../EmployeeApi';
+import { SalaryType, useGetApiEmployeesDepartmentsQuery, useGetApiEmployeesLeavesCurrentQuery, useGetApiEmployeesSitesQuery, usePostApiEmployeesAddNewSiteMutation } from '../../EmployeeApi';
 import EnhancedAutocomplete from '../EnhancedAutocomplete';
+import { useState } from 'react';
 
 /**
  * The basic info tab.
@@ -16,6 +17,15 @@ function WorkInfoTab() {
 	const { errors } = formState;
 	const { data: employeesDepartmentsOptions = [] } = useGetApiEmployeesDepartmentsQuery();
 	const { data: employeesSiteOptions = [] } = useGetApiEmployeesSitesQuery();
+	const { data: employeeLeaveTypes = [] } = useGetApiEmployeesLeavesCurrentQuery();
+
+	const [useDefaultLeaves, setUseDefaultLeaves] = useState(true);
+
+	
+	const { fields, append, remove } = useFieldArray({
+		control,
+		name: 'employeeLeaves'
+	});
 
 	const [AddSite] = usePostApiEmployeesAddNewSiteMutation();
 
@@ -338,8 +348,77 @@ function WorkInfoTab() {
 							/>
 						)}
 					/>
+				
 				</div>
 			</div>
+			<div className="space-y-16">
+        <div className="flex items-center border-b-1 space-x-8 pb-8">
+          <FuseSvgIcon color="action" size={24}>
+            heroicons-outline:user-circle
+          </FuseSvgIcon>
+          <Typography className="text-2xl" color="text.secondary">
+            Leave Information 
+          </Typography>
+        </div>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={useDefaultLeaves}
+              onChange={(e) => setUseDefaultLeaves(e.target.checked)}
+            />
+          }
+          label="Use Default Leaves"
+        />
+        {!useDefaultLeaves && (
+          <div className="space-y-4">
+            {employeeLeaveTypes.map((field1, index) => (
+              <div key={index} className="flex space-x-4 mb-4">
+                <div className="flex-1">
+                  <Controller
+                    name={`employeeLeaves.${index}.employeeLeaveTypeId`}
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        value={field1.employeeLeaveType}
+                        label="Employee Leave Type"
+                        fullWidth
+                        type="text"
+						InputLabelProps={{ shrink: true, }}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                        margin="normal"
+                        className="mx-4"
+                      />
+                    )}
+                  />
+                </div>
+                <div className="flex-1">
+                  <Controller
+                    name={`employeeLeaves.${index}.totalLeaves`}
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+						
+                        label="Total Leaves"
+                        type="number"
+                        margin="normal"
+                        variant="outlined"
+						InputLabelProps={{ shrink: !!field1.totalLeaves,}}
+                        placeholder="Total Leaves"
+                        className="mx-4"
+                      />
+                    )}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
 		</div>
 	);
 }

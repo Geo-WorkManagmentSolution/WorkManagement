@@ -13,7 +13,7 @@ namespace WorkManagement.Domain.Contracts
     {
         public Task<List<EmployeeModel>> GetAllEmployeesAsync();
 
-        public Task<List<EmployeeLeaveSummary>> GetEmployeeLeaves(int employeeId);
+        public Task<List<EmployeeLeaveSummaryModel>> GetEmployeeLeaves(string loggedUserId);
         
         public Task<EmployeeModel> GetEmployeeByIdAsync(int id);
 

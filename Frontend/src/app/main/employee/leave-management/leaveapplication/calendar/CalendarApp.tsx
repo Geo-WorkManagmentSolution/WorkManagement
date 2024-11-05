@@ -1,402 +1,390 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from 'app/store/hooks';
-
+import React, { useState, useRef } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import {
-	DateSelectArg,
-	EventClickArg,
-	DatesSetArg,
-	EventAddArg,
-	EventChangeArg,
-	EventContentArg
+  DateSelectArg,
+  EventClickArg,
+  DatesSetArg,
+  EventContentArg
 } from '@fullcalendar/core';
-
 import { styled, useTheme } from '@mui/material/styles';
 import { Box, Typography } from '@mui/material';
 import clsx from 'clsx';
 import FusePageSimple from '@fuse/core/FusePageSimple';
 import CalendarHeader from './CalendarHeader';
 import EventDialog from './EventDialog';
-import { Event, holidays, leaveTypes } from '../types';
 import LeaveTypeSelector from './LeaveTypeSelctor';
-import {
-	addLeave,
-	updateLeave,
-	cancelLeave,
-	setInitialEvents,
-	selectEvents,
-	selectLeaveBalance
-} from '../../LeaveManagementSlice';
 import LeaveSummury from './LeaveSummury';
-import { useGetApiLeavesHolidaysQuery } from '../../LeavesApi';
+import { 
+  useGetApiLeavesHolidaysQuery, 
+  useDeleteApiEmployeesByEmployeeIdLeavesCancelLeaveMutation,
+  useGetApiEmployeesByEmployeeIdLeavesUpdateLeaveQuery,
+  useGetApiLeavesLeavesHistoryQuery,
+  EmployeeLeave,
+  EmployeeHoliday,
+  EmployeeLeaveType,
+  LeaveStatus,
+  usePutApiEmployeesLeavesAddLeaveMutation
+} from '../../LeavesApi';
+import { useGetApiEmployeesLeavesCurrentQuery } from '../../../EmployeeApi';
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
-	'& .container': {
-		maxWidth: '100%!important'
-	},
-	'& a': {
-		color: `${theme.palette.text.primary}!important`,
-		textDecoration: 'none!important'
-	},
-	'&  .fc-media-screen': {
-		minHeight: '100%',
-		width: '100%'
-	},
-	'& .fc': {
-		height: '800px'
-	},
-	'& .fc-scrollgrid, & .fc-theme-standard td, & .fc-theme-standard th': {
-		borderColor: `${theme.palette.divider}!important`
-	},
-	'&  .fc-scrollgrid-section > td': {
-		border: 0
-	},
-	'& .fc-daygrid-day': {
-		'&:last-child': {
-			borderRight: 0
-		}
-	},
-	'& .fc-col-header-cell': {
-		borderWidth: '0 1px 0 1px',
-		padding: '8px 0 0 0',
-		'& .fc-col-header-cell-cushion': {
-			color: theme.palette.text.secondary,
-			fontWeight: 500,
-			fontSize: 12,
-			textTransform: 'uppercase'
-		}
-	},
-	'& .fc-view ': {
-		'& > .fc-scrollgrid': {
-			border: 0
-		}
-	},
-	'& .fc-daygrid-day.fc-day-today': {
-		backgroundColor: 'transparent!important',
-		'& .fc-daygrid-day-number': {
-			borderRadius: '100%',
-			backgroundColor: `${theme.palette.secondary.main}!important`,
-			color: `${theme.palette.secondary.contrastText}!important`
-		}
-	},
-	'& .fc-daygrid-day-top': {
-		justifyContent: 'center',
-		'& .fc-daygrid-day-number': {
-			color: theme.palette.text.secondary,
-			fontWeight: 500,
-			fontSize: 12,
-			display: 'inline-flex',
-			alignItems: 'center',
-			justifyContent: 'center',
-			width: 26,
-			height: 26,
-			margin: '4px 0',
-			borderRadius: '50%',
-			float: 'none',
-			lineHeight: 1
-		}
-	},
-	'& .fc-h-event': {
-		background: 'initial'
-	},
-	'& .fc-event': {
-		border: 0,
-		padding: '0 ',
-		fontSize: 12,
-		margin: '0 6px 4px 6px!important'
-	}
+  '& .container': {
+    maxWidth: '100%!important'
+  },
+  '& a': {
+    color: `${theme.palette.text.primary}!important`,
+    textDecoration: 'none!important'
+  },
+  '&  .fc-media-screen': {
+    minHeight: '100%',
+    width: '100%'
+  },
+  '& .fc': {
+    height: '800px'
+  },
+  '& .fc-scrollgrid, & .fc-theme-standard td, & .fc-theme-standard th': {
+    borderColor: `${theme.palette.divider}!important`
+  },
+  '&  .fc-scrollgrid-section > td': {
+    border: 0
+  },
+  '& .fc-daygrid-day': {
+    '&:last-child': {
+      borderRight: 0
+    }
+  },
+  '& .fc-col-header-cell': {
+    borderWidth: '0 1px 0 1px',
+    padding: '8px 0 0 0',
+    '& .fc-col-header-cell-cushion': {
+      color: theme.palette.text.secondary,
+      fontWeight: 500,
+      fontSize: 12,
+      textTransform: 'uppercase'
+    }
+  },
+  '& .fc-view ': {
+    '& > .fc-scrollgrid': {
+      border: 0
+    }
+  },
+  '& .fc-daygrid-day.fc-day-today': {
+    backgroundColor: 'transparent!important',
+    '& .fc-daygrid-day-number': {
+      borderRadius: '100%',
+      backgroundColor: `${theme.palette.secondary.main}!important`,
+      color: `${theme.palette.secondary.contrastText}!important`
+    }
+  },
+  '& .fc-daygrid-day-top': {
+    justifyContent: 'center',
+    '& .fc-daygrid-day-number': {
+      color: theme.palette.text.secondary,
+      fontWeight: 500,
+      fontSize: 12,
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: 26,
+      height: 26,
+      margin: '4px 0',
+      borderRadius: '50%',
+      float: 'none',
+      lineHeight: 1
+    }
+  },
+  '& .fc-h-event': {
+    background: 'initial'
+  },
+  '& .fc-event': {
+    border: 0,
+    padding: '0 ',
+    fontSize: 12,
+    margin: '0 6px 4px 6px!important'
+  }
 }));
 
+const {LeaveDetails: EmployeeLeaveSummary}= useGetApiEmployeesLeavesCurrentQuery;
+
+
 export default function CalendarApp() {
-	const dispatch = useAppDispatch();
-	const events = useAppSelector(selectEvents);
-	const leaveBalance = useAppSelector(selectLeaveBalance);
-	const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-	const [isNewEvent, setIsNewEvent] = useState(false);
-	const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-	const [leaveAnchor, setLeaveAnchor] = useState<HTMLElement | null>(null);
-	const [currentDate, setCurrentDate] = useState<DatesSetArg | null>(null);
-	const [selectedLabels, setSelectedLabels] = useState(leaveTypes.map((type) => type.leaveType));
-	const [tabValue, setTabValue] = useState('Calendar View');
-	const [alertMessage, setAlertMessage] = useState('');
-	const [alertOpen, setAlertOpen] = useState(false);
-	const calendarRef = useRef<FullCalendar>(null);
-	const {
-		data: holidaysData,
-		isLoading,
-		isError
-	} = useGetApiLeavesHolidaysQuery();
-	const theme = useTheme();
+  const [selectedEvent, setSelectedEvent] = useState<EmployeeLeave | null>(null);
+  const [isNewEvent, setIsNewEvent] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [leaveAnchor, setLeaveAnchor] = useState<HTMLElement | null>(null);
+  const [currentDate, setCurrentDate] = useState<DatesSetArg | null>(null);
+  const [selectedLabels, setSelectedLabels] = useState(leaveTypes.map((type) => type.name));
+  const [tabValue, setTabValue] = useState('Calendar View');
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertOpen, setAlertOpen] = useState(false);
+  const calendarRef = useRef<FullCalendar>(null);
+  const theme = useTheme();
 
-	const openEventDialoge = (event: Event) => {
-		setIsNewEvent(false);
-		setSelectedEvent({
-			id: event.id,
-			reason: event.reason || '',
-			summary: event.summary || '',
-			leaveType: event.leaveType || 'Casual Leave',
-			halfDay: event.halfDay || false,
-			fullDay: event.fullDay || false,
-			start: new Date(event.start) || new Date(),
-			end: new Date(event.end),
-			isApproved: event.isApproved
-		});
+  // API hooks
+  const { data: holidaysData, isLoading: isHolidaysLoading } = useGetApiLeavesHolidaysQuery();
+  const { data: currentLeaves, isLoading: isCurrentLeavesLoading } = useGetApiEmployeesLeavesCurrentQuery(); // Replace 1 with actual employee ID
+  const [addLeaveApi] = usePutApiEmployeesLeavesAddLeaveMutation();
+  const [cancelLeaveApi] = useDeleteApiEmployeesByEmployeeIdLeavesCancelLeaveMutation();
+  const { refetch: updateLeaveApi } = useGetApiEmployeesByEmployeeIdLeavesUpdateLeaveQuery({ employeeId: '1', employeeLeave: {} as EmployeeLeave }, { skip: true });
+  const { data: leavesHistory } = useGetApiLeavesLeavesHistoryQuery();
 
-		setAnchorEl(document.body);
-	};
+  const openEventDialoge = (event: EmployeeLeave) => {
+    setIsNewEvent(false);
+    setSelectedEvent(event);
+    setAnchorEl(document.body);
+  };
 
-	useEffect(() => {
-		const storedEvents: string = localStorage.getItem('calendarEvents');
+  const handleDateSelect = (selectInfo: DateSelectArg) => {
+    const start = new Date(selectInfo.start);
+    let end = new Date(selectInfo.end);
 
-		if (storedEvents) {
-			dispatch(setInitialEvents(JSON.parse(storedEvents)));
-		}
-	}, [dispatch]);
+    end.setDate(end.getDate() - 1);
 
-	useEffect(() => {
-		localStorage.setItem('calendarEvents', JSON.stringify(events));
-	}, [events]);
+    if (start.getTime() === end.getTime()) {
+      end = new Date(start);
+    }
 
-	const handleDateSelect = (selectInfo: DateSelectArg) => {
-		const start = new Date(selectInfo.start);
-		let end = new Date(selectInfo.end);
+    setIsNewEvent(true);
+    setSelectedEvent({
+      id: 0,
+      employeeId: 1, // Replace with actual employee ID
+      status: LeaveStatus.Pending,
+      description: '',
+      reason: '',
+      startDate: start.toISOString(),
+      endDate: end.toISOString(),
+      leaveDays: 1,
+      employeeLeaveTypeId: leaveTypes[0].id,
+      employeeLeaveTypes: leaveTypes[0],
+    });
+    setAnchorEl(selectInfo.jsEvent.target as HTMLElement);
+  };
 
-		// Adjust end date to be inclusive
-		end.setDate(end.getDate() - 1);
+  const handleEventClick = (clickInfo: EventClickArg) => {
+    const eventData = clickInfo.event;
+    if (eventData.extendedProps.isHoliday) {
+      // Don't open dialog for holidays
+      return;
+    }
+    setIsNewEvent(false);
+    setSelectedEvent({
+      id: Number(eventData.id),
+      employeeId: 1, // Replace with actual employee ID
+      status: eventData.extendedProps.status as LeaveStatus,
+      description: eventData.extendedProps.description || '',
+      reason: eventData.extendedProps.reason || '',
+      startDate: eventData.start?.toISOString() || new Date().toISOString(),
+      endDate: eventData.end?.toISOString() || new Date().toISOString(),
+      leaveDays: eventData.extendedProps.leaveDays,
+      employeeLeaveTypeId: eventData.extendedProps.employeeLeaveTypeId,
+      employeeLeaveTypes: eventData.extendedProps.employeeLeaveTypes,
+    });
+    setAnchorEl(clickInfo.jsEvent.target as HTMLElement);
+  };
 
-		// If it's a single day selection, set both start and end to the same day
-		if (start.getTime() === end.getTime()) {
-			end = new Date(start);
-		}
+  const handleClosePopover = () => {
+    setAnchorEl(null);
+    setSelectedEvent(null);
+  };
 
-		setIsNewEvent(true);
-		setSelectedEvent({
-			id: String(Date.now()),
-			reason: '',
-			summary: '',
-			leaveType: 'Casual Leave',
-			halfDay: false,
-			fullDay: false,
-			start,
-			end,
-			isApproved: false
-		});
-		setAnchorEl(selectInfo.jsEvent.target as HTMLElement);
-	};
+  const handleLeaveSelectorPopOver = () => {
+    setLeaveAnchor(null);
+  };
 
-	const handleEventClick = (clickInfo: EventClickArg) => {
-		setIsNewEvent(false);
-		const eventData = clickInfo.event;
-		setSelectedEvent({
-			id: eventData.id,
-			reason: eventData.extendedProps.reason || '',
-			summary: eventData.extendedProps.summary || '',
-			leaveType: eventData.extendedProps.leaveType || 'Casual Leave',
-			halfDay: eventData.extendedProps.halfDay || false,
-			fullDay: eventData.extendedProps.fullDay || false,
-			start: clickInfo.event.start || new Date(),
-			end: eventData.end,
-			isApproved: eventData.extendedProps.isApproved
-		});
-		setAnchorEl(clickInfo.jsEvent.target as HTMLElement);
-	};
+  const refreshCalendar = () => {
+    if (calendarRef.current) {
+      calendarRef.current.getApi().refetchEvents();
+    }
+  };
+``
+const handleSaveEvent = async (event: EmployeeLeave) => {
+  try {
+    const eventToSave = {
+      ...event,
+      employeeLeaveTypes: leaveTypes.find(type => type.id === event.employeeLeaveTypeId)
+    };
 
-	const handleClosePopover = () => {
-		setAnchorEl(null);
-		setSelectedEvent(null);
-	};
+    if (isNewEvent) {
+      await addLeaveApi({ 
+        employeeId:'b45720f0-a484-47dd-2827-08dcfcba549e', 
+        employeeLeave: eventToSave 
+      }).unwrap();
+    } else {
+      await updateLeaveApi();
+        }
+    handleClosePopover();
+    refreshCalendar();
+  } catch (error) {
+    console.error('Error saving event:', error);
+    setAlertMessage('Failed to save event. Please try again.');
+    setAlertOpen(true);
+  }
+};
 
-	const handleLeaveSelectorPopOver = () => {
-		setLeaveAnchor(null);
-	};
+  const handleDeleteEvent = async (eventId: number) => {
+    try {
+      await cancelLeaveApi({ employeeId: '1', employeeLeaveId: eventId });
+      handleClosePopover();
+      refreshCalendar();
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      setAlertMessage('Failed to delete event. Please try again.');
+      setAlertOpen(true);
+    }
+  };
 
-	const refreshCalendar = () => {
-		if (calendarRef.current) {
-			calendarRef.current.getApi().render();
-		}
-	};
+  const handleDatesSet = (arg: DatesSetArg) => {
+    setCurrentDate(arg);
+  };
 
-	const handleSaveEvent = (event: Event) => {
-		try {
-			if (isNewEvent) {
-				dispatch(addLeave(event));
-			} else {
-				dispatch(updateLeave(event));
-			}
+  const handleEventContent = (arg: EventContentArg) => {
+    const leaveType = leaveTypes.find((leave) => leave.id === arg.event.extendedProps.employeeLeaveTypeId);
+    const backgroundColor = leaveType ? '#0dc8e0' : '#FFA500'; // Default color for holidays
 
-			handleClosePopover();
-		} catch (error) {
-			console.log('error is comming');
+    return (
+      <Box
+        sx={{
+          backgroundColor,
+          color: theme.palette.getContrastText(backgroundColor)
+        }}
+        className={clsx('flex items-center w-full rounded px-8 py-2 h-22 text-white')}
+      >
+        <Typography className="text-md font-semibold">{leaveType ? leaveType.name : 'Holiday'} - </Typography>
+        <Typography className="text-md px-4 font-extrabold">{arg.event.extendedProps.reason}</Typography>
+      </Box>
+    );
+  };
 
-			if (error instanceof Error) {
-				setAlertMessage(error.message);
-				setAlertOpen(true);
-			}
-		}
-	};
+  const handleAddEventClick = () => {
+    setIsNewEvent(true);
+    setSelectedEvent({
+      id: 0,
+      employeeId: 1, // Replace with actual employee ID
+      status: LeaveStatus.Pending,
+      description: '',
+      reason: '',
+      startDate: new Date().toISOString(),
+      endDate: new Date().toISOString(),
+      leaveDays: 1,
+      employeeLeaveTypeId: leaveTypes[0].id,
+      employeeLeaveTypes: leaveTypes[0],
+    });
+    setAnchorEl(document.body);
+  };
 
-	const handleDeleteEvent = (eventId: string) => {
-		dispatch(cancelLeave(eventId));
-		handleClosePopover();
-	};
+  const handleLeaveSelectorDetails = () => {
+    setLeaveAnchor(document.body);
+  };
 
-	const handleDatesSet = (arg: DatesSetArg) => {
-		setCurrentDate(arg);
-	};
+  const toggleSelectedLabels = (leaveType: string) => {
+    setSelectedLabels((prev) =>
+      prev.includes(leaveType) ? prev.filter((label) => label !== leaveType) : [...prev, leaveType]
+    );
+  };
 
-	const handleEventAdd = (arg: EventAddArg) => {
-		arg.event.toPlainObject();
-		// console.log('Event added:', );
-	};
+  const allEvents = [
+    ...(currentLeaves || []).map((leave: EmployeeLeave) => ({
+      id: leave.id,
+      title: leave.reason,
+      start: leave.startDate,
+      end: leave.endDate,
+      extendedProps: {
+        ...leave,
+        isHoliday: false
+      }
+    })),
+    ...(holidaysData || []).map((holiday: EmployeeHoliday) => ({
+      id: holiday.id,
+      title: holiday.name,
+      start: holiday.startDate,
+      end: holiday.endDate,
+      extendedProps: {
+        ...holiday,
+        isHoliday: true
+      }
+    }))
+  ];
 
-	const handleEventChange = (arg: EventChangeArg) => {
-		arg.event.toPlainObject();
-		// console.log('Event changed:', arg.event.toPlainObject());
-	};
+  const filteredEvents = allEvents.filter((event) => 
+    event.extendedProps.isHoliday || 
+    selectedLabels.includes(event.extendedProps.employeeLeaveTypes?.name)
+  );
 
-	const handleEventContent = (arg: EventContentArg) => {
-		const leaveType = leaveTypes.find((leave) => leave.leaveType === arg.event.extendedProps.leaveType);
-		const backgroundColor = leaveType ? leaveType.color : '#0dc8e0';
+  const showCalender = () => {
+    setTabValue('Calendar View');
+    setTimeout(refreshCalendar, 0);
+  };
 
-		return (
-			<Box
-				sx={{
-					backgroundColor,
-					color: theme.palette.getContrastText(backgroundColor)
-				}}
-				className={clsx('flex items-center w-full rounded px-8 py-2 h-22 text-white')}
-			>
-				<Typography className="text-md font-semibold">{arg.event.extendedProps.leaveType} - </Typography>
-				<Typography className="text-md px-4 font-extrabold">{arg.event.extendedProps.reason}</Typography>
-			</Box>
-		);
-	};
+  const showSummury = () => {
+    setTabValue('Summury View');
+  };
 
-	const handleAddEventClick = () => {
-		setIsNewEvent(true);
-		setSelectedEvent({
-			id: String(Date.now()),
-			reason: '',
-			summary: '',
-			leaveType: 'Vacation',
-			halfDay: false,
-			fullDay: false,
-			start: new Date(),
-			end: new Date(),
-			isApproved: false
-		});
-		setAnchorEl(document.body);
-	};
+  return (
+    <Root
+      header={
+        <CalendarHeader
+          currentDate={currentDate}
+          calendarRef={calendarRef}
+          onAddEventClick={handleAddEventClick}
+          onShowLeaveSelectorDetails={handleLeaveSelectorDetails}
+          showCalander={showCalender}
+          showLeaveSummury={showSummury}
+        />
+      }
+      content={
+        <>
+          <div className={`${tabValue !== 'Calendar View' ? 'hidden' : ''} w-full`}>
+            <FullCalendar
+              plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+              headerToolbar={false}
+              initialView="dayGridMonth"
+              editable
+              selectable
+              selectMirror
+              dayMaxEvents
+              weekends
+              events={filteredEvents}
+              select={handleDateSelect}
+              eventClick={handleEventClick}
+              datesSet={handleDatesSet}
+              eventContent={handleEventContent}
+              ref={calendarRef}
+            />
+          </div>
+          <div className={`${tabValue !== 'Summury View' ? 'hidden' : ''} w-full`}>
+            <LeaveSummury
+              events={currentLeaves || []}
+              holidays={holidaysData || []}
+              openDialoge={openEventDialoge}
+            />
+          </div>
 
-	const handleLeaveSelectorDetails = () => {
-		setLeaveAnchor(document.body);
-	};
-
-	const toggleSelectedLabels = (leaveType: string) => {
-		setSelectedLabels((prev) =>
-			prev.includes(leaveType) ? prev.filter((label) => label !== leaveType) : [...prev, leaveType]
-		);
-	};
-
-	const allEvents = [...events, ...holidays];
-	const filteredEvents = allEvents.filter((event) => selectedLabels.includes(event.leaveType));
-
-	function showCalender() {
-		setTabValue('Calendar View');
-		setTimeout(refreshCalendar, 0); // Ensure render after state change
-	}
-
-	function showSummury() {
-		setTabValue('Summury View');
-	}
-
-	return (
-		<Root
-			header={
-				<CalendarHeader
-					currentDate={currentDate}
-					calendarRef={calendarRef}
-					onAddEventClick={handleAddEventClick}
-					onShowLeaveSelectorDetails={handleLeaveSelectorDetails}
-					showCalander={showCalender}
-					showLeaveSummury={showSummury}
-				/>
-			}
-			content={
-				<>
-					<div className={`${tabValue !== 'Calendar View' ? 'hidden' : ''} w-full`}>
-						<FullCalendar
-							plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-							headerToolbar={false}
-							initialView="dayGridMonth"
-							editable
-							selectable
-							selectMirror
-							dayMaxEvents
-							weekends
-							// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-							// events={filteredEvents.map((event) => ({
-							// 	...event,
-							// 	// Adjust end date for display purposes
-							// 	end: new Date(new Date(event.end).setDate(new Date(event.end).getDate() + 1))
-							// }))}
-							events={holidaysData?.map((event) => ({
-								id:event.id.toString(),
-								start:event.startDate,
-								end:event.endDate,
-								reason: event.name,
-								summary: event.name,					
-								extendedProps:{isHoliday:true}
-							}))}
-							select={handleDateSelect}
-							eventClick={(clickInfo) => {
-								if (clickInfo.event.extendedProps.isHoliday) {
-									// Prevent editing for holiday events
-									return;
-								}
-
-								handleEventClick(clickInfo);
-							}}
-							datesSet={handleDatesSet}
-							eventAdd={handleEventAdd}
-							eventChange={handleEventChange}
-							eventContent={handleEventContent}
-							ref={calendarRef}
-						/>
-					</div>
-					<div className={`${tabValue !== 'Summury View' ? 'hidden' : ''} w-full`}>
-						<LeaveSummury
-							events={events}
-							holidays={holidays}
-							openDialoge={openEventDialoge}
-						/>
-					</div>
-
-					{selectedEvent && (
-						<EventDialog
-							event={selectedEvent}
-							isNewEvent={isNewEvent}
-							anchorEl={anchorEl}
-							onClose={handleClosePopover}
-							onSave={handleSaveEvent}
-							onDelete={handleDeleteEvent}
-							leaveBalance={leaveBalance}
-							alertMessage={alertMessage}
-							alertOpen={alertOpen}
-							setAlertOpen={setAlertOpen}
-						/>
-					)}
-					<LeaveTypeSelector
-						anchorEl={leaveAnchor}
-						onClose={handleLeaveSelectorPopOver}
-						selectedLabels={selectedLabels}
-						toggleSelectedLabels={toggleSelectedLabels}
-					/>
-				</>
-			}
-		/>
-	);
+          {selectedEvent && (
+            <EventDialog
+              event={selectedEvent}
+              isNewEvent={isNewEvent}
+              anchorEl={anchorEl}
+              onClose={handleClosePopover}
+              onSave={handleSaveEvent}
+              onDelete={handleDeleteEvent}
+              leaveBalance={{}} // You might want to fetch this from an API
+              alertMessage={alertMessage}
+              alertOpen={alertOpen}
+              setAlertOpen={setAlertOpen}
+            />
+          )}
+          <LeaveTypeSelector
+            anchorEl={leaveAnchor}
+            
+            onClose={handleLeaveSelectorPopOver}
+            selectedLabels={selectedLabels}
+            toggleSelectedLabels={toggleSelectedLabels}
+          />
+        </>
+      }
+    />
+  );
 }

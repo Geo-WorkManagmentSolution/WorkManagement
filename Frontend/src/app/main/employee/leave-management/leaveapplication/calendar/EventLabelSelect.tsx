@@ -9,7 +9,7 @@ import { forwardRef } from 'react';
 import Box from '@mui/material/Box';
 import { Typography } from '@mui/material';
 import { leaveTypes } from '../types';
-import { selectLeaveBalance } from '../../LeaveManagementSlice';
+// import { selectLeaveBalance } from '../../LeaveManagementSlice';
 
 export type EventLabelSelectProps = {
 	value: string;
@@ -19,7 +19,7 @@ export type EventLabelSelectProps = {
 
 const EventLabelSelect = forwardRef<HTMLElement, EventLabelSelectProps>((props, ref) => {
 	const { value, onChange, className } = props;
-	const leaveBalance = useSelector(selectLeaveBalance);
+
 
 	const handleChange = (event: SelectChangeEvent) => {
 		onChange(event.target.value);

@@ -8,10 +8,10 @@ namespace WorkManagement.Domain.Contracts
 {
     public interface IAuthService
     {
-        public string GenerateJwtToken(string email, string role);
+        public string GenerateJwtToken(string email, string role,string Id);
 
         public bool ValidateToken(string token);
 
-        public Tuple<string, string> DecodeJwtToken(string jwtToken);
+        public Tuple<string, string,string> DecodeJwtToken(string jwtToken);
     }
 }

@@ -188,21 +188,29 @@ namespace WorkManagement.Service
             return true;
         }
 
-        public async Task<List<EmployeeLeaveSummary>> GetEmployeeLeaves(int employeeId)
+        public async Task<List<EmployeeLeaveSummaryModel>> GetEmployeeLeaves(string loggedUserId)
         {
-            var defaultLeaves = await _dbContext.EmployeeDefaultLeave.ToListAsync();
+            //var EmployeeId = _dbContext.Employees.FirstOrDefaultAsync(x => x.UserId == Guid.Parse(loggedUserId))?.Id??1;
+
+            var defaultLeaves = await _dbContext.EmployeeDefaultLeave.Include(x=>x.EmployeeLeaveTypes).ToListAsync();
             var defaultLeaveSummary = mapper.Map<List<EmployeeLeaveSummary>>(defaultLeaves);
 
-            return  _dbContext.EmployeeLeaveSummary.Where(x => x.EmployeeId == employeeId)?.ToList()?? defaultLeaveSummary;
+            //var model=  _dbContext.EmployeeLeaveSummary.Where(x => x.EmployeeId == EmployeeId)?.ToList()?? defaultLeaveSummary;
+            var model = defaultLeaveSummary;
+
+
+            return mapper.Map<List<EmployeeLeaveSummaryModel>>(model);
         }
 
 
         public async Task<EmployeeLeave> AddLeave(EmployeeLeave employeeLeave, string loggedUserId)
         {
-            //add validation in future
-            _dbContext.EmployeeLeaves.Add(employeeLeave);
 
             var EmployeeId = _dbContext.Employees.First(x => x.UserId == Guid.Parse(loggedUserId)).Id;
+
+            employeeLeave.EmployeeId = EmployeeId;
+            //add validation in future
+            _dbContext.EmployeeLeaves.Add(employeeLeave);
             var leaveSummary = await _dbContext.EmployeeLeaveSummary.FirstAsync(x => x.EmployeeId == EmployeeId && x.EmployeeLeaveTypeId == employeeLeave.EmployeeLeaveTypeId);
             leaveSummary.RemainingLeaves = leaveSummary.RemainingLeaves - employeeLeave.LeaveDays;
             _dbContext.EmployeeLeaveSummary.Update(leaveSummary);

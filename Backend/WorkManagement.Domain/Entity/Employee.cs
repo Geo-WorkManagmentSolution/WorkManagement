@@ -93,7 +93,16 @@ namespace WorkManagementSolution.Employee
         public Employee? employee { get; set; }
         public double RemainingLeaves { get; set; }
     }
+    public class EmployeeLeaveSummaryModel {
+        public int Id { get; set; }
 
+        public string EmployeeLeaveType { get; set; }
+
+        public int TotalLeaves { get; set; }
+
+        public double RemainingLeaves { get; set; }
+
+    }
 
     public class EmployeeDefaultLeaveSummary : BaseEntity
     {

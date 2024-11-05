@@ -1,20 +1,18 @@
 import { apiService as api } from "app/store/apiService";
 const injectedRtkApi = api.injectEndpoints({
   endpoints: (build) => ({
-    getApiEmployeesByEmployeeIdLeavesCurrent: build.query<
-      GetApiEmployeesByEmployeeIdLeavesCurrentApiResponse,
-      GetApiEmployeesByEmployeeIdLeavesCurrentApiArg
+    getApiEmployeesLeavesCurrent: build.query<
+      GetApiEmployeesLeavesCurrentApiResponse,
+      GetApiEmployeesLeavesCurrentApiArg
     >({
-      query: (queryArg) => ({
-        url: `/api/Employees/${queryArg.employeeId}/leaves/current`,
-      }),
+      query: () => ({ url: `/api/Employees/leaves/current` }),
     }),
-    putApiEmployeesByEmployeeIdLeavesAddLeave: build.mutation<
-      PutApiEmployeesByEmployeeIdLeavesAddLeaveApiResponse,
-      PutApiEmployeesByEmployeeIdLeavesAddLeaveApiArg
+    putApiEmployeesLeavesAddLeave: build.mutation<
+      PutApiEmployeesLeavesAddLeaveApiResponse,
+      PutApiEmployeesLeavesAddLeaveApiArg
     >({
       query: (queryArg) => ({
-        url: `/api/Employees/${queryArg.employeeId}/leaves/addLeave`,
+        url: `/api/Employees/leaves/addLeave`,
         method: "PUT",
         body: queryArg.employeeLeave,
       }),
@@ -54,15 +52,12 @@ const injectedRtkApi = api.injectEndpoints({
   overrideExisting: false,
 });
 export { injectedRtkApi as enhancedApi };
-export type GetApiEmployeesByEmployeeIdLeavesCurrentApiResponse =
-  /** status 200 OK */ EmployeeLeaveSummary[];
-export type GetApiEmployeesByEmployeeIdLeavesCurrentApiArg = {
-  employeeId: number;
-};
-export type PutApiEmployeesByEmployeeIdLeavesAddLeaveApiResponse =
+export type GetApiEmployeesLeavesCurrentApiResponse =
+  /** status 200 OK */ EmployeeLeaveSummaryModel[];
+export type GetApiEmployeesLeavesCurrentApiArg = void;
+export type PutApiEmployeesLeavesAddLeaveApiResponse =
   /** status 200 OK */ EmployeeLeave;
-export type PutApiEmployeesByEmployeeIdLeavesAddLeaveApiArg = {
-  employeeId: string;
+export type PutApiEmployeesLeavesAddLeaveApiArg = {
   employeeLeave: EmployeeLeave;
 };
 export type DeleteApiEmployeesByEmployeeIdLeavesCancelLeaveApiResponse =
@@ -83,11 +78,11 @@ export type GetApiLeavesHolidaysApiArg = void;
 export type GetApiLeavesLeavesHistoryApiResponse =
   /** status 200 OK */ EmployeeLeave[];
 export type GetApiLeavesLeavesHistoryApiArg = void;
-export type EmployeeLeaveType = {
+export type EmployeeLeaveSummaryModel = {
   id?: number;
-  isDeleted?: boolean;
-  name?: string | null;
-  isPaid?: boolean;
+  employeeLeaveType?: string | null;
+  totalLeaves?: number;
+  remainingLeaves?: number;
 };
 export type EmployeeDepartment = {
   id?: number;
@@ -236,6 +231,22 @@ export type EmployeeDocuments = {
   employeeId?: number | null;
   employee?: Employee;
 };
+export type EmployeeLeaveType = {
+  id?: number;
+  isDeleted?: boolean;
+  name?: string | null;
+  isPaid?: boolean;
+};
+export type EmployeeLeaveSummary = {
+  id?: number;
+  isDeleted?: boolean;
+  employeeLeaveTypeId?: number | null;
+  employeeLeaveTypes?: EmployeeLeaveType;
+  totalLeaves?: number;
+  employeeId?: number;
+  employee?: Employee;
+  remainingLeaves?: number;
+};
 export type Employee = {
   id?: number;
   createdBy?: string;
@@ -278,16 +289,6 @@ export type Employee = {
   employeeRelationshipDetails?: EmployeeRelationshipDetail[] | null;
   employeeDocuments?: EmployeeDocuments[] | null;
   employeeLeaves?: EmployeeLeaveSummary[] | null;
-};
-export type EmployeeLeaveSummary = {
-  id?: number;
-  isDeleted?: boolean;
-  employeeLeaveTypeId?: number | null;
-  employeeLeaveTypes?: EmployeeLeaveType;
-  totalLeaves?: number;
-  employeeId?: number;
-  employee?: Employee;
-  remainingLeaves?: number;
 };
 export type EmployeeLeave = {
   id?: number;
@@ -369,9 +370,9 @@ export enum LeaveStatus {
   Rejected = "Rejected",
 }
 export const {
-  useGetApiEmployeesByEmployeeIdLeavesCurrentQuery,
-  useLazyGetApiEmployeesByEmployeeIdLeavesCurrentQuery,
-  usePutApiEmployeesByEmployeeIdLeavesAddLeaveMutation,
+  useGetApiEmployeesLeavesCurrentQuery,
+  useLazyGetApiEmployeesLeavesCurrentQuery,
+  usePutApiEmployeesLeavesAddLeaveMutation,
   useDeleteApiEmployeesByEmployeeIdLeavesCancelLeaveMutation,
   useGetApiEmployeesByEmployeeIdLeavesUpdateLeaveQuery,
   useLazyGetApiEmployeesByEmployeeIdLeavesUpdateLeaveQuery,

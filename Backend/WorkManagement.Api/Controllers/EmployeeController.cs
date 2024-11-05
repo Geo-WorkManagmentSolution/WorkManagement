@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Security.Claims;
 using WorkManagement.Domain.Contracts;
 using WorkManagement.Domain.Entity;
 using WorkManagement.Domain.Models;
@@ -184,20 +185,20 @@ namespace WorkManagement.API.Controllers
             return Ok(newOption);
         }
 
-        // GET api/employee/1/leaves/current
-        [HttpGet("{employeeId}/leaves/current")]
-        public async Task<ActionResult<IEnumerable<EmployeeLeaveSummary>>> GetEmployeeLeaves(int employeeId)
+        // GET api/employee/leaves/current
+        [HttpGet("leaves/current")]
+        public async Task<ActionResult<IEnumerable<EmployeeLeaveSummaryModel>>> GetEmployeeLeaves()
         {
-            var leaves = await employeeService.GetEmployeeLeaves(employeeId);
+            var leaves = await employeeService.GetEmployeeLeaves(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             return Ok(leaves);
         }
 
 
-        // GET api/employee/1/leaves/addLeave
-        [HttpPut("{employeeId}/leaves/addLeave")]
+        // GET api/employee/leaves/addLeave
+        [HttpPut("leaves/addLeave")]
         public async Task<ActionResult<EmployeeLeave>> AddLeave(EmployeeLeave employeeLeave)
         {
-            var leaves = await employeeService.AddLeave(employeeLeave, User.Identity.GetUserId());
+            var leaves = await employeeService.AddLeave(employeeLeave, User.FindFirst(ClaimTypes.NameIdentifier).Value);
             return Ok(leaves);
         }
 
