@@ -45,6 +45,7 @@ function CalendarHeader(props: CalendarHeaderProps) {
 							aria-label="Previous"
 							className="border border-divider"
 							size="small"
+							
 							onClick={() => calendarApi().prev()}
 						>
 							<FuseSvgIcon size={16}>
@@ -79,6 +80,7 @@ function CalendarHeader(props: CalendarHeaderProps) {
 									aria-label="today"
 									className="border border-divider"
 									size="small"
+									color="info"
 									onClick={() => calendarApi().today()}
 								>
 									<FuseSvgIcon size={16}>heroicons-outline:calendar</FuseSvgIcon>
@@ -91,21 +93,26 @@ function CalendarHeader(props: CalendarHeaderProps) {
 
 			<div>
 				<ButtonGroup>
+				<Tooltip title="Leave summary">
+
 					<Button
 						variant="outlined"
-						color="inherit"
+						color="info"
 						onClick={showLeaveSummury}
 					>
-						
 						<FuseSvgIcon size={20}>heroicons-solid:queue-list</FuseSvgIcon>
 					</Button>
+					</Tooltip>
+					<Tooltip title="Calander View">
+
 					<Button
 						variant="outlined"
-						color="inherit"
+						color="info"
 						onClick={showCalander}
 					>
 						<FuseSvgIcon size={20}>heroicons-solid:calendar-days</FuseSvgIcon>
 					</Button>
+					</Tooltip>
 				</ButtonGroup>
 			</div>
 
@@ -114,23 +121,36 @@ function CalendarHeader(props: CalendarHeaderProps) {
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1, transition: { delay: 0.3 } }}
 			>
-				<IconButton
+				{/* <IconButton
 					className="border border-divider"
 					size="small"
 					aria-label="checkbox"
 					onClick={onShowLeaveSelectorDetails}
 				>
 					<FuseSvgIcon>heroicons-outline:tag</FuseSvgIcon>
-				</IconButton>
-
-				<IconButton
+				</IconButton> */}
+				<Button
 					className="border border-divider"
-					size="small"
-					aria-label="add"
-					onClick={onAddEventClick}
-				>
+					variant="contained"
+						color="info"
+						size="small"
+						aria-label="checkbox"
+						onClick={onShowLeaveSelectorDetails}
+						>
+					<FuseSvgIcon>heroicons-outline:tag</FuseSvgIcon>
+					<span className="mx-4 sm:mx-8">Available Leaves</span>
+					</Button>
+
+				<Button
+					className="border border-divider"
+					variant="contained"
+						color="primary"
+						size="small"
+						onClick={onAddEventClick}
+					>
 					<FuseSvgIcon>heroicons-outline:plus-circle</FuseSvgIcon>
-				</IconButton>
+							<span className="mx-4 sm:mx-8">AddLeave</span>
+					</Button>
 
 				<CalendarViewMenu
 					currentDate={currentDate}
