@@ -39,6 +39,11 @@ function EmployeeHeader() {
 	const { photoURL, firstName, lastName } = watch() as EmployeeModel;
 
 	function handleUpdateProduct() {
+		if(_.isEmpty(dirtyFields) || !isValid){
+			dispatch(showMessage({ message:'Required fileds must be filled out',variant:'warning' }));
+			return;
+		}
+		
 		updateEmployee({
 			id: parseInt(employeeId, 10),
 			employeeModel: getValues() as EmployeeModel
@@ -145,7 +150,6 @@ function EmployeeHeader() {
 							className="whitespace-nowrap mx-4"
 							variant="contained"
 							color="secondary"
-							disabled={_.isEmpty(dirtyFields) || !isValid}
 							onClick={handleUpdateProduct}
 						>
 							Save

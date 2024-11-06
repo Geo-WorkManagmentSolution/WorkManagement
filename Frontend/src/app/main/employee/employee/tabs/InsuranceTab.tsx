@@ -59,7 +59,6 @@ function IdentityInfoTab() {
 									field.onChange(newValue ? newValue.id : null);
 								}}
 								isOptionEqualToValue={(option, value) => option.id === value}
-								className="mt-8 mb-16 mx-4"
 								placeholder="Type to search or add"
 								renderInput={(params) => (
 									<TextField
@@ -81,7 +80,8 @@ function IdentityInfoTab() {
 							/>
 						)}
 					/>
-
+				</div>
+				<div className="flex -mx-4">
 					<Controller
 						name="employeeInsuranceDetails.serialNumber"
 						control={control}

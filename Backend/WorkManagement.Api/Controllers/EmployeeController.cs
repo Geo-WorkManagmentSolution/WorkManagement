@@ -35,7 +35,7 @@ namespace WorkManagement.API.Controllers
 
         // GET: api/employees
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<EmployeeModel>>> GetEmployees()
+        public async Task<ActionResult<IEnumerable<EmployeeDashboardDataModel>>> GetEmployees()
         {
             var employees = await employeeService.GetAllEmployeesAsync();
             return Ok(employees);
@@ -70,6 +70,21 @@ namespace WorkManagement.API.Controllers
         {
             var Sites = await employeeService.GetSites();
             return Ok(Sites);
+        }
+
+        [HttpGet("ReportToEmployeeList")]
+        public async Task<ActionResult<IEnumerable<EmployeeReportToModel>>> GetReportToEmployeeList(int? departmentId, int? employeeId)
+        {
+            var reportToEmployeeList = await employeeService.GetReportToEmployeeList(departmentId, employeeId);
+            return Ok(reportToEmployeeList);
+        }
+
+
+        [HttpGet("TeamMembersList")]
+        public async Task<ActionResult<IEnumerable<EmployeeTeamMemberList>>> GetTeamMembersList(int? employeeId)
+        {
+            var teamMembersList = await employeeService.GetTeamMembersList(employeeId);
+            return Ok(teamMembersList);
         }
 
         // GET: api/employees/5

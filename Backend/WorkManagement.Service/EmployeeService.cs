@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System;
 using WorkManagement.Domain.Contracts;
 using WorkManagement.Domain.Entity;
 using WorkManagement.Domain.Models.Email;
@@ -9,7 +8,6 @@ using WorkManagement.Domain.Models.Employee;
 using WorkManagement.Domain.Utility;
 using WorkManagementSolution.Employee;
 using WorkManagmentSolution.EFCore;
-using static WorkManagement.Service.EmailService;
 
 namespace WorkManagement.Service
 {
@@ -33,10 +31,45 @@ namespace WorkManagement.Service
             _emailService = emailService;
         }
 
-        public async Task<List<EmployeeModel>> GetAllEmployeesAsync()
+        public async Task<List<EmployeeDashboardDataModel>> GetAllEmployeesAsync()
         {
-            var Employee = await _dbContext.Employees.ToListAsync();
-            return mapper.Map<List<EmployeeModel>>(Employee);
+            try
+            {
+                //var Employee = await _dbContext.Employees.ToListAsync();
+                //return mapper.Map<List<EmployeeModel>>(Employee);
+                var employeeData = (from e in _dbContext.Employees.Where(s=>!s.IsDeleted)
+                                    select new EmployeeDashboardDataModel
+                                    {
+                                        Id = e.Id,
+                                        EmployeeNumber = e.EmployeeNumber,
+                                        FirstName = e.FirstName,
+                                        MiddleName = e.MiddleName,
+                                        LastName = e.LastName,
+                                        Email = e.Email,
+                                        PhoneNumber = e.PhoneNumber,
+                                        Gender = e.EmployeePersonalDetails == null ? "" : e.EmployeePersonalDetails.Gender.ToUpper(),
+                                        DepartmentName = e.EmployeeDepartment == null ? "" : e.EmployeeDepartment.Name,
+                                        DesignationName = e.EmployeeDesignation == null ? "" : e.EmployeeDesignation.Name,
+                                        CategoryName = e.EmployeeCategory == null ? "" : e.EmployeeCategory.Name,
+                                        Site = e.EmployeeWorkInformation == null ? "" : (e.EmployeeWorkInformation.Site == null ? "" : e.EmployeeWorkInformation.Site.Name),
+                                        HireDate = e.EmployeeWorkInformation == null ? "" : (e.EmployeeWorkInformation.HireDate.HasValue ? e.EmployeeWorkInformation.HireDate.Value.ToString("yyyy-MM-dd") : ""),
+                                    }).ToList();
+
+
+                if(employeeData != null )
+                {
+                    return employeeData;
+                }
+                else
+                {
+                    return new List<EmployeeDashboardDataModel>();
+                }
+            }
+            catch (Exception ex)
+            {
+                return new List<EmployeeDashboardDataModel>();
+            }
+
         }
 
         public async Task<List<EmployeeCategory>> GetEmployeeCategories()
@@ -65,6 +98,48 @@ namespace WorkManagement.Service
             return await _dbContext.Sites.ToListAsync();
         }
 
+        public async Task<List<EmployeeTeamMemberList>> GetTeamMembersList(int? employeeId)
+        {
+            if (employeeId == null)
+            {
+                return new List<EmployeeTeamMemberList>();
+            }
+            else
+            {
+
+                var data = (from e in _dbContext.Employees.Where(e => !e.IsDeleted && e.EmployeeReportToId == employeeId)
+                            select new EmployeeTeamMemberList
+                            {
+                                Name = e.FirstName + " " + e.LastName,
+                                Email = e.Email,
+                                Avatar = "",
+                            }).ToList();
+
+                return data;
+            }
+        }
+
+        public async Task<List<EmployeeReportToModel>> GetReportToEmployeeList(int? departmentId, int? employeeId)
+        {
+            if(departmentId == null || employeeId == null)
+            {
+                return new List<EmployeeReportToModel>();
+            }
+            else
+            {
+
+                var data = (from e in _dbContext.Employees.Where(e => !e.IsDeleted && e.EmployeeDepartmentId == departmentId && e.Id != employeeId)
+                            select new EmployeeReportToModel
+                            {
+                                Name = e.FirstName + " " + e.LastName,
+                                Id = e.Id,
+                            }).ToList();
+
+                return data;
+            }
+
+        }
+
         public async Task<EmployeeDesignation> AddNewDesignation(EmployeeDesignation employeeDesignation)
         {
             _dbContext.Entry(employeeDesignation).State = EntityState.Added;
@@ -82,17 +157,161 @@ namespace WorkManagement.Service
 
         public async Task<EmployeeModel> GetEmployeeByIdAsync(int id)
         {
-            var Employee = await _dbContext.Employees
-                .AsNoTracking()
-                .Include(x => x.EmployeePersonalDetails)
-                .Include(x => x.EmployeeWorkInformation)
-                .Include(x => x.EmployeeAddresses)
-                .Include(x => x.EmployeeIdentityInfos)
-                .Include(x => x.EmployeeEducationDetail)
-                .Include(x => x.EmployeeDocuments)
-                .SingleOrDefaultAsync(x => x.Id == id);
-            var EmployeeModel = mapper.Map<EmployeeModel>(Employee);
-            return EmployeeModel;
+            //var Employee = await _dbContext.Employees
+            //    .AsNoTracking()
+            //    .Include(x => x.EmployeePersonalDetails)
+            //    .Include(x => x.EmployeeWorkInformation)
+            //    .Include(x => x.EmployeeAddresses)
+            //    .Include(x => x.EmployeeIdentityInfos)
+            //    .Include(x => x.EmployeeEducationDetail)
+            //    .Include(x => x.EmployeeDocuments)
+            //    .SingleOrDefaultAsync(x => x.Id == id);
+            //var EmployeeModel = mapper.Map<EmployeeModel>(Employee);
+            //return EmployeeModel;
+
+            var employeeData = (from e in _dbContext.Employees.Where(s => s.Id == id)
+                                select new EmployeeModel
+                                {
+                                    Id = e.Id,
+                                    PhotoURL = e.PhotoURL,
+                                    EmployeeNumber = e.EmployeeNumber,
+                                    FirstName = e.FirstName,
+                                    MiddleName = e.MiddleName,
+                                    LastName = e.LastName,
+                                    MotherName = e.MotherName,
+                                    Email = e.Email,
+                                    AlternateEmail = e.AlternateEmail,
+                                    PhoneNumber = e.PhoneNumber,
+                                    AlternateNumber = e.AlternateNumber,
+                                    EmployeeCategoryId = e.EmployeeCategoryId,
+                                    EmployeeDepartmentId = e.EmployeeDepartmentId,
+                                    EmployeeDesignationId = e.EmployeeDesignationId,
+                                    EmployeeReportToId = e.EmployeeReportToId,
+                                    RoleId = e.RoleId,
+                                    UserId = e.UserId,
+                                    IsDeleted = e.IsDeleted,
+                                    /*EmployeeCategory = new EmployeeCategory
+                                    {
+                                        Name = e.EmployeeCategory == null ? "" : e.EmployeeCategory.Name
+                                    },*/
+                                    EmployeeDesignation = new EmployeeDesignation
+                                    {
+                                        Name = e.EmployeeDesignation == null ? "" : e.EmployeeDesignation.Name
+                                    },
+                                    /*EmployeeDepartment = new EmployeeDepartment
+                                    {
+                                        Name = e.EmployeeDepartment == null ? "" : e.EmployeeDepartment.Name
+                                    },*/
+                                    EmployeePersonalDetails = new EmployeePersonalDetailsModel
+                                    {
+                                        DateOfBirth = e.EmployeePersonalDetails == null ? "" : (e.EmployeePersonalDetails.DateOfBirth.HasValue ? e.EmployeePersonalDetails.DateOfBirth.Value.ToString("yyyy-MM-dd") : ""),
+                                        Gender = e.EmployeePersonalDetails == null ? "" : e.EmployeePersonalDetails.Gender,
+                                        MaritalStatus = e.EmployeePersonalDetails == null ? null : e.EmployeePersonalDetails.MaritalStatus,
+                                        bloodGroup = e.EmployeePersonalDetails == null ? null : e.EmployeePersonalDetails.bloodGroup,
+                                    },
+                                    EmployeeWorkInformation = new EmployeeWorkInformationModel
+                                    {
+                                        Designation = e.EmployeeWorkInformation == null ? null : e.EmployeeWorkInformation.Designation,
+                                        SalaryType = e.EmployeeWorkInformation == null ? null : e.EmployeeWorkInformation.SalaryType,
+                                        HireDate = e.EmployeeWorkInformation == null ? null : (e.EmployeeWorkInformation.HireDate.HasValue ? e.EmployeeWorkInformation.HireDate.Value.ToString("yyyy-MM-dd") : ""),
+                                        ConfirmationDate = e.EmployeeWorkInformation == null ? null : (e.EmployeeWorkInformation.ConfirmationDate.HasValue ? e.EmployeeWorkInformation.ConfirmationDate.Value.ToString("yyyy-MM-dd") : ""),
+                                        TotalPreviousExperience = e.EmployeeWorkInformation == null ? 0 : e.EmployeeWorkInformation.TotalPreviousExperience,
+                                        Salary = e.EmployeeWorkInformation == null ? 0 : e.EmployeeWorkInformation.Salary,
+                                        Basic = e.EmployeeWorkInformation == null ? 0 : e.EmployeeWorkInformation.Basic,
+                                        HRAllowances = e.EmployeeWorkInformation == null ? 0 : e.EmployeeWorkInformation.HRAllowances,
+                                        Bonus = e.EmployeeWorkInformation == null ? 0 : e.EmployeeWorkInformation.Bonus,
+                                        Gratuity = e.EmployeeWorkInformation == null ? 0 : e.EmployeeWorkInformation.Gratuity,
+                                        PF = e.EmployeeWorkInformation == null ? 0 : e.EmployeeWorkInformation.PF,
+                                        ESI = e.EmployeeWorkInformation == null ? 0 : e.EmployeeWorkInformation.ESI,
+                                        PT = e.EmployeeWorkInformation == null ? 0 : e.EmployeeWorkInformation.PT,
+                                        SiteId = e.EmployeeWorkInformation == null ? null : e.EmployeeWorkInformation.SiteId,
+                                        GRPHead = e.EmployeeWorkInformation == null ? null : e.EmployeeWorkInformation.GRPHead,
+                                    },
+                                    EmployeeInsuranceDetails = new EmployeeInsuranceDetailModel
+                                    {
+                                        EmployeeDesignationId = e.EmployeeInsuranceDetails == null ? null : e.EmployeeInsuranceDetails.EmployeeDesignationId,
+                                        SerialNumber = e.EmployeeInsuranceDetails == null ? "" : e.EmployeeInsuranceDetails.SerialNumber,
+                                        DateOfJoining = e.EmployeeInsuranceDetails == null ? "" : (e.EmployeeInsuranceDetails.DateOfJoining.HasValue ? e.EmployeeInsuranceDetails.DateOfJoining.Value.ToString("yyyy-MM-dd") : ""),
+                                        DateOfBirth = e.EmployeeInsuranceDetails == null ? "" : (e.EmployeeInsuranceDetails.DateOfBirth.HasValue ? e.EmployeeInsuranceDetails.DateOfJoining.Value.ToString("yyyy-MM-dd") : ""),
+                                        Age = e.EmployeeInsuranceDetails == null ? 0 : e.EmployeeInsuranceDetails.Age,
+                                        GrossSalary = e.EmployeeInsuranceDetails == null ? 0 : e.EmployeeInsuranceDetails.GrossSalary,
+                                        TotalSIWider = e.EmployeeInsuranceDetails == null ? 0 : e.EmployeeInsuranceDetails.TotalSIWider,
+                                        Comprehensive = e.EmployeeInsuranceDetails == null ? 0 : e.EmployeeInsuranceDetails.Comprehensive,
+                                        Risk = e.EmployeeInsuranceDetails == null ? "" : e.EmployeeInsuranceDetails.Risk,
+                                    },
+                                    EmployeeAddresses = new EmployeeAddressModel
+                                    {
+                                        AddressLine1 = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.AddressLine1,
+                                        AddressLine2 = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.AddressLine2,
+                                        City = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.City,
+                                        Country = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.Country,
+                                        State = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.State,
+                                        PinCode = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.PinCode,
+                                    },
+                                    EmployeeIdentityInfos = new EmployeeBankingDataModel
+                                    {
+                                        UID = e.EmployeeIdentityInfos == null ? null : e.EmployeeIdentityInfos.UID,
+                                        BankAccountNumber = e.EmployeeIdentityInfos == null ? null : e.EmployeeIdentityInfos.BankAccountNumber,
+                                        BankName = e.EmployeeIdentityInfos == null ? null : e.EmployeeIdentityInfos.BankName,
+                                        Branch = e.EmployeeIdentityInfos == null ? null : e.EmployeeIdentityInfos.Branch,
+                                        IFSC = e.EmployeeIdentityInfos == null ? null : e.EmployeeIdentityInfos.IFSC,
+                                        AccountHolderName = e.EmployeeIdentityInfos == null ? null : e.EmployeeIdentityInfos.AccountHolderName,
+                                        PAN = e.EmployeeIdentityInfos == null ? null : e.EmployeeIdentityInfos.PAN,
+                                        ProvidentFundNumber = e.EmployeeIdentityInfos == null ? null : e.EmployeeIdentityInfos.ProvidentFundNumber,
+                                        EmployeeStateInsuranceNumber = e.EmployeeIdentityInfos == null ? null : e.EmployeeIdentityInfos.EmployeeStateInsuranceNumber,
+                                        BiometricCode = e.EmployeeIdentityInfos == null ? null : e.EmployeeIdentityInfos.BiometricCode,
+                                    },
+                                    EmployeeDocuments = new List<EmployeeDocumentsModel>(),
+                                });
+
+            if(employeeData != null)
+            {
+                var returnEployeeData = employeeData.FirstOrDefault();
+                var employeeEducationData = (from e in _dbContext.EmployeeEducationDetails.Where(s => s.EmployeeId == returnEployeeData.Id)
+                                             select new EmployeeEducationDetailModel
+                                             {
+                                                 Type = e.Type,
+                                                 PassingYear = e.PassingYear,
+                                                 DegreeCertificateDate = e.DegreeCertificateDate,
+                                                 University = e.University,
+                                                 grade = e.grade
+                                             }).ToList();
+
+                returnEployeeData.EmployeeEducationDetail = employeeEducationData == null ? new List<EmployeeEducationDetailModel>() : employeeEducationData;
+
+                var employeeRelationshipData = (from r in _dbContext.EmployeeRelationshipDetails.Where(s => s.EmployeeId == returnEployeeData.Id)
+                                                select new EmployeeRelationshipDetailModel
+                                                {
+                                                    RelationshipType = r.RelationshipType,
+                                                    Name = r.Name,
+                                                    Email = r.Email,
+                                                    PhoneNumber = r.PhoneNumber,
+                                                }).ToList();
+
+                if(employeeRelationshipData != null)
+                {
+                    returnEployeeData.EmployeeRelationshipDetails = employeeRelationshipData;
+                }
+                else
+                {
+                    var relationshipData = new EmployeeRelationshipDetailModel();
+                    relationshipData.RelationshipType = RelationshipType.Parent;
+                    relationshipData.Name = "";
+                    relationshipData.Email = "";
+                    relationshipData.PhoneNumber = "";
+
+                    returnEployeeData.EmployeeRelationshipDetails.Add(relationshipData);    
+
+                }
+                
+                returnEployeeData.EmployeeRelationshipDetails = employeeRelationshipData == null ? new List<EmployeeRelationshipDetailModel>() : employeeRelationshipData; ;
+
+                return returnEployeeData;
+            }
+            else
+            {
+                return new EmployeeModel();
+            }
         }
         public async Task<bool> CheckEmailExists(string email)
         {

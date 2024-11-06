@@ -1,10 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { TextField, MenuItem, InputAdornment, Typography, Autocomplete } from '@mui/material';
 import { Controller, useFormContext } from 'react-hook-form';
+import {useParams } from 'react-router-dom';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { DatePicker } from '@mui/x-date-pickers';
-import { SalaryType, useGetApiEmployeesDepartmentsQuery, useGetApiEmployeesSitesQuery, usePostApiEmployeesAddNewSiteMutation } from '../../EmployeeApi';
+import { useGetApiEmployeesDepartmentsQuery, useGetApiEmployeesDesignationsQuery, 
+		useGetApiEmployeesSitesQuery, usePostApiEmployeesAddNewDesignationMutation, 
+		usePostApiEmployeesAddNewSiteMutation, useGetApiEmployeesReportToEmployeeListQuery } from '../../EmployeeApi';
 import EnhancedAutocomplete from '../EnhancedAutocomplete';
+import {SalaryType} from '../../models/EmployeeDropdownModels';
+
 
 /**
  * The basic info tab.
@@ -15,13 +20,39 @@ function WorkInfoTab() {
 	const { control, formState } = methods;
 	const { errors } = formState;
 	const { data: employeesDepartmentsOptions = [] } = useGetApiEmployeesDepartmentsQuery();
+	//const { data: employeesReportToOptions = [] } = useGetApiEmployeesReportToEmployeeListQuery();
 	const { data: employeesSiteOptions = [] } = useGetApiEmployeesSitesQuery();
+	const { data: employeesDesignationsOptions = [] } = useGetApiEmployeesDesignationsQuery();
+
+	const routeParams = useParams();
+	const { employeeId } = routeParams as unknown;
+	
+	const {
+		data: employeesReportToOptions,
+		isLoading,
+		isError
+	} = useGetApiEmployeesReportToEmployeeListQuery(
+		{ departmentId: employeeId, employeeId: employeeId},
+		{
+			skip: !employeeId || employeeId === 'new'
+		}
+	);
 
 	const [AddSite] = usePostApiEmployeesAddNewSiteMutation();
+	const [AddDesignation] = usePostApiEmployeesAddNewDesignationMutation();
 
 	const handleOptionAdd = async (newOption: Omit<Option, 'id'>) => {
 		try {
 			const result = await AddSite({ site: newOption }).unwrap();
+			return { ...newOption, id: result.id };
+		} catch (error) {
+			console.error('Failed to add new option:', error);
+			throw error;
+		}
+	};
+	const handleDesignationOptionAdd = async (newOption: Omit<Option, 'id'>) => {
+		try {
+			const result = await AddDesignation({ employeeDesignation: newOption }).unwrap();
 			return { ...newOption, id: result.id };
 		} catch (error) {
 			console.error('Failed to add new option:', error);
@@ -45,83 +76,6 @@ function WorkInfoTab() {
 						Job profile
 					</Typography>
 				</div>
-				<Controller
-					name="employeeWorkInformation.designation"
-					control={control}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							label="Designation"
-							fullWidth
-							error={!!errors.employeeWorkInformation?.designation}
-							helperText={errors.employeeWorkInformation?.designation?.message as string}
-						/>
-					)}
-				/>
-				<Controller
-					name="employeeWorkInformation.grpHead"
-					control={control}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							label="GRP Head"
-							fullWidth
-							error={!!errors.employeeWorkInformation?.grpHead}
-							helperText={errors.employeeWorkInformation?.grpHead?.message as string}
-						/>
-					)}
-				/>
-				{/* <Controller
-					name="employeeWorkInformation.site"
-					control={control}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							label="Site"
-							fullWidth
-							error={!!errors.employeeWorkInformation?.site}
-							helperText={errors.employeeWorkInformation?.site?.message as string}
-						/>
-					)}
-				/> */}
-
-				<Controller
-					name="employeeWorkInformation.siteId"
-					control={control}
-					render={({ field }) => (
-						<EnhancedAutocomplete
-							{...field}
-							fullWidth
-							label="Select or add Site"
-							options={employeesSiteOptions}
-							onChange={(_, newValue) => {
-								field.onChange(newValue ? newValue.id : null);
-							}}
-							isOptionEqualToValue={(option, value) => option.id === value}
-							className="mt-8 mb-16 mx-4"
-							placeholder="Type to search or add"
-							renderInput={(params) => (
-								<TextField
-									{...params}
-									value={params.value || ''}
-									placeholder="Select or Add Site"
-									label="Site"
-									required
-									variant="outlined"
-									InputLabelProps={{
-										shrink: true
-									}}
-									error={!!errors?.siteId}
-									helperText={errors?.siteId?.message as string}
-								/>
-							)}
-							attachedLabel="A site will be added to the database"
-							onOptionAdd={handleOptionAdd}
-
-						/>
-					)}
-				/>
-
 				<Controller
 					name="employeeDepartmentId"
 					control={control}
@@ -153,6 +107,121 @@ function WorkInfoTab() {
 						/>
 					)}
 				/>
+				<Controller
+						name="employeeWorkInformation.designation"
+						control={control}
+						render={({ field }) => (
+							<EnhancedAutocomplete
+								{...field}
+								fullWidth
+								label="Select or add Designation"
+								options={employeesDesignationsOptions}
+								onChange={(_, newValue) => {
+									field.onChange(newValue ? newValue.id : null);
+								}}
+								isOptionEqualToValue={(option, value) => option.id === value}
+								placeholder="Type to search or add"
+								renderInput={(params) => (
+									<TextField
+										{...params}
+										value={params.value || ''}
+										placeholder="Select or Add Designation"
+										label="Designation"
+										required
+										variant="outlined"
+										InputLabelProps={{
+											shrink: true
+										}}
+										error={!!errors.employeeWorkInformation?.designation}
+										helperText={errors.employeeWorkInformation?.designation?.message as string}
+									/>
+								)}
+								attachedLabel="A Designation will be added to the database"
+								onOptionAdd={handleDesignationOptionAdd}
+							/>
+						)}
+					/>
+				{/* <Controller
+					name="employeeWorkInformation.grpHead"
+					control={control}
+					render={({ field }) => (
+						<TextField
+							{...field}
+							label="GRP Head"
+							fullWidth
+							error={!!errors.employeeWorkInformation?.grpHead}
+							helperText={errors.employeeWorkInformation?.grpHead?.message as string}
+						/>
+					)}
+				/> */}
+
+				<Controller
+					name="employeeReportToId"
+					control={control}
+					render={({ field: { onChange, value } }) => (
+						<Autocomplete
+							fullWidth
+							options={employeesReportToOptions}
+							getOptionLabel={(option) => option?.name}
+							isOptionEqualToValue={(option, value) => option.id === value}
+							value={employeesReportToOptions?.find((c) => c.id === value) || null}
+							onChange={(_, newValue) => {
+								onChange(newValue ? newValue.id : null);
+							}}
+							renderInput={(params) => (
+								<TextField
+									{...params}
+									value={params.value || ''}
+									placeholder="Select Employee Report To"
+									label="Report To"
+									variant="outlined"
+									InputLabelProps={{
+										shrink: true
+									}}
+									error={!!errors.employeeReportToId}
+									helperText={errors.employeeReportToId?.message as string}
+								/>
+							)}
+						/>
+					)}
+				/>
+
+				<Controller
+					name="employeeWorkInformation.siteId"
+					control={control}
+					render={({ field }) => (
+						<EnhancedAutocomplete
+							{...field}
+							fullWidth
+							label="Select or add Site"
+							options={employeesSiteOptions}
+							onChange={(_, newValue) => {
+								field.onChange(newValue ? newValue.id : null);
+							}}
+							isOptionEqualToValue={(option, value) => option.id === value}
+							placeholder="Type to search or add"
+							renderInput={(params) => (
+								<TextField
+									{...params}
+									value={params.value || ''}
+									placeholder="Select or Add Site"
+									label="Site"
+									variant="outlined"
+									InputLabelProps={{
+										shrink: true
+									}}
+									error={!!errors?.siteId}
+									helperText={errors?.siteId?.message as string}
+								/>
+							)}
+							attachedLabel="A site will be added to the database"
+							onOptionAdd={handleOptionAdd}
+
+						/>
+					)}
+				/>
+
+				
 			</div>
 
 			<div className="space-y-16">
@@ -170,7 +239,7 @@ function WorkInfoTab() {
 						Salary Information
 					</Typography>
 				</div>
-				<Controller
+				{/* <Controller
 					name="employeeWorkInformation.bond"
 					control={control}
 					render={({ field }) => (
@@ -188,7 +257,7 @@ function WorkInfoTab() {
 							helperText={errors.employeeWorkInformation?.bond?.message as string}
 						/>
 					)}
-				/>
+				/> */}
 				<div className="flex -mx-4">
 					<Controller
 						name="employeeWorkInformation.salaryType"
@@ -215,6 +284,8 @@ function WorkInfoTab() {
 							</TextField>
 						)}
 					/>
+				</div>
+				<div className="flex -mx-4">
 
 					<Controller
 						name="employeeWorkInformation.salary"
@@ -235,6 +306,155 @@ function WorkInfoTab() {
 								fullWidth
 								error={!!errors.employeeWorkInformation?.salary}
 								helperText={errors.employeeWorkInformation?.salary?.message as string}
+							/>
+						)}
+					/>
+					<Controller
+						name="employeeWorkInformation.basic"
+						control={control}
+						render={({ field }) => (
+							<TextField
+								{...field}
+								label="Basic"
+								type="number"
+								className="mx-4"
+								InputProps={{
+									inputProps: {
+										min: 1
+									},
+									startAdornment: <InputAdornment position="start">₹</InputAdornment>
+								}}
+								fullWidth
+								error={!!errors.employeeWorkInformation?.basic}
+								helperText={errors.employeeWorkInformation?.basic?.message as string}
+							/>
+						)}
+					/>
+					<Controller
+						name="employeeWorkInformation.HRAllowances"
+						control={control}
+						render={({ field }) => (
+							<TextField
+								{...field}
+								label="HR Allowances"
+								type="number"
+								className="mx-4"
+								InputProps={{
+									inputProps: {
+										min: 1
+									},
+									startAdornment: <InputAdornment position="start">₹</InputAdornment>
+								}}
+								fullWidth
+								error={!!errors.employeeWorkInformation?.HRAllowances}
+								helperText={errors.employeeWorkInformation?.HRAllowances?.message as string}
+							/>
+						)}
+					/>
+					<Controller
+						name="employeeWorkInformation.Bonus"
+						control={control}
+						render={({ field }) => (
+							<TextField
+								{...field}
+								label="Bonus"
+								type="number"
+								className="mx-4"
+								InputProps={{
+									inputProps: {
+										min: 1
+									},
+									startAdornment: <InputAdornment position="start">₹</InputAdornment>
+								}}
+								fullWidth
+								error={!!errors.employeeWorkInformation?.Bonus}
+								helperText={errors.employeeWorkInformation?.Bonus?.message as string}
+							/>
+						)}
+					/>
+				</div>
+				<div className="flex -mx-4">
+					<Controller
+						name="employeeWorkInformation.Gratuity"
+						control={control}
+						render={({ field }) => (
+							<TextField
+								{...field}
+								label="Gratuity"
+								type="number"
+								className="mx-4"
+								InputProps={{
+									inputProps: {
+										min: 1
+									},
+									startAdornment: <InputAdornment position="start">₹</InputAdornment>
+								}}
+								fullWidth
+								error={!!errors.employeeWorkInformation?.Gratuity}
+								helperText={errors.employeeWorkInformation?.Gratuity?.message as string}
+							/>
+						)}
+					/>
+					<Controller
+						name="employeeWorkInformation.PF"
+						control={control}
+						render={({ field }) => (
+							<TextField
+								{...field}
+								label="PF"
+								type="number"
+								className="mx-4"
+								InputProps={{
+									inputProps: {
+										min: 1
+									},
+									startAdornment: <InputAdornment position="start">₹</InputAdornment>
+								}}
+								fullWidth
+								error={!!errors.employeeWorkInformation?.PF}
+								helperText={errors.employeeWorkInformation?.PF?.message as string}
+							/>
+						)}
+					/>
+					<Controller
+						name="employeeWorkInformation.ESI"
+						control={control}
+						render={({ field }) => (
+							<TextField
+								{...field}
+								label="ESI"
+								type="number"
+								className="mx-4"
+								InputProps={{
+									inputProps: {
+										min: 1
+									},
+									startAdornment: <InputAdornment position="start">₹</InputAdornment>
+								}}
+								fullWidth
+								error={!!errors.employeeWorkInformation?.ESI}
+								helperText={errors.employeeWorkInformation?.ESI?.message as string}
+							/>
+						)}
+					/>
+					<Controller
+						name="employeeWorkInformation.PT"
+						control={control}
+						render={({ field }) => (
+							<TextField
+								{...field}
+								label="PT"
+								type="number"
+								className="mx-4"
+								InputProps={{
+									inputProps: {
+										min: 1
+									},
+									startAdornment: <InputAdornment position="start">₹</InputAdornment>
+								}}
+								fullWidth
+								error={!!errors.employeeWorkInformation?.PT}
+								helperText={errors.employeeWorkInformation?.PT?.message as string}
 							/>
 						)}
 					/>

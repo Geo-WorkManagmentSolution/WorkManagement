@@ -41,6 +41,27 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: () => ({ url: `/api/Employees/sites` }),
     }),
+    getApiEmployeesReportToEmployeeList: build.query<
+      GetApiEmployeesReportToEmployeeListApiResponse,
+      GetApiEmployeesReportToEmployeeListApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/ReportToEmployeeList`,
+        params: {
+          departmentId: queryArg.departmentId,
+          employeeId: queryArg.employeeId,
+        },
+      }),
+    }),
+    getApiEmployeesTeamMembersList: build.query<
+      GetApiEmployeesTeamMembersListApiResponse,
+      GetApiEmployeesTeamMembersListApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/TeamMembersList`,
+        params: { employeeId: queryArg.employeeId },
+      }),
+    }),
     getApiEmployeesById: build.query<
       GetApiEmployeesByIdApiResponse,
       GetApiEmployeesByIdApiArg
@@ -135,7 +156,8 @@ const injectedRtkApi = api.injectEndpoints({
   overrideExisting: false,
 });
 export { injectedRtkApi as enhancedApi };
-export type GetApiEmployeesApiResponse = /** status 200 OK */ EmployeeModel[];
+export type GetApiEmployeesApiResponse =
+  /** status 200 OK */ EmployeeDashboardDataModel[];
 export type GetApiEmployeesApiArg = void;
 export type PostApiEmployeesApiResponse = /** status 200 OK */ EmployeeModel;
 export type PostApiEmployeesApiArg = {
@@ -152,6 +174,17 @@ export type GetApiEmployeesDesignationsApiResponse =
 export type GetApiEmployeesDesignationsApiArg = void;
 export type GetApiEmployeesSitesApiResponse = /** status 200 OK */ Site[];
 export type GetApiEmployeesSitesApiArg = void;
+export type GetApiEmployeesReportToEmployeeListApiResponse =
+  /** status 200 OK */ EmployeeReportToModel[];
+export type GetApiEmployeesReportToEmployeeListApiArg = {
+  departmentId?: number;
+  employeeId?: number;
+};
+export type GetApiEmployeesTeamMembersListApiResponse =
+  /** status 200 OK */ EmployeeTeamMemberList[];
+export type GetApiEmployeesTeamMembersListApiArg = {
+  employeeId?: number;
+};
 export type GetApiEmployeesByIdApiResponse = /** status 200 OK */ EmployeeModel;
 export type GetApiEmployeesByIdApiArg = {
   id: number;
@@ -193,74 +226,52 @@ export type PostApiEmployeesAddNewDesignationApiResponse = unknown;
 export type PostApiEmployeesAddNewDesignationApiArg = {
   employeeDesignation: EmployeeDesignation;
 };
-export type EmployeeCategory = {
+export type EmployeeDashboardDataModel = {
   id?: number;
-  isDeleted?: boolean;
-  name?: string | null;
-};
-export type EmployeeDepartment = {
-  id?: number;
-  isDeleted?: boolean;
-  name?: string | null;
+  employeeNumber?: number | null;
+  firstName?: string | null;
+  middleName?: string | null;
+  lastName?: string | null;
+  motherName?: string | null;
+  email?: string | null;
+  phoneNumber?: number | null;
+  gender?: string | null;
+  departmentName?: string | null;
+  designationName?: string | null;
+  categoryName?: string | null;
+  site?: string | null;
+  hireDate?: string | null;
 };
 export type EmployeeDesignation = {
   id?: number;
   isDeleted?: boolean;
   name?: string | null;
 };
-export type ApplicationUser = {
-  id?: string;
-  userName?: string | null;
-  normalizedUserName?: string | null;
-  email?: string | null;
-  normalizedEmail?: string | null;
-  emailConfirmed?: boolean;
-  passwordHash?: string | null;
-  securityStamp?: string | null;
-  concurrencyStamp?: string | null;
-  phoneNumber?: string | null;
-  phoneNumberConfirmed?: boolean;
-  twoFactorEnabled?: boolean;
-  lockoutEnd?: string | null;
-  lockoutEnabled?: boolean;
-  accessFailedCount?: number;
-  shortcuts?: string[] | null;
+export type EmployeePersonalDetailsModel = {
+  dateOfBirth?: string | null;
+  gender?: string | null;
+  maritalStatus?: MaritalStatus;
+  bloodGroup?: BloodGroup;
 };
-export type ApplicationRole = {
-  id?: string;
-  name?: string | null;
-  normalizedName?: string | null;
-  concurrencyStamp?: string | null;
-};
-export type Site = {
-  id?: number;
-  isDeleted?: boolean;
-  name?: string | null;
-};
-export type EmployeeWorkInformation = {
-  id?: number;
-  isDeleted?: boolean;
-  employeeId?: number | null;
+export type EmployeeWorkInformationModel = {
   designation?: string | null;
+  grpHead?: string | null;
+  siteId?: number | null;
   salaryType?: SalaryType;
+  salary?: number;
+  basic?: number;
+  hrAllowances?: number;
+  bonus?: number;
+  gratuity?: number;
+  pf?: number;
+  esi?: number;
+  pt?: number;
   hireDate?: string | null;
   confirmationDate?: string | null;
   totalPreviousExperience?: number;
-  salary?: number;
-  siteId?: number | null;
-  site?: Site;
-  bond?: number | null;
-  previousDateOfJoiningInGDR?: string | null;
-  previousDateOfLeavingInGDR?: string | null;
-  grpHead?: string | null;
 };
-export type EmployeeInsuranceDetail = {
-  id?: number;
-  isDeleted?: boolean;
-  employeeId?: number | null;
-  employee?: Employee;
+export type EmployeeInsuranceDetailModel = {
   employeeDesignationId?: number | null;
-  employeeDesignation?: EmployeeDesignation;
   serialNumber: string | null;
   dateOfJoining?: string | null;
   dateOfBirth?: string | null;
@@ -270,11 +281,7 @@ export type EmployeeInsuranceDetail = {
   comprehensive?: number;
   risk?: string | null;
 };
-export type EmployeeAddress = {
-  id?: number;
-  isDeleted?: boolean;
-  employeeId?: number | null;
-  employee?: Employee;
+export type EmployeeAddressModel = {
   addressLine1?: string | null;
   addressLine2?: string | null;
   city?: string | null;
@@ -282,11 +289,7 @@ export type EmployeeAddress = {
   state?: string | null;
   pinCode?: number | null;
 };
-export type EmployeeIdentityInfo = {
-  id?: number;
-  isDeleted?: boolean;
-  employeeId?: number | null;
-  employee?: Employee;
+export type EmployeeBankingDataModel = {
   uid?: string | null;
   bankAccountNumber?: string | null;
   bankName?: string | null;
@@ -298,116 +301,79 @@ export type EmployeeIdentityInfo = {
   employeeStateInsuranceNumber?: string | null;
   biometricCode?: string | null;
 };
-export type EmployeeEducationDetail = {
-  id?: number;
-  isDeleted?: boolean;
-  employee?: Employee;
+export type EmployeeEducationDetailModel = {
   type?: string | null;
   passingYear?: string | null;
   degreeCertificateDate?: string | null;
   university?: string | null;
   grade?: string | null;
-  employeeId?: number | null;
 };
-export type EmployeeRelationshipDetail = {
-  id?: number;
-  isDeleted?: boolean;
-  employeeId?: number | null;
-  employee?: Employee;
+export type EmployeeRelationshipDetailModel = {
   relationshipType?: RelationshipType;
-  name: string | null;
+  name?: string | null;
   email?: string | null;
   phoneNumber?: string | null;
 };
-export type EmployeeDocuments = {
-  id?: number;
-  isDeleted?: boolean;
+export type EmployeeDocumentsModel = {
   fileName?: string | null;
   fileSize?: number | null;
   fileContent?: string | null;
   fileType?: FileType;
-  employeeId?: number | null;
-  employee?: Employee;
-};
-export type Employee = {
-  id?: number;
-  createdBy?: string;
-  createdOn?: string;
-  lastModifiedBy?: string | null;
-  lastModifiedOn?: string;
-  isDeleted?: boolean;
-  photoURL?: string | null;
-  employeeNumber?: number;
-  firstName: string | null;
-  middleName: string | null;
-  lastName: string | null;
-  motherName?: string | null;
-  employeeDepartmentId?: number | null;
-  employeeDepartment?: EmployeeDepartment;
-  employeeDesignationId?: number | null;
-  employeeDesignation?: EmployeeDesignation;
-  employeeReportToId?: number | null;
-  employeeReportTo?: Employee;
-  email: string | null;
-  alternateEmail?: string | null;
-  phoneNumber?: number | null;
-  alternateNumber?: number | null;
-  userId: string;
-  applicationUser?: ApplicationUser;
-  roleId: string;
-  applicationRole?: ApplicationRole;
-  employeeCategoryId?: number | null;
-  employeeCategory?: EmployeeCategory;
-  employeePersonalDetails?: EmployeePersonalDetails;
-  employeeWorkInformation?: EmployeeWorkInformation;
-  employeeInsuranceDetails?: EmployeeInsuranceDetail;
-  employeeAddresses?: EmployeeAddress;
-  employeeIdentityInfos?: EmployeeIdentityInfo;
-  employeeEducationDetail?: EmployeeEducationDetail[] | null;
-  employeeRelationshipDetails?: EmployeeRelationshipDetail[] | null;
-  employeeDocuments?: EmployeeDocuments[] | null;
-};
-export type EmployeePersonalDetails = {
-  id?: number;
-  isDeleted?: boolean;
-  employeeId?: number | null;
-  employee?: Employee;
-  dateOfBirth?: string | null;
-  gender: string | null;
-  maritalStatus?: MaritalStatus;
-  bloodGroup?: BloodGroup;
-  relationWithEmployee?: RelationWithEmployee;
 };
 export type EmployeeModel = {
   id?: number;
   photoURL?: string | null;
   employeeNumber?: number | null;
-  firstName: string | null;
-  middleName: string | null;
-  lastName: string | null;
-  motherName: string | null;
-  email: string | null;
+  firstName?: string | null;
+  middleName?: string | null;
+  lastName?: string | null;
+  motherName?: string | null;
+  email?: string | null;
   alternateEmail?: string | null;
   phoneNumber?: number | null;
   alternateNumber?: number | null;
   position?: string | null;
   isDeleted?: boolean | null;
   userId?: string | null;
-  roleId: string;
-  employeeCategoryId: number;
-  employeeCategory?: EmployeeCategory;
+  roleId?: string;
+  employeeCategoryId?: number | null;
   employeeDepartmentId?: number | null;
-  employeeDepartment?: EmployeeDepartment;
+  employeeReportToId?: number | null;
+  employeeReportToName?: string | null;
   employeeDesignationId?: number | null;
   employeeDesignation?: EmployeeDesignation;
-  employeePersonalDetails?: EmployeePersonalDetails;
-  employeeWorkInformation?: EmployeeWorkInformation;
-  employeeInsuranceDetails?: EmployeeInsuranceDetail;
-  employeeAddresses?: EmployeeAddress;
-  employeeIdentityInfos?: EmployeeIdentityInfo;
-  employeeEducationDetail?: EmployeeEducationDetail[] | null;
-  employeeRelationshipDetails?: EmployeeRelationshipDetail[] | null;
-  employeeDocuments?: EmployeeDocuments[] | null;
+  employeePersonalDetails?: EmployeePersonalDetailsModel;
+  employeeWorkInformation?: EmployeeWorkInformationModel;
+  employeeInsuranceDetails?: EmployeeInsuranceDetailModel;
+  employeeAddresses?: EmployeeAddressModel;
+  employeeIdentityInfos?: EmployeeBankingDataModel;
+  employeeEducationDetail?: EmployeeEducationDetailModel[] | null;
+  employeeRelationshipDetails?: EmployeeRelationshipDetailModel[] | null;
+  employeeDocuments?: EmployeeDocumentsModel[] | null;
+};
+export type EmployeeCategory = {
+  id?: number;
+  isDeleted?: boolean;
+  name?: string | null;
+};
+export type EmployeeDepartment = {
+  id?: number;
+  isDeleted?: boolean;
+  name?: string | null;
+};
+export type Site = {
+  id?: number;
+  isDeleted?: boolean;
+  name?: string | null;
+};
+export type EmployeeReportToModel = {
+  name?: string | null;
+  id?: number;
+};
+export type EmployeeTeamMemberList = {
+  name?: string | null;
+  email?: string | null;
+  avatar?: string | null;
 };
 export type Criterion = {
   field?: string | null;
@@ -415,26 +381,6 @@ export type Criterion = {
   value?: any | null;
   nextOperator?: string | null;
 };
-export enum SalaryType {
-  M = "M",
-  F = "F",
-}
-export enum RelationshipType {
-  Parent = "Parent",
-  Spouse = "Spouse",
-  FamilyMember = "FamilyMember",
-  Friend = "Friend",
-  Other = "Other",
-}
-export enum FileType {
-  Pdf = "PDF",
-  Docx = "DOCX",
-  Txt = "TXT",
-  Zip = "ZIP",
-  Xlsx = "XLSX",
-  Csv = "CSV",
-  Other = "Other",
-}
 export enum MaritalStatus {
   Unknown = "Unknown",
   Single = "Single",
@@ -457,14 +403,27 @@ export enum BloodGroup {
   BNegative = "BNegative",
   ONegative = "ONegative",
 }
-export enum RelationWithEmployee {
-  Colleague = "Colleague",
-  Supervisor = "Supervisor",
-  Subordinate = "Subordinate",
-  Manager = "Manager",
-  Mentor = "Mentor",
-  Friend = "Friend",
+export enum SalaryType {
+  OnRoll = "OnRoll",
+  Consultant = "Consultant",
+  Labour = "Labour",
+  Apprentice = "Apprentice",
+  VisitBased = "VisitBased",
+}
+export enum RelationshipType {
+  Parent = "Parent",
+  Spouse = "Spouse",
   FamilyMember = "FamilyMember",
+  Friend = "Friend",
+  Other = "Other",
+}
+export enum FileType {
+  Pdf = "PDF",
+  Docx = "DOCX",
+  Txt = "TXT",
+  Zip = "ZIP",
+  Xlsx = "XLSX",
+  Csv = "CSV",
   Other = "Other",
 }
 export const {
@@ -479,6 +438,10 @@ export const {
   useLazyGetApiEmployeesDesignationsQuery,
   useGetApiEmployeesSitesQuery,
   useLazyGetApiEmployeesSitesQuery,
+  useGetApiEmployeesReportToEmployeeListQuery,
+  useLazyGetApiEmployeesReportToEmployeeListQuery,
+  useGetApiEmployeesTeamMembersListQuery,
+  useLazyGetApiEmployeesTeamMembersListQuery,
   useGetApiEmployeesByIdQuery,
   useLazyGetApiEmployeesByIdQuery,
   usePutApiEmployeesByIdMutation,

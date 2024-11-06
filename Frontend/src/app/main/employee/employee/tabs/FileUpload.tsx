@@ -5,6 +5,7 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DeleteIcon from '@mui/icons-material/Delete';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import { FileType } from '../../models/EmployeeDropdownModels';
 
 interface FileInfo {
 	id: string;

@@ -10,6 +10,7 @@ import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { useGetApiEmployeesCategoriesQuery, usePostApiEmployeesAddNewCategoryMutation } from '../../EmployeeApi';
 import EmailCheckerInput from '../EmailChecker';
 import EnhancedAutocomplete from '../EnhancedAutocomplete';
+import { RelationshipType} from '../../models/EmployeeDropdownModels';
 
 /**
  * The basic info tab.
@@ -17,7 +18,7 @@ import EnhancedAutocomplete from '../EnhancedAutocomplete';
 function BasicInfoTab() {
 	const { data: employeesCategoriesOptions = [] } = useGetApiEmployeesCategoriesQuery();
 	// const { data: employeesCategoriesOptions,refetch } = useGetApiEmployeesCategoriesQuery();
-	const relationShipTypes = ['Parent', 'Spouse', 'Family', 'Friend', 'Other'];
+	//const relationShipTypes = ['Parent', 'Spouse', 'Family', 'Friend', 'Other'];
 	const { data: employeesRolesOptions = [] } = useGetApiAuthRolesQuery();
 	const [AddCategory] = usePostApiEmployeesAddNewCategoryMutation();
 
@@ -177,39 +178,6 @@ function BasicInfoTab() {
 									/>
 								)}
 							/>
-
-							{/* <Controller
-								name="employeeCategoryId"
-								control={control}
-								render={({ field: { onChange, value } }) => (
-									<Autocomplete
-										className="mt-8 mb-16 mx-4"
-										fullWidth
-										options={employeesCategoriesOptions}
-										getOptionLabel={(option) => option?.name}
-										isOptionEqualToValue={(option, value) => option.id === value}
-										value={employeesCategoriesOptions.find((c) => c.id === value) || null}
-										onChange={(_, newValue) => {
-											onChange(newValue ? newValue.id : null);
-										}}
-										renderInput={(params) => (
-											<TextField
-												{...params}
-												value={params.value || ''}
-												placeholder="Select Employee categories"
-												label="Category"
-												required
-												variant="outlined"
-												InputLabelProps={{
-													shrink: true
-												}}
-												error={!!errors?.employeeCategoryId}
-												helperText={errors?.employeeCategoryId?.message as string}		
-											/>
-										)}
-									/>
-								)}
-							/> */}
 							<Controller
 								name="roleId"
 								control={control}
@@ -325,7 +293,7 @@ function BasicInfoTab() {
 					</Typography>
 				</div>
 				<div className="flex -mx-4">
-					{/* <Controller
+					<Controller
 						name="email"
 						control={control}
 						render={({ field }) => (
@@ -351,8 +319,8 @@ function BasicInfoTab() {
 								helperText={errors?.email?.message as string}
 							/>
 						)}
-					/> */}
-					<EmailCheckerInput />
+					/>
+					{/* <EmailCheckerInput /> */}
 					<Controller
 						name="alternateEmail"
 						control={control}
@@ -433,21 +401,9 @@ function BasicInfoTab() {
 						)}
 					/>
 				</div>
-				{/* <Controller
-					name="motherName"
-					control={control}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							label="Mother Name"
-							fullWidth
-							
-						/>
-					)}
-				/> */}
 			</div>
 			<div className="space-y-16">
-			<div className="flex items-center border-b-1 space-x-8 pb-8">
+				<div className="flex items-center border-b-1 space-x-8 pb-8">
 					<FuseSvgIcon
 						color="action"
 						size={24}
@@ -487,7 +443,7 @@ function BasicInfoTab() {
 											label="Relationship Type"
 											SelectProps={{ MenuProps: { disableScrollLock: false,autoFocus: true } }}
 										>
-											{relationShipTypes.map((option) => (
+											{Object.values(RelationshipType).map((option) => (
 												<MenuItem
 													key={option}
 													value={option}

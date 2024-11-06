@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import { Controller, useFormContext } from 'react-hook-form';
 import { DatePicker } from '@mui/x-date-pickers';
-import { BloodGroup, MaritalStatus } from '../../EmployeeApi';
+import { BloodGroup, MaritalStatus } from '../../models/EmployeeDropdownModels';
 
 /**
  * The basic info tab.
@@ -127,31 +127,6 @@ function PersonalInfoTab() {
 					/>
 				)}
 			/>
-
-			{/* <Controller
-				name="employeePersonalDetails.relationWithEmployee"
-				control={control}
-				render={({ field }) => (
-					<TextField
-						{...field}
-						className="mt-8 mb-16 "
-						select
-						label="Relation with Employee"
-						fullWidth
-						error={!!errors.employeePersonalDetails?.relationWithEmployee}
-						helperText={errors.employeePersonalDetails?.relationWithEmployee?.message}
-					>
-						{Object.values(RelationWithEmployee).map((relation) => (
-							<MenuItem
-								key={relation}
-								value={relation}
-							>
-								{relation}
-							</MenuItem>
-						))}
-					</TextField>
-				)}
-			/> */}
 			<Controller
 				control={control}
 				name="employeePersonalDetails.dateOfBirth"

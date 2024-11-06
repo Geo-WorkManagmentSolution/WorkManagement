@@ -9,40 +9,14 @@ import _ from '@lodash';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { Link } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
-import { EmployeeModel, useDeleteApiEmployeesByIdMutation, useGetApiEmployeesQuery } from '../EmployeeApi';
+import { EmployeeDashboardDataModel, useDeleteApiEmployeesByIdMutation, useGetApiEmployeesQuery } from '../EmployeeApi';
 
 function EmployeesTable() {
 	const { data: employees, isLoading,} = useGetApiEmployeesQuery();
 	const [removeEmployees] = useDeleteApiEmployeesByIdMutation();
 
-	const columns = useMemo<MRT_ColumnDef<EmployeeModel>[]>(
+	const columns = useMemo<MRT_ColumnDef<EmployeeDashboardDataModel>[]>(
 		() => [
-			{
-				accessorFn: (row) => row.photoURL,
-				id: 'photoURL',
-				header: '',
-				enableColumnFilter: false,
-				enableColumnDragging: false,
-				size: 64,
-				enableSorting: false,
-				Cell: ({ row }) => (
-					<div className="flex items-center justify-center">
-						{ row.original.photoURL ? (
-							<img
-								className="w-full max-h-36 max-w-36 block rounded"
-								src={row.original.photoURL}
-								alt=""
-							/>
-						) : (
-							<img
-								className="w-full max-h-36 max-w-36 block rounded"
-								src="assets/images/apps/ecommerce/product-image-placeholder.png"
-								alt=""
-							/>
-						)}
-					</div>
-				)
-			},
 			{
 				accessorKey: 'employeeNumber',
 				header: 'Employee Number',
@@ -69,28 +43,40 @@ function EmployeesTable() {
 				accessorFn: (row) => `${row?.email}`
 			},
 			{
-				accessorKey: 'isDeleted',
-				header: 'Active',
-				accessorFn: (row) => (
-					<div className="flex items-center">
-						{row.isDeleted ? (
-							<FuseSvgIcon
-								className="text-green"
-								size={20}
-							>
-								heroicons-outline:check-circle
-							</FuseSvgIcon>
-						) : (
-							<FuseSvgIcon
-								className="text-red"
-								size={20}
-							>
-								heroicons-outline:minus-circle
-							</FuseSvgIcon>
-						)}
-					</div>
-				)
-			}
+				accessorKey: 'phoneNumber',
+				header: 'Phone Number',
+				accessorFn: (row) => `${row?.phoneNumber}`
+			},
+			{
+				accessorKey: 'gender',
+				header: 'Gender',
+				accessorFn: (row) => `${row?.gender}`
+			},			
+			{
+				accessorKey: 'departmentName',
+				header: 'Department',
+				accessorFn: (row) => `${row?.departmentName}`
+			},
+			{
+				accessorKey: 'designationName',
+				header: 'Designation',
+				accessorFn: (row) => `${row?.designationName}`
+			},
+			{
+				accessorKey: 'employeeCategory',
+				header: 'Category',
+				accessorFn: (row) => `${row?.categoryName}`
+			},
+			{
+				accessorKey: 'site',
+				header: 'Site',
+				accessorFn: (row) => `${row?.site}`
+			},
+			{
+				accessorKey: 'hireDate',
+				header: 'Hire Date',
+				accessorFn: (row) => `${row?.hireDate}`
+			}			
 		],
 		[]
 	);

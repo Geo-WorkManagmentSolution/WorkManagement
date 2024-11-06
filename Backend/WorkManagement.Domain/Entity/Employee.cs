@@ -19,7 +19,7 @@ namespace WorkManagementSolution.Employee
         public required string FirstName { get; set; }
         public required string MiddleName { get; set; }
         public required string LastName { get; set; }
-        public string? MotherName { get; set; }
+        public string? MotherName { get; set; }        
 
         [EmailAddress]
         public required string Email { get; set; }
@@ -142,6 +142,7 @@ namespace WorkManagementSolution.Employee
         public RelationWithEmployee? RelationWithEmployee { get; set; }
     }
 
+
     public class EmployeeWorkInformation : BaseEntity
     {
         public string? Designation { get; set; }
@@ -153,6 +154,13 @@ namespace WorkManagementSolution.Employee
         public DateTime? ConfirmationDate { get; set; }
         public decimal TotalPreviousExperience { get; set; }
         public decimal Salary { get; set; }
+        public decimal Basic { get; set; }
+        public decimal HRAllowances { get; set; }
+        public decimal Bonus { get; set; }
+        public decimal Gratuity { get; set; }
+        public decimal PF { get; set; }
+        public decimal ESI { get; set; }
+        public decimal PT { get; set; }
 
         [ForeignKey(nameof(Site))]
         public int? SiteId { get; set; }
@@ -237,8 +245,11 @@ namespace WorkManagementSolution.Employee
 
     public enum SalaryType
     {
-        M,
-        F
+        OnRoll,
+        Consultant,
+        Labour,
+        Apprentice,
+        VisitBased,
     }
     public enum RelationWithEmployee
     {

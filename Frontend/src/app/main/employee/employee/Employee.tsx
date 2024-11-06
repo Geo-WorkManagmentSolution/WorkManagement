@@ -67,6 +67,7 @@ const schema = yup.object({
 	employeeCategoryId: yup.mixed().required('Category is required'),
 	roleId: yup.string().required('Employee role is required'),
 	employeePersonalDetails: yup.object().shape({
+		gender: yup.string().required('Gender is required'),
 		dateOfBirth: yup
 			.date()
 			.max(new Date(), 'Birth date cannot be in the future')
@@ -75,9 +76,14 @@ const schema = yup.object({
 				const today = new Date();
 				const eighteenYearsAgo = new Date(today);
 				eighteenYearsAgo.setFullYear(today.getFullYear() - 16);
-				return value <= eighteenYearsAgo;
-			}),
-		gender: yup.string().required('Gender is required')
+
+				if(value != undefined){
+					return value <= eighteenYearsAgo;
+				} else{
+					return true;
+				}
+				
+			})
 	}),
 	employeeWorkInformation: yup.object().shape({
 		salaryType: yup.string().required('Salary Type is required'),

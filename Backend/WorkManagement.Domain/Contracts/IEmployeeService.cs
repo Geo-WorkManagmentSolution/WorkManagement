@@ -11,7 +11,7 @@ namespace WorkManagement.Domain.Contracts
 {
     public interface IEmployeeService
     {
-        public Task<List<EmployeeModel>> GetAllEmployeesAsync();
+        public Task<List<EmployeeDashboardDataModel>> GetAllEmployeesAsync();
 
         public Task<EmployeeModel> GetEmployeeByIdAsync(int id);
 
@@ -32,6 +32,7 @@ namespace WorkManagement.Domain.Contracts
         public Task<EmployeeDesignation> AddNewDesignation(EmployeeDesignation employeeDesignation);
 
         public Task<Site> AddNewSite(Site site);
-
+        public Task<List<EmployeeReportToModel>> GetReportToEmployeeList(int? departmentId, int? employeeId);
+        public Task<List<EmployeeTeamMemberList>> GetTeamMembersList(int? employeeId);
     }
 }

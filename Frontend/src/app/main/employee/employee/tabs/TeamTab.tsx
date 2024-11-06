@@ -1,6 +1,7 @@
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import IconButton from '@mui/material/IconButton';
+import {useParams } from 'react-router-dom';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemText from '@mui/material/ListItemText/ListItemText';
@@ -11,16 +12,31 @@ import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 import { Autocomplete, InputAdornment } from '@mui/material';
 import { showMessage } from '@fuse/core/FuseMessage/fuseMessageSlice';
+import { useGetApiEmployeesTeamMembersListQuery} from '../../EmployeeApi';
+
 // import { useGetTeamMembersSettingsQuery, useUpdateTeamMemberSettingsMutation } from '../SettingsApi';
 import { useDispatch } from 'react-redux';
 
 function TeamTab() {
+
+	const routeParams = useParams();
+	const { employeeId } = routeParams as unknown;
+	
+	const {
+		data: employeeTeamMembersList,
+		isLoading,
+		isError
+	} = useGetApiEmployeesTeamMembersListQuery(
+		{ employeeId: employeeId},
+		{
+			skip: !employeeId || employeeId === 'new'
+		}
+	);
+
+	
 	// const { data: teamMembers } = useGetTeamMembersSettingsQuery({onCompleted: setTeamMember});
 	// const [updateTeamMembers] = useUpdateTeamMemberSettingsMutation();
-	const init = [
-		{ email: 'inzi@up.com', name: 'inzi', avatar: '' },
-		{ email: 'napul@up.com', name: 'napul', avatar: '' }
-	];
+	const init = employeeTeamMembersList;
 	const [selectedCard, setSelectedCard] = useState<(typeof init)[0] | null>(null);
 	const [teamMembers, setTeamMember] = useState(init);
 	const dispatch = useDispatch();
@@ -40,13 +56,12 @@ function TeamTab() {
 		} else setTeamMember((prev) => [...prev, selectedCard]);
 	};
 
+	
+
 	return (
 		<div>
 			<Autocomplete
-				options={[
-					{ email: 'a@up.com', name: 'a', avatar: '' },
-					{ email: 'b@up.com', name: 'b', avatar: '' }
-				]}
+				options={employeeTeamMembersList}
 				getOptionLabel={(option) => option.email}
 				renderOption={(props, option) => (
 					<ListItem
