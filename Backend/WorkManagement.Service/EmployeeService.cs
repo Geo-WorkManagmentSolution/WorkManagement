@@ -93,6 +93,7 @@ namespace WorkManagement.Service
                 .Include(x => x.EmployeeEducationDetail)
                 .Include(x => x.EmployeeDocuments)
                 .SingleOrDefaultAsync(x => x.Id == id);
+
             var EmployeeModel = mapper.Map<EmployeeModel>(Employee);
             return EmployeeModel;
         }

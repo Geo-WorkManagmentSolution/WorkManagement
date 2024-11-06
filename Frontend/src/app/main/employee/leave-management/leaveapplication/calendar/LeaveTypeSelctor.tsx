@@ -3,7 +3,7 @@ import Checkbox from '@mui/material/Checkbox';
 import Popover from '@mui/material/Popover';
 import { Box } from '@mui/system';
 import { FormLabel, Typography } from '@mui/material';
-import { EmployeeLeaveType, useGetApiEmployeesLeavesCurrentQuery } from '../../LeavesApi';
+import { useGetApiEmployeesLeavesCurrentQuery } from '../../LeavesApi';
 
 interface LeaveTypeSelectorProps {
   anchorEl: HTMLElement | null;
@@ -12,13 +12,13 @@ interface LeaveTypeSelectorProps {
   toggleSelectedLabels: (leaveType: string) => void;
 }
 
-
-
 function LeaveTypeSelector({ anchorEl, onClose, selectedLabels, toggleSelectedLabels }: LeaveTypeSelectorProps) {
+  const { data: EmployeeLeaveSummary } = useGetApiEmployeesLeavesCurrentQuery();
+
   const handleToggleLabel = (leaveType: string) => {
     toggleSelectedLabels(leaveType);
   };
-  const {data:EmployeeLeaveSummary}=useGetApiEmployeesLeavesCurrentQuery();
+
   return (
     <Popover
       open={Boolean(anchorEl)}
@@ -43,7 +43,7 @@ function LeaveTypeSelector({ anchorEl, onClose, selectedLabels, toggleSelectedLa
           </Typography>
         </div>
 
-        {EmployeeLeaveSummary.map((eachType) => (
+        {EmployeeLeaveSummary?.map((eachType) => (
           <FormLabel
             htmlFor={`leave-type-${eachType.id}`}
             key={eachType.id}
@@ -53,8 +53,8 @@ function LeaveTypeSelector({ anchorEl, onClose, selectedLabels, toggleSelectedLa
               id={`leave-type-${eachType.id}`}
               color="secondary"
               className="p-0"
-              checked={selectedLabels.includes(eachType.employeeLeaveType)}
-              onChange={() => handleToggleLabel(eachType.employeeLeaveType)}
+              checked={selectedLabels.includes(eachType.employeeLeaveType || '')}
+              onChange={() => handleToggleLabel(eachType.employeeLeaveType || '')}
             />
 
             <Box
@@ -67,10 +67,7 @@ function LeaveTypeSelector({ anchorEl, onClose, selectedLabels, toggleSelectedLa
                 className="flex justify-between items-center flex-1 leading-none"
               >
                 <span>{eachType.employeeLeaveType}</span>
-                {eachType.employeeLeaveType !== 'Work From Home' &&
-                  eachType.employeeLeaveType !== 'Leave without pay' && (
-                    <span>[Available Balance : {eachType.remainingLeaves} ]</span>
-                  )}
+                <span>[Available Balance : {eachType.remainingLeaves} ]</span>
               </Typography>
             </div>
           </FormLabel>

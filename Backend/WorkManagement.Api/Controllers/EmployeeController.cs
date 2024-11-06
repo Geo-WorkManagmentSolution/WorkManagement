@@ -203,16 +203,16 @@ namespace WorkManagement.API.Controllers
         }
 
 
-        // GET api/employee/1/leaves/CancelLeave
-        [HttpDelete("{employeeId}/leaves/cancelLeave")]
+        // GET api/employee/leaves/CancelLeave
+        [HttpDelete("leaves/cancelLeave")]
         public async Task<ActionResult<bool>> CancelLeave(int employeeLeaveId)
         {
             await employeeService.CancelLeave(employeeLeaveId);
             return Ok(true);
         }
 
-        // GET api/employee/1/leaves/CancelLeave
-        [HttpGet("{employeeId}/leaves/updateLeave")]
+        // GET api/employee/leaves/CancelLeave
+        [HttpGet("leaves/updateLeave")]
         public async Task<ActionResult<EmployeeLeave>> UpdateLeave(EmployeeLeave employeeLeave)
         {
             var leaves = await employeeService.UpdateLeave(employeeLeave);
