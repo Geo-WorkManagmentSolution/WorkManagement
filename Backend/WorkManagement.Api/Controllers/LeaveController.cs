@@ -41,6 +41,14 @@ namespace WorkManagement.API.Controllers
             return Ok(leaves);
         }
 
+        // GET api/leaves/history
+        [HttpGet("leaves/employeeLeaveHistory")]
+        public async Task<ActionResult<IEnumerable<EmployeeLeaveHistoryDTO>>> GetEmployeeLeaveHistory([FromBody] EmployeeLeaveHistoryDataModel data)
+        {
+            var leaves = await leavesService.GetEmployeeLeaveHistory(data);
+            return Ok(leaves);
+        }
+
 
 
     }
