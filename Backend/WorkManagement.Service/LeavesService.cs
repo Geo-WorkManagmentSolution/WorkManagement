@@ -41,127 +41,59 @@ namespace WorkManagement.Service
         public async Task<List<EmployeeLeaveHistoryDTO>> GetEmployeeLeaveHistory(EmployeeLeaveHistoryDataModel data)
         {
             var returnData = new List<EmployeeLeaveHistoryDTO>();
-           
-            if (data != null)
+
+            if (data == null) return returnData;
+
+            var startDate = DateTime.Now;
+            var employeeId = data.EmployeeId;
+
+            if (data.GetLeaveData)
             {
-                var employeeId = data.EmployeeId;
-                if (data.GetLeaveData && !data.GetHolidayData)
-                {
-                    var startDate = DateTime.Now;
-                    if (data.GetFutureLeaveData)
-                    {
-                        returnData = (from l in _dbContext.EmployeeLeaves.Where(s => s.StartDate >= startDate && s.EmployeeId == employeeId)
-                                      select new EmployeeLeaveHistoryDTO
-                                      {
-                                          StartDate = l.StartDate,
-                                          EndDate = l.EndDate,
-                                          EmployeeId = l.EmployeeId,
-                                          Description = l.Description,
-                                          Reason = l.Reason,
-                                      }).ToList();
+                var leaveData = data.GetFutureLeaveData
+                    ? GetLeaveData(employeeId, startDate, true)
+                    : GetLeaveData(employeeId, startDate, false);
 
+                returnData.AddRange(leaveData);
+            }
 
-                    }
-                    else
-                    {
-                        returnData = (from l in _dbContext.EmployeeLeaves.Where(s => s.StartDate < startDate && s.EmployeeId == employeeId)
-                                      select new EmployeeLeaveHistoryDTO
-                                      {
-                                          StartDate = l.StartDate,
-                                          EndDate = l.EndDate,
-                                          EmployeeId = l.EmployeeId,
-                                          Description = l.Description,
-                                          Reason = l.Reason,
-                                      }).ToList();
-                    }
+            if (data.GetHolidayData)
+            {
+                var holidayData = data.GetFutureLeaveData
+                    ? GetHolidayData(employeeId, startDate, true)
+                    : GetHolidayData(employeeId, startDate, false);
 
-                }
-
-                if (data.GetHolidayData && !data.GetLeaveData)
-                {
-                    var startDate = DateTime.Now;
-                    if (data.GetFutureLeaveData)
-                    {
-                        returnData = (from l in _dbContext.EmployeeHolidays.Where(s => s.StartDate >= startDate)
-                                      select new EmployeeLeaveHistoryDTO
-                                      {
-                                          StartDate = l.StartDate,
-                                          EndDate = l.EndDate,
-                                          EmployeeId = employeeId,
-                                      }).ToList();
-
-
-                    }
-                    else
-                    {
-                        returnData = (from l in _dbContext.EmployeeHolidays.Where(s => s.StartDate < startDate)
-                                      select new EmployeeLeaveHistoryDTO
-                                      {
-                                          StartDate = l.StartDate,
-                                          EndDate = l.EndDate,
-                                          EmployeeId = employeeId,
-                                      }).ToList();
-                    }
-
-
-                }
-
-                if(data.GetHolidayData && data.GetLeaveData)
-                {
-                    var startDate = DateTime.Now;
-                    if (data.GetFutureLeaveData)
-                    {
-                        var holidayData = (from l in _dbContext.EmployeeHolidays.Where(s => s.StartDate >= startDate)
-                                      select new EmployeeLeaveHistoryDTO
-                                      {
-                                          StartDate = l.StartDate,
-                                          EndDate = l.EndDate,
-                                          EmployeeId = employeeId,
-                                      }).ToList();
-
-                        var leaveData = (from l in _dbContext.EmployeeLeaves.Where(s => s.StartDate >= startDate && s.EmployeeId == employeeId)
-                                         select new EmployeeLeaveHistoryDTO
-                                         {
-                                             StartDate = l.StartDate,
-                                             EndDate = l.EndDate,
-                                             EmployeeId = l.EmployeeId,
-                                             Description = l.Description,
-                                             Reason = l.Reason,
-                                         }).ToList();
-
-                        returnData.AddRange(leaveData);
-                        returnData.AddRange(holidayData);
-                    }
-                    else
-                    {
-                        var holidayData = (from l in _dbContext.EmployeeHolidays.Where(s => s.StartDate < startDate)
-                                      select new EmployeeLeaveHistoryDTO
-                                      {
-                                          StartDate = l.StartDate,
-                                          EndDate = l.EndDate,
-                                          EmployeeId = employeeId,
-                                      }).ToList();
-
-                        var leaveData = (from l in _dbContext.EmployeeLeaves.Where(s => s.StartDate < startDate && s.EmployeeId == employeeId)
-                                         select new EmployeeLeaveHistoryDTO
-                                         {
-                                             StartDate = l.StartDate,
-                                             EndDate = l.EndDate,
-                                             EmployeeId = l.EmployeeId,
-                                             Description = l.Description,
-                                             Reason = l.Reason,
-                                         }).ToList();
-
-                        returnData.AddRange(leaveData);
-                        returnData.AddRange(holidayData);
-                    }
-                }
+                returnData.AddRange(holidayData);
             }
 
             return returnData;
         }
 
-      
+        private List<EmployeeLeaveHistoryDTO> GetLeaveData(int employeeId, DateTime startDate, bool isFutureData)
+        {
+            return _dbContext.EmployeeLeaves
+                .Where(l => (isFutureData ? l.StartDate >= startDate : l.StartDate < startDate) && l.EmployeeId == employeeId)
+                .Select(l => new EmployeeLeaveHistoryDTO
+                {
+                    StartDate = l.StartDate,
+                    EndDate = l.EndDate,
+                    EmployeeId = l.EmployeeId,
+                    Description = l.Description,
+                    Reason = l.Reason
+                })
+                .ToList();
+        }
 
+        private List<EmployeeLeaveHistoryDTO> GetHolidayData(int employeeId, DateTime startDate, bool isFutureData)
+        {
+            return _dbContext.EmployeeHolidays
+                .Where(h => isFutureData ? h.StartDate >= startDate : h.StartDate < startDate)
+                .Select(h => new EmployeeLeaveHistoryDTO
+                {
+                    StartDate = h.StartDate,
+                    EndDate = h.EndDate,
+                    EmployeeId = employeeId
+                })
+                .ToList();
+        }
     }
 }
