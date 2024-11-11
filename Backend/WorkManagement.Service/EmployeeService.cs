@@ -37,7 +37,7 @@ namespace WorkManagement.Service
             {
                 //var Employee = await _dbContext.Employees.ToListAsync();
                 //return mapper.Map<List<EmployeeModel>>(Employee);
-                var employeeData = (from e in _dbContext.Employees.Where(s=>!s.IsDeleted)
+                var employeeData = (from e in _dbContext.Employees.Where(s => !s.IsDeleted)
                                     select new EmployeeDashboardDataModel
                                     {
                                         Id = e.Id,
@@ -56,7 +56,7 @@ namespace WorkManagement.Service
                                     }).ToList();
 
 
-                if(employeeData != null )
+                if (employeeData != null)
                 {
                     return employeeData;
                 }
@@ -121,7 +121,7 @@ namespace WorkManagement.Service
 
         public async Task<List<EmployeeReportToModel>> GetReportToEmployeeList(int? departmentId, int? employeeId)
         {
-            if(departmentId == null || employeeId == null)
+            if (departmentId == null || employeeId == null)
             {
                 return new List<EmployeeReportToModel>();
             }
@@ -178,7 +178,6 @@ namespace WorkManagement.Service
                                     FirstName = e.FirstName,
                                     MiddleName = e.MiddleName,
                                     LastName = e.LastName,
-                                    MotherName = e.MotherName,
                                     Email = e.Email,
                                     AlternateEmail = e.AlternateEmail,
                                     PhoneNumber = e.PhoneNumber,
@@ -190,18 +189,6 @@ namespace WorkManagement.Service
                                     RoleId = e.RoleId,
                                     UserId = e.UserId,
                                     IsDeleted = e.IsDeleted,
-                                    /*EmployeeCategory = new EmployeeCategory
-                                    {
-                                        Name = e.EmployeeCategory == null ? "" : e.EmployeeCategory.Name
-                                    },*/
-                                    EmployeeDesignation = new EmployeeDesignation
-                                    {
-                                        Name = e.EmployeeDesignation == null ? "" : e.EmployeeDesignation.Name
-                                    },
-                                    /*EmployeeDepartment = new EmployeeDepartment
-                                    {
-                                        Name = e.EmployeeDepartment == null ? "" : e.EmployeeDepartment.Name
-                                    },*/
                                     EmployeePersonalDetails = new EmployeePersonalDetailsModel
                                     {
                                         DateOfBirth = e.EmployeePersonalDetails == null ? "" : (e.EmployeePersonalDetails.DateOfBirth.HasValue ? e.EmployeePersonalDetails.DateOfBirth.Value.ToString("yyyy-MM-dd") : ""),
@@ -262,9 +249,11 @@ namespace WorkManagement.Service
                                         BiometricCode = e.EmployeeIdentityInfos == null ? null : e.EmployeeIdentityInfos.BiometricCode,
                                     },
                                     EmployeeDocuments = new List<EmployeeDocumentsModel>(),
+                                    EmployeeEducationDetail = new List<EmployeeEducationDetailModel>(),
+                                    EmployeeRelationshipDetails = new List<EmployeeRelationshipDetailModel>(),
                                 });
 
-            if(employeeData != null)
+            if (employeeData != null)
             {
                 var returnEployeeData = employeeData.FirstOrDefault();
                 var employeeEducationData = (from e in _dbContext.EmployeeEducationDetails.Where(s => s.EmployeeId == returnEployeeData.Id)
@@ -277,7 +266,39 @@ namespace WorkManagement.Service
                                                  grade = e.grade
                                              }).ToList();
 
-                returnEployeeData.EmployeeEducationDetail = employeeEducationData == null ? new List<EmployeeEducationDetailModel>() : employeeEducationData;
+
+                if (employeeEducationData != null)
+                {
+                    if(employeeEducationData.Count == 0)
+                    {
+                        var educationData = new EmployeeEducationDetailModel();
+                        educationData.Type = "";
+                        educationData.PassingYear = "";
+                        educationData.University = "";
+                        educationData.grade = "";
+                        educationData.DegreeCertificateDate = null;
+
+                        returnEployeeData.EmployeeEducationDetail.Add(educationData);
+                    }
+                    else
+                    {
+                        returnEployeeData.EmployeeEducationDetail = employeeEducationData;
+                    }
+
+                   
+                }
+                else
+                {
+                    var educationData = new EmployeeEducationDetailModel();
+                    educationData.Type = "";
+                    educationData.PassingYear = "";
+                    educationData.University = "";
+                    educationData.grade = "";
+                    educationData.DegreeCertificateDate = null;
+
+                    returnEployeeData.EmployeeEducationDetail.Add(educationData);
+
+                }
 
                 var employeeRelationshipData = (from r in _dbContext.EmployeeRelationshipDetails.Where(s => s.EmployeeId == returnEployeeData.Id)
                                                 select new EmployeeRelationshipDetailModel
@@ -288,9 +309,23 @@ namespace WorkManagement.Service
                                                     PhoneNumber = r.PhoneNumber,
                                                 }).ToList();
 
-                if(employeeRelationshipData != null)
+                if (employeeRelationshipData != null)
                 {
-                    returnEployeeData.EmployeeRelationshipDetails = employeeRelationshipData;
+                    if(employeeEducationData.Count == 0)
+                    {
+                        var relationshipData = new EmployeeRelationshipDetailModel();
+                        relationshipData.RelationshipType = RelationshipType.Parent;
+                        relationshipData.Name = "";
+                        relationshipData.Email = "";
+                        relationshipData.PhoneNumber = "";
+
+                        returnEployeeData.EmployeeRelationshipDetails.Add(relationshipData);
+                    }
+                    else
+                    {
+                        returnEployeeData.EmployeeRelationshipDetails = employeeRelationshipData;
+                    }
+                   
                 }
                 else
                 {
@@ -300,11 +335,11 @@ namespace WorkManagement.Service
                     relationshipData.Email = "";
                     relationshipData.PhoneNumber = "";
 
-                    returnEployeeData.EmployeeRelationshipDetails.Add(relationshipData);    
+                    returnEployeeData.EmployeeRelationshipDetails.Add(relationshipData);
 
                 }
-                
-                returnEployeeData.EmployeeRelationshipDetails = employeeRelationshipData == null ? new List<EmployeeRelationshipDetailModel>() : employeeRelationshipData; ;
+
+
 
                 return returnEployeeData;
             }
@@ -342,9 +377,8 @@ namespace WorkManagement.Service
             _emailService.SendWelcomeMail(emailModel);
         }
 
-        public async Task<EmployeeModel> CreateEmployeeAsync(Employee employee)
+        public async Task<EmployeeModel> CreateEmployeeAsync(EmployeeModel employee)
         {
-
             var user = new ApplicationUser { UserName = employee.Email, Email = employee.Email, Shortcuts = new List<string>() };
             var password = new PasswordGenerator().GenerateRandomPassword(6);
             var userResult = await userManager.CreateAsync(
@@ -357,45 +391,432 @@ namespace WorkManagement.Service
 
             if (roleResult.Succeeded && userResult.Succeeded)
             {
-                employee.UserId = user.Id;
-                _dbContext.Employees.Add(employee);
-                await _dbContext.SaveChangesAsync();
-
                 try
                 {
-                    var WelcomeModelCredentials = new WelcomeModel();
-                    WelcomeModelCredentials.Username = user.UserName;
-                    WelcomeModelCredentials.Password = password;
+                    var today = DateTime.Today;
+                    var age = 0;
+                    decimal grossSalary = 0;
+                    var HRDate = today;
+                    var DOB = today;
+                    var newEmployee = new Employee();
 
-                    var emailModel = new EmailModel<WelcomeModel>();
-                    emailModel.From = "naupul30@gmail.com";
-                    emailModel.To = user.UserName;
-                    emailModel.Subject = "Welcome to Geo!";
-                    emailModel.repModel = WelcomeModelCredentials;
-                    _emailService.SendWelcomeMail(emailModel);
+                    newEmployee.PhotoURL = employee.PhotoURL;
+                    newEmployee.FirstName = employee.FirstName;
+                    newEmployee.MiddleName = employee.MiddleName;
+                    newEmployee.LastName = employee.LastName;
+                    newEmployee.Email = employee.Email;
+                    newEmployee.AlternateEmail = employee.AlternateEmail;
+                    newEmployee.PhoneNumber = employee.PhoneNumber;
+                    newEmployee.AlternateNumber = employee.AlternateNumber;
+                    newEmployee.EmployeeDepartmentId = employee.EmployeeDepartmentId;
+                    newEmployee.EmployeeDesignationId = employee.EmployeeDesignationId;
+                    newEmployee.EmployeeReportToId = employee.EmployeeReportToId;
+                    newEmployee.RoleId = employee.RoleId;
+                    newEmployee.EmployeeCategoryId = employee.EmployeeCategoryId;
+
+                    if (employee.EmployeePersonalDetails != null)
+                    {
+                        var employeePersonalDetailsData = new EmployeePersonalDetails();
+
+                        if (!string.IsNullOrEmpty(employee.EmployeePersonalDetails.DateOfBirth))
+                        {
+                            var dateOfBirth = DateTime.Parse(employee.EmployeePersonalDetails.DateOfBirth);
+                            employeePersonalDetailsData.DateOfBirth = dateOfBirth;
+                        }
+                        if (employeePersonalDetailsData.DateOfBirth.HasValue)
+                        {
+                            DOB = employeePersonalDetailsData.DateOfBirth.Value;
+                        }
+
+                        if (employeePersonalDetailsData.DateOfBirth.HasValue)
+                        {
+                            age = today.Year - employeePersonalDetailsData.DateOfBirth.Value.Year;
+                        }
+
+
+
+                        employeePersonalDetailsData.Gender = employee.EmployeePersonalDetails.Gender;
+                        employeePersonalDetailsData.MaritalStatus = employee.EmployeePersonalDetails.MaritalStatus;
+                        employeePersonalDetailsData.bloodGroup = employee.EmployeePersonalDetails.bloodGroup;
+
+                        newEmployee.EmployeePersonalDetails = employeePersonalDetailsData;
+                    }
+
+                    if (employee.EmployeeWorkInformation != null)
+                    {
+                        var employeeWorkInformationData = new EmployeeWorkInformation();
+                        if (!string.IsNullOrEmpty(employee.EmployeeWorkInformation.HireDate))
+                        {
+                            var hireDate = DateTime.Parse(employee.EmployeeWorkInformation.HireDate);
+                            employeeWorkInformationData.HireDate = hireDate;
+                        }
+
+                        if (employeeWorkInformationData.HireDate.HasValue)
+                        {
+                            HRDate = employeeWorkInformationData.HireDate.Value;
+                        }
+
+                        if (!string.IsNullOrEmpty(employee.EmployeeWorkInformation.ConfirmationDate))
+                        {
+                            var confirmationDate = DateTime.Parse(employee.EmployeeWorkInformation.ConfirmationDate);
+                            employeeWorkInformationData.ConfirmationDate = confirmationDate;
+                        }
+
+                        employeeWorkInformationData.Designation = employee.EmployeeWorkInformation.Designation;
+                        employeeWorkInformationData.GRPHead = employee.EmployeeWorkInformation.GRPHead;
+                        employeeWorkInformationData.SiteId = employee.EmployeeWorkInformation.SiteId;
+                        employeeWorkInformationData.SalaryType = employee.EmployeeWorkInformation.SalaryType;
+                        employeeWorkInformationData.Salary = employee.EmployeeWorkInformation.Salary;
+                        employeeWorkInformationData.Basic = employee.EmployeeWorkInformation.Basic;
+                        employeeWorkInformationData.HRAllowances = employee.EmployeeWorkInformation.HRAllowances;
+                        employeeWorkInformationData.Bonus = employee.EmployeeWorkInformation.Bonus;
+                        employeeWorkInformationData.Gratuity = employee.EmployeeWorkInformation.Gratuity;
+                        employeeWorkInformationData.PF = employee.EmployeeWorkInformation.PF;
+                        employeeWorkInformationData.ESI = employee.EmployeeWorkInformation.ESI;
+                        employeeWorkInformationData.PT = employee.EmployeeWorkInformation.PT;
+                        employeeWorkInformationData.TotalPreviousExperience = employee.EmployeeWorkInformation.TotalPreviousExperience;
+
+                        grossSalary = employeeWorkInformationData.Salary;
+
+                        newEmployee.EmployeeWorkInformation = employeeWorkInformationData;
+                    }
+
+                    if (employee.EmployeeInsuranceDetails != null)
+                    {
+                        var employeeInsuranceData = new EmployeeInsuranceDetail();
+
+                        employeeInsuranceData.SerialNumber = employee.EmployeeInsuranceDetails.SerialNumber;
+                        employeeInsuranceData.TotalSIWider = employee.EmployeeInsuranceDetails.TotalSIWider.HasValue ? employee.EmployeeInsuranceDetails.TotalSIWider.Value : 0;
+                        employeeInsuranceData.Comprehensive = employee.EmployeeInsuranceDetails.Comprehensive.HasValue ? employee.EmployeeInsuranceDetails.Comprehensive.Value : 0;
+                        employeeInsuranceData.Risk = employee.EmployeeInsuranceDetails.Risk;
+                        employeeInsuranceData.Age = age;
+                        employeeInsuranceData.EmployeeDesignationId = employee.EmployeeDesignationId;
+                        employeeInsuranceData.DateOfJoining = HRDate;
+                        employeeInsuranceData.DateOfBirth = DOB;
+                        employeeInsuranceData.GrossSalary = grossSalary;
+
+                        newEmployee.EmployeeInsuranceDetails = employeeInsuranceData;
+                    }
+
+                    if (employee.EmployeeAddresses != null)
+                    {
+                        var employeeAddressData = new EmployeeAddress();
+                        employeeAddressData.AddressLine1 = employee.EmployeeAddresses.AddressLine1;
+                        employeeAddressData.AddressLine2 = employee.EmployeeAddresses.AddressLine2;
+                        employeeAddressData.City = employee.EmployeeAddresses.City;
+                        employeeAddressData.Country = employee.EmployeeAddresses.Country;
+                        employeeAddressData.State = employee.EmployeeAddresses.State;
+                        employeeAddressData.PinCode = employee.EmployeeAddresses.PinCode;
+
+                        newEmployee.EmployeeAddresses = employeeAddressData;
+                    }
+
+                    if (employee.EmployeeIdentityInfos != null)
+                    {
+                        var employeeIdentityData = new EmployeeIdentityInfo();
+                        employeeIdentityData.UID = employee.EmployeeIdentityInfos.UID;
+                        employeeIdentityData.BankAccountNumber = employee.EmployeeIdentityInfos.BankAccountNumber;
+                        employeeIdentityData.BankName = employee.EmployeeIdentityInfos.BankName;
+                        employeeIdentityData.Branch = employee.EmployeeIdentityInfos.Branch;
+                        employeeIdentityData.IFSC = employee.EmployeeIdentityInfos.IFSC;
+                        employeeIdentityData.AccountHolderName = employee.EmployeeIdentityInfos.AccountHolderName;
+                        employeeIdentityData.PAN = employee.EmployeeIdentityInfos.PAN;
+                        employeeIdentityData.ProvidentFundNumber = employee.EmployeeIdentityInfos.ProvidentFundNumber;
+                        employeeIdentityData.EmployeeStateInsuranceNumber = employee.EmployeeIdentityInfos.EmployeeStateInsuranceNumber;
+                        employeeIdentityData.BiometricCode = employee.EmployeeIdentityInfos.BiometricCode;
+
+                        newEmployee.EmployeeIdentityInfos = employeeIdentityData;
+                    }
+
+                    if (employee.EmployeeEducationDetail != null)
+                    {
+                        if (employee.EmployeeEducationDetail.Count > 0)
+                        {
+                            newEmployee.EmployeeEducationDetail = new List<EmployeeEducationDetail>();
+                            foreach (var detail in employee.EmployeeEducationDetail)
+                            {
+                                var educationData = new EmployeeEducationDetail();
+                                educationData.Type = detail.Type;
+                                educationData.PassingYear = detail.PassingYear;
+                                educationData.DegreeCertificateDate = detail.DegreeCertificateDate;
+                                educationData.University = detail.University;
+                                educationData.grade = detail.grade;
+
+                                newEmployee.EmployeeEducationDetail.Add(educationData);
+                            }
+                        }
+                    }
+
+                    if (employee.EmployeeRelationshipDetails != null)
+                    {
+                        if (employee.EmployeeRelationshipDetails.Count > 0)
+                        {
+                            newEmployee.EmployeeRelationshipDetails = new List<EmployeeRelationshipDetail>();
+                            foreach (var detail in employee.EmployeeRelationshipDetails)
+                            {
+                                var relationshipData = new EmployeeRelationshipDetail();
+                                relationshipData.RelationshipType = RelationshipType.Parent;
+                                relationshipData.Name = detail.Name;
+                                relationshipData.Email = detail.Email;
+                                relationshipData.PhoneNumber = detail.PhoneNumber;
+
+                                newEmployee.EmployeeRelationshipDetails.Add(relationshipData);
+                            }
+                        }
+                    }
+
+
+                    newEmployee.UserId = user.Id;
+                    newEmployee.CreatedBy = user.Id;
+                    newEmployee.CreatedOn = DateTime.Now;
+                    newEmployee.LastModifiedBy = user.Id;
+                    newEmployee.LastModifiedOn = DateTime.Now;
+
+                    _dbContext.Employees.Add(newEmployee);
+                    _dbContext.SaveChanges();
+
+                    SendEmail(user, password);
+
+                    return employee;
                 }
                 catch (Exception e)
                 {
-                    // think about the exception later
+                    throw new InvalidOperationException("Somthing wrong while creating Users and Roles for employee");
                 }
-                return mapper.Map<EmployeeModel>(employee);
             }
             else
+            {
                 throw new InvalidOperationException("Somthing wrong while creating Users and Roles for employee");
+            }
         }
 
-        public async Task<EmployeeModel> UpdateEmployeeAsync(Employee employee)
+        public async Task<EmployeeModel> UpdateEmployeeAsync(int id, EmployeeModel employee)
         {
-            _dbContext.Employees.Update(employee);
-            await _dbContext.SaveChangesAsync();
-            return mapper.Map<EmployeeModel>(employee);
-            ;
+            var employeeData = _dbContext.Employees.FirstOrDefault(s => s.Id == id);
+            var today = DateTime.Today;
+            var age = 0;
+            decimal grossSalary = 0;
+            var HRDate = today;
+            var DOB = today;
+            try
+            {
+                if (employeeData != null)
+                {
+                    employeeData.PhotoURL = employee.PhotoURL;
+                    employeeData.FirstName = employee.FirstName;
+                    employeeData.MiddleName = employee.MiddleName;
+                    employeeData.LastName = employee.LastName;
+                    employeeData.Email = employee.Email;
+                    employeeData.AlternateEmail = employee.AlternateEmail;
+                    employeeData.PhoneNumber = employee.PhoneNumber;
+                    employeeData.AlternateNumber = employee.AlternateNumber;
+                    employeeData.RoleId = employee.RoleId;
+                    employeeData.EmployeeCategoryId = employee.EmployeeCategoryId;
+                    employeeData.EmployeeDepartmentId = employee.EmployeeDepartmentId;
+                    employeeData.EmployeeReportToId = employee.EmployeeReportToId;
+                    employeeData.EmployeeDesignationId = employee.EmployeeDesignationId;
+
+                    if (employeeData.EmployeePersonalDetailsId.HasValue && employee.EmployeePersonalDetails != null)
+                    {
+                        var employeePersonalDetailsData = _dbContext.EmployeePersonalDetails.FirstOrDefault(s => s.Id == employeeData.EmployeePersonalDetailsId.Value);
+                        if (employeePersonalDetailsData != null)
+                        {
+                            if (!string.IsNullOrEmpty(employee.EmployeePersonalDetails.DateOfBirth))
+                            {
+                                var dateOfBirth = DateTime.Parse(employee.EmployeePersonalDetails.DateOfBirth);
+                                employeePersonalDetailsData.DateOfBirth = dateOfBirth;
+                            }
+                            if (employeePersonalDetailsData.DateOfBirth.HasValue)
+                            {
+                                DOB = employeePersonalDetailsData.DateOfBirth.Value;
+                            }
+                           
+
+                            if (employeePersonalDetailsData.DateOfBirth.HasValue)
+                            {
+                                age = today.Year - employeePersonalDetailsData.DateOfBirth.Value.Year;
+                            }
+
+
+
+                            employeePersonalDetailsData.Gender = employee.EmployeePersonalDetails.Gender;
+                            employeePersonalDetailsData.MaritalStatus = employee.EmployeePersonalDetails.MaritalStatus;
+                            employeePersonalDetailsData.bloodGroup = employee.EmployeePersonalDetails.bloodGroup;
+
+                            //_dbContext.Update(employeePersonalDetailsData);
+                            employeeData.EmployeePersonalDetails = employeePersonalDetailsData;
+                        }
+                    }
+
+                    if (employeeData.EmployeeWorkInformationId.HasValue && employee.EmployeeWorkInformation != null)
+                    {
+                        var employeeWorkInformationData = _dbContext.EmployeeWorkInformations.FirstOrDefault(s => s.Id == employeeData.EmployeeWorkInformationId.Value);
+                        if (employeeWorkInformationData != null)
+                        {
+                            if (!string.IsNullOrEmpty(employee.EmployeeWorkInformation.HireDate))
+                            {
+                                var hireDate = DateTime.Parse(employee.EmployeeWorkInformation.HireDate);
+                                employeeWorkInformationData.HireDate = hireDate;
+                            }
+
+                            if (employeeWorkInformationData.HireDate.HasValue)
+                            {
+                                HRDate = employeeWorkInformationData.HireDate.Value;
+                            }
+
+                            if (!string.IsNullOrEmpty(employee.EmployeeWorkInformation.ConfirmationDate))
+                            {
+                                var confirmationDate = DateTime.Parse(employee.EmployeeWorkInformation.ConfirmationDate);
+                                employeeWorkInformationData.ConfirmationDate = confirmationDate;
+                            }
+
+                            employeeWorkInformationData.Designation = employee.EmployeeWorkInformation.Designation;
+                            employeeWorkInformationData.GRPHead = employee.EmployeeWorkInformation.GRPHead;
+                            employeeWorkInformationData.SiteId = employee.EmployeeWorkInformation.SiteId;
+                            employeeWorkInformationData.SalaryType = employee.EmployeeWorkInformation.SalaryType;
+                            employeeWorkInformationData.Salary = employee.EmployeeWorkInformation.Salary;
+                            employeeWorkInformationData.Basic = employee.EmployeeWorkInformation.Basic;
+                            employeeWorkInformationData.HRAllowances = employee.EmployeeWorkInformation.HRAllowances;
+                            employeeWorkInformationData.Bonus = employee.EmployeeWorkInformation.Bonus;
+                            employeeWorkInformationData.Gratuity = employee.EmployeeWorkInformation.Gratuity;
+                            employeeWorkInformationData.PF = employee.EmployeeWorkInformation.PF;
+                            employeeWorkInformationData.ESI = employee.EmployeeWorkInformation.ESI;
+                            employeeWorkInformationData.PT = employee.EmployeeWorkInformation.PT;
+                            employeeWorkInformationData.TotalPreviousExperience = employee.EmployeeWorkInformation.TotalPreviousExperience;
+
+                            grossSalary = employeeWorkInformationData.Salary;
+
+                            employeeData.EmployeeWorkInformation = employeeWorkInformationData;
+                        }
+                    }
+
+                    if (employeeData.EmployeeInsuranceDetailsId.HasValue && employee.EmployeeInsuranceDetails != null)
+                    {
+                        var employeeInsuranceData = _dbContext.EmployeeInsuranceDetails.FirstOrDefault(s => s.Id == employeeData.EmployeeInsuranceDetailsId.Value);
+                        if (employeeInsuranceData != null)
+                        {
+                            employeeInsuranceData.SerialNumber = employee.EmployeeInsuranceDetails.SerialNumber;
+                            employeeInsuranceData.TotalSIWider = employee.EmployeeInsuranceDetails.TotalSIWider.HasValue ? employee.EmployeeInsuranceDetails.TotalSIWider.Value : 0 ;
+                            employeeInsuranceData.Comprehensive = employee.EmployeeInsuranceDetails.Comprehensive.HasValue ? employee.EmployeeInsuranceDetails.Comprehensive.Value : 0;
+                            employeeInsuranceData.Risk = employee.EmployeeInsuranceDetails.Risk;
+                            employeeInsuranceData.Age = age;
+                            employeeInsuranceData.EmployeeDesignationId = employee.EmployeeDesignationId;
+                            employeeInsuranceData.DateOfJoining = HRDate;
+                            employeeInsuranceData.DateOfBirth = DOB;
+                            employeeInsuranceData.GrossSalary = grossSalary;
+
+                            employeeData.EmployeeInsuranceDetails = employeeInsuranceData;
+                        }
+                    }
+
+                    if (employeeData.EmployeeAddressesId.HasValue && employee.EmployeeAddresses != null)
+                    {
+                        var employeeAddressData = _dbContext.EmployeeAddresses.FirstOrDefault(s => s.Id == employeeData.EmployeeAddressesId.Value);
+                        if (employeeAddressData != null)
+                        {
+                            employeeAddressData.AddressLine1 = employee.EmployeeAddresses.AddressLine1;
+                            employeeAddressData.AddressLine2 = employee.EmployeeAddresses.AddressLine2;
+                            employeeAddressData.City = employee.EmployeeAddresses.City;
+                            employeeAddressData.Country = employee.EmployeeAddresses.Country;
+                            employeeAddressData.State = employee.EmployeeAddresses.State;
+                            employeeAddressData.PinCode = employee.EmployeeAddresses.PinCode;
+
+                            employeeData.EmployeeAddresses = employeeAddressData;
+                        }
+                    }
+
+                    if (employeeData.EmployeeIdentityInfoId.HasValue && employee.EmployeeIdentityInfos != null)
+                    {
+                        var employeeIdentityData = _dbContext.EmployeeIdentityInfos.FirstOrDefault(s => s.Id == employeeData.EmployeeIdentityInfoId.Value);
+                        if (employeeIdentityData != null)
+                        {
+                            employeeIdentityData.UID = employee.EmployeeIdentityInfos.UID;
+                            employeeIdentityData.BankAccountNumber = employee.EmployeeIdentityInfos.BankAccountNumber;
+                            employeeIdentityData.BankName = employee.EmployeeIdentityInfos.BankName;
+                            employeeIdentityData.Branch = employee.EmployeeIdentityInfos.Branch;
+                            employeeIdentityData.IFSC = employee.EmployeeIdentityInfos.IFSC;
+                            employeeIdentityData.AccountHolderName = employee.EmployeeIdentityInfos.AccountHolderName;
+                            employeeIdentityData.PAN = employee.EmployeeIdentityInfos.PAN;
+                            employeeIdentityData.ProvidentFundNumber = employee.EmployeeIdentityInfos.ProvidentFundNumber;
+                            employeeIdentityData.EmployeeStateInsuranceNumber = employee.EmployeeIdentityInfos.EmployeeStateInsuranceNumber;
+                            employeeIdentityData.BiometricCode = employee.EmployeeIdentityInfos.BiometricCode;
+
+                            employeeData.EmployeeIdentityInfos = employeeIdentityData;
+                        }
+                    }
+
+                    if (employee.EmployeeEducationDetail != null)
+                    {
+                        if(employee.EmployeeEducationDetail.Count > 0)
+                        {
+                            var educationDetails = _dbContext.EmployeeEducationDetails.Where(s => s.EmployeeId == employeeData.Id).ToList();
+                            foreach(var detail in educationDetails)
+                            {
+                                _dbContext.EmployeeEducationDetails.Remove(detail);
+                            }
+
+                            foreach(var detail in employee.EmployeeEducationDetail)
+                            {
+                                var educationData = new EmployeeEducationDetail();
+                                educationData.EmployeeId = employeeData.Id;
+                                educationData.Type = detail.Type;
+                                educationData.PassingYear = detail.PassingYear;
+                                educationData.DegreeCertificateDate = detail.DegreeCertificateDate;
+                                educationData.University = detail.University;
+                                educationData.grade = detail.grade;
+
+                                _dbContext.EmployeeEducationDetails.Add(educationData);
+                            }
+                        }
+                    }
+
+
+                    if (employee.EmployeeRelationshipDetails != null)
+                    {
+                        if (employee.EmployeeRelationshipDetails.Count > 0)
+                        {
+                            var relationshipDetails = _dbContext.EmployeeRelationshipDetails.Where(s => s.EmployeeId == employeeData.Id).ToList();
+                            foreach (var detail in relationshipDetails)
+                            {
+                                _dbContext.EmployeeRelationshipDetails.Remove(detail);
+                            }
+
+                            foreach (var detail in employee.EmployeeRelationshipDetails)
+                            {
+                                var relationshipData = new EmployeeRelationshipDetail();
+                                relationshipData.EmployeeId = employeeData.Id;
+                                relationshipData.RelationshipType = detail.RelationshipType;
+                                relationshipData.Name = detail.Name;
+                                relationshipData.Email = detail.Email;
+                                relationshipData.PhoneNumber = detail.PhoneNumber;
+
+                                _dbContext.EmployeeRelationshipDetails.Add(relationshipData);
+                            }
+                        }
+                    }
+
+                    employeeData.LastModifiedOn = DateTime.Now;
+                    
+
+                    _dbContext.Employees.Update(employeeData);
+                    _dbContext.SaveChanges();
+
+                    return employee;
+                }
+                else
+                {
+                    return null;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
         }
 
         public async Task<bool> DeleteEmployeeAsync(int id)
         {
-            var edu = await _dbContext.EmployeeEducationDetails.Where(x => x.EmployeeId == id).ExecuteDeleteAsync();
-
             var employee = await _dbContext.Employees.FindAsync(id);
             if (employee == null)
                 return false;
@@ -404,5 +825,24 @@ namespace WorkManagement.Service
             await _dbContext.SaveChangesAsync();
             return true;
         }
+
+        #region Private methods
+
+        private async void SendEmail(ApplicationUser user,string password)
+        {
+            var WelcomeModelCredentials = new WelcomeModel();
+            WelcomeModelCredentials.Username = user.UserName;
+            WelcomeModelCredentials.Password = password;
+
+            var emailModel = new EmailModel<WelcomeModel>();
+            emailModel.From = "naupul30@gmail.com";
+            emailModel.To = user.UserName;
+            emailModel.Subject = "Welcome to Geo!";
+            emailModel.repModel = WelcomeModelCredentials;
+            _emailService.SendWelcomeMail(emailModel);
+        }
+
+
+        #endregion
     }
 }

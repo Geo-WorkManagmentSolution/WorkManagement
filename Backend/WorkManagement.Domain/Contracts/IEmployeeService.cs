@@ -17,9 +17,9 @@ namespace WorkManagement.Domain.Contracts
 
         public Task SendEmail();
 
-        public Task<EmployeeModel> CreateEmployeeAsync(Employee employee);
+        public Task<EmployeeModel> CreateEmployeeAsync(EmployeeModel employee);
 
-        public Task<EmployeeModel> UpdateEmployeeAsync(Employee employee);
+        public Task<EmployeeModel> UpdateEmployeeAsync(int id, EmployeeModel employee);
         public Task<List<EmployeeCategory>> GetEmployeeCategories();
         public Task<List<EmployeeDepartment>> GetEmployeeDepartments();
         public Task<List<EmployeeDesignation>> GetEmployeeDesignations();

@@ -20,7 +20,6 @@ namespace WorkManagement.Domain.Models.Employee
         public string FirstName { get; set; }
         public string MiddleName { get; set; }
         public string LastName { get; set; }
-        public string MotherName { get; set; }
         [EmailAddress]
         public string Email { get; set; }
         public string AlternateEmail { get; set; }
@@ -35,9 +34,7 @@ namespace WorkManagement.Domain.Models.Employee
         public int? EmployeeDepartmentId { get; set; }
        // public EmployeeDepartment? EmployeeDepartment { get; set; }
         public int? EmployeeReportToId { get; set; }
-        public string EmployeeReportToName { get; set; }
         public int? EmployeeDesignationId { get; set; }
-        public EmployeeDesignation? EmployeeDesignation { get; set; }
         public EmployeePersonalDetailsModel EmployeePersonalDetails { get; set; }
         public EmployeeWorkInformationModel EmployeeWorkInformation { get; set; }
         public EmployeeInsuranceDetailModel EmployeeInsuranceDetails { get; set; }
@@ -70,21 +67,21 @@ namespace WorkManagement.Domain.Models.Employee
         public decimal PF { get; set; }
         public decimal ESI { get; set; }
         public decimal PT { get; set; }
-        public string HireDate { get; set; }
-        public string ConfirmationDate { get; set; }
+        public string? HireDate { get; set; }
+        public string? ConfirmationDate { get; set; }
         public decimal TotalPreviousExperience { get; set; }
     }
 
     public class EmployeeInsuranceDetailModel
     {
         public int? EmployeeDesignationId { get; set; }
-        public required string SerialNumber { get; set; }
+        public string? SerialNumber { get; set; }
         public string? DateOfJoining { get; set; }
         public string? DateOfBirth { get; set; }
-        public decimal Age { get; set; }
-        public decimal GrossSalary { get; set; }
-        public decimal TotalSIWider { get; set; }
-        public decimal Comprehensive { get; set; }
+        public decimal? Age { get; set; }
+        public decimal? GrossSalary { get; set; }
+        public decimal? TotalSIWider { get; set; }
+        public decimal? Comprehensive { get; set; }
         public string? Risk { get; set; }
     }
 

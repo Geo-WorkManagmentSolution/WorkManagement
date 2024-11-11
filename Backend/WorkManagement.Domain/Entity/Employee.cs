@@ -16,13 +16,16 @@ namespace WorkManagementSolution.Employee
     {
         public string? PhotoURL { get; set; }
         public int EmployeeNumber { get; set; }
-        public required string FirstName { get; set; }
-        public required string MiddleName { get; set; }
-        public required string LastName { get; set; }
-        public string? MotherName { get; set; }        
+        [Required]
+        public string FirstName { get; set; }
+        [Required]
+        public string MiddleName { get; set; }
+        [Required]
+        public string LastName { get; set; }       
 
         [EmailAddress]
-        public required string Email { get; set; }
+        [Required]
+        public string Email { get; set; }
         public string AlternateEmail { get; set; }
         public long? PhoneNumber { get; set; }
         public long? AlternateNumber { get; set; }
@@ -39,10 +42,10 @@ namespace WorkManagementSolution.Employee
         public int? EmployeeReportToId { get; set; }
 
         [ForeignKey(nameof(ApplicationUser))]
-        public required Guid UserId { get; set; }
+        public Guid UserId { get; set; }
 
         [ForeignKey(nameof(ApplicationRole))]
-        public required Guid RoleId { get; set; }
+        public Guid RoleId { get; set; }
 
         [ForeignKey(nameof(EmployeeCategory))]
         public int? EmployeeCategoryId { get; set; }
@@ -58,6 +61,9 @@ namespace WorkManagementSolution.Employee
 
         [ForeignKey(nameof(EmployeeAddresses))]
         public int? EmployeeAddressesId { get; set; }
+
+        [ForeignKey(nameof(EmployeeIdentityInfos))]
+        public int? EmployeeIdentityInfoId { get; set; }
 
         #endregion
 
@@ -135,7 +141,7 @@ namespace WorkManagementSolution.Employee
     {
         [DataType(DataType.Date)]
         public DateTime? DateOfBirth { get; set; }
-        public required string Gender { get; set; }
+        public string Gender { get; set; }
         public MaritalStatus? MaritalStatus { get; set; }
         public BloodGroup? bloodGroup { get; set; }
 
@@ -206,7 +212,7 @@ namespace WorkManagementSolution.Employee
         public Employee? Employee { get; set; }
 
         public RelationshipType? RelationshipType { get; set; }
-        public required string Name { get; set; }
+        public string Name { get; set; }
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
 
@@ -218,7 +224,7 @@ namespace WorkManagementSolution.Employee
         [ForeignKey(nameof(EmployeeDesignation))]
         public int? EmployeeDesignationId { get; set; }
         public EmployeeDesignation? EmployeeDesignation { get; set; }
-        public required string SerialNumber { get; set; }
+        public string SerialNumber { get; set; }
         public DateTime? DateOfJoining { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public decimal Age { get; set; }

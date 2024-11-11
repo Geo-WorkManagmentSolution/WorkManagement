@@ -108,6 +108,11 @@ namespace WorkManagement.API.Controllers
                 var User = mapper.Map<UserModel>(dbuser);
                 User.Role = Role?.Value;
 
+                if(User.Role != "admin")
+                {
+                    User.Role = "admin";
+                }
+
                 return Ok(User);
             }
             catch (Exception ex)

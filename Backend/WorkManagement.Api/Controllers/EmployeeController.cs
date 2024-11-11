@@ -112,8 +112,7 @@ namespace WorkManagement.API.Controllers
         [HttpPost]
         public async Task<ActionResult<EmployeeModel>> CreateEmployee([FromBody] EmployeeModel employeeModel)
         {
-            var employee = mapper.Map<Employee>(employeeModel);
-            var createdEmployee = await employeeService.CreateEmployeeAsync(employee);
+            var createdEmployee = await employeeService.CreateEmployeeAsync(employeeModel);
             return CreatedAtAction(nameof(GetEmployee), new { id = createdEmployee.Id }, createdEmployee);
         }
 
@@ -148,7 +147,9 @@ namespace WorkManagement.API.Controllers
             {
                 return BadRequest();
             }
-            await employeeService.UpdateEmployeeAsync(mapper.Map<Employee>(employee));
+
+
+            await employeeService.UpdateEmployeeAsync(id,employee);
             return NoContent();
         }
 
