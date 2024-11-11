@@ -242,11 +242,6 @@ export type EmployeeDashboardDataModel = {
   site?: string | null;
   hireDate?: string | null;
 };
-export type EmployeeDesignation = {
-  id?: number;
-  isDeleted?: boolean;
-  name?: string | null;
-};
 export type EmployeePersonalDetailsModel = {
   dateOfBirth?: string | null;
   gender?: string | null;
@@ -272,13 +267,13 @@ export type EmployeeWorkInformationModel = {
 };
 export type EmployeeInsuranceDetailModel = {
   employeeDesignationId?: number | null;
-  serialNumber: string | null;
+  serialNumber?: string | null;
   dateOfJoining?: string | null;
   dateOfBirth?: string | null;
-  age?: number;
-  grossSalary?: number;
-  totalSIWider?: number;
-  comprehensive?: number;
+  age?: number | null;
+  grossSalary?: number | null;
+  totalSIWider?: number | null;
+  comprehensive?: number | null;
   risk?: string | null;
 };
 export type EmployeeAddressModel = {
@@ -327,7 +322,6 @@ export type EmployeeModel = {
   firstName?: string | null;
   middleName?: string | null;
   lastName?: string | null;
-  motherName?: string | null;
   email?: string | null;
   alternateEmail?: string | null;
   phoneNumber?: number | null;
@@ -339,9 +333,7 @@ export type EmployeeModel = {
   employeeCategoryId?: number | null;
   employeeDepartmentId?: number | null;
   employeeReportToId?: number | null;
-  employeeReportToName?: string | null;
   employeeDesignationId?: number | null;
-  employeeDesignation?: EmployeeDesignation;
   employeePersonalDetails?: EmployeePersonalDetailsModel;
   employeeWorkInformation?: EmployeeWorkInformationModel;
   employeeInsuranceDetails?: EmployeeInsuranceDetailModel;
@@ -357,6 +349,11 @@ export type EmployeeCategory = {
   name?: string | null;
 };
 export type EmployeeDepartment = {
+  id?: number;
+  isDeleted?: boolean;
+  name?: string | null;
+};
+export type EmployeeDesignation = {
   id?: number;
   isDeleted?: boolean;
   name?: string | null;
