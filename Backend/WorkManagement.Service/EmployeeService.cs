@@ -311,7 +311,7 @@ namespace WorkManagement.Service
 
                 if (employeeRelationshipData != null)
                 {
-                    if(employeeEducationData.Count == 0)
+                    if(employeeRelationshipData.Count == 0)
                     {
                         var relationshipData = new EmployeeRelationshipDetailModel();
                         relationshipData.RelationshipType = RelationshipType.Parent;
