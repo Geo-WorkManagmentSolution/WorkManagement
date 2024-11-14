@@ -85,6 +85,38 @@ export type EmployeeDesignation = {
   isDeleted?: boolean;
   name?: string | null;
 };
+export type EmployeePersonalDetails = {
+  id?: number;
+  isDeleted?: boolean;
+  employeeId?: number | null;
+  dateOfBirth?: string | null;
+  gender: string | null;
+  maritalStatus?: MaritalStatus;
+  bloodGroup?: BloodGroup;
+  relationWithEmployee?: RelationWithEmployee;
+};
+export type Site = {
+  id?: number;
+  isDeleted?: boolean;
+  name?: string | null;
+};
+export type EmployeeWorkInformation = {
+  id?: number;
+  isDeleted?: boolean;
+  employeeId?: number | null;
+  designation?: string | null;
+  salaryType?: SalaryType;
+  hireDate?: string | null;
+  confirmationDate?: string | null;
+  totalPreviousExperience?: number;
+  salary?: number;
+  siteId?: number | null;
+  site?: Site;
+  bond?: number | null;
+  previousDateOfJoiningInGDR?: string | null;
+  previousDateOfLeavingInGDR?: string | null;
+  grpHead?: string | null;
+};
 export type ApplicationUser = {
   id?: string;
   userName?: string | null;
@@ -109,49 +141,10 @@ export type ApplicationRole = {
   normalizedName?: string | null;
   concurrencyStamp?: string | null;
 };
-export type Site = {
-  id?: number;
-  isDeleted?: boolean;
-  name?: string | null;
-};
-export type EmployeeWorkInformation = {
-  id?: number;
-  isDeleted?: boolean;
-  employeeId?: number | null;
-  designation?: string | null;
-  salaryType?: SalaryType;
-  hireDate?: string | null;
-  confirmationDate?: string | null;
-  totalPreviousExperience?: number;
-  salary?: number;
-  siteId?: number | null;
-  site?: Site;
-  bond?: number | null;
-  previousDateOfJoiningInGDR?: string | null;
-  previousDateOfLeavingInGDR?: string | null;
-  grpHead?: string | null;
-};
-export type EmployeeInsuranceDetail = {
-  id?: number;
-  isDeleted?: boolean;
-  employeeId?: number | null;
-  employee?: Employee;
-  employeeDesignationId?: number | null;
-  employeeDesignation?: EmployeeDesignation;
-  serialNumber: string | null;
-  dateOfJoining?: string | null;
-  dateOfBirth?: string | null;
-  age?: number;
-  grossSalary?: number;
-  totalSIWider?: number;
-  comprehensive?: number;
-  risk?: string | null;
-};
 export type EmployeeAddress = {
   id?: number;
   isDeleted?: boolean;
   employeeId?: number | null;
-  employee?: Employee;
   addressLine1?: string | null;
   addressLine2?: string | null;
   city?: string | null;
@@ -215,12 +208,12 @@ export type EmployeeLeaveType = {
 export type EmployeeLeaveSummary = {
   id?: number;
   isDeleted?: boolean;
-  employeeLeaveTypeId?: number | null;
-  employeeLeaveTypes?: EmployeeLeaveType;
-  totalLeaves?: number;
   employeeId?: number;
   employee?: Employee;
   remainingLeaves?: number;
+  employeeLeaveTypeId?: number | null;
+  employeeLeaveTypes?: EmployeeLeaveType;
+  totalLeaves?: number;
 };
 export type Employee = {
   id?: number;
@@ -265,16 +258,21 @@ export type Employee = {
   employeeDocuments?: EmployeeDocuments[] | null;
   employeeLeaves?: EmployeeLeaveSummary[] | null;
 };
-export type EmployeePersonalDetails = {
+export type EmployeeInsuranceDetail = {
   id?: number;
   isDeleted?: boolean;
   employeeId?: number | null;
   employee?: Employee;
+  employeeDesignationId?: number | null;
+  employeeDesignation?: EmployeeDesignation;
+  serialNumber: string | null;
+  dateOfJoining?: string | null;
   dateOfBirth?: string | null;
-  gender: string | null;
-  maritalStatus?: MaritalStatus;
-  bloodGroup?: BloodGroup;
-  relationWithEmployee?: RelationWithEmployee;
+  age?: number;
+  grossSalary?: number;
+  totalSIWider?: number;
+  comprehensive?: number;
+  risk?: string | null;
 };
 export type EmployeeModel = {
   id?: number;
@@ -306,27 +304,8 @@ export type EmployeeModel = {
   employeeEducationDetail?: EmployeeEducationDetail[] | null;
   employeeRelationshipDetails?: EmployeeRelationshipDetail[] | null;
   employeeDocuments?: EmployeeDocuments[] | null;
+  employeeLeaves?: EmployeeLeaveSummary[] | null;
 };
-export enum SalaryType {
-  M = "M",
-  F = "F",
-}
-export enum RelationshipType {
-  Parent = "Parent",
-  Spouse = "Spouse",
-  FamilyMember = "FamilyMember",
-  Friend = "Friend",
-  Other = "Other",
-}
-export enum FileType {
-  Pdf = "PDF",
-  Docx = "DOCX",
-  Txt = "TXT",
-  Zip = "ZIP",
-  Xlsx = "XLSX",
-  Csv = "CSV",
-  Other = "Other",
-}
 export enum MaritalStatus {
   Unknown = "Unknown",
   Single = "Single",
@@ -357,6 +336,26 @@ export enum RelationWithEmployee {
   Mentor = "Mentor",
   Friend = "Friend",
   FamilyMember = "FamilyMember",
+  Other = "Other",
+}
+export enum SalaryType {
+  M = "M",
+  F = "F",
+}
+export enum RelationshipType {
+  Parent = "Parent",
+  Spouse = "Spouse",
+  FamilyMember = "FamilyMember",
+  Friend = "Friend",
+  Other = "Other",
+}
+export enum FileType {
+  Pdf = "PDF",
+  Docx = "DOCX",
+  Txt = "TXT",
+  Zip = "ZIP",
+  Xlsx = "XLSX",
+  Csv = "CSV",
   Other = "Other",
 }
 export const {

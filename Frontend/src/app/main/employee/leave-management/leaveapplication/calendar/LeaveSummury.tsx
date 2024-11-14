@@ -1,230 +1,249 @@
-import React, { useState, useMemo } from 'react';
-import {
-  FormControl,
-  MenuItem,
-  Paper,
-  Select,
-  SelectChangeEvent,
-  Typography,
-  Box,
-  IconButton,
-} from '@mui/material';
+import React, { useState, useMemo, useEffect } from 'react';
+import { FormControl, MenuItem, Paper, Select, SelectChangeEvent } from '@mui/material';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { MRT_ColumnDef } from 'material-react-table';
 import DataTable from 'app/shared-components/data-table/DataTable';
-import { 
-  EmployeeLeave, 
-  EmployeeHoliday, 
-  LeaveStatus,
-  useGetApiLeavesLeavesHistoryQuery,
-  useGetApiLeavesHolidaysQuery
+import {
+	EmployeeLeave,
+	usePostApiLeavesLeavesEmployeeLeaveHistoryMutation,
+	EmployeeLeaveHistoryDto
 } from '../../LeavesApi';
 
 interface LeaveSummaryProps {
-  openDialoge: (event: EmployeeLeave) => void;
+	openDialoge: (event: EmployeeLeaveHistoryDto) => void;
+	onSave: (event: EmployeeLeave) => Promise<void>;
+	onDelete: (eventId: number) => Promise<void>;
+	refetchEvents: () => Promise<void>;
 }
 
-function LeaveSummary({ openDialoge }: LeaveSummaryProps) {
-  const [upcomingOptions, setUpcomingOptions] = useState('Upcoming Leaves');
-  const [pastOptions, setPastOptions] = useState('Past Leaves');
-  const pastOptionsArray = ['Past Leaves', 'Past Holidays', 'Past Leave and Holidays'];
-  const upcomingOptionsArray = ['Upcoming Leaves', 'Upcoming Holidays', 'Upcoming Leave and Holidays'];
+function LeaveSummary({ openDialoge, onSave, onDelete, refetchEvents }: LeaveSummaryProps) {
+	const [upcomingOptions, setUpcomingOptions] = useState('Upcoming Leaves');
+	const [pastOptions, setPastOptions] = useState('Past Leaves');
+	const pastOptionsArray = ['Past Leaves', 'Past Holidays', 'Past Leave and Holidays'];
+	const upcomingOptionsArray = ['Upcoming Leaves', 'Upcoming Holidays', 'Upcoming Leave and Holidays'];
 
-  const { data: leavesHistory, isLoading: isLeavesLoading } = useGetApiLeavesLeavesHistoryQuery();
-  const { data: holidays, isLoading: isHolidaysLoading } = useGetApiLeavesHolidaysQuery();
+	const handleOpenDialog = (event: EmployeeLeaveHistoryDto) => {
+		openDialoge({
+			...event,
+			isNewEvent: false
+		});
+	};
 
-  const columns = useMemo<MRT_ColumnDef<EmployeeLeave | EmployeeHoliday>[]>(() => [
-    {
-      accessorKey: 'startDate',
-      header: 'From',
-      accessorFn: (row) => new Date(row.startDate).toLocaleDateString(),
-    },
-    {
-      accessorKey: 'endDate',
-      header: 'To',
-      accessorFn: (row) => new Date(row.endDate).toLocaleDateString(),
-    },
-    {
-      accessorKey: 'leaveType',
-      header: 'Type of leave',
-      accessorFn: (row) => 'employeeLeaveTypes' in row ? row.employeeLeaveTypes?.name : 'Holiday',
-    },
-    {
-      accessorKey: 'reason',
-      header: 'Reason',
-      accessorFn: (row) => 'reason' in row ? row.reason : row.name,
-    },
-    {
-      accessorKey: 'status',
-      header: 'Status',
-      accessorFn: (row) => 
-        'status' in row ? (
-          <Typography
-            variant="body1"
-            sx={{
-              textAlign: 'center',
-              backgroundColor: row.status === LeaveStatus.Approved ? 'success.main' : 'info.main',
-              color: row.status === LeaveStatus.Approved ? 'success.contrastText' : 'info.contrastText',
-              padding: '2px 4px',
-              borderRadius: '4px'
-            }}
-          >
-            {row.status}
-          </Typography>
-        ) : (
-          <Typography variant="body1">N/A</Typography>
-        ),
-    },
-  ], []);
+	const [upcomingRequestBody, setUpcomingRequestBody] = useState({
+		getLeaveData: true,
+		getHolidayData: false,
+		getFutureLeaveData: true
+	});
 
-  const handleFutureOptionChange = (event: SelectChangeEvent) => {
-    setUpcomingOptions(event.target.value);
-  };
+	const [pastRequestBody, setPastRequestBody] = useState({
+		getLeaveData: true,
+		getHolidayData: false,
+		getFutureLeaveData: false
+	});
 
-  const handlePastOptionChange = (event: SelectChangeEvent) => {
-    setPastOptions(event.target.value);
-  };
+	const [postLeaveHistory] = usePostApiLeavesLeavesEmployeeLeaveHistoryMutation();
 
-  const sortedFutureEvents = useMemo(() => {
-    if (isLeavesLoading || isHolidaysLoading) return [];
+	const [upcomingEvents, setUpcomingEvents] = useState<EmployeeLeaveHistoryDto[]>([]);
+	const [pastEvents, setPastEvents] = useState<EmployeeLeaveHistoryDto[]>([]);
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+	const fetchUpcomingEvents = async () => {
+		try {
+			const response = await postLeaveHistory({
+				employeeLeaveHistoryDataModel: upcomingRequestBody
+			}).unwrap();
+			setUpcomingEvents(response);
+		} catch (error) {
+			console.error('Error fetching upcoming events:', error);
+		}
+	};
 
-    let filteredEvents: (EmployeeLeave | EmployeeHoliday)[] = [];
+	const fetchPastEvents = async () => {
+		try {
+			const response = await postLeaveHistory({ employeeLeaveHistoryDataModel: pastRequestBody }).unwrap();
+			setPastEvents(response);
+		} catch (error) {
+			console.error('Error fetching past events:', error);
+		}
+	};
 
-    if (upcomingOptions === 'Upcoming Leaves' || upcomingOptions === 'Upcoming Leave and Holidays') {
-      filteredEvents = [
-        ...filteredEvents,
-        ...(leavesHistory || []).filter((event) => new Date(event.startDate) >= today),
-      ];
-    }
+	useEffect(() => {
+		fetchUpcomingEvents();
+	}, [upcomingRequestBody]);
 
-    if (upcomingOptions === 'Upcoming Holidays' || upcomingOptions === 'Upcoming Leave and Holidays') {
-      filteredEvents = [
-        ...filteredEvents,
-        ...(holidays || []).filter((holiday) => new Date(holiday.startDate) >= today),
-      ];
-    }
+	useEffect(() => {
+		fetchPastEvents();
+	}, [pastRequestBody]);
 
-    return filteredEvents.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
-  }, [leavesHistory, holidays, upcomingOptions, isLeavesLoading, isHolidaysLoading]);
+	const columns = useMemo<MRT_ColumnDef<EmployeeLeaveHistoryDto>[]>(
+		() => [
+			{
+				accessorKey: 'startDate',
+				header: 'From',
+				accessorFn: (row) => new Date(row.startDate || '').toLocaleDateString()
+			},
+			{
+				accessorKey: 'endDate',
+				header: 'To',
+				accessorFn: (row) => new Date(row.endDate || '').toLocaleDateString()
+			},
+			{
+				accessorKey: 'name',
+				header: 'Type of leave'
+			},
+			{
+				accessorKey: 'reason',
+				header: 'Reason'
+			},
+			{
+				accessorKey: 'description',
+				header: 'Description'
+			}
+		],
+		[]
+	);
 
-  const sortedPastEvents = useMemo(() => {
-    if (isLeavesLoading || isHolidaysLoading) return [];
+	const handleFutureOptionChange = (event: SelectChangeEvent) => {
+		const newValue = event.target.value;
+		setUpcomingOptions(newValue);
+		setUpcomingRequestBody((prev) => ({
+			...prev,
+			getLeaveData: newValue.includes('Leaves') || newValue.includes('Leave and Holidays'),
+			getHolidayData: newValue.includes('Holidays') || newValue.includes('Leave and Holidays'),
+			getFutureLeaveData: true
+		}));
+	};
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+	const handlePastOptionChange = (event: SelectChangeEvent) => {
+		const newValue = event.target.value;
+		setPastOptions(newValue);
+		setPastRequestBody((prev) => ({
+			...prev,
+			getLeaveData: newValue.includes('Leaves') || newValue.includes('Leave and Holidays'),
+			getHolidayData: newValue.includes('Holidays') || newValue.includes('Leave and Holidays'),
+			getFutureLeaveData: false
+		}));
+	};
 
-    let filteredEvents: (EmployeeLeave | EmployeeHoliday)[] = [];
+	const handleSave = async (event: EmployeeLeave) => {
+		await onSave(event);
+		await refetchEvents();
+		await fetchUpcomingEvents();
+		await fetchPastEvents();
+	};
 
-    if (pastOptions === 'Past Leaves' || pastOptions === 'Past Leave and Holidays') {
-      filteredEvents = [
-        ...filteredEvents,
-        ...(leavesHistory || []).filter((event) => new Date(event.startDate) < today),
-      ];
-    }
+	const handleDelete = async (eventId: number) => {
+		await onDelete(eventId);
+		await refetchEvents();
+		await fetchUpcomingEvents();
+		await fetchPastEvents();
+	};
 
-    if (pastOptions === 'Past Holidays' || pastOptions === 'Past Leave and Holidays') {
-      filteredEvents = [
-        ...filteredEvents,
-        ...(holidays || []).filter((holiday) => new Date(holiday.startDate) < today),
-      ];
-    }
-
-    return filteredEvents.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
-  }, [leavesHistory, holidays, pastOptions, isLeavesLoading, isHolidaysLoading]);
-
-  return (
-    <>
-      <Paper elevation={3} className="w-full p-5 mb-10">
-        <div className="m-10">
-          <FormControl>
-            <Select
-              id="upcoming-select"
-              value={upcomingOptions}
-              onChange={handleFutureOptionChange}
-            >
-              {upcomingOptionsArray.map((eachOption) => (
-                <MenuItem value={eachOption} key={eachOption}>
-                  {eachOption}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </div>
-        <div className="w-full h-auto bg-grey-200 m-12 rounded-2xl p-6">
-          <DataTable
-            enableMultiRemove={false}
-            data={sortedFutureEvents}
-            columns={columns}
-            renderRowActionMenuItems={({ row, closeMenu }) => {
-              const isLeave = 'employeeLeaveTypes' in row.original;
-              return isLeave ? (
-                <MenuItem
-                  key={0}
-                  onClick={() => {
-                    openDialoge(row.original as EmployeeLeave);
-                    closeMenu();
-                  }}
-                >
-                  <FuseSvgIcon size={20}>heroicons-outline:pencil-square</FuseSvgIcon>
-                  <span className="ml-2">Update</span>
-                </MenuItem>
-              ) : (
-                <Typography variant="body1" sx={{ p: '5px' }}>
-                  N/A
-                </Typography>
-              );
-            }}
-          />
-        </div>
-      </Paper>
-      <Paper elevation={3} className="w-full p-5">
-        <div className="m-10">
-          <FormControl>
-            <Select
-              id="past-select"
-              value={pastOptions}
-              onChange={handlePastOptionChange}
-            >
-              {pastOptionsArray.map((eachOption) => (
-                <MenuItem value={eachOption} key={eachOption}>
-                  {eachOption}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </div>
-        <div className="w-full h-auto bg-grey-200 m-12 rounded-2xl p-6">
-          <DataTable
-            enableMultiRemove={false}
-            data={sortedPastEvents}
-            columns={columns}
-            renderRowActionMenuItems={({ row, closeMenu }) => {
-              const isLeave = 'employeeLeaveTypes' in row.original;
-              return isLeave ? (
-                <MenuItem
-                  key={0}
-                  onClick={() => {
-                    openDialoge(row.original as EmployeeLeave);
-                    closeMenu();
-                  }}
-                >
-                  <FuseSvgIcon size={20}>heroicons-outline:pencil-square</FuseSvgIcon>
-                  <span className="ml-2">Update</span>
-                </MenuItem>
-              ) : (
-                <Typography variant="body1" sx={{ p: '5px' }}>
-                  N/A
-                </Typography>
-              );
-            }}
-          />
-        </div>
-      </Paper>
-    </>
-  );
-}
-
-export default LeaveSummary;
+	return (
+		<>
+		  <Paper elevation={3} className="w-full p-5 mb-10">
+			<div className="m-10">
+			  <FormControl>
+				<Select
+				  id="upcoming-select"
+				  value={upcomingOptions}
+				  onChange={handleFutureOptionChange}
+				>
+				  {upcomingOptionsArray.map((eachOption) => (
+					<MenuItem value={eachOption} key={eachOption}>
+					  {eachOption}
+					</MenuItem>
+				  ))}
+				</Select>
+			  </FormControl>
+			</div>
+			<div className="w-full h-auto bg-grey-200 m-12 rounded-2xl p-6">
+			  <DataTable
+				enableMultiRemove={false}
+				data={upcomingEvents}
+				columns={columns}
+				renderRowActionMenuItems={({ row, closeMenu }) => {
+				  if (row.original.name==="Holiday") {
+					return (
+					  <MenuItem key="na" onClick={closeMenu}>
+						<span className="ml-2">N/A</span>
+					  </MenuItem>
+					);
+				  }
+				  return (
+					<>
+					  <MenuItem
+						key="edit"
+						onClick={() => {
+						  handleOpenDialog(row.original as unknown as EmployeeLeaveHistoryDto);
+						  closeMenu();
+						}}
+					  >
+						<FuseSvgIcon size={20}>heroicons-outline:pencil-square</FuseSvgIcon>
+						<span className="ml-2">Update</span>
+					  </MenuItem>
+					  <MenuItem
+						key="delete"
+						onClick={() => {
+						  handleDelete(row.original.employeeLeaveId);
+						  closeMenu();
+						}}
+					  >
+						<FuseSvgIcon size={20}>heroicons-outline:trash</FuseSvgIcon>
+						<span className="ml-2">Cancel Leave</span>
+					  </MenuItem>
+					</>
+				  );
+				}}
+			  />
+			</div>
+		  </Paper>
+		  <Paper elevation={3} className="w-full p-5">
+			<div className="m-10">
+			  <FormControl>
+				<Select
+				  id="past-select"
+				  value={pastOptions}
+				  onChange={handlePastOptionChange}
+				>
+				  {pastOptionsArray.map((eachOption) => (
+					<MenuItem value={eachOption} key={eachOption}>
+					  {eachOption}
+					</MenuItem>
+				  ))}
+				</Select>
+			  </FormControl>
+			</div>
+			<div className="w-full h-auto bg-grey-200 m-12 rounded-2xl p-6">
+			  <DataTable
+				enableMultiRemove={false}
+				data={pastEvents}
+				columns={columns}
+				renderRowActionMenuItems={({ row, closeMenu }) => {
+				  if (row.original.name==="Holiday") {
+					return (
+					  <MenuItem key="na" onClick={closeMenu}>
+						<span className="ml-2">N/A</span>
+					  </MenuItem>
+					);
+				  }
+				  return (
+					<MenuItem
+					  key={0}
+					  onClick={() => {
+						openDialoge(row.original as unknown as EmployeeLeave);
+						closeMenu();
+					  }}
+					>
+					  <FuseSvgIcon size={20}>heroicons-outline:eye</FuseSvgIcon>
+					  <span className="ml-2">View</span>
+					</MenuItem>
+				  );
+				}}
+			  />
+			</div>
+		  </Paper>
+		</>
+	  );
+	}
+	
+	export default LeaveSummary;

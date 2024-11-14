@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WorkManagmentSolution.EFCore;
 
@@ -11,9 +12,11 @@ using WorkManagmentSolution.EFCore;
 namespace WorkManagement.EFCore.Migrations
 {
     [DbContext(typeof(WorkManagementDbContext))]
-    partial class WorkManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241110194624_pending")]
+    partial class pending
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -512,6 +515,11 @@ namespace WorkManagement.EFCore.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(34)
+                        .HasColumnType("nvarchar(34)");
+
                     b.Property<int?>("EmployeeLeaveTypeId")
                         .HasColumnType("int");
 
@@ -526,6 +534,10 @@ namespace WorkManagement.EFCore.Migrations
                     b.HasIndex("EmployeeLeaveTypeId");
 
                     b.ToTable("EmployeeDefaultLeave");
+
+                    b.HasDiscriminator().HasValue("EmployeeDefaultLeaveSummary");
+
+                    b.UseTphMappingStrategy();
 
                     b.HasData(
                         new
@@ -979,38 +991,6 @@ namespace WorkManagement.EFCore.Migrations
                     b.ToTable("EmployeeLeaves");
                 });
 
-            modelBuilder.Entity("WorkManagementSolution.Employee.EmployeeLeaveSummary", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("EmployeeId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("EmployeeLeaveTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<double>("RemainingLeaves")
-                        .HasColumnType("float");
-
-                    b.Property<int>("TotalLeaves")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.HasIndex("EmployeeLeaveTypeId");
-
-                    b.ToTable("EmployeeLeaveSummary");
-                });
-
             modelBuilder.Entity("WorkManagementSolution.Employee.EmployeeLeaveType", b =>
                 {
                     b.Property<int>("Id")
@@ -1222,6 +1202,21 @@ namespace WorkManagement.EFCore.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Sites");
+                });
+
+            modelBuilder.Entity("WorkManagementSolution.Employee.EmployeeLeaveSummary", b =>
+                {
+                    b.HasBaseType("WorkManagementSolution.Employee.EmployeeDefaultLeaveSummary");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("RemainingLeaves")
+                        .HasColumnType("float");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasDiscriminator().HasValue("EmployeeLeaveSummary");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -1438,23 +1433,6 @@ namespace WorkManagement.EFCore.Migrations
                     b.Navigation("employee");
                 });
 
-            modelBuilder.Entity("WorkManagementSolution.Employee.EmployeeLeaveSummary", b =>
-                {
-                    b.HasOne("WorkManagementSolution.Employee.Employee", "employee")
-                        .WithMany("EmployeeLeaves")
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WorkManagementSolution.Employee.EmployeeLeaveType", "EmployeeLeaveTypes")
-                        .WithMany()
-                        .HasForeignKey("EmployeeLeaveTypeId");
-
-                    b.Navigation("EmployeeLeaveTypes");
-
-                    b.Navigation("employee");
-                });
-
             modelBuilder.Entity("WorkManagementSolution.Employee.EmployeePersonalDetails", b =>
                 {
                     b.HasOne("WorkManagementSolution.Employee.Employee", "Employee")
@@ -1480,6 +1458,17 @@ namespace WorkManagement.EFCore.Migrations
                         .HasForeignKey("SiteId");
 
                     b.Navigation("Site");
+                });
+
+            modelBuilder.Entity("WorkManagementSolution.Employee.EmployeeLeaveSummary", b =>
+                {
+                    b.HasOne("WorkManagementSolution.Employee.Employee", "employee")
+                        .WithMany("EmployeeLeaves")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("employee");
                 });
 
             modelBuilder.Entity("WorkManagementSolution.Employee.Employee", b =>

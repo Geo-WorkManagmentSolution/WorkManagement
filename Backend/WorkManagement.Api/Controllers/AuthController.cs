@@ -118,11 +118,10 @@ namespace WorkManagement.API.Controllers
         }
 
 
-
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserRegistrationModel model)
         {
-             if (ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 if (await UserExists(model.Email))
                     return BadRequest("The email address is already in use.");
@@ -147,23 +146,58 @@ namespace WorkManagement.API.Controllers
                             var userdata = await workManagementDbContext.Users.FirstOrDefaultAsync(s => s.Email == model.Email);
                             var User = mapper.Map<UserModel>(userdata);
                             User.Role = role;
-                            var token = _authService.GenerateJwtToken(User.Data.Email, role,User.Uid);
+                            var token = _authService.GenerateJwtToken(User.Data.Email, role, User.Uid);
+
+                            //var employee = new Employee
+                            //{
+                            //    UserId = user.Id,
+                            //    Email = user.Email,
+                            //    FirstName = model.DisplayName,
+                            //    LastName = model.DisplayName,
+                            //    MiddleName=model.DisplayName,
+                            //    RoleId = (await roleManager.FindByNameAsync(role)).Id
+                            //    // Add other necessary fields
+                            //};
+
+                            // Fetch default leave summaries
+                            //var defaultLeaves = await workManagementDbContext.EmployeeDefaultLeave.ToListAsync();
+
+                            // Create leave summaries for the new employee
+                            //var employeeLeaves = defaultLeaves.Select(leave => new EmployeeLeaveSummary
+                            //{
+                            //    EmployeeId = employee.Id,
+                            //    EmployeeLeaveTypeId = leave.EmployeeLeaveTypeId,
+                            //    TotalLeaves = leave.TotalLeaves,
+                            //    RemainingLeaves = leave.TotalLeaves
+                            //    // Add other necessary fields
+                            //}).ToList();
+
+                            //employee.EmployeeLeaves = employeeLeaves;
+
+                            //workManagementDbContext.Employees.Add(employee);
+                            //await workManagementDbContext.SaveChangesAsync();
 
                             return Ok(new { User = User, AccessToken = token });
                         }
                         else
+                        {
                             return Problem("Error while creating user.");
+                        }
                     }
                     catch (Exception ex)
                     {
+                        // Log the exception for debugging purposes
+                        Console.WriteLine(ex.ToString());
                         return Problem("Error while creating user.");
                     }
-
                 }
             }
             else
+            {
                 return BadRequest(ModelState);
+            }
         }
+
 
         private async Task<bool> UserExists(string email)
         {

@@ -1,27 +1,29 @@
-import React, { useState, useRef } from 'react';
+'use client';
+
+import React, { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { DateSelectArg, EventClickArg, DatesSetArg, EventContentArg } from '@fullcalendar/core';
+import { DateSelectArg, EventClickArg, DatesSetArg, EventContentArg, EventSourceFunc } from '@fullcalendar/core';
 import { styled, useTheme } from '@mui/material/styles';
-import { Box, Typography } from '@mui/material';
+import { Alert, Box, Snackbar, Typography } from '@mui/material';
 import clsx from 'clsx';
 import FusePageSimple from '@fuse/core/FusePageSimple';
 import CalendarHeader from './CalendarHeader';
 import EventDialog from './EventDialog';
 import LeaveTypeSelector from './LeaveTypeSelctor';
-import LeaveSummury from './LeaveSummury';
+import LeaveSummary from './LeaveSummury';
 import {
-	useGetApiLeavesHolidaysQuery,
-	useDeleteApiEmployeesByEmployeeIdLeavesCancelLeaveMutation,
-	useGetApiEmployeesByEmployeeIdLeavesUpdateLeaveQuery,
 	EmployeeLeave,
-	EmployeeHoliday,
 	LeaveStatus,
-	usePutApiEmployeesLeavesAddLeaveMutation
+	usePutApiEmployeesLeavesAddLeaveMutation,
+	useDeleteApiEmployeesLeavesCancelLeaveMutation,
+	usePostApiLeavesLeavesEmployeeLeaveHistoryMutation,
+	EmployeeLeaveHistoryDto,
+	useGetApiEmployeesLeavesCurrentQuery,
+	usePutApiEmployeesLeavesUpdateLeaveMutation
 } from '../../LeavesApi';
-import { useGetApiEmployeesLeavesCurrentQuery } from '../../../EmployeeApi';
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
 	'& .container': {
@@ -108,76 +110,81 @@ export default function CalendarApp() {
 	const [currentDate, setCurrentDate] = useState<DatesSetArg | null>(null);
 	const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
 	const [tabValue, setTabValue] = useState('Calendar View');
-	const [alertMessage, setAlertMessage] = useState('');
-	const [alertOpen, setAlertOpen] = useState(false);
+	const [alertInfo, setAlertInfo] = useState<{ message: string; severity: 'success' | 'error' } | null>(null);
+	// const [alertOpen, setAlertOpen] = useState(false);
+	const [allEvents, setAllEvents] = useState<EmployeeLeaveHistoryDto[]>([]);
+	const [eventColors, setEventColors] = useState<Record<number, string>>({});
 	const calendarRef = useRef<FullCalendar>(null);
 	const theme = useTheme();
 
 	// API hooks
-	const { data: holidaysData, isLoading: isHolidaysLoading } = useGetApiLeavesHolidaysQuery();
-	const { data: currentLeaves, isLoading: isCurrentLeavesLoading } = useGetApiEmployeesLeavesCurrentQuery();
+	const { data: currentLeaves, refetch: refetchCurrentLeaves } = useGetApiEmployeesLeavesCurrentQuery();
 	const [addLeaveApi] = usePutApiEmployeesLeavesAddLeaveMutation();
-	const [cancelLeaveApi] = useDeleteApiEmployeesByEmployeeIdLeavesCancelLeaveMutation();
-	const { refetch: updateLeaveApi } = useGetApiEmployeesByEmployeeIdLeavesUpdateLeaveQuery(
-		{ employeeId: '1', employeeLeave: {} as EmployeeLeave },
-		{ skip: true }
-	);
+	const [cancelLeaveApi] = useDeleteApiEmployeesLeavesCancelLeaveMutation();
+	const [postLeaveHistory] = usePostApiLeavesLeavesEmployeeLeaveHistoryMutation();
+	const [updateLeaveApi] = usePutApiEmployeesLeavesUpdateLeaveMutation();
 
-	React.useEffect(() => {
+	useEffect(() => {
 		if (currentLeaves) {
 			setSelectedLabels(currentLeaves.map((leave) => leave.employeeLeaveType || ''));
+
+			// Generate and set colors for each leave type
+			const colors: Record<number, string> = {};
+			currentLeaves.forEach((leave, index) => {
+				colors[leave.id] = `hsl(${(index * 137.5) % 360}, 80%, 50%)`;
+			});
+			setEventColors(colors);
 		}
 	}, [currentLeaves]);
 
-	const openEventDialoge = (event: EmployeeLeave) => {
+	const openEventDialog = (event: EmployeeLeaveHistoryDto) => {
 		setIsNewEvent(false);
-		setSelectedEvent(event);
+		console.log('event d', event);
+
+		setSelectedEvent({ employeeLeaveTypeId: event.leaveTypeId, id: event.employeeLeaveId, ...event });
 		setAnchorEl(document.body);
 	};
-
 	const handleDateSelect = (selectInfo: DateSelectArg) => {
 		const start = new Date(selectInfo.start);
-		let end = new Date(selectInfo.end);
+		const end = new Date(selectInfo.end);
 
+		// Adjust the end date
 		end.setDate(end.getDate() - 1);
 
-		if (start.getTime() === end.getTime()) {
-			end = new Date(start);
-		}
-
+		// Ensure start and end dates are in the local timezone
+		const startDate = new Date(Date.UTC(start.getFullYear(), start.getMonth(), start.getDate()));
+		const endDate = new Date(Date.UTC(end.getFullYear(), end.getMonth(), end.getDate()));
 		setIsNewEvent(true);
 		setSelectedEvent({
 			id: 0,
 			status: LeaveStatus.Pending,
 			description: '',
 			reason: '',
-			startDate: start.toISOString(),
-			endDate: end.toISOString(),
+			startDate: startDate.toISOString(),
+			endDate: endDate.toISOString(),
 			employeeLeaveTypeId: currentLeaves?.[0]?.id || 1,
-			leaveDays: 1,
+			leaveDays: 1
 		});
 		setAnchorEl(selectInfo.jsEvent.target as HTMLElement);
 	};
 
 	const handleEventClick = (clickInfo: EventClickArg) => {
 		const eventData = clickInfo.event;
-
-		if (eventData.extendedProps.isHoliday) {
-			// Don't open dialog for holidays
+		
+		if (eventData.extendedProps.name==="Holiday") {
 			return;
 		}
 
 		setIsNewEvent(false);
 		setSelectedEvent({
-			id: Number(eventData.id),
+			id: eventData.extendedProps.employeeLeaveId,
 			status: eventData.extendedProps.status as LeaveStatus,
 			description: eventData.extendedProps.description || '',
 			reason: eventData.extendedProps.reason || '',
-			startDate: eventData.start?.toISOString() || new Date().toISOString(),
-			endDate: eventData.end?.toISOString() || new Date().toISOString(),
+			startDate: eventData.extendedProps.startDate || new Date().toISOString(),
+			endDate: eventData.extendedProps.endDate,
 			leaveDays: eventData.extendedProps.leaveDays,
-			employeeLeaveTypeId: eventData.extendedProps.employeeLeaveTypeId,
-		
+			employeeLeaveTypeId: eventData.extendedProps.leaveTypeId
 		});
 		setAnchorEl(clickInfo.jsEvent.target as HTMLElement);
 	};
@@ -191,74 +198,121 @@ export default function CalendarApp() {
 		setLeaveAnchor(null);
 	};
 
-	const refreshCalendar = () => {
+	const refreshCalendar = useCallback(() => {
 		if (calendarRef.current) {
 			calendarRef.current.getApi().refetchEvents();
 		}
-	};
+	}, []);
 
 	const handleSaveEvent = async (data: EmployeeLeave) => {
 		try {
-			console.log('Event data received:', data);
-
-			const eventToSave = {
-				...data,
-				employeeLeaveTypes: {
-					id: data.employeeLeaveTypeId,
-					isDeleted: false,
-					name:
-						currentLeaves?.find((leave) => leave.id === data.employeeLeaveTypeId)?.employeeLeaveType || '',
-					isPaid: true // You might want to get this value from somewhere else
-				} as EmployeeLeaveType,
-				leaveDays: data.leaveDays || 1
-			};
-
-			console.log('Event data to be sent:', eventToSave);
-
 			if (isNewEvent) {
-				const response = await addLeaveApi({
-					employeeLeave: eventToSave
-				}).unwrap();
-				console.log('API Response for new event:', response);
+				await addLeaveApi({ employeeLeave: data });
 			} else {
-				const response = await updateLeaveApi({
-					employeeLeave: eventToSave
-				});
-				console.log('API Response for update:', response);
+				await updateLeaveApi({ employeeLeave: data });
 			}
 
 			handleClosePopover();
+			await fetchEvents(currentDate?.start || new Date(), currentDate?.end || new Date());
+			await refetchCurrentLeaves();
 			refreshCalendar();
-			setAlertMessage('Leave request saved successfully.');
-			setAlertOpen(true);
+			setAlertInfo({ message: 'Leave request saved successfully.', severity: 'success' });
+			// setAlertOpen(true);
 		} catch (error) {
 			console.error('Error saving event:', error);
-			setAlertMessage('Failed to save event. Please try again.');
-			setAlertOpen(true);
+			setAlertInfo({ message: 'Failed to save event. Please try again.', severity: 'error' });
+			// setAlertOpen(true);
 		}
 	};
 
 	const handleDeleteEvent = async (eventId: number) => {
 		try {
-			await cancelLeaveApi({ employeeId: '1', employeeLeaveId: eventId });
+			await cancelLeaveApi({ employeeLeaveId: eventId });
 			handleClosePopover();
-			refreshCalendar();
-			setAlertMessage('Leave request cancelled successfully.');
-			setAlertOpen(true);
+			// Remove the event from allEvents state
+			setAllEvents((prevEvents) => prevEvents.filter((event) => event.employeeLeaveId !== eventId));
+
+			// Remove the event from the calendar
+			if (calendarRef.current) {
+				const calendarApi = calendarRef.current.getApi();
+				const eventToRemove = calendarApi.getEventById(eventId.toString());
+
+				if (eventToRemove) {
+					eventToRemove.remove();
+				}
+			}
+
+			await refetchCurrentLeaves(); // refethch updated leaves
+			setAlertInfo({ message: 'Leave request cancelled successfully.', severity: 'success' });
+			// setAlertOpen(true);
 		} catch (error) {
 			console.error('Error deleting event:', error);
-			setAlertMessage('Failed to delete event. Please try again.');
-			setAlertOpen(true);
+			setAlertInfo({ message: 'Failed to delete event. Please try again.', severity: 'error' });
+			// setAlertOpen(true);
 		}
 	};
+	const handleCloseAlert = (event?: React.SyntheticEvent | Event, reason?: string) => {
+		if (reason === 'clickaway') {
+			return;
+		}
 
-	const handleDatesSet = (arg: DatesSetArg) => {
-		setCurrentDate(arg);
+		setAlertInfo(null);
 	};
 
+	const fetchEvents = useCallback(
+		async (start: Date, end: Date) => {
+			try {
+				const pastData = await postLeaveHistory({
+					employeeLeaveHistoryDataModel: {
+						getLeaveData: true,
+						getHolidayData: true,
+						getFutureLeaveData: false
+						// startDate: start.toISOString(),
+						// endDate: end.toISOString()
+					}
+				}).unwrap();
+
+				const futureData = await postLeaveHistory({
+					employeeLeaveHistoryDataModel: {
+						getLeaveData: true,
+						getHolidayData: true,
+						getFutureLeaveData: true
+						// startDate: start.toISOString(),
+						// endDate: end.toISOString()
+					}
+				}).unwrap();
+
+				const newEvents = [...pastData, ...futureData];
+				setAllEvents(newEvents);
+
+				if (calendarRef.current) {
+					calendarRef.current.getApi().removeAllEvents();
+					calendarRef.current.getApi().addEventSource(newEvents);
+				}
+
+				const newLabels = [...new Set(newEvents.map((event) => event.name || ''))];
+				setSelectedLabels((prevLabels) => [...new Set([...prevLabels, ...newLabels])]);
+			} catch (error) {
+				console.error('Error fetching events:', error);
+				setAlertMessage('Failed to fetch events. Please try again.');
+				// setAlertOpen(true);
+			}
+		},
+		[postLeaveHistory]
+	);
+
+	const handleDatesSet = useCallback(
+		(arg: DatesSetArg) => {
+			setCurrentDate(arg);
+			fetchEvents(arg.start, arg.end);
+		},
+		[fetchEvents]
+	);
+
 	const handleEventContent = (arg: EventContentArg) => {
-		const leaveType = currentLeaves?.find((leave) => leave.id === arg.event.extendedProps.employeeLeaveTypeId);
-		const backgroundColor = leaveType ? '#0dc8e0' : '#FFA500'; // Default color for holidays
+		const backgroundColor = arg.event.extendedProps.isHoliday
+			? '#FFA500'
+			: eventColors[arg.event.extendedProps.leaveTypeId] || '#0dc8e0';
 
 		return (
 			<Box
@@ -268,9 +322,7 @@ export default function CalendarApp() {
 				}}
 				className={clsx('flex items-center w-full rounded px-8 py-2 h-22 text-white')}
 			>
-				<Typography className="text-md font-semibold">
-					{leaveType ? leaveType.employeeLeaveType : 'Holiday'} -{' '}
-				</Typography>
+				<Typography className="text-md font-semibold">{arg.event.extendedProps.name} -</Typography>
 				<Typography className="text-md px-4 font-extrabold">{arg.event.extendedProps.reason}</Typography>
 			</Box>
 		);
@@ -286,8 +338,7 @@ export default function CalendarApp() {
 			startDate: new Date().toISOString(),
 			endDate: new Date().toISOString(),
 			employeeLeaveTypeId: currentLeaves?.[0]?.id || 1,
-			leaveDays: 1,
-			
+			leaveDays: 1
 		});
 		setAnchorEl(document.body);
 	};
@@ -302,40 +353,43 @@ export default function CalendarApp() {
 		);
 	};
 
-	const allEvents = [
-		...(currentLeaves || []).map((leave: EmployeeLeave) => ({
-			id: leave.id,
-			title: leave.reason,
-			start: leave.startDate,
-			end: leave.endDate,
-			extendedProps: {
-				...leave,
-				isHoliday: false
-			}
-		})),
-		...(holidaysData || []).map((holiday: EmployeeHoliday) => ({
-			id: holiday.id,
-			title: holiday.name,
-			start: holiday.startDate,
-			end: holiday.endDate,
-			extendedProps: {
-				...holiday,
-				isHoliday: true
-			}
-		}))
-	];
-
-	const filteredEvents = allEvents.filter(
-		(event) => event.extendedProps.isHoliday || selectedLabels.includes(event.extendedProps.employeeLeaveType || '')
+	const filteredEvents = useMemo(
+		() => allEvents.filter((event) => selectedLabels.includes(event.name || '')),
+		[allEvents, selectedLabels]
 	);
 
-	const showCalender = () => {
+	const calendarEvents = useMemo(
+		() =>
+			filteredEvents.map((event) => ({
+				id: event.employeeId?.toString(),
+				title: event.name,
+				start: event.startDate,
+				// end: event.endDate,
+				end: new Date(new Date(event.endDate).setDate(new Date(event.endDate).getDate() + 1)),
+				extendedProps: {
+					...event
+				}
+			})),
+		[filteredEvents]
+	);
+
+	const eventSource: EventSourceFunc = useCallback(
+		(fetchInfo, successCallback, failureCallback) => {
+			const relevantEvents = calendarEvents.filter(
+				(event) => new Date(event.start) >= fetchInfo.start && new Date(event.end) <= fetchInfo.end
+			);
+			successCallback(relevantEvents);
+		},
+		[calendarEvents]
+	);
+
+	const showCalendar = () => {
 		setTabValue('Calendar View');
 		setTimeout(refreshCalendar, 0);
 	};
 
-	const showSummury = () => {
-		setTabValue('Summury View');
+	const showSummary = () => {
+		setTabValue('Summary View');
 	};
 
 	return (
@@ -346,12 +400,27 @@ export default function CalendarApp() {
 					calendarRef={calendarRef}
 					onAddEventClick={handleAddEventClick}
 					onShowLeaveSelectorDetails={handleLeaveSelectorDetails}
-					showCalander={showCalender}
-					showLeaveSummury={showSummury}
+					showCalander={showCalendar}
+					showLeaveSummury={showSummary}
 				/>
 			}
 			content={
 				<>
+					<Snackbar
+						className="absolute"
+						open={!!alertInfo}
+						autoHideDuration={6000}
+						onClose={handleCloseAlert}
+						anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+					>
+						<Alert
+							onClose={handleCloseAlert}
+							severity={alertInfo?.severity}
+							sx={{ width: '100%' }}
+						>
+							{alertInfo?.message}
+						</Alert>
+					</Snackbar>
 					<div className={`${tabValue !== 'Calendar View' ? 'hidden' : ''} w-full`}>
 						<FullCalendar
 							plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
@@ -362,7 +431,7 @@ export default function CalendarApp() {
 							selectMirror
 							dayMaxEvents
 							weekends
-							events={filteredEvents}
+							events={eventSource}
 							select={handleDateSelect}
 							eventClick={handleEventClick}
 							datesSet={handleDatesSet}
@@ -370,11 +439,14 @@ export default function CalendarApp() {
 							ref={calendarRef}
 						/>
 					</div>
-					<div className={`${tabValue !== 'Summury View' ? 'hidden' : ''} w-full`}>
-						<LeaveSummury
-							events={currentLeaves || []}
-							holidays={holidaysData || []}
-							openDialoge={openEventDialoge}
+					<div className={`${tabValue !== 'Summary View' ? 'hidden' : ''} w-full`}>
+						<LeaveSummary
+							openDialoge={openEventDialog}
+							onSave={handleSaveEvent}
+							onDelete={handleDeleteEvent}
+							refetchEvents={() =>
+								fetchEvents(currentDate?.start || new Date(), currentDate?.end || new Date())
+							}
 						/>
 					</div>
 
@@ -386,10 +458,12 @@ export default function CalendarApp() {
 							onClose={handleClosePopover}
 							onSave={handleSaveEvent}
 							onDelete={handleDeleteEvent}
-							leaveBalance={{}}
-							alertMessage={alertMessage}
-							alertOpen={alertOpen}
-							setAlertOpen={setAlertOpen}
+							leaveBalance={currentLeaves?.reduce(
+								(acc, leave) => ({ ...acc, [leave.id]: leave.remainingLeaves }),
+								{}
+							)}
+							eventColors={eventColors}
+							currentLeaves={currentLeaves}
 						/>
 					)}
 					<LeaveTypeSelector
@@ -397,6 +471,8 @@ export default function CalendarApp() {
 						onClose={handleLeaveSelectorPopOver}
 						selectedLabels={selectedLabels}
 						toggleSelectedLabels={toggleSelectedLabels}
+						eventColors={eventColors}
+						currentLeaves={currentLeaves}
 					/>
 				</>
 			}

@@ -191,17 +191,46 @@ namespace WorkManagement.Service
 
         public async Task<List<EmployeeLeaveSummaryModel>> GetEmployeeLeaves(string loggedUserId)
         {
-            //var EmployeeId = _dbContext.Employees.FirstOrDefaultAsync(x => x.UserId == Guid.Parse(loggedUserId))?.Id??1;
+            try
+            {
+                // Check if the loggedUserId can be parsed to a GUID
+                if (!Guid.TryParse(loggedUserId, out Guid userGuid))
+                {
+                    throw new Exception("Invalid User ID");
+                }
 
-            var defaultLeaves = await _dbContext.EmployeeDefaultLeave.Include(x=>x.EmployeeLeaveTypes).ToListAsync();
-            var defaultLeaveSummary = mapper.Map<List<EmployeeLeaveSummary>>(defaultLeaves);
+                // Find Employee ID
+                var employee = await _dbContext.Employees.FirstOrDefaultAsync(x => x.UserId == userGuid);
+                if (employee == null)
+                {
+                    throw new Exception("User was not found");
+                }
+                var employeeId = employee.Id;
 
-            //var model=  _dbContext.EmployeeLeaveSummary.Where(x => x.EmployeeId == EmployeeId)?.ToList()?? defaultLeaveSummary;
-            var model = defaultLeaveSummary;
+                // Fetch default leave summaries
+                var defaultLeaves = await _dbContext.EmployeeDefaultLeave.Include(x => x.EmployeeLeaveTypes).ToListAsync();
+                var defaultLeaveSummary = mapper.Map<List<EmployeeLeaveSummary>>(defaultLeaves);
 
+                // Fetch leave summaries for the specific employee
+                var leaveModel = await _dbContext.EmployeeLeaveSummary
+                    .Include(x => x.EmployeeLeaveTypes)
+                    .Where(x => x.EmployeeId == employeeId).ToListAsync();
+                var model = leaveModel.Count <= 0 ? defaultLeaveSummary : leaveModel;
 
-            return mapper.Map<List<EmployeeLeaveSummaryModel>>(model);
+                var MappedEntity= mapper.Map<List<EmployeeLeaveSummaryModel>>(model);
+                // Map and return the result
+                return MappedEntity;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (use your preferred logging framework)
+                Console.WriteLine(ex.ToString());
+
+                // Optionally, rethrow the exception or handle it accordingly
+                throw new Exception("An error occurred while fetching the employee leaves.", ex);
+            }
         }
+
 
 
         public async Task<EmployeeLeave> AddLeave(EmployeeLeave employeeLeave, string loggedUserId)
@@ -219,18 +248,21 @@ namespace WorkManagement.Service
             await _dbContext.SaveChangesAsync();
             return employeeLeave;
         }
-
-        public async Task CancelLeave(int employeeLeaveId)
-        {
-            var QuarableCancel = _dbContext.EmployeeLeaves.Where(x => x.Id == employeeLeaveId);
-            var cancelLeaves = await QuarableCancel.FirstAsync();
-            var leaveSummary = await _dbContext.EmployeeLeaveSummary.FirstAsync(x => x.EmployeeId == cancelLeaves.EmployeeId && x.EmployeeLeaveTypeId == cancelLeaves.EmployeeLeaveTypeId);
-            leaveSummary.RemainingLeaves += cancelLeaves.LeaveDays;
-            await QuarableCancel.ExecuteDeleteAsync();
+         
+            public async Task CancelLeave(int employeeLeaveId)
+            {
+                var QuarableCancel = _dbContext.EmployeeLeaves.Where(x => x.Id == employeeLeaveId);
+                var cancelLeaves = await QuarableCancel.FirstAsync();
+                var leaveSummary = await _dbContext.EmployeeLeaveSummary.FirstAsync(x => x.EmployeeId == cancelLeaves.EmployeeId && x.EmployeeLeaveTypeId == cancelLeaves.EmployeeLeaveTypeId);
+                leaveSummary.RemainingLeaves += cancelLeaves.LeaveDays;
+                await QuarableCancel.ExecuteDeleteAsync();
+                    await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<EmployeeLeave> UpdateLeave(EmployeeLeave employeeLeave)
+        public async Task<EmployeeLeave> UpdateLeave(EmployeeLeave employeeLeave, string loggedUserId)
         {
+            var EmployeeId = _dbContext.Employees.First(x => x.UserId == Guid.Parse(loggedUserId)).Id;
+            employeeLeave.EmployeeId = EmployeeId;
             _dbContext.EmployeeLeaves.Update(employeeLeave);
             await _dbContext.SaveChangesAsync();
             return employeeLeave;
