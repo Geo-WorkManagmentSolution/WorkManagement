@@ -4,8 +4,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Security.Claims;
 using WorkManagement.Domain.Contracts;
 using WorkManagement.Domain.Entity;
+using WorkManagement.Domain.Entity.EmployeeLeaveTables;
 using WorkManagement.Domain.Models;
 using WorkManagement.Domain.Models.Employee;
 using WorkManagement.Service;
@@ -197,6 +199,38 @@ namespace WorkManagement.API.Controllers
         {
             var newOption = await employeeService.AddNewDesignation(site);
             return Ok(newOption);
+        }
+
+        // GET api/employee/leaves/current
+        [HttpGet("leaves/current")]
+        public async Task<ActionResult<IEnumerable<EmployeeLeaveSummaryModel>>> GetEmployeeLeaves()
+        {
+            var leaves = await employeeService.GetEmployeeLeaves(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            return Ok(leaves);
+        }
+
+        // GET api/employee/leaves/addLeave
+        [HttpPost("leaves/addLeave")]
+        public async Task<ActionResult<EmployeeLeaveModel>> AddLeave(EmployeeLeaveModel employeeLeaveData)
+        {
+            var leaves = await employeeService.AddLeave(employeeLeaveData, User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            return Ok(leaves);
+        }
+
+        // GET api/employee/leaves/updateLeave
+        [HttpPut("leaves/updateLeave")]
+        public async Task<ActionResult<EmployeeLeaveModel>> UpdateLeave(EmployeeLeaveModel employeeLeaveData)
+        {
+            var leaves = await employeeService.UpdateLeave(employeeLeaveData, User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            return Ok(leaves);
+        }
+
+        // GET api/employee/leaves/CancelLeave
+        [HttpDelete("leaves/cancelLeave")]
+        public async Task<ActionResult<bool>> CancelLeave(int employeeLeaveId)
+        {
+            await employeeService.CancelLeave(employeeLeaveId, User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            return Ok(true);
         }
     }
 

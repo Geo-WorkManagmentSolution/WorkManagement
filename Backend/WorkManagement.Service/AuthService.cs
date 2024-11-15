@@ -24,7 +24,7 @@ namespace WorkManagement.Service
         }
 
 
-        public string GenerateJwtToken(string email, string role)
+        public string GenerateJwtToken(string email, string role, string userId)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
 
@@ -36,6 +36,7 @@ namespace WorkManagement.Service
             {
                 new Claim(JwtRegisteredClaimNames.Email,email),
                 new Claim(JwtRegisteredClaimNames.Name,email),
+                new Claim(JwtRegisteredClaimNames.NameId,userId),
                 new Claim(ClaimTypes.Role,role)
             };
 
@@ -86,7 +87,7 @@ namespace WorkManagement.Service
             }
         }
 
-        public Tuple<string, string> DecodeJwtToken(string jwtToken)
+        public Tuple<string, string, string> DecodeJwtToken(string jwtToken)
         {
             var handler = new JwtSecurityTokenHandler();
             var token = handler.ReadJwtToken(jwtToken);
@@ -95,9 +96,11 @@ namespace WorkManagement.Service
             var userId = token.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
             var userName = token.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
             var role = token.Claims.FirstOrDefault(c => c.Type == "role")?.Value;
+            var nameId = token.Claims.FirstOrDefault(c => c.Type == "nameid")?.Value;
+
 
             // Do something with userId and userName (e.g., log them or use them in your application)
-            return new Tuple<string, string>(userName, role); // Return the user ID if needed
+            return new Tuple<string, string, string>(userName, role, nameId); // Return the user ID if needed
         }
 
     }

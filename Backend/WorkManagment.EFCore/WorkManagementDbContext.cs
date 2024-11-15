@@ -1,15 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
-using System.Diagnostics.Metrics;
-using System.Linq.Expressions;
-using System.Net.Http;
-using System.Reflection.Metadata;
 using System.Security.Claims;
-using System.Xml;
 using WorkManagement.Domain.Entity;
+using WorkManagement.Domain.Entity.EmployeeLeaveTables;
 using WorkManagement.Domain.Models;
 using WorkManagementSolution.Employee;
 
@@ -42,6 +36,12 @@ namespace WorkManagmentSolution.EFCore
         public virtual DbSet<EmployeeDocuments> EmployeeDocuments { get; set; }
         public virtual DbSet<Project> Projects { get; set; }
         public virtual DbSet<ProjectEmployee> ProjectEmployees { get; set; }
+
+        public virtual DbSet<EmployeeLeaveSummary> EmployeeLeaveSummary { get; set; }
+        public virtual DbSet<EmployeeDefaultLeaveSummary> EmployeeDefaultLeave { get; set; }
+        public virtual DbSet<EmployeeLeaveType> EmployeeLeaveType { get; set; }
+        public virtual DbSet<EmployeeLeave> EmployeeLeaves { get; set; }
+        public virtual DbSet<EmployeeHoliday> EmployeeHolidays { get; set; }
 
         public IHttpContextAccessor HttpContextAccessor { get; }
 

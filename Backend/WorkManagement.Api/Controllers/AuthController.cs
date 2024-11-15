@@ -69,7 +69,7 @@ namespace WorkManagement.API.Controllers
                     {
                         ApplicationUser? user = await workManagementDbContext.Users.FirstOrDefaultAsync(s => s.UserName == userloginModel.Email);
                         var role = await userManager.GetRolesAsync(user);
-                        var token = _authService.GenerateJwtToken(userloginModel.Email, role.FirstOrDefault());
+                        var token = _authService.GenerateJwtToken(userloginModel.Email, role.FirstOrDefault(), user.Id.ToString());
                         var User = mapper.Map<UserModel>(user);
                         User.Role = role.FirstOrDefault();
 
@@ -108,10 +108,10 @@ namespace WorkManagement.API.Controllers
                 var User = mapper.Map<UserModel>(dbuser);
                 User.Role = Role?.Value;
 
-                if(User.Role != "admin")
-                {
-                    User.Role = "admin";
-                }
+                //if(User.Role != "admin")
+                //{
+                //    User.Role = "admin";
+                //}
 
                 return Ok(User);
             }
@@ -152,7 +152,7 @@ namespace WorkManagement.API.Controllers
                             var userdata = await workManagementDbContext.Users.FirstOrDefaultAsync(s => s.Email == model.Email);
                             var User = mapper.Map<UserModel>(userdata);
                             User.Role = role;
-                            var token = _authService.GenerateJwtToken(User.Data.Email, role);
+                            var token = _authService.GenerateJwtToken(User.Data.Email, role,User.Uid);
 
                             return Ok(new { User = User, AccessToken = token });
                         }
@@ -186,7 +186,7 @@ namespace WorkManagement.API.Controllers
             if (_authService.ValidateToken(accesstoken))
             {
                 var userrole = _authService.DecodeJwtToken(accesstoken);
-                var token = _authService.GenerateJwtToken(userrole.Item1, userrole.Item2);
+                var token = _authService.GenerateJwtToken(userrole.Item1, userrole.Item2, userrole.Item3);
 
                 ApplicationUser? AppUser = await workManagementDbContext.Users.FindAsync(userrole.Item1);
                 var User = mapper.Map<UserModel>(AppUser);

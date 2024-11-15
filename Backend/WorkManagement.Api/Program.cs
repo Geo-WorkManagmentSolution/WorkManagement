@@ -73,6 +73,7 @@ try
     builder.Services.AddScoped<IEmployeeService, EmployeeService>();
     builder.Services.AddScoped<IProjectService, ProjectServices>();
     builder.Services.AddScoped<IEmailService, EmailService>();
+    builder.Services.AddScoped<ILeavesService, LeavesService>();
     builder.Services.AddCors();
     builder.Services.AddSwaggerGen(option =>
     {

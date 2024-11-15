@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WorkManagement.Domain.Contracts;
 using WorkManagement.Domain.Entity;
+using WorkManagement.Domain.Entity.EmployeeLeaveTables;
 using WorkManagement.Domain.Models.Email;
 using WorkManagement.Domain.Models.Employee;
 using WorkManagement.Domain.Utility;
@@ -826,6 +827,202 @@ namespace WorkManagement.Service
             return true;
         }
 
+        #region Leave management
+
+        public async Task<List<EmployeeLeaveSummaryModel>> GetEmployeeLeaves(string loggedUserId)
+        {
+            try
+            {
+                var employeeId = CheckValidEmployeeId(loggedUserId);
+                if (employeeId == -1)
+                {
+                    throw new Exception("Invalid User data");
+                }
+                
+
+                //var defaultLeaves = await _dbContext.EmployeeDefaultLeave.Include(x => x.EmployeeLeaveTypes).ToListAsync();
+
+                var defaultLeaves = (from ed in _dbContext.EmployeeDefaultLeave
+                                     select new EmployeeLeaveSummaryModel
+                                     {
+                                         Id = ed.EmployeeLeaveTypeId.HasValue ? ed.EmployeeLeaveTypeId.Value : 0,
+                                         EmployeeLeaveType = ed.EmployeeLeaveTypes.Name,
+                                         TotalLeaves = ed.TotalLeaves,
+                                         RemainingLeaves = 0
+                                     }).ToList();
+
+                var employeeLeaveData = (from el in _dbContext.EmployeeLeaveSummary.Where(s => s.EmployeeId == employeeId)
+                                         select new EmployeeLeaveSummaryModel
+                                         {
+                                             Id = el.EmployeeLeaveTypeId.HasValue ? el.EmployeeLeaveTypeId.Value : 0,
+                                             EmployeeLeaveType = el.EmployeeLeaveTypes.Name,
+                                             TotalLeaves = el.TotalLeaves,
+                                             RemainingLeaves = el.RemainingLeaves
+                                         }).ToList();
+
+                if (employeeLeaveData.Count > 0)
+                {
+                    return employeeLeaveData;
+                }
+                else
+                {
+                    return defaultLeaves;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (use your preferred logging framework)
+                Console.WriteLine(ex.ToString());
+
+                // Optionally, rethrow the exception or handle it accordingly
+                throw new Exception("An error occurred while fetching the employee leaves.", ex);
+            }
+
+        }
+
+        public async Task<EmployeeLeaveModel> AddLeave(EmployeeLeaveModel employeeLeaveData, string loggedUserId)
+        {
+            try
+            {
+                var returnData = new EmployeeLeaveModel();
+                var employeeId = CheckValidEmployeeId(loggedUserId);
+                if (employeeId == -1)
+                {
+                    throw new Exception("Invalid User data");
+                }
+
+                var leaveSummary = await _dbContext.EmployeeLeaveSummary.FirstAsync(x => x.EmployeeId == employeeId && x.EmployeeLeaveTypeId == employeeLeaveData.EmployeeLeaveTypeId);
+                leaveSummary.RemainingLeaves = leaveSummary.RemainingLeaves - employeeLeaveData.LeaveDays;
+
+                if (leaveSummary.RemainingLeaves <= 0)
+                {
+                    return returnData;
+                    throw new Exception("Applied leavs are more than available leave for employee. Can not add more leaves");
+                }
+                else
+                {
+                    _dbContext.EmployeeLeaveSummary.Update(leaveSummary);
+                }
+
+                employeeLeaveData.EmployeeId = employeeId;
+
+                EmployeeLeave employeeLeave = new EmployeeLeave();
+                employeeLeave.EmployeeId = employeeId;
+                employeeLeave.Status = employeeLeaveData.Status;
+                employeeLeave.Description = string.IsNullOrEmpty(employeeLeaveData.Description) ? "" : employeeLeaveData.Description;
+                employeeLeave.Reason = string.IsNullOrEmpty(employeeLeaveData.Reason) ? "" : employeeLeaveData.Reason;
+                employeeLeave.StartDate = employeeLeaveData.StartDate.HasValue ? employeeLeaveData.StartDate.Value : DateTime.Now;
+                employeeLeave.EndDate = employeeLeaveData.EndDate.HasValue ? employeeLeaveData.EndDate.Value : DateTime.Now;
+                employeeLeave.LeaveDays = employeeLeaveData.LeaveDays;
+                employeeLeave.EmployeeLeaveTypeId = employeeLeaveData.EmployeeLeaveTypeId;
+
+                _dbContext.EmployeeLeaves.Add(employeeLeave);
+
+                _dbContext.SaveChanges();
+
+                return employeeLeaveData;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (use your preferred logging framework)
+                Console.WriteLine(ex.ToString());
+
+                // Optionally, rethrow the exception or handle it accordingly
+                throw new Exception("An error occurred while adding the employee leaves.", ex);
+            }
+
+
+        }
+
+        public async Task<EmployeeLeaveModel> UpdateLeave(EmployeeLeaveModel employeeLeaveData, string loggedUserId)
+        {
+            try
+            {
+                var employeeId = CheckValidEmployeeId(loggedUserId);
+                if (employeeId == -1)
+                {
+                    throw new Exception("Invalid User data");
+                }
+
+                employeeLeaveData.EmployeeId = employeeId;
+
+                var leaveSummary = await _dbContext.EmployeeLeaveSummary.FirstAsync(x => x.EmployeeId == employeeId && x.EmployeeLeaveTypeId == employeeLeaveData.EmployeeLeaveTypeId);
+                leaveSummary.RemainingLeaves = leaveSummary.RemainingLeaves - employeeLeaveData.LeaveDays;
+
+                if (leaveSummary.RemainingLeaves <= 0)
+                {
+                    return employeeLeaveData;
+                    throw new Exception("Applied leavs are more than available leave for employee. Can not add more leaves");
+                }
+                else
+                {
+                    _dbContext.EmployeeLeaveSummary.Update(leaveSummary);
+                }
+
+                var employeeLeave = _dbContext.EmployeeLeaves.FirstOrDefault(x => x.Id == employeeLeaveData.EmployeeLeaveId);
+
+                if(employeeLeave != null)
+                {
+                    employeeLeave.Status = employeeLeaveData.Status;
+                    employeeLeave.Description = string.IsNullOrEmpty(employeeLeaveData.Description) ? "" : employeeLeaveData.Description;
+                    employeeLeave.Reason = string.IsNullOrEmpty(employeeLeaveData.Reason) ? "" : employeeLeaveData.Reason;
+                    employeeLeave.StartDate = employeeLeaveData.StartDate.HasValue ? employeeLeaveData.StartDate.Value : DateTime.Now;
+                    employeeLeave.EndDate = employeeLeaveData.EndDate.HasValue ? employeeLeaveData.EndDate.Value : DateTime.Now;
+                    employeeLeave.LeaveDays = employeeLeaveData.LeaveDays;
+                    employeeLeave.EmployeeLeaveTypeId = employeeLeaveData.EmployeeLeaveTypeId;
+
+                    _dbContext.EmployeeLeaves.Update(employeeLeave);
+                }
+
+                _dbContext.SaveChanges();
+
+
+                return employeeLeaveData;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (use your preferred logging framework)
+                Console.WriteLine(ex.ToString());
+
+                // Optionally, rethrow the exception or handle it accordingly
+                throw new Exception("An error occurred while updating the employee leaves.", ex);
+            }
+        }
+
+        public async Task CancelLeave(int employeeLeaveId, string loggedUserId)
+        {
+            try
+            {
+                var employeeId = CheckValidEmployeeId(loggedUserId);
+                if (employeeId == -1)
+                {
+                    throw new Exception("Invalid User data");
+                }
+
+                var employeeLeave = _dbContext.EmployeeLeaves.FirstOrDefault(x => x.Id == employeeLeaveId);
+
+                var leaveSummary = await _dbContext.EmployeeLeaveSummary.FirstAsync(x => x.EmployeeId == employeeId && x.EmployeeLeaveTypeId == employeeLeave.EmployeeLeaveTypeId);
+                leaveSummary.RemainingLeaves += employeeLeave.LeaveDays;
+
+                _dbContext.EmployeeLeaves.Remove(employeeLeave);
+                _dbContext.EmployeeLeaveSummary.Update(leaveSummary);
+
+                _dbContext.SaveChanges();
+
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (use your preferred logging framework)
+                Console.WriteLine(ex.ToString());
+
+                // Optionally, rethrow the exception or handle it accordingly
+                throw new Exception("An error occurred while deleting the employee leaves.", ex);
+            }            
+        }
+
+
+        #endregion
+
         #region Private methods
 
         private async void SendEmail(ApplicationUser user,string password)
@@ -840,6 +1037,28 @@ namespace WorkManagement.Service
             emailModel.Subject = "Welcome to Geo!";
             emailModel.repModel = WelcomeModelCredentials;
             _emailService.SendWelcomeMail(emailModel);
+        }
+
+        private int CheckValidEmployeeId(string loggedUserId)
+        {
+            // Check if the loggedUserId can be parsed to a GUID
+            if (!Guid.TryParse(loggedUserId, out Guid userGuid))
+            {
+                return -1;
+                throw new Exception("Invalid User ID");
+
+            }
+
+            // Find Employee ID
+            var employee = _dbContext.Employees.FirstOrDefault(x => x.UserId == userGuid);
+            if (employee == null)
+            {
+                return -1;
+                throw new Exception("User was not found");
+
+            }
+
+            return employee.Id;
         }
 
 

@@ -8,6 +8,7 @@ using System.Reflection.Metadata;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 using WorkManagement.Domain.Entity;
+using WorkManagement.Domain.Entity.EmployeeLeaveTables;
 using WorkManagement.Domain.Models;
 
 namespace WorkManagementSolution.Employee
@@ -81,6 +82,7 @@ namespace WorkManagementSolution.Employee
         public List<EmployeeEducationDetail>? EmployeeEducationDetail { get; set; }
         public List<EmployeeRelationshipDetail>? EmployeeRelationshipDetails { get; set; }
         public List<EmployeeDocuments>? EmployeeDocuments { get; set; }
+        public List<EmployeeLeaveSummary> EmployeeLeaves { get; set; }
 
     }
 
