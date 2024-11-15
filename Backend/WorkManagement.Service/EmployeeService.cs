@@ -829,16 +829,22 @@ namespace WorkManagement.Service
 
         #region Leave management
 
-        public async Task<List<EmployeeLeaveSummaryModel>> GetEmployeeLeaves(string loggedUserId)
+        public async Task<List<EmployeeLeaveSummaryModel>> GetEmployeeLeaves(int employeeId,string loggedUserId)
         {
             try
             {
-                var employeeId = CheckValidEmployeeId(loggedUserId);
-                if (employeeId == -1)
+                // Check if the loggedUserId can be parsed to a GUID
+                if (!Guid.TryParse(loggedUserId, out Guid userGuid))
                 {
-                    throw new Exception("Invalid User data");
+                    throw new Exception("Invalid User ID");
+
                 }
                 
+                var employee = _dbContext.Employees.FirstOrDefault(x => x.UserId == userGuid);
+                if(employee != null)
+                {
+                    employeeId = employee.Id;
+                }
 
                 //var defaultLeaves = await _dbContext.EmployeeDefaultLeave.Include(x => x.EmployeeLeaveTypes).ToListAsync();
 
@@ -885,13 +891,24 @@ namespace WorkManagement.Service
             try
             {
                 var returnData = new EmployeeLeaveModel();
-                var employeeId = CheckValidEmployeeId(loggedUserId);
-                if (employeeId == -1)
+
+                // Check if the loggedUserId can be parsed to a GUID
+                if (!Guid.TryParse(loggedUserId, out Guid userGuid))
                 {
-                    throw new Exception("Invalid User data");
+                    throw new Exception("Invalid User ID");
+
                 }
 
-                var leaveSummary = await _dbContext.EmployeeLeaveSummary.FirstAsync(x => x.EmployeeId == employeeId && x.EmployeeLeaveTypeId == employeeLeaveData.EmployeeLeaveTypeId);
+                var employee = _dbContext.Employees.FirstOrDefault(x => x.UserId == userGuid);
+                 
+                if (employee != null)
+                {
+                    employeeLeaveData.EmployeeId= employee.Id;
+                }
+
+                
+
+                var leaveSummary = await _dbContext.EmployeeLeaveSummary.FirstAsync(x => x.EmployeeId == employeeLeaveData.EmployeeId && x.EmployeeLeaveTypeId == employeeLeaveData.EmployeeLeaveTypeId);
                 leaveSummary.RemainingLeaves = leaveSummary.RemainingLeaves - employeeLeaveData.LeaveDays;
 
                 if (leaveSummary.RemainingLeaves <= 0)
@@ -904,10 +921,9 @@ namespace WorkManagement.Service
                     _dbContext.EmployeeLeaveSummary.Update(leaveSummary);
                 }
 
-                employeeLeaveData.EmployeeId = employeeId;
 
                 EmployeeLeave employeeLeave = new EmployeeLeave();
-                employeeLeave.EmployeeId = employeeId;
+                employeeLeave.EmployeeId = employeeLeaveData.EmployeeId;
                 employeeLeave.Status = employeeLeaveData.Status;
                 employeeLeave.Description = string.IsNullOrEmpty(employeeLeaveData.Description) ? "" : employeeLeaveData.Description;
                 employeeLeave.Reason = string.IsNullOrEmpty(employeeLeaveData.Reason) ? "" : employeeLeaveData.Reason;
@@ -938,15 +954,22 @@ namespace WorkManagement.Service
         {
             try
             {
-                var employeeId = CheckValidEmployeeId(loggedUserId);
-                if (employeeId == -1)
+                // Check if the loggedUserId can be parsed to a GUID
+                if (!Guid.TryParse(loggedUserId, out Guid userGuid))
                 {
-                    throw new Exception("Invalid User data");
+                    throw new Exception("Invalid User ID");
+
                 }
 
-                employeeLeaveData.EmployeeId = employeeId;
+                var employee = _dbContext.Employees.FirstOrDefault(x => x.UserId == userGuid);
 
-                var leaveSummary = await _dbContext.EmployeeLeaveSummary.FirstAsync(x => x.EmployeeId == employeeId && x.EmployeeLeaveTypeId == employeeLeaveData.EmployeeLeaveTypeId);
+                if (employee != null)
+                {
+                    employeeLeaveData.EmployeeId = employee.Id;
+                }
+
+
+                var leaveSummary = await _dbContext.EmployeeLeaveSummary.FirstAsync(x => x.EmployeeId == employeeLeaveData.EmployeeId && x.EmployeeLeaveTypeId == employeeLeaveData.EmployeeLeaveTypeId);
                 leaveSummary.RemainingLeaves = leaveSummary.RemainingLeaves - employeeLeaveData.LeaveDays;
 
                 if (leaveSummary.RemainingLeaves <= 0)
@@ -989,14 +1012,21 @@ namespace WorkManagement.Service
             }
         }
 
-        public async Task CancelLeave(int employeeLeaveId, string loggedUserId)
+        public async Task CancelLeave(int employeeLeaveId,int employeeId, string loggedUserId)
         {
             try
-            {
-                var employeeId = CheckValidEmployeeId(loggedUserId);
-                if (employeeId == -1)
+            {// Check if the loggedUserId can be parsed to a GUID
+                if (!Guid.TryParse(loggedUserId, out Guid userGuid))
                 {
-                    throw new Exception("Invalid User data");
+                    throw new Exception("Invalid User ID");
+
+                }
+
+                var employee = _dbContext.Employees.FirstOrDefault(x => x.UserId == userGuid);
+
+                if (employee != null)
+                {
+                    employeeId = employee.Id;
                 }
 
                 var employeeLeave = _dbContext.EmployeeLeaves.FirstOrDefault(x => x.Id == employeeLeaveId);
