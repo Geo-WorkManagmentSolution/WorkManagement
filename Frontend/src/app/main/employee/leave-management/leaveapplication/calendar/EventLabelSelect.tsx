@@ -115,6 +115,7 @@ const EventLabelSelect = React.forwardRef<HTMLElement, EventLabelSelectProps>((p
 				onChange={handleChange}
 				ref={ref}
 				classes={{ select: 'flex items-center space-x-12' }}
+				{...props}
 			>
 				{currentLeaves?.map((leaveType) => (
 					<MenuItem

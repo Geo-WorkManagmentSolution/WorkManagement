@@ -232,14 +232,50 @@ namespace WorkManagement.Service
         }
 
 
+        public async Task<(bool isValid, string errorMessage)> ValidateLeaveRequest(DateTime startDate, DateTime endDate, int employeeId)
+        {
+            // Check for existing leaves
+            var existingLeaves = await _dbContext.EmployeeLeaves
+                .Where(l => l.EmployeeId == employeeId &&
+                            ((l.StartDate <= startDate && l.EndDate >= startDate) ||
+                             (l.StartDate <= endDate && l.EndDate >= endDate) ||
+                             (l.StartDate >= startDate && l.EndDate <= endDate)))
+                .ToListAsync();
+
+            if (existingLeaves.Any())
+            {
+                return (false, "You already have leave applied for the selected dates.");
+            }
+
+            // Check for holidays
+            var holidays = await _dbContext.EmployeeHolidays
+                .Where(h => (h.StartDate <= startDate && h.EndDate >= startDate) ||
+                            (h.StartDate <= endDate && h.EndDate >= endDate) ||
+                            (h.StartDate >= startDate && h.EndDate <= endDate))
+                .ToListAsync();
+
+            if (holidays.Any())
+            {
+                return (false, "The selected date range includes holidays.");
+            }
+
+            return (true, string.Empty);
+        }
+
 
         public async Task<EmployeeLeave> AddLeave(EmployeeLeave employeeLeave, string loggedUserId)
         {
-
             var EmployeeId = _dbContext.Employees.First(x => x.UserId == Guid.Parse(loggedUserId)).Id;
 
             employeeLeave.EmployeeId = EmployeeId;
-            //add validation in future
+
+            // Validate the leave request
+            var (isValid, errorMessage) = await ValidateLeaveRequest(employeeLeave.StartDate, employeeLeave.EndDate, EmployeeId);
+            if (!isValid)
+            {
+                throw new InvalidOperationException(errorMessage);
+            }
+
             _dbContext.EmployeeLeaves.Add(employeeLeave);
             var leaveSummary = await _dbContext.EmployeeLeaveSummary.FirstAsync(x => x.EmployeeId == EmployeeId && x.EmployeeLeaveTypeId == employeeLeave.EmployeeLeaveTypeId);
             leaveSummary.RemainingLeaves = leaveSummary.RemainingLeaves - employeeLeave.LeaveDays;
@@ -248,8 +284,8 @@ namespace WorkManagement.Service
             await _dbContext.SaveChangesAsync();
             return employeeLeave;
         }
-         
-            public async Task CancelLeave(int employeeLeaveId)
+
+        public async Task CancelLeave(int employeeLeaveId)
             {
                 var QuarableCancel = _dbContext.EmployeeLeaves.Where(x => x.Id == employeeLeaveId);
                 var cancelLeaves = await QuarableCancel.FirstAsync();

@@ -83,7 +83,9 @@ namespace WorkManagement.Service
                     Reason = l.Reason,
                     Name=l.EmployeeLeaveTypes.Name,
                     LeaveTypeId=l.EmployeeLeaveTypeId,
-                    EmployeeLeaveId=l.Id
+                    EmployeeLeaveId=l.Id,
+                    status=l.Status
+                    
                     
                     
                 })
@@ -99,7 +101,7 @@ namespace WorkManagement.Service
                     StartDate = h.StartDate,
                     EndDate = h.EndDate,
                     EmployeeId = employeeId,
-                    Reason=h.Name,
+                    Description=h.Name,
                     Name="Holiday"
                     
                 })

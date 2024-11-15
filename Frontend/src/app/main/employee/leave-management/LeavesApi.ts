@@ -127,6 +127,7 @@ export type EmployeeLeaveHistoryDto = {
   reason?: string | null;
   startDate?: string;
   endDate?: string;
+  status?: LeaveStatus;
 };
 export type EmployeeLeaveHistoryDataModel = {
   employeeId?: number;

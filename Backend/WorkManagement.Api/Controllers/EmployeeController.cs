@@ -198,8 +198,15 @@ namespace WorkManagement.API.Controllers
         [HttpPut("leaves/addLeave")]
         public async Task<ActionResult<EmployeeLeave>> AddLeave(EmployeeLeave employeeLeave)
         {
-            var leaves = await employeeService.AddLeave(employeeLeave, User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            return Ok(leaves);
+            try
+            {
+                var leaves = await employeeService.AddLeave(employeeLeave, User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                return Ok(leaves);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
 

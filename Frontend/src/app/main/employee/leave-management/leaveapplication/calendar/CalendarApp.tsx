@@ -171,9 +171,12 @@ export default function CalendarApp() {
 	const handleEventClick = (clickInfo: EventClickArg) => {
 		const eventData = clickInfo.event;
 		
+		
 		if (eventData.extendedProps.name==="Holiday") {
 			return;
 		}
+
+
 
 		setIsNewEvent(false);
 		setSelectedEvent({
@@ -206,24 +209,25 @@ export default function CalendarApp() {
 
 	const handleSaveEvent = async (data: EmployeeLeave) => {
 		try {
-			if (isNewEvent) {
-				await addLeaveApi({ employeeLeave: data });
-			} else {
-				await updateLeaveApi({ employeeLeave: data });
-			}
-
-			handleClosePopover();
-			await fetchEvents(currentDate?.start || new Date(), currentDate?.end || new Date());
-			await refetchCurrentLeaves();
-			refreshCalendar();
-			setAlertInfo({ message: 'Leave request saved successfully.', severity: 'success' });
-			// setAlertOpen(true);
+		  if (isNewEvent) {
+			await addLeaveApi({ employeeLeave: data }).unwrap();
+		  } else {
+			await updateLeaveApi({ employeeLeave: data }).unwrap();
+		  }
+	
+		  handleClosePopover();
+		  await fetchEvents(currentDate?.start || new Date(), currentDate?.end || new Date());
+		  await refetchCurrentLeaves();
+		  refreshCalendar();
+		  setAlertInfo({ message: 'Leave request saved successfully.', severity: 'success' });
 		} catch (error) {
-			console.error('Error saving event:', error);
-			setAlertInfo({ message: 'Failed to save event. Please try again.', severity: 'error' });
-			// setAlertOpen(true);
+		  if (error instanceof Error) {
+			setAlertInfo({ message: error.response.data.message, severity: 'error' });
+		  } else {
+			setAlertInfo({ message: 'An unknown error occurred', severity: 'error' });
+		  }
 		}
-	};
+	  };
 
 	const handleDeleteEvent = async (eventId: number) => {
 		try {
@@ -407,9 +411,9 @@ export default function CalendarApp() {
 			content={
 				<>
 					<Snackbar
-						className="absolute"
+						className="absolute top-11"
 						open={!!alertInfo}
-						autoHideDuration={6000}
+						autoHideDuration={4000}
 						onClose={handleCloseAlert}
 						anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
 					>
@@ -447,6 +451,7 @@ export default function CalendarApp() {
 							refetchEvents={() =>
 								fetchEvents(currentDate?.start || new Date(), currentDate?.end || new Date())
 							}
+							eventColors={eventColors}
 						/>
 					</div>
 
