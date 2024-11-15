@@ -43,10 +43,10 @@ namespace WorkManagement.Domain.Contracts
 
         #region Employee Leave
 
-        public Task<List<EmployeeLeaveSummaryModel>> GetEmployeeLeaves(int employeeId,string loggedUserId);
+        public Task<List<EmployeeLeaveSummaryModel>> GetEmployeeLeaves(string loggedUserId);
         public Task<EmployeeLeaveModel> AddLeave(EmployeeLeaveModel employeeLeave, string loggedUserId);
         public Task<EmployeeLeaveModel> UpdateLeave(EmployeeLeaveModel employeeLeaveData, string loggedUserId);
-        public Task CancelLeave(int employeeLeaveId,int employeeId, string value);
+        public Task CancelLeave(int employeeLeaveId, string value);
 
         #endregion
 

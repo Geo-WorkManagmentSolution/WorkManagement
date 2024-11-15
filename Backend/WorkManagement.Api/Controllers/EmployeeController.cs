@@ -203,9 +203,9 @@ namespace WorkManagement.API.Controllers
 
         // GET api/employee/leaves/current
         [HttpGet("leaves/current")]
-        public async Task<ActionResult<IEnumerable<EmployeeLeaveSummaryModel>>> GetEmployeeLeaves(int employeeId)
+        public async Task<ActionResult<IEnumerable<EmployeeLeaveSummaryModel>>> GetEmployeeLeaves()
         {
-            var leaves = await employeeService.GetEmployeeLeaves(employeeId,User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var leaves = await employeeService.GetEmployeeLeaves(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             return Ok(leaves);
         }
 
@@ -227,9 +227,9 @@ namespace WorkManagement.API.Controllers
 
         // GET api/employee/leaves/CancelLeave
         [HttpDelete("leaves/cancelLeave")]
-        public async Task<ActionResult<bool>> CancelLeave(int employeeLeaveId,int employeeId)
+        public async Task<ActionResult<bool>> CancelLeave(int employeeLeaveId)
         {
-            await employeeService.CancelLeave(employeeLeaveId, employeeId, User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            await employeeService.CancelLeave(employeeLeaveId, User.FindFirst(ClaimTypes.NameIdentifier).Value);
             return Ok(true);
         }
     }
