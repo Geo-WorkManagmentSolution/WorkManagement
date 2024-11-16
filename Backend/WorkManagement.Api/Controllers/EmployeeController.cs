@@ -152,7 +152,7 @@ namespace WorkManagement.API.Controllers
             }
 
 
-            await employeeService.UpdateEmployeeAsync(id,employee);
+            await employeeService.UpdateEmployeeAsync(id, employee);
             return NoContent();
         }
 
@@ -210,4 +210,5 @@ namespace WorkManagement.API.Controllers
             return Ok(leaves);
         }
 
+    }
 }

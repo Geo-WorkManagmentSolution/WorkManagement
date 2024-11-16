@@ -22,7 +22,7 @@ namespace WorkManagementSolution.Employee
         [Required]
         public string MiddleName { get; set; }
         [Required]
-        public string LastName { get; set; }       
+        public string LastName { get; set; }
 
         [EmailAddress]
         [Required]
@@ -53,7 +53,7 @@ namespace WorkManagementSolution.Employee
 
         [ForeignKey(nameof(EmployeePersonalDetails))]
         public int? EmployeePersonalDetailsId { get; set; }
-        
+
         [ForeignKey(nameof(EmployeeWorkInformation))]
         public int? EmployeeWorkInformationId { get; set; }
 
@@ -68,11 +68,11 @@ namespace WorkManagementSolution.Employee
 
         #endregion
 
-        public EmployeeDepartment? EmployeeDepartment { get; set; }             
-        public EmployeeDesignation? EmployeeDesignation { get; set; }        
+        public EmployeeDepartment? EmployeeDepartment { get; set; }
+        public EmployeeDesignation? EmployeeDesignation { get; set; }
         public Employee? EmployeeReportTo { get; set; }
         public ApplicationUser? ApplicationUser { get; set; }
-        public ApplicationRole? ApplicationRole { get; set; }        
+        public ApplicationRole? ApplicationRole { get; set; }
         public EmployeeCategory? EmployeeCategory { get; set; }
         public EmployeePersonalDetails? EmployeePersonalDetails { get; set; }
         public EmployeeWorkInformation? EmployeeWorkInformation { get; set; }
@@ -83,96 +83,6 @@ namespace WorkManagementSolution.Employee
         public List<EmployeeRelationshipDetail>? EmployeeRelationshipDetails { get; set; }
         public List<EmployeeDocuments>? EmployeeDocuments { get; set; }
         public List<EmployeeLeaveSummary> EmployeeLeaves { get; set; }
-
-        public List<EmployeeLeaveSummary> EmployeeLeaves { get; set; }
-    }
-
-    public class EmployeeLeaveSummary : BaseEntity
-    {
-        public int EmployeeId { get; set; }
-     
-        [ForeignKey(nameof(EmployeeId))]
-        public Employee? employee { get; set; }
-        public double RemainingLeaves { get; set; }
-
-        [ForeignKey(nameof(EmployeeLeaveType))]
-        public int? EmployeeLeaveTypeId { get; set; }
-        public EmployeeLeaveType EmployeeLeaveTypes { get; set; }
-        public int TotalLeaves { get; set; }
-
-    }
-    public class EmployeeDefaultLeaveSummary : BaseEntity {
-        [ForeignKey(nameof(EmployeeLeaveType))]
-        public int? EmployeeLeaveTypeId { get; set; }
-        public EmployeeLeaveType EmployeeLeaveTypes { get; set; }
-        public int TotalLeaves { get; set; }
-    }
-    public class EmployeeLeaveSummaryModel {
-        public int Id { get; set; }
-
-        public string EmployeeLeaveType { get; set; }
-
-     
-
-        public int TotalLeaves { get; set; }
-
-        public double RemainingLeaves { get; set; }
-
-
-    }
-
-    public class EmployeeLeaveType : BaseEntity
-    {
-        public string Name { get; set; }
-        public bool IsPaid { get; set; }
-    }
-
-
-    public class EmployeeHoliday : BaseEntity
-    {
-
-        public string Name { get; set; }
-        public bool IsFloater { get; set; }
-
-        [DataType(DataType.Date)]
-        public DateTime StartDate { get; set; }
-
-        [DataType(DataType.Date)]
-        public DateTime EndDate { get; set; }
-    }
-
-    public class EmployeeLeave : BaseEntity
-    {
-        public int EmployeeId { get; set; }
-
-        [JsonIgnore]
-        [ForeignKey(nameof(EmployeeId))]
-        public Employee? employee { get; set; }
-
-        public LeaveStatus Status { get; set; }
-        public string? Description { get; set; }
-        public string? Reason { get; set; }
-
-        [DataType(DataType.Date)]
-        public DateTime StartDate { get; set; }
-
-        [DataType(DataType.Date)]
-        public DateTime EndDate { get; set; }
-        public double LeaveDays { get; set; }
-
-        [ForeignKey(nameof(EmployeeLeaveType))]
-        public required int EmployeeLeaveTypeId { get; set; }
-
-        [JsonIgnore]
-        public EmployeeLeaveType? EmployeeLeaveTypes { get; set; }
-
-    }
-
-    public enum LeaveStatus
-    {
-        Approved,
-        Pending,
-        Rejected
     }
 
     public class EmployeeDocuments : BaseEntity
@@ -388,8 +298,4 @@ namespace WorkManagementSolution.Employee
         [Display(Name = "O-")]
         ONegative
     }
-
 }
-
-
-

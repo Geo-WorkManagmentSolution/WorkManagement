@@ -271,7 +271,7 @@ namespace WorkManagement.Service
 
                 if (employeeEducationData != null)
                 {
-                    if(employeeEducationData.Count == 0)
+                    if (employeeEducationData.Count == 0)
                     {
                         var educationData = new EmployeeEducationDetailModel();
                         educationData.Type = "";
@@ -287,7 +287,7 @@ namespace WorkManagement.Service
                         returnEployeeData.EmployeeEducationDetail = employeeEducationData;
                     }
 
-                   
+
                 }
                 else
                 {
@@ -313,7 +313,7 @@ namespace WorkManagement.Service
 
                 if (employeeRelationshipData != null)
                 {
-                    if(employeeRelationshipData.Count == 0)
+                    if (employeeRelationshipData.Count == 0)
                     {
                         var relationshipData = new EmployeeRelationshipDetailModel();
                         relationshipData.RelationshipType = RelationshipType.Parent;
@@ -327,7 +327,7 @@ namespace WorkManagement.Service
                     {
                         returnEployeeData.EmployeeRelationshipDetails = employeeRelationshipData;
                     }
-                   
+
                 }
                 else
                 {
@@ -632,7 +632,7 @@ namespace WorkManagement.Service
                             {
                                 DOB = employeePersonalDetailsData.DateOfBirth.Value;
                             }
-                           
+
 
                             if (employeePersonalDetailsData.DateOfBirth.HasValue)
                             {
@@ -698,7 +698,7 @@ namespace WorkManagement.Service
                         if (employeeInsuranceData != null)
                         {
                             employeeInsuranceData.SerialNumber = employee.EmployeeInsuranceDetails.SerialNumber;
-                            employeeInsuranceData.TotalSIWider = employee.EmployeeInsuranceDetails.TotalSIWider.HasValue ? employee.EmployeeInsuranceDetails.TotalSIWider.Value : 0 ;
+                            employeeInsuranceData.TotalSIWider = employee.EmployeeInsuranceDetails.TotalSIWider.HasValue ? employee.EmployeeInsuranceDetails.TotalSIWider.Value : 0;
                             employeeInsuranceData.Comprehensive = employee.EmployeeInsuranceDetails.Comprehensive.HasValue ? employee.EmployeeInsuranceDetails.Comprehensive.Value : 0;
                             employeeInsuranceData.Risk = employee.EmployeeInsuranceDetails.Risk;
                             employeeInsuranceData.Age = age;
@@ -749,15 +749,15 @@ namespace WorkManagement.Service
 
                     if (employee.EmployeeEducationDetail != null)
                     {
-                        if(employee.EmployeeEducationDetail.Count > 0)
+                        if (employee.EmployeeEducationDetail.Count > 0)
                         {
                             var educationDetails = _dbContext.EmployeeEducationDetails.Where(s => s.EmployeeId == employeeData.Id).ToList();
-                            foreach(var detail in educationDetails)
+                            foreach (var detail in educationDetails)
                             {
                                 _dbContext.EmployeeEducationDetails.Remove(detail);
                             }
 
-                            foreach(var detail in employee.EmployeeEducationDetail)
+                            foreach (var detail in employee.EmployeeEducationDetail)
                             {
                                 var educationData = new EmployeeEducationDetail();
                                 educationData.EmployeeId = employeeData.Id;
@@ -798,7 +798,7 @@ namespace WorkManagement.Service
                     }
 
                     employeeData.LastModifiedOn = DateTime.Now;
-                    
+
 
                     _dbContext.Employees.Update(employeeData);
                     _dbContext.SaveChanges();
@@ -839,7 +839,7 @@ namespace WorkManagement.Service
                 {
                     throw new Exception("Invalid User data");
                 }
-                
+
 
                 //var defaultLeaves = await _dbContext.EmployeeDefaultLeave.Include(x => x.EmployeeLeaveTypes).ToListAsync();
 
@@ -962,7 +962,7 @@ namespace WorkManagement.Service
 
                 var employeeLeave = _dbContext.EmployeeLeaves.FirstOrDefault(x => x.Id == employeeLeaveData.EmployeeLeaveId);
 
-                if(employeeLeave != null)
+                if (employeeLeave != null)
                 {
                     employeeLeave.Status = employeeLeaveData.Status;
                     employeeLeave.Description = string.IsNullOrEmpty(employeeLeaveData.Description) ? "" : employeeLeaveData.Description;
@@ -1018,7 +1018,7 @@ namespace WorkManagement.Service
 
                 // Optionally, rethrow the exception or handle it accordingly
                 throw new Exception("An error occurred while deleting the employee leaves.", ex);
-            }            
+            }
         }
 
 
@@ -1026,7 +1026,7 @@ namespace WorkManagement.Service
 
         #region Private methods
 
-        private async void SendEmail(ApplicationUser user,string password)
+        private async void SendEmail(ApplicationUser user, string password)
         {
             var WelcomeModelCredentials = new WelcomeModel();
             WelcomeModelCredentials.Username = user.UserName;
@@ -1098,7 +1098,7 @@ namespace WorkManagement.Service
         }
 
 
-  
+
 
     }
 }

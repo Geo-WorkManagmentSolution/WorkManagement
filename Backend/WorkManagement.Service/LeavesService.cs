@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WorkManagement.Domain.Contracts;
 using WorkManagement.Domain.Entity;
+using WorkManagement.Domain.Entity.EmployeeLeaveTables;
 using WorkManagement.Domain.Models.Employee;
 using WorkManagementSolution.Employee;
 using WorkManagmentSolution.EFCore;
