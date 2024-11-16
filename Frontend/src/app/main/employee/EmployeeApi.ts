@@ -152,6 +152,42 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.employeeDesignation,
       }),
     }),
+    getApiEmployeesLeavesCurrent: build.query<
+      GetApiEmployeesLeavesCurrentApiResponse,
+      GetApiEmployeesLeavesCurrentApiArg
+    >({
+      query: () => ({ url: `/api/Employees/leaves/current` }),
+    }),
+    putApiEmployeesLeavesAddLeave: build.mutation<
+      PutApiEmployeesLeavesAddLeaveApiResponse,
+      PutApiEmployeesLeavesAddLeaveApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/leaves/addLeave`,
+        method: "PUT",
+        body: queryArg.employeeLeave,
+      }),
+    }),
+    deleteApiEmployeesLeavesCancelLeave: build.mutation<
+      DeleteApiEmployeesLeavesCancelLeaveApiResponse,
+      DeleteApiEmployeesLeavesCancelLeaveApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/leaves/cancelLeave`,
+        method: "DELETE",
+        params: { employeeLeaveId: queryArg.employeeLeaveId },
+      }),
+    }),
+    putApiEmployeesLeavesUpdateLeave: build.mutation<
+      PutApiEmployeesLeavesUpdateLeaveApiResponse,
+      PutApiEmployeesLeavesUpdateLeaveApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/leaves/updateLeave`,
+        method: "PUT",
+        body: queryArg.employeeLeave,
+      }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -423,6 +459,31 @@ export enum FileType {
   Csv = "CSV",
   Other = "Other",
 }
+export enum SalaryType {
+  M = "M",
+  F = "F",
+}
+export enum RelationshipType {
+  Parent = "Parent",
+  Spouse = "Spouse",
+  FamilyMember = "FamilyMember",
+  Friend = "Friend",
+  Other = "Other",
+}
+export enum FileType {
+  Pdf = "PDF",
+  Docx = "DOCX",
+  Txt = "TXT",
+  Zip = "ZIP",
+  Xlsx = "XLSX",
+  Csv = "CSV",
+  Other = "Other",
+}
+export enum LeaveStatus {
+  Approved = "Approved",
+  Pending = "Pending",
+  Rejected = "Rejected",
+}
 export const {
   useGetApiEmployeesQuery,
   useLazyGetApiEmployeesQuery,
@@ -451,4 +512,9 @@ export const {
   usePostApiEmployeesAddNewDepartmentMutation,
   usePostApiEmployeesAddNewSiteMutation,
   usePostApiEmployeesAddNewDesignationMutation,
+  useGetApiEmployeesLeavesCurrentQuery,
+  useLazyGetApiEmployeesLeavesCurrentQuery,
+  usePutApiEmployeesLeavesAddLeaveMutation,
+  useDeleteApiEmployeesLeavesCancelLeaveMutation,
+  usePutApiEmployeesLeavesUpdateLeaveMutation,
 } = injectedRtkApi;

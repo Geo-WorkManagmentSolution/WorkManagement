@@ -95,6 +95,85 @@ namespace WorkManagmentSolution.EFCore
                 new EmployeeDesignation { Id = 6, Name = "Engineer" }
             );
 
+            modelBuilder.Entity<EmployeeLeaveType>().HasData(
+              new EmployeeLeaveType { Id = 1, Name = "Privilege Leave", IsPaid = true },
+              new EmployeeLeaveType { Id = 2, Name = "Sick Leave", IsPaid = true },
+              new EmployeeLeaveType { Id = 3, Name = "Casual Leave", IsPaid = true },
+              new EmployeeLeaveType { Id = 4, Name = "Maternity Leave", IsPaid = true },
+              new EmployeeLeaveType { Id = 5, Name = "Bereavement Leave", IsPaid = true },
+              new EmployeeLeaveType { Id = 6, Name = "Compensatory Leave", IsPaid = true }
+          );
+
+            modelBuilder.Entity<EmployeeDefaultLeaveSummary>().HasData(
+              new EmployeeDefaultLeaveSummary { Id = 1, EmployeeLeaveTypeId = 1, TotalLeaves = 5},
+              new EmployeeDefaultLeaveSummary { Id = 2, EmployeeLeaveTypeId = 2, TotalLeaves = 5},
+              new EmployeeDefaultLeaveSummary { Id = 3, EmployeeLeaveTypeId = 3, TotalLeaves = 5},
+              new EmployeeDefaultLeaveSummary { Id = 4, EmployeeLeaveTypeId = 4, TotalLeaves = 5},
+              new EmployeeDefaultLeaveSummary { Id = 5, EmployeeLeaveTypeId = 5, TotalLeaves = 5},
+              new EmployeeDefaultLeaveSummary { Id = 6, EmployeeLeaveTypeId = 6, TotalLeaves = 5}
+          );
+
+
+            modelBuilder.Entity<EmployeeHoliday>().HasData(
+new EmployeeHoliday
+{
+    Id = 1,
+    Name = "New Year's Day",
+    IsFloater = false,
+    StartDate = new DateTime(2024, 1, 1),
+    EndDate = new DateTime(2024, 1, 1)
+
+},
+    new EmployeeHoliday
+    {
+        Id = 2,
+        Name = "Republic Day",
+        IsFloater = false,
+        StartDate = new DateTime(2024, 1, 26),
+            EndDate = new DateTime(2024, 1, 26)
+
+    },
+    new EmployeeHoliday
+    {
+        Id = 3,
+        Name = "Holi",
+        IsFloater = true,
+        StartDate = new DateTime(2024, 3, 25),
+        EndDate = new DateTime(2024, 3, 25),
+
+    },
+    new EmployeeHoliday
+    {
+        Id = 4,
+        Name = "Independence Day",
+        IsFloater = false,
+        StartDate = new DateTime(2024, 8, 15),
+        EndDate = new DateTime(2024, 8, 15),
+    },
+    new EmployeeHoliday
+    {
+        Id = 5,
+        Name = "Dussehra",
+        IsFloater = false,
+        StartDate = new DateTime(2024, 10, 12),
+        EndDate = new DateTime(2024, 10, 12),
+    },
+    new EmployeeHoliday
+    {
+        Id = 6,
+        Name = "Diwali",
+        IsFloater = false,
+        StartDate = new DateTime(2024, 10, 31),
+        EndDate = new DateTime(2024, 10, 31),
+    },
+    new EmployeeHoliday
+    {
+        Id = 7,
+        Name = "Christmas",
+        IsFloater = false,
+        StartDate = new DateTime(2024, 12, 25),
+        EndDate = new DateTime(2024, 12, 25),
+    });
         }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

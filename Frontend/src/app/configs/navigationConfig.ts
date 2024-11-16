@@ -30,13 +30,25 @@ const navigationConfig: FuseNavItemType[] = [
 						title: 'Employee Dashboard',
 						type: 'item',
 						url: '/apps/employees',
-						end: true,
+						end: true
 					},
 					{
 						id: 'applicationmanagement.employees.new',
 						title: 'Add Employee',
 						type: 'item',
 						url: '/apps/employees/employeesSearch/new'
+					},
+					{
+						id:'applicationmanagement.employees.leavemanagement',
+						title:'Leave Management',
+						type:'item',
+						url:'/apps/employees/leave-management'
+					},
+					{
+						id:'applicationmanagement.employees.leaveapprovals',
+						title:'Leave Approvals',
+						type:'item',
+						url:'/apps/employees/leave-approval'
 					}
 				]
 			},

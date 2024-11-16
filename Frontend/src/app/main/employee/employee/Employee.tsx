@@ -59,6 +59,10 @@ import TeamTab from "./tabs/TeamTab";
 // 	employeePersonalDetails: employeePersonalDetailsSchema
 // });
 
+const employeeLeavesSchema = yup.object().shape({
+	totalLeaves: yup.number().required('Leaves are required').positive('Total Leaves must be greater than zero')
+  });
+
 const schema = yup.object({
   firstName: yup.string().required("First Name is required"),
   middleName: yup.string().required("Middle Name is required"),
@@ -112,7 +116,11 @@ const schema = yup.object({
   // 	employeeStateInsuranceNumber: yup.string().nullable(),
   // 	biometricCode: yup.string().nullable()
   // })
+  	employeeLeaves: yup.array().of(employeeLeavesSchema)
+
 });
+
+  
 
 // The product page.
 type EmployeeFormValues = yup.InferType<typeof schema>;

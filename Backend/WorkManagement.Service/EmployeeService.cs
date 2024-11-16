@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WorkManagement.Domain.Contracts;
@@ -1063,5 +1064,41 @@ namespace WorkManagement.Service
 
 
         #endregion
+
+
+
+        public async Task<(bool isValid, string errorMessage)> ValidateLeaveRequest(DateTime startDate, DateTime endDate, int employeeId)
+        {
+            // Check for existing leaves
+            var existingLeaves = await _dbContext.EmployeeLeaves
+                .Where(l => l.EmployeeId == employeeId &&
+                            ((l.StartDate <= startDate && l.EndDate >= startDate) ||
+                             (l.StartDate <= endDate && l.EndDate >= endDate) ||
+                             (l.StartDate >= startDate && l.EndDate <= endDate)))
+                .ToListAsync();
+
+            if (existingLeaves.Any())
+            {
+                return (false, "You already have leave applied for the selected dates.");
+            }
+
+            // Check for holidays
+            var holidays = await _dbContext.EmployeeHolidays
+                .Where(h => (h.StartDate <= startDate && h.EndDate >= startDate) ||
+                            (h.StartDate <= endDate && h.EndDate >= endDate) ||
+                            (h.StartDate >= startDate && h.EndDate <= endDate))
+                .ToListAsync();
+
+            if (holidays.Any())
+            {
+                return (false, "The selected date range includes holidays.");
+            }
+
+            return (true, string.Empty);
+        }
+
+
+  
+
     }
 }

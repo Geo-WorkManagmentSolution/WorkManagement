@@ -6,8 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WorkManagement.Domain.Contracts;
-using WorkManagement.Domain.Entity.EmployeeLeaveTables;
+using WorkManagement.Domain.Entity;
 using WorkManagement.Domain.Models.Employee;
+using WorkManagementSolution.Employee;
 using WorkManagmentSolution.EFCore;
 
 namespace WorkManagement.Service
@@ -36,7 +37,17 @@ namespace WorkManagement.Service
             return await _dbContext.EmployeeHolidays.ToListAsync();
         }
 
-        public async Task<List<EmployeeLeaveHistoryDTO>> GetEmployeeLeaveHistory(EmployeeLeaveHistoryDataModel data, string loggedUserId)
+        public async Task<List<EmployeeLeave>> GetAssignedEmployeeLeaves(string loggedUserId)
+        {
+            var ManagerId = _dbContext.Employees.First(x => x.UserId == Guid.Parse(loggedUserId)).Id;
+
+            var assignedLeaves = from emp in _dbContext.Employees.Where(x => x.EmployeeReportToId == ManagerId)
+                                 join empLeave in _dbContext.EmployeeLeaves on emp.Id equals empLeave.EmployeeId
+                                 select empLeave;
+            return assignedLeaves.ToList();
+        }
+
+        public async Task<List<EmployeeLeaveHistoryDTO>> GetEmployeeLeaveHistory(EmployeeLeaveHistoryDataModel data,string loggedUserId)
         {
             var returnData = new List<EmployeeLeaveHistoryDTO>();
 
@@ -46,7 +57,7 @@ namespace WorkManagement.Service
             var EmployeeId = _dbContext.Employees.First(x => x.UserId == Guid.Parse(loggedUserId)).Id;
             data.EmployeeId = EmployeeId;
             var employeeId = data.EmployeeId;
-
+            
             if (data.GetLeaveData)
             {
                 var leaveData = data.GetFutureLeaveData
@@ -81,11 +92,13 @@ namespace WorkManagement.Service
                     EmployeeId = l.EmployeeId,
                     Description = l.Description,
                     Reason = l.Reason,
-                    Name = l.EmployeeLeaveTypes.Name,
-                    LeaveTypeId = l.EmployeeLeaveTypeId,
-                    EmployeeLeaveId = l.Id
-
-
+                    Name=l.EmployeeLeaveTypes.Name,
+                    LeaveTypeId=l.EmployeeLeaveTypeId,
+                    EmployeeLeaveId=l.Id,
+                    status=l.Status
+                    
+                    
+                    
                 })
                 .ToList();
         }
@@ -99,9 +112,9 @@ namespace WorkManagement.Service
                     StartDate = h.StartDate,
                     EndDate = h.EndDate,
                     EmployeeId = employeeId,
-                    Reason = h.Name,
-                    Name = "Holiday"
-
+                    Description=h.Name,
+                    Name="Holiday"
+                    
                 })
                 .ToList();
         }

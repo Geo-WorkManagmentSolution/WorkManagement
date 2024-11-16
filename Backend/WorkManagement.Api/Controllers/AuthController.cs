@@ -23,7 +23,7 @@ namespace WorkManagement.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController : ControllerBase
+    public class AuthController : APIControllerBase
     {
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly IAuthService _authService;
@@ -74,7 +74,7 @@ namespace WorkManagement.API.Controllers
                         User.Role = role.FirstOrDefault();
 
                         //await SignInUser(token);
-
+                        LoggedInUserId = User.Uid;
                         return Ok(new { User = User, AccessToken = token });
                     }
                     else
@@ -123,11 +123,10 @@ namespace WorkManagement.API.Controllers
         }
 
 
-
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserRegistrationModel model)
         {
-             if (ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 if (await UserExists(model.Email))
                     return BadRequest("The email address is already in use.");
@@ -157,18 +156,24 @@ namespace WorkManagement.API.Controllers
                             return Ok(new { User = User, AccessToken = token });
                         }
                         else
+                        {
                             return Problem("Error while creating user.");
+                        }
                     }
                     catch (Exception ex)
                     {
+                        // Log the exception for debugging purposes
+                        Console.WriteLine(ex.ToString());
                         return Problem("Error while creating user.");
                     }
-
                 }
             }
             else
+            {
                 return BadRequest(ModelState);
+            }
         }
+
 
         private async Task<bool> UserExists(string email)
         {
@@ -191,7 +196,7 @@ namespace WorkManagement.API.Controllers
                 ApplicationUser? AppUser = await workManagementDbContext.Users.FindAsync(userrole.Item1);
                 var User = mapper.Map<UserModel>(AppUser);
                 User.Role = userrole.Item2;
-
+                LoggedInUserId = User.Uid;
                 return Ok(new { User = User, AccessToken = token });
 
             }

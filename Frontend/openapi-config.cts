@@ -13,6 +13,9 @@ const config: ConfigFile = {
 		},
 		'./src/app/main/project/ProjectApi.ts': {
 			filterEndpoints: [/Project/i],
+		},
+		'./src/app/main/employee/leave-management/LeavesApi.ts': {
+			filterEndpoints: [/Leaves/i],
 		}
 	},
 	useEnumType:true,

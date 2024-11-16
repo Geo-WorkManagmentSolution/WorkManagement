@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +19,7 @@ namespace WorkManagement.API.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
-    public class EmployeesController : ControllerBase
+    public class EmployeesController : APIControllerBase
     {
         private readonly IEmployeeService employeeService;
         private readonly IEmailService _emailService;
@@ -208,30 +209,5 @@ namespace WorkManagement.API.Controllers
             var leaves = await employeeService.GetEmployeeLeaves(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             return Ok(leaves);
         }
-
-        // GET api/employee/leaves/addLeave
-        [HttpPost("leaves/addLeave")]
-        public async Task<ActionResult<EmployeeLeaveModel>> AddLeave(EmployeeLeaveModel employeeLeaveData)
-        {
-            var leaves = await employeeService.AddLeave(employeeLeaveData, User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            return Ok(leaves);
-        }
-
-        // GET api/employee/leaves/updateLeave
-        [HttpPut("leaves/updateLeave")]
-        public async Task<ActionResult<EmployeeLeaveModel>> UpdateLeave(EmployeeLeaveModel employeeLeaveData)
-        {
-            var leaves = await employeeService.UpdateLeave(employeeLeaveData, User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            return Ok(leaves);
-        }
-
-        // GET api/employee/leaves/CancelLeave
-        [HttpDelete("leaves/cancelLeave")]
-        public async Task<ActionResult<bool>> CancelLeave(int employeeLeaveId)
-        {
-            await employeeService.CancelLeave(employeeLeaveId, User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            return Ok(true);
-        }
-    }
 
 }

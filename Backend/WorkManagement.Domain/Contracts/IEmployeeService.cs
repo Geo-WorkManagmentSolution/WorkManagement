@@ -14,6 +14,14 @@ namespace WorkManagement.Domain.Contracts
     {
         #region Getting Dropdown data
 
+        public Task<List<EmployeeLeaveSummaryModel>> GetEmployeeLeaves(string loggedUserId);
+        public Task<EmployeeModel> GetEmployeeByIdAsync(int id);
+
+        public Task SendEmail();
+
+        public Task<EmployeeModel> CreateEmployeeAsync(Employee employee);
+
+        public Task<EmployeeModel> UpdateEmployeeAsync(Employee employee);
         public Task<List<EmployeeCategory>> GetEmployeeCategories();
         public Task<List<EmployeeDepartment>> GetEmployeeDepartments();
         public Task<List<EmployeeDesignation>> GetEmployeeDesignations();
@@ -33,26 +41,9 @@ namespace WorkManagement.Domain.Contracts
 
         #region Employee Dashboard
 
-        public Task<List<EmployeeDashboardDataModel>> GetAllEmployeesAsync();
-        public Task<EmployeeModel> GetEmployeeByIdAsync(int id);
-        public Task<EmployeeModel> CreateEmployeeAsync(EmployeeModel employee);
-        public Task<EmployeeModel> UpdateEmployeeAsync(int id, EmployeeModel employee);     
-        public Task<bool> DeleteEmployeeAsync(int id);
-
-        #endregion        
-
-        #region Employee Leave
-
-        public Task<List<EmployeeLeaveSummaryModel>> GetEmployeeLeaves(string loggedUserId);
-        public Task<EmployeeLeaveModel> AddLeave(EmployeeLeaveModel employeeLeave, string loggedUserId);
-        public Task<EmployeeLeaveModel> UpdateLeave(EmployeeLeaveModel employeeLeaveData, string loggedUserId);
-        public Task CancelLeave(int employeeLeaveId, string value);
-
-        #endregion
-
-        public Task<bool> CheckEmailExists(string email);
-
-        public Task SendEmail();
-        
+        public Task<Site> AddNewSite(Site site);
+        public Task<EmployeeLeave> AddLeave(EmployeeLeave employeeLeave,string loggedUserId);
+        public Task CancelLeave(int employeeLeaveId);
+        public Task<EmployeeLeave> UpdateLeave(EmployeeLeave employeeLeave, string loggedUserId);
     }
 }
