@@ -5,7 +5,7 @@ import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { DatePicker } from '@mui/x-date-pickers';
 import { SalaryType, useGetApiEmployeesDepartmentsQuery, useGetApiEmployeesLeavesCurrentQuery, useGetApiEmployeesSitesQuery, usePostApiEmployeesAddNewSiteMutation } from '../../EmployeeApi';
 import EnhancedAutocomplete from '../EnhancedAutocomplete';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 /**
  * The basic info tab.
@@ -13,7 +13,7 @@ import { useState } from 'react';
 
 function WorkInfoTab() {
 	const methods = useFormContext();
-	const { control, formState } = methods;
+	const { control, formState,setValue } = methods;
 	const { errors } = formState;
 	const { data: employeesDepartmentsOptions = [] } = useGetApiEmployeesDepartmentsQuery();
 	const { data: employeesSiteOptions = [] } = useGetApiEmployeesSitesQuery();
@@ -26,6 +26,22 @@ function WorkInfoTab() {
 		control,
 		name: 'employeeLeaves'
 	});
+
+	
+	useEffect(() => {
+		if(employeeLeaveTypes){
+			setValue(
+				'employeeLeaves',
+				employeeLeaveTypes.map((x, i) => ({
+					employeeLeaveTypeId:x.id,
+					employeeLeaveType: x.employeeLeaveType,
+					totalLeaves: x.totalLeaves
+				}))
+			);
+		}
+	  },[employeeLeaveTypes])
+	  
+
 
 	const [AddSite] = usePostApiEmployeesAddNewSiteMutation();
 
@@ -371,20 +387,20 @@ function WorkInfoTab() {
         />
         {!useDefaultLeaves && (
           <div className="space-y-4">
-            {employeeLeaveTypes.map((field1, index) => (
+            {fields.map((field, index) => (
               <div key={index} className="flex space-x-4 mb-4">
                 <div className="flex-1">
                   <Controller
-                    name={`employeeLeaves.${index}.employeeLeaveTypeId`}
+                    name={`employeeLeaves.${index}.employeeLeaveType`}
                     control={control}
                     render={({ field }) => (
                       <TextField
                         {...field}
-                        value={field1.employeeLeaveType}
+                        // value={field1.employeeLeaveType}
                         label="Employee Leave Type"
                         fullWidth
                         type="text"
-						InputLabelProps={{ shrink: true, }}
+						// InputLabelProps={{ shrink: true, }}
                         InputProps={{
                           readOnly: true,
                         }}
@@ -401,12 +417,14 @@ function WorkInfoTab() {
                     render={({ field }) => (
                       <TextField
                         {...field}
-						
+						// value={field1.totalLeaves}
+						onChange={field.onChange}
+						required
                         label="Total Leaves"
                         type="number"
                         margin="normal"
                         variant="outlined"
-						InputLabelProps={{ shrink: !!field1.totalLeaves,}}
+						// InputLabelProps={{ shrink: !!field1.totalLeaves,}}
                         placeholder="Total Leaves"
                         className="mx-4"
                       />

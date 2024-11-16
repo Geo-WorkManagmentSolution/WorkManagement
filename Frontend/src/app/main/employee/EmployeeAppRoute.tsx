@@ -52,6 +52,10 @@ const EmployeeAppRoute: FuseRouteItemType = {
 			path:"leave-management",
 			element:<LeaveApplication/>
 		}
+		,{
+			path:"leave-approval",
+			element:<LeaveApproval/>
+		}
 		
 	]
 };

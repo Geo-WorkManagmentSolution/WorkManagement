@@ -59,6 +59,10 @@ import TeamTab from './tabs/TeamTab';
 // 	employeePersonalDetails: employeePersonalDetailsSchema
 // });
 
+const employeeLeavesSchema = yup.object().shape({
+	totalLeaves: yup.number().required('Leaves are required').positive('Total Leaves must be greater than zero')
+  });
+
 const schema = yup.object({
 	firstName: yup.string().required('First Name is required'),
 	middleName: yup.string().required('Middle Name is required'),
@@ -96,7 +100,7 @@ const schema = yup.object({
 		pinCode: yup.number().typeError('Pin Code must be a number').required('Pin Code is required')
 	}),
 	// employeeEducationDetail: yup.array().of(educationDetailSchema),
-	employeeDepartmentId: yup.string().required('Department Id is required')
+	employeeDepartmentId: yup.string().required('Department Id is required'),
 	// employeeIdentityInfos: yup.object().shape({
 	// 	uid: yup.string().nullable(),
 	// 	bankAccountNumber: yup.string().nullable(),
@@ -109,7 +113,10 @@ const schema = yup.object({
 	// 	employeeStateInsuranceNumber: yup.string().nullable(),
 	// 	biometricCode: yup.string().nullable()
 	// })
+	employeeLeaves: yup.array().of(employeeLeavesSchema)
 });
+
+  
 
 // The product page.
 type EmployeeFormValues = yup.InferType<typeof schema>;
