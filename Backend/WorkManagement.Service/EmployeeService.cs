@@ -208,7 +208,6 @@ namespace WorkManagement.Service
         {
 
             var EmployeeId = _dbContext.Employees.First(x => x.UserId == Guid.Parse(loggedUserId)).Id;
-
             employeeLeave.EmployeeId = EmployeeId;
             //add validation in future
             _dbContext.EmployeeLeaves.Add(employeeLeave);

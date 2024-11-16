@@ -18,7 +18,7 @@ namespace WorkManagement.API.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
-    public class EmployeesController : ControllerBase
+    public class EmployeesController : APIControllerBase
     {
         private readonly IEmployeeService employeeService;
         private readonly IEmailService _emailService;

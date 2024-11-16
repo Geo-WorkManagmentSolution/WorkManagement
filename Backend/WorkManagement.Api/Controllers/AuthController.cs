@@ -23,7 +23,7 @@ namespace WorkManagement.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController : ControllerBase
+    public class AuthController : APIControllerBase
     {
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly IAuthService _authService;
@@ -74,7 +74,7 @@ namespace WorkManagement.API.Controllers
                         User.Role = role.FirstOrDefault();
 
                         //await SignInUser(token);
-
+                        LoggedInUserId = User.Uid;
                         return Ok(new { User = User, AccessToken = token });
                     }
                     else
@@ -186,7 +186,7 @@ namespace WorkManagement.API.Controllers
                 ApplicationUser? AppUser = await workManagementDbContext.Users.FindAsync(userrole.Item1);
                 var User = mapper.Map<UserModel>(AppUser);
                 User.Role = userrole.Item2;
-
+                LoggedInUserId = User.Uid;
                 return Ok(new { User = User, AccessToken = token });
 
             }

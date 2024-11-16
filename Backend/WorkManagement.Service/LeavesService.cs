@@ -30,12 +30,17 @@ namespace WorkManagement.Service
 
         public async Task<List<EmployeeHoliday>> GetHolidays()
         {
-           return await _dbContext.EmployeeHolidays.ToListAsync();
+            return await _dbContext.EmployeeHolidays.ToListAsync();
         }
 
-        public async Task<List<EmployeeLeave>> GetAllEmployeeLeaves()
+        public async Task<List<EmployeeLeave>> GetAssignedEmployeeLeaves(string loggedUserId)
         {
-            return await _dbContext.EmployeeLeaves.ToListAsync();
+            var ManagerId = _dbContext.Employees.First(x => x.UserId == Guid.Parse(loggedUserId)).Id;
+
+            var assignedLeaves = from emp in _dbContext.Employees.Where(x => x.EmployeeReportToId == ManagerId)
+                                 join empLeave in _dbContext.EmployeeLeaves on emp.Id equals empLeave.EmployeeId
+                                 select empLeave;
+            return assignedLeaves.ToList();
         }
 
         public async Task<List<EmployeeLeaveHistoryDTO>> GetEmployeeLeaveHistory(EmployeeLeaveHistoryDataModel data)

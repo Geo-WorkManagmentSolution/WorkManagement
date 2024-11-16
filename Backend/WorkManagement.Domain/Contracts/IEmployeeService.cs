@@ -14,7 +14,6 @@ namespace WorkManagement.Domain.Contracts
         public Task<List<EmployeeModel>> GetAllEmployeesAsync();
 
         public Task<List<EmployeeLeaveSummaryModel>> GetEmployeeLeaves(string loggedUserId);
-        
         public Task<EmployeeModel> GetEmployeeByIdAsync(int id);
 
         public Task SendEmail();

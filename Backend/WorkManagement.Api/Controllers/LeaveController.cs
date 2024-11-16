@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using WorkManagement.Domain.Contracts;
 using WorkManagement.Domain.Models.Employee;
 using WorkManagement.Service;
@@ -33,11 +35,12 @@ namespace WorkManagement.API.Controllers
             return Ok(leaves);
         }
 
-        // GET api/leaves/history
-        [HttpGet("leaves/history")]
-        public async Task<ActionResult<IEnumerable<EmployeeLeave>>> LeaveHistory()
+        // GET api/leaves/assignedLeaves
+        [HttpGet("leaves/all")]
+        public async Task<ActionResult<IEnumerable<EmployeeLeave>>> GetAllLeves()
         {
-            var leaves = await leavesService.GetAllEmployeeLeaves();
+            
+            var leaves = await leavesService.GetAssignedEmployeeLeaves(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             return Ok(leaves);
         }
 
