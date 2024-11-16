@@ -85,31 +85,38 @@ namespace WorkManagementSolution.Employee
         public List<EmployeeLeaveSummary> EmployeeLeaves { get; set; }
     }
 
-    public class EmployeeLeaveSummary : EmployeeDefaultLeaveSummary
+    public class EmployeeLeaveSummary : BaseEntity
     {
         public int EmployeeId { get; set; }
      
         [ForeignKey(nameof(EmployeeId))]
         public Employee? employee { get; set; }
         public double RemainingLeaves { get; set; }
+
+        [ForeignKey(nameof(EmployeeLeaveType))]
+        public int? EmployeeLeaveTypeId { get; set; }
+        public EmployeeLeaveType EmployeeLeaveTypes { get; set; }
+        public int TotalLeaves { get; set; }
+
+    }
+    public class EmployeeDefaultLeaveSummary : BaseEntity {
+        [ForeignKey(nameof(EmployeeLeaveType))]
+        public int? EmployeeLeaveTypeId { get; set; }
+        public EmployeeLeaveType EmployeeLeaveTypes { get; set; }
+        public int TotalLeaves { get; set; }
     }
     public class EmployeeLeaveSummaryModel {
         public int Id { get; set; }
 
         public string EmployeeLeaveType { get; set; }
 
+     
+
         public int TotalLeaves { get; set; }
 
         public double RemainingLeaves { get; set; }
 
-    }
 
-    public class EmployeeDefaultLeaveSummary : BaseEntity
-    {
-        [ForeignKey(nameof(EmployeeLeaveType))]
-        public int? EmployeeLeaveTypeId { get; set; }
-        public EmployeeLeaveType EmployeeLeaveTypes { get; set; }
-        public int TotalLeaves { get; set; }
     }
 
     public class EmployeeLeaveType : BaseEntity
@@ -136,6 +143,7 @@ namespace WorkManagementSolution.Employee
     {
         public int EmployeeId { get; set; }
 
+        [JsonIgnore]
         [ForeignKey(nameof(EmployeeId))]
         public Employee? employee { get; set; }
 
@@ -151,8 +159,10 @@ namespace WorkManagementSolution.Employee
         public double LeaveDays { get; set; }
 
         [ForeignKey(nameof(EmployeeLeaveType))]
-        public int? EmployeeLeaveTypeId { get; set; }
-        public EmployeeLeaveType EmployeeLeaveTypes { get; set; }
+        public required int EmployeeLeaveTypeId { get; set; }
+
+        [JsonIgnore]
+        public EmployeeLeaveType? EmployeeLeaveTypes { get; set; }
 
     }
 
@@ -220,6 +230,7 @@ namespace WorkManagementSolution.Employee
     {
         public int? EmployeeId { get; set; }
         [ForeignKey("EmployeeId")]
+        [JsonIgnore]
         public Employee? Employee { get; set; }
         [DataType(DataType.Date)]
         public DateTime? DateOfBirth { get; set; }
@@ -260,6 +271,7 @@ namespace WorkManagementSolution.Employee
     {
         public int? EmployeeId { get; set; }
         [ForeignKey("EmployeeId")]
+        [JsonIgnore]
         public Employee? Employee { get; set; }
         public string? AddressLine1 { get; set; }
         public string? AddressLine2 { get; set; }

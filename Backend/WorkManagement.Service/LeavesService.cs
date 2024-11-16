@@ -43,15 +43,17 @@ namespace WorkManagement.Service
             return assignedLeaves.ToList();
         }
 
-        public async Task<List<EmployeeLeaveHistoryDTO>> GetEmployeeLeaveHistory(EmployeeLeaveHistoryDataModel data)
+        public async Task<List<EmployeeLeaveHistoryDTO>> GetEmployeeLeaveHistory(EmployeeLeaveHistoryDataModel data,string loggedUserId)
         {
             var returnData = new List<EmployeeLeaveHistoryDTO>();
 
             if (data == null) return returnData;
 
             var startDate = DateTime.Now;
+            var EmployeeId = _dbContext.Employees.First(x => x.UserId == Guid.Parse(loggedUserId)).Id;
+            data.EmployeeId = EmployeeId;
             var employeeId = data.EmployeeId;
-
+            
             if (data.GetLeaveData)
             {
                 var leaveData = data.GetFutureLeaveData
@@ -83,7 +85,14 @@ namespace WorkManagement.Service
                     EndDate = l.EndDate,
                     EmployeeId = l.EmployeeId,
                     Description = l.Description,
-                    Reason = l.Reason
+                    Reason = l.Reason,
+                    Name=l.EmployeeLeaveTypes.Name,
+                    LeaveTypeId=l.EmployeeLeaveTypeId,
+                    EmployeeLeaveId=l.Id,
+                    status=l.Status
+                    
+                    
+                    
                 })
                 .ToList();
         }
@@ -96,7 +105,10 @@ namespace WorkManagement.Service
                 {
                     StartDate = h.StartDate,
                     EndDate = h.EndDate,
-                    EmployeeId = employeeId
+                    EmployeeId = employeeId,
+                    Description=h.Name,
+                    Name="Holiday"
+                    
                 })
                 .ToList();
         }

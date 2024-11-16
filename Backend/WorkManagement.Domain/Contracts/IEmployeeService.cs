@@ -35,6 +35,6 @@ namespace WorkManagement.Domain.Contracts
         public Task<Site> AddNewSite(Site site);
         public Task<EmployeeLeave> AddLeave(EmployeeLeave employeeLeave,string loggedUserId);
         public Task CancelLeave(int employeeLeaveId);
-        public Task<EmployeeLeave> UpdateLeave(EmployeeLeave employeeLeave);
+        public Task<EmployeeLeave> UpdateLeave(EmployeeLeave employeeLeave, string loggedUserId);
     }
 }

@@ -198,8 +198,15 @@ namespace WorkManagement.API.Controllers
         [HttpPut("leaves/addLeave")]
         public async Task<ActionResult<EmployeeLeave>> AddLeave(EmployeeLeave employeeLeave)
         {
-            var leaves = await employeeService.AddLeave(employeeLeave, User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            return Ok(leaves);
+            try
+            {
+                var leaves = await employeeService.AddLeave(employeeLeave, User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                return Ok(leaves);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
 
@@ -211,11 +218,11 @@ namespace WorkManagement.API.Controllers
             return Ok(true);
         }
 
-        // GET api/employee/leaves/CancelLeave
-        [HttpGet("leaves/updateLeave")]
+        // GET api/employee/leaves/updateLeave
+        [HttpPut("leaves/updateLeave")]
         public async Task<ActionResult<EmployeeLeave>> UpdateLeave(EmployeeLeave employeeLeave)
         {
-            var leaves = await employeeService.UpdateLeave(employeeLeave);
+            var leaves = await employeeService.UpdateLeave(employeeLeave, User.FindFirst(ClaimTypes.NameIdentifier).Value);
             return Ok(leaves);
         }
 
@@ -223,3 +230,45 @@ namespace WorkManagement.API.Controllers
     }
 
 }
+//**********************************Use this json to create Employee**********************************************
+//*************************Replace "roleId" from "api/auth/roles"***************************************** 
+//*********************Add breakpoint at Password for password ********************
+
+
+
+//{
+//    "firstName": "John",
+//  "middleName": "A.",
+//  "lastName": "Doe",
+//  "motherName": "johnmother",
+//  "email": "sample1@sample.com",
+//  "alternateEmail": "alternate@alternate.com",
+//  "roleId": "b9d9f6ac-9abb-41dd-e08f-08dd01c34ce0", 
+//  "employeeCategoryId": 1,
+//  "employeeLeaves": [
+//    {
+//        "totalLeaves": 10,
+//      "remainingLeaves": 10,
+//      "employeeLeaveTypes": {
+//            "name": "Sick Leave",
+//        "isPaid": true
+//      }
+//    },
+//    {
+//        "totalLeaves": 15,
+//      "remainingLeaves": 15,
+//      "employeeLeaveTypes": {
+//            "name": "Vacation Leave",
+//        "isPaid": true
+//      }
+//    },
+//    {
+//        "totalLeaves": 20,
+//      "remainingLeaves": 20,
+//      "employeeLeaveTypes": {
+//            "name": "Emergency Leave",
+//        "isPaid": true
+//      }
+//    }
+//  ]
+//}

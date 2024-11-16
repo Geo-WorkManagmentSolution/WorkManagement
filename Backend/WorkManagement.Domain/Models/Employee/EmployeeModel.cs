@@ -44,6 +44,8 @@ namespace WorkManagement.Domain.Models.Employee
         public List<EmployeeEducationDetail>? EmployeeEducationDetail { get; set; }
         public List<EmployeeRelationshipDetail>? EmployeeRelationshipDetails { get; set; }
         public List<EmployeeDocuments>? EmployeeDocuments { get; set; }
+        public List<EmployeeLeaveSummary> EmployeeLeaves { get; set; }
+
     }
 }
 
