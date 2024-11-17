@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import FuseLoading from "@fuse/core/FuseLoading";
 import FusePageCarded from "@fuse/core/FusePageCarded";
 import FuseScrollbars from "@fuse/core/FuseScrollbars";
@@ -30,34 +27,6 @@ import IdentityInfoTab from "./tabs/IdentityInfoTab";
 import FileUpload from "./tabs/FileUpload";
 import EmployeeModelClone from "../models/EmployeeModelClone";
 import TeamTab from "./tabs/TeamTab";
-/**
- * Form Validation Schema
- */
-
-// const employeePersonalDetailsSchema = yup.object({
-// 	dateOfBirth: yup.date().required('Date of birth is required'),
-// 	gender: yup.string().required('Please select a gender'),
-// 	maritalStatus: yup.mixed().required('Please select a marital status')
-// });
-
-// const employeeSchema = yup.object({
-// 	photoURL: yup.string().nullable(),
-// 	firstName: yup.string().min(1, 'First name is required').required(),
-// 	lastName: yup.string().min(1, 'Last name is required').required(),
-// 	email: yup.string().email('Invalid email address').required('Email required'),
-// 	phoneNumber: yup
-// 		.number()
-// 		.nullable()
-// 		// .test('phonenumber_digit', 'Invalid phone number format', (value) => {
-// 		// 	// Regular expression: allows letters, numbers, and underscores
-// 		// 	const regex = /^\+[1-9]\d{1,14}$/;
-// 		// 	return regex.test(value.toString());
-// 		// }),
-// 		,
-// 	position: yup.string().min(1,'Position required'),
-// 	roleId: yup.mixed().required('Role required'),
-// 	employeePersonalDetails: employeePersonalDetailsSchema
-// });
 
 const schema = yup.object({
   firstName: yup.string().required("First Name is required"),
@@ -96,22 +65,8 @@ const schema = yup.object({
       .typeError("Salary must be a number")
       .positive("Salary must be greater than zero"),
   }),
-  // employeeEducationDetail: yup.array().of(educationDetailSchema),
   employeeDepartmentId: yup.string().required("Department is required"),
   employeeDesignationId: yup.string().required("Designation is required"),
-
-  // employeeIdentityInfos: yup.object().shape({
-  // 	uid: yup.string().nullable(),
-  // 	bankAccountNumber: yup.string().nullable(),
-  // 	bankName: yup.string().nullable(),
-  // 	branch: yup.string().nullable(),
-  // 	ifsc: yup.string().nullable(),
-  // 	accountHolderName: yup.string().nullable(),
-  // 	pan: yup.string().nullable(),
-  // 	providentFundNumber: yup.string().nullable(),
-  // 	employeeStateInsuranceNumber: yup.string().nullable(),
-  // 	biometricCode: yup.string().nullable()
-  // })
 });
 
 // The product page.
@@ -255,23 +210,6 @@ function Employee() {
               <div className={tabValue !== "team-member" ? "hidden" : ""}>
                 <TeamTab />
               </div>
-
-              {/* 
-							<div className={tabValue !== 'product-images' ? 'hidden' : ''}>
-								<ProductImagesTab />
-							</div>
-
-							<div className={tabValue !== 'pricing' ? 'hidden' : ''}>
-								<PricingTab />
-							</div>
-
-							<div className={tabValue !== 'inventory' ? 'hidden' : ''}>
-								<InventoryTab />
-							</div>
-
-							<div className={tabValue !== 'shipping' ? 'hidden' : ''}>
-								<ShippingTab />
-							</div> */}
             </div>
           </div>
         }

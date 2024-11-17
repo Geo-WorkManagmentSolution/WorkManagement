@@ -32,13 +32,14 @@ function EmployeeHeader() {
   const { formState, watch, getValues } = methods;
   const { errors, dirtyFields, isValid } = formState;
 
-  // const isValid = !Object.keys(errors).length;
-
   const navigate = useNavigate();
 
   const { photoURL, firstName, lastName } = watch() as EmployeeModel;
 
   function handleUpdateProduct() {
+    var data = getValues() as EmployeeModel;
+    console.log(data);
+
     if (_.isEmpty(dirtyFields) || !isValid) {
       dispatch(
         showMessage({
@@ -48,7 +49,6 @@ function EmployeeHeader() {
       );
       return;
     }
-    var data = getValues() as EmployeeModel;
     updateEmployee({
       id: parseInt(employeeId, 10),
       employeeModel: data,
@@ -56,13 +56,21 @@ function EmployeeHeader() {
       .unwrap()
       .then((data) => {
         dispatch(showMessage({ message: "An employee updated successfully." }));
-        navigate(`/apps/employees/employeesSearch`);
       });
   }
 
   function handleCreateEmployee() {
     var data = getValues() as EmployeeModel;
 
+    if (_.isEmpty(dirtyFields) || !isValid) {
+      dispatch(
+        showMessage({
+          message: "Required fileds must be filled out",
+          variant: "warning",
+        })
+      );
+      return;
+    }
     createEmployee({ employeeModel: data })
       .unwrap()
       .then((data) => {

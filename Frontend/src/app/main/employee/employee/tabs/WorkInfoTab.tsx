@@ -5,8 +5,10 @@ import {
   InputAdornment,
   Typography,
   Autocomplete,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
-import { Controller, useFormContext } from "react-hook-form";
+import { Controller, useFormContext, useFieldArray } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import FuseSvgIcon from "@fuse/core/FuseSvgIcon";
 import { DatePicker } from "@mui/x-date-pickers";
@@ -17,9 +19,11 @@ import {
   usePostApiEmployeesAddNewDesignationMutation,
   usePostApiEmployeesAddNewSiteMutation,
   useGetApiEmployeesReportToEmployeeListQuery,
+  useGetApiEmployeesLeavesCurrentQuery,
 } from "../../EmployeeApi";
 import EnhancedAutocomplete from "../EnhancedAutocomplete";
 import { SalaryType } from "../../models/EmployeeDropdownModels";
+import { useState } from "react";
 
 /**
  * The basic info tab.
@@ -27,28 +31,26 @@ import { SalaryType } from "../../models/EmployeeDropdownModels";
 
 function WorkInfoTab() {
   const methods = useFormContext();
-  const { control, formState } = methods;
+  const { control, watch, formState } = methods;
   const { errors } = formState;
+  const routeParams = useParams();
+  const { employeeId } = routeParams as unknown;
+  const departmentId = watch("employeeDepartmentId");
+  const [useDefaultLeaves, setUseDefaultLeaves] = useState(true);
+
   const { data: employeesDepartmentsOptions = [] } =
     useGetApiEmployeesDepartmentsQuery();
-  //const { data: employeesReportToOptions = [] } = useGetApiEmployeesReportToEmployeeListQuery();
   const { data: employeesSiteOptions = [] } = useGetApiEmployeesSitesQuery();
+  const { data: employeeLeaveTypes = [] } =
+    useGetApiEmployeesLeavesCurrentQuery();
   const { data: employeesDesignationsOptions = [] } =
     useGetApiEmployeesDesignationsQuery();
 
-  const routeParams = useParams();
-  const { employeeId } = routeParams as unknown;
-
-  const {
-    data: employeesReportToOptions,
-    isLoading,
-    isError,
-  } = useGetApiEmployeesReportToEmployeeListQuery(
-    { departmentId: employeeId, employeeId: employeeId },
-    {
-      skip: !employeeId || employeeId === "new",
-    }
-  );
+  const { data: employeesReportToOptions = [] } =
+    useGetApiEmployeesReportToEmployeeListQuery({
+      departmentId: departmentId,
+      employeeId: employeeId,
+    });
 
   const [AddSite] = usePostApiEmployeesAddNewSiteMutation();
   const [AddDesignation] = usePostApiEmployeesAddNewDesignationMutation();
@@ -73,6 +75,12 @@ function WorkInfoTab() {
       throw error;
     }
   };
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "employeeLeaves",
+  });
+
   return (
     <div className="space-y-48">
       <div className="space-y-16">
@@ -98,6 +106,7 @@ function WorkInfoTab() {
               }
               onChange={(_, newValue) => {
                 onChange(newValue ? newValue.id : null);
+                setDepartmentId(newValue ? newValue.id : null);
               }}
               renderInput={(params) => (
                 <TextField
@@ -245,25 +254,6 @@ function WorkInfoTab() {
             Salary Information
           </Typography>
         </div>
-        {/* <Controller
-					name="employeeWorkInformation.bond"
-					control={control}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							label="Bond"
-							type="number"
-							fullWidth
-							InputProps={{
-								inputProps: {
-									min: 1
-								}
-							}}
-							error={!!errors.employeeWorkInformation?.bond}
-							helperText={errors.employeeWorkInformation?.bond?.message as string}
-						/>
-					)}
-				/> */}
         <div className="flex -mx-4">
           <Controller
             name="employeeWorkInformation.salaryType"
@@ -597,6 +587,72 @@ function WorkInfoTab() {
             )}
           />
         </div>
+      </div>
+      <div className="space-y-16">
+        <div className="flex items-center border-b-1 space-x-8 pb-8">
+          <FuseSvgIcon color="action" size={24}>
+            heroicons-outline:user-circle
+          </FuseSvgIcon>
+          <Typography className="text-2xl" color="text.secondary">
+            Leave Information
+          </Typography>
+        </div>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={useDefaultLeaves}
+              onChange={(e) => setUseDefaultLeaves(e.target.checked)}
+            />
+          }
+          label="Use Default Leaves"
+        />
+        {!useDefaultLeaves && (
+          <div className="space-y-4">
+            {employeeLeaveTypes.map((field1, index) => (
+              <div key={index} className="flex space-x-4 mb-4">
+                <div className="flex-1">
+                  <Controller
+                    name={`employeeLeaves.${index}.employeeLeaveTypeId`}
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        value={field1.employeeLeaveType}
+                        label="Employee Leave Type"
+                        fullWidth
+                        type="text"
+                        InputLabelProps={{ shrink: true }}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                        margin="normal"
+                        className="mx-4"
+                      />
+                    )}
+                  />
+                </div>
+                <div className="flex-1">
+                  <Controller
+                    name={`employeeLeaves.${index}.totalLeaves`}
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label="Total Leaves"
+                        type="number"
+                        margin="normal"
+                        variant="outlined"
+                        InputLabelProps={{ shrink: !!field1.totalLeaves }}
+                        placeholder="Total Leaves"
+                        className="mx-4"
+                      />
+                    )}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

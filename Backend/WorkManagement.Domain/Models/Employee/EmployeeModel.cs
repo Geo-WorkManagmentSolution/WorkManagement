@@ -26,7 +26,6 @@ namespace WorkManagement.Domain.Models.Employee
         public string AlternateEmail { get; set; }
         public long? PhoneNumber { get; set; }
         public long? AlternateNumber { get; set; }
-        public string? Position { get; set; }
         public bool? IsDeleted { get; set; }
         public Guid? UserId { get; set; }
         public Guid RoleId { get; set; }
@@ -89,6 +88,13 @@ namespace WorkManagement.Domain.Models.Employee
 
     public class EmployeeAddressModel
     {
+        public bool UseUserAddressForMailing {  get; set; }
+       public AddressModel? UserAddress { get; set; }
+       public AddressModel? MailingAddress { get; set; }
+    }
+
+    public class AddressModel
+    {
         public string? AddressLine1 { get; set; }
         public string? AddressLine2 { get; set; }
         public string? City { get; set; }
@@ -96,6 +102,8 @@ namespace WorkManagement.Domain.Models.Employee
         public string? State { get; set; }
         public long? PinCode { get; set; }
     }
+
+   
 
     public class EmployeeBankingDataModel
     {

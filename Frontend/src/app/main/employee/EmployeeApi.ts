@@ -152,6 +152,42 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.employeeDesignation,
       }),
     }),
+    getApiEmployeesLeavesCurrent: build.query<
+      GetApiEmployeesLeavesCurrentApiResponse,
+      GetApiEmployeesLeavesCurrentApiArg
+    >({
+      query: () => ({ url: `/api/Employees/leaves/current` }),
+    }),
+    postApiEmployeesLeavesAddLeave: build.mutation<
+      PostApiEmployeesLeavesAddLeaveApiResponse,
+      PostApiEmployeesLeavesAddLeaveApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/leaves/addLeave`,
+        method: "POST",
+        body: queryArg.employeeLeaveModel,
+      }),
+    }),
+    putApiEmployeesLeavesUpdateLeave: build.mutation<
+      PutApiEmployeesLeavesUpdateLeaveApiResponse,
+      PutApiEmployeesLeavesUpdateLeaveApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/leaves/updateLeave`,
+        method: "PUT",
+        body: queryArg.employeeLeaveModel,
+      }),
+    }),
+    deleteApiEmployeesLeavesCancelLeave: build.mutation<
+      DeleteApiEmployeesLeavesCancelLeaveApiResponse,
+      DeleteApiEmployeesLeavesCancelLeaveApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/leaves/cancelLeave`,
+        method: "DELETE",
+        params: { employeeLeaveId: queryArg.employeeLeaveId },
+      }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -226,6 +262,24 @@ export type PostApiEmployeesAddNewDesignationApiResponse = unknown;
 export type PostApiEmployeesAddNewDesignationApiArg = {
   employeeDesignation: EmployeeDesignation;
 };
+export type GetApiEmployeesLeavesCurrentApiResponse =
+  /** status 200 OK */ EmployeeLeaveSummaryModel[];
+export type GetApiEmployeesLeavesCurrentApiArg = void;
+export type PostApiEmployeesLeavesAddLeaveApiResponse =
+  /** status 200 OK */ EmployeeLeaveModel;
+export type PostApiEmployeesLeavesAddLeaveApiArg = {
+  employeeLeaveModel: EmployeeLeaveModel;
+};
+export type PutApiEmployeesLeavesUpdateLeaveApiResponse =
+  /** status 200 OK */ EmployeeLeaveModel;
+export type PutApiEmployeesLeavesUpdateLeaveApiArg = {
+  employeeLeaveModel: EmployeeLeaveModel;
+};
+export type DeleteApiEmployeesLeavesCancelLeaveApiResponse =
+  /** status 200 OK */ boolean;
+export type DeleteApiEmployeesLeavesCancelLeaveApiArg = {
+  employeeLeaveId?: number;
+};
 export type EmployeeDashboardDataModel = {
   id?: number;
   employeeNumber?: number | null;
@@ -276,13 +330,18 @@ export type EmployeeInsuranceDetailModel = {
   comprehensive?: number | null;
   risk?: string | null;
 };
-export type EmployeeAddressModel = {
+export type AddressModel = {
   addressLine1?: string | null;
   addressLine2?: string | null;
   city?: string | null;
   country?: string | null;
   state?: string | null;
   pinCode?: number | null;
+};
+export type EmployeeAddressModel = {
+  useUserAddressForMailing?: boolean;
+  userAddress?: AddressModel;
+  mailingAddress?: AddressModel;
 };
 export type EmployeeBankingDataModel = {
   uid?: string | null;
@@ -315,6 +374,12 @@ export type EmployeeDocumentsModel = {
   fileContent?: string | null;
   fileType?: FileType;
 };
+export type EmployeeLeaveSummaryModel = {
+  id?: number;
+  employeeLeaveType?: string | null;
+  totalLeaves?: number;
+  remainingLeaves?: number;
+};
 export type EmployeeModel = {
   id?: number;
   photoURL?: string | null;
@@ -326,7 +391,6 @@ export type EmployeeModel = {
   alternateEmail?: string | null;
   phoneNumber?: number | null;
   alternateNumber?: number | null;
-  position?: string | null;
   isDeleted?: boolean | null;
   userId?: string | null;
   roleId?: string;
@@ -342,6 +406,7 @@ export type EmployeeModel = {
   employeeEducationDetail?: EmployeeEducationDetailModel[] | null;
   employeeRelationshipDetails?: EmployeeRelationshipDetailModel[] | null;
   employeeDocuments?: EmployeeDocumentsModel[] | null;
+  employeeLeaves?: EmployeeLeaveSummaryModel[] | null;
 };
 export type EmployeeCategory = {
   id?: number;
@@ -377,6 +442,17 @@ export type Criterion = {
   operator?: string | null;
   value?: any | null;
   nextOperator?: string | null;
+};
+export type EmployeeLeaveModel = {
+  employeeLeaveId?: number;
+  employeeId?: number;
+  status?: LeaveStatus;
+  description?: string | null;
+  reason?: string | null;
+  startDate?: string | null;
+  endDate?: string | null;
+  leaveDays?: number;
+  employeeLeaveTypeId?: number;
 };
 export enum MaritalStatus {
   Unknown = "Unknown",
@@ -423,6 +499,11 @@ export enum FileType {
   Csv = "CSV",
   Other = "Other",
 }
+export enum LeaveStatus {
+  Approved = "Approved",
+  Pending = "Pending",
+  Rejected = "Rejected",
+}
 export const {
   useGetApiEmployeesQuery,
   useLazyGetApiEmployeesQuery,
@@ -451,4 +532,9 @@ export const {
   usePostApiEmployeesAddNewDepartmentMutation,
   usePostApiEmployeesAddNewSiteMutation,
   usePostApiEmployeesAddNewDesignationMutation,
+  useGetApiEmployeesLeavesCurrentQuery,
+  useLazyGetApiEmployeesLeavesCurrentQuery,
+  usePostApiEmployeesLeavesAddLeaveMutation,
+  usePutApiEmployeesLeavesUpdateLeaveMutation,
+  useDeleteApiEmployeesLeavesCancelLeaveMutation,
 } = injectedRtkApi;

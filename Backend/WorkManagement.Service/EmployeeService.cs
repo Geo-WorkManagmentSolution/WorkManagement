@@ -128,15 +128,37 @@ namespace WorkManagement.Service
             }
             else
             {
+                var existingEmployee = _dbContext.Employees.FirstOrDefault(s => s.Id == employeeId.Value);
+                if(existingEmployee != null)
+                {
+                    if (departmentId == null || departmentId == 0)
+                    {
+                        var data = (from e in _dbContext.Employees.Where(e => !e.IsDeleted && e.EmployeeDepartmentId == existingEmployee.EmployeeDepartmentId && e.Id != employeeId)
+                                    select new EmployeeReportToModel
+                                    {
+                                        Name = e.FirstName + " " + e.LastName,
+                                        Id = e.Id,
+                                    }).ToList();
 
-                var data = (from e in _dbContext.Employees.Where(e => !e.IsDeleted && e.EmployeeDepartmentId == departmentId && e.Id != employeeId)
-                            select new EmployeeReportToModel
-                            {
-                                Name = e.FirstName + " " + e.LastName,
-                                Id = e.Id,
-                            }).ToList();
+                        return data;
+                    }
+                    else
+                    {
+                        var data = (from e in _dbContext.Employees.Where(e => !e.IsDeleted && e.EmployeeDepartmentId == departmentId && e.Id != employeeId)
+                                    select new EmployeeReportToModel
+                                    {
+                                        Name = e.FirstName + " " + e.LastName,
+                                        Id = e.Id,
+                                    }).ToList();
 
-                return data;
+                        return data;
+                    }
+                }
+                else
+                {
+                    return new List<EmployeeReportToModel>();
+                }
+                
             }
 
         }
@@ -229,12 +251,25 @@ namespace WorkManagement.Service
                                     },
                                     EmployeeAddresses = new EmployeeAddressModel
                                     {
-                                        AddressLine1 = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.AddressLine1,
-                                        AddressLine2 = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.AddressLine2,
-                                        City = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.City,
-                                        Country = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.Country,
-                                        State = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.State,
-                                        PinCode = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.PinCode,
+                                        UserAddress = new AddressModel
+                                        {
+                                            AddressLine1 = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.UserAddressLine1,
+                                            AddressLine2 = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.UserAddressLine2,
+                                            City = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.UserCity,
+                                            Country = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.UserCountry,
+                                            State = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.UserState,
+                                            PinCode = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.UserAddressPinCode,
+                                        },
+                                        MailingAddress = new AddressModel
+                                        {
+                                            AddressLine1 = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.MailingAddressLine1,
+                                            AddressLine2 = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.MailingAddressLine2,
+                                            City = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.MailingCity,
+                                            Country = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.MailingCountry,
+                                            State = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.MailingState,
+                                            PinCode = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.MailingAddressPinCode,
+                                        }
+
                                     },
                                     EmployeeIdentityInfos = new EmployeeBankingDataModel
                                     {
@@ -502,12 +537,26 @@ namespace WorkManagement.Service
                     if (employee.EmployeeAddresses != null)
                     {
                         var employeeAddressData = new EmployeeAddress();
-                        employeeAddressData.AddressLine1 = employee.EmployeeAddresses.AddressLine1;
-                        employeeAddressData.AddressLine2 = employee.EmployeeAddresses.AddressLine2;
-                        employeeAddressData.City = employee.EmployeeAddresses.City;
-                        employeeAddressData.Country = employee.EmployeeAddresses.Country;
-                        employeeAddressData.State = employee.EmployeeAddresses.State;
-                        employeeAddressData.PinCode = employee.EmployeeAddresses.PinCode;
+                        if(employee.EmployeeAddresses.UserAddress != null)
+                        {
+                            employeeAddressData.UserAddressLine1 = employee.EmployeeAddresses.UserAddress.AddressLine1;
+                            employeeAddressData.UserAddressLine2 = employee.EmployeeAddresses.UserAddress.AddressLine2;
+                            employeeAddressData.UserCity = employee.EmployeeAddresses.UserAddress.City;
+                            employeeAddressData.UserCountry = employee.EmployeeAddresses.UserAddress.Country;
+                            employeeAddressData.UserState = employee.EmployeeAddresses.UserAddress.State;
+                            employeeAddressData.UserAddressPinCode = employee.EmployeeAddresses.UserAddress.PinCode;
+                        }
+
+                        if (employee.EmployeeAddresses.MailingAddress != null)
+                        {
+                            employeeAddressData.MailingAddressLine1 = employee.EmployeeAddresses.MailingAddress.AddressLine1;
+                            employeeAddressData.MailingAddressLine2 = employee.EmployeeAddresses.MailingAddress.AddressLine2;
+                            employeeAddressData.MailingCity = employee.EmployeeAddresses.MailingAddress.City;
+                            employeeAddressData.MailingCountry = employee.EmployeeAddresses.MailingAddress.Country;
+                            employeeAddressData.MailingState = employee.EmployeeAddresses.MailingAddress.State;
+                            employeeAddressData.MailingAddressPinCode = employee.EmployeeAddresses.MailingAddress.PinCode;
+                        }
+
 
                         newEmployee.EmployeeAddresses = employeeAddressData;
                     }
@@ -715,12 +764,37 @@ namespace WorkManagement.Service
                         var employeeAddressData = _dbContext.EmployeeAddresses.FirstOrDefault(s => s.Id == employeeData.EmployeeAddressesId.Value);
                         if (employeeAddressData != null)
                         {
-                            employeeAddressData.AddressLine1 = employee.EmployeeAddresses.AddressLine1;
-                            employeeAddressData.AddressLine2 = employee.EmployeeAddresses.AddressLine2;
-                            employeeAddressData.City = employee.EmployeeAddresses.City;
-                            employeeAddressData.Country = employee.EmployeeAddresses.Country;
-                            employeeAddressData.State = employee.EmployeeAddresses.State;
-                            employeeAddressData.PinCode = employee.EmployeeAddresses.PinCode;
+                            if(employee.EmployeeAddresses.UserAddress != null)
+                            {
+                                employeeAddressData.UserAddressLine1 = employee.EmployeeAddresses.UserAddress.AddressLine1;
+                                employeeAddressData.UserAddressLine2 = employee.EmployeeAddresses.UserAddress.AddressLine2;
+                                employeeAddressData.UserCity = employee.EmployeeAddresses.UserAddress.City;
+                                employeeAddressData.UserCountry = employee.EmployeeAddresses.UserAddress.Country;
+                                employeeAddressData.UserState = employee.EmployeeAddresses.UserAddress.State;
+                                employeeAddressData.UserAddressPinCode = employee.EmployeeAddresses.UserAddress.PinCode;
+                            }
+
+                            if (employee.EmployeeAddresses.UseUserAddressForMailing && employee.EmployeeAddresses.UserAddress != null)
+                            {
+                                employeeAddressData.MailingAddressLine1 = employee.EmployeeAddresses.UserAddress.AddressLine1;
+                                employeeAddressData.MailingAddressLine2 = employee.EmployeeAddresses.UserAddress.AddressLine2;
+                                employeeAddressData.MailingCity = employee.EmployeeAddresses.UserAddress.City;
+                                employeeAddressData.MailingCountry = employee.EmployeeAddresses.UserAddress.Country;
+                                employeeAddressData.MailingState = employee.EmployeeAddresses.UserAddress.State;
+                                employeeAddressData.MailingAddressPinCode = employee.EmployeeAddresses.UserAddress.PinCode;
+                            }
+                            else
+                            {
+                                if (employee.EmployeeAddresses.MailingAddress != null)
+                                {
+                                    employeeAddressData.MailingAddressLine1 = employee.EmployeeAddresses.MailingAddress.AddressLine1;
+                                    employeeAddressData.MailingAddressLine2 = employee.EmployeeAddresses.MailingAddress.AddressLine2;
+                                    employeeAddressData.MailingCity = employee.EmployeeAddresses.MailingAddress.City;
+                                    employeeAddressData.MailingCountry = employee.EmployeeAddresses.MailingAddress.Country;
+                                    employeeAddressData.MailingState = employee.EmployeeAddresses.MailingAddress.State;
+                                    employeeAddressData.MailingAddressPinCode = employee.EmployeeAddresses.MailingAddress.PinCode;
+                                }
+                            }
 
                             employeeData.EmployeeAddresses = employeeAddressData;
                         }
@@ -818,13 +892,62 @@ namespace WorkManagement.Service
 
         public async Task<bool> DeleteEmployeeAsync(int id)
         {
-            var employee = await _dbContext.Employees.FindAsync(id);
-            if (employee == null)
-                return false;
+            try
+            {
+                var employee = await _dbContext.Employees.FindAsync(id);
+                if (employee == null)
+                    return false;
+               
+                var employeeReportTo = _dbContext.Employees.Where(s=>s.EmployeeReportToId == id).ToList();
+                if (employeeReportTo.Any())
+                {
+                    foreach (var e in employeeReportTo)
+                    {
+                        e.EmployeeReportToId = null;
+                        _dbContext.Employees.Update(e);                       
+                    }
 
-            _dbContext.Employees.Remove(employee);
-            await _dbContext.SaveChangesAsync();
-            return true;
+                    _dbContext.SaveChanges();
+                }
+
+
+
+                var employeeEducation = _dbContext.EmployeeEducationDetails.Where(e => e.EmployeeId == id).ToList();
+                if(employeeEducation.Any())
+                {
+                    foreach(var e in employeeEducation)
+                    {
+                        _dbContext.EmployeeEducationDetails.Remove(e);
+                    }
+                }
+
+                var employeeRelation = _dbContext.EmployeeRelationshipDetails.Where(e => e.EmployeeId == id).ToList();
+                if (employeeRelation.Any())
+                {
+                    foreach (var e in employeeRelation)
+                    {
+                        _dbContext.EmployeeRelationshipDetails.Remove(e);
+                    }
+                }
+
+                var employeeDocuments = _dbContext.EmployeeDocuments.Where(e => e.EmployeeId == id).ToList();
+                if (employeeDocuments.Any())
+                {
+                    foreach (var e in employeeDocuments)
+                    {
+                        _dbContext.EmployeeDocuments.Remove(e);
+                    }
+                }
+
+                _dbContext.Employees.Remove(employee);
+                await _dbContext.SaveChangesAsync();
+                return true;
+            }
+            catch(Exception ex)
+            {
+                return false;
+            }
+            
         }
 
         #region Leave management
@@ -848,7 +971,7 @@ namespace WorkManagement.Service
                                          Id = ed.EmployeeLeaveTypeId.HasValue ? ed.EmployeeLeaveTypeId.Value : 0,
                                          EmployeeLeaveType = ed.EmployeeLeaveTypes.Name,
                                          TotalLeaves = ed.TotalLeaves,
-                                         RemainingLeaves = 0
+                                         RemainingLeaves = ed.TotalLeaves
                                      }).ToList();
 
                 var employeeLeaveData = (from el in _dbContext.EmployeeLeaveSummary.Where(s => s.EmployeeId == employeeId)
@@ -1025,7 +1148,7 @@ namespace WorkManagement.Service
 
         #region Private methods
 
-        private async void SendEmail(ApplicationUser user,string password)
+        private async Task SendEmail(ApplicationUser user,string password)
         {
             var WelcomeModelCredentials = new WelcomeModel();
             WelcomeModelCredentials.Username = user.UserName;

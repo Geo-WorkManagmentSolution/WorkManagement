@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WorkManagmentSolution.EFCore;
 
@@ -11,9 +12,11 @@ using WorkManagmentSolution.EFCore;
 namespace WorkManagement.EFCore.Migrations
 {
     [DbContext(typeof(WorkManagementDbContext))]
-    partial class WorkManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241115180454_udate-serial-number")]
+    partial class udateserialnumber
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -288,50 +291,6 @@ namespace WorkManagement.EFCore.Migrations
                     b.HasIndex("EmployeeLeaveTypeId");
 
                     b.ToTable("EmployeeDefaultLeave");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            EmployeeLeaveTypeId = 1,
-                            IsDeleted = false,
-                            TotalLeaves = 5
-                        },
-                        new
-                        {
-                            Id = 2,
-                            EmployeeLeaveTypeId = 2,
-                            IsDeleted = false,
-                            TotalLeaves = 5
-                        },
-                        new
-                        {
-                            Id = 3,
-                            EmployeeLeaveTypeId = 3,
-                            IsDeleted = false,
-                            TotalLeaves = 5
-                        },
-                        new
-                        {
-                            Id = 4,
-                            EmployeeLeaveTypeId = 4,
-                            IsDeleted = false,
-                            TotalLeaves = 5
-                        },
-                        new
-                        {
-                            Id = 5,
-                            EmployeeLeaveTypeId = 5,
-                            IsDeleted = false,
-                            TotalLeaves = 5
-                        },
-                        new
-                        {
-                            Id = 6,
-                            EmployeeLeaveTypeId = 6,
-                            IsDeleted = false,
-                            TotalLeaves = 5
-                        });
                 });
 
             modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeHoliday", b =>
@@ -361,71 +320,6 @@ namespace WorkManagement.EFCore.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("EmployeeHolidays");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            EndDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            IsFloater = false,
-                            Name = "New Year's Day",
-                            StartDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 2,
-                            EndDate = new DateTime(2024, 1, 26, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            IsFloater = false,
-                            Name = "Republic Day",
-                            StartDate = new DateTime(2024, 1, 26, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 3,
-                            EndDate = new DateTime(2024, 3, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            IsFloater = true,
-                            Name = "Holi",
-                            StartDate = new DateTime(2024, 3, 25, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 4,
-                            EndDate = new DateTime(2024, 8, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            IsFloater = false,
-                            Name = "Independence Day",
-                            StartDate = new DateTime(2024, 8, 15, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 5,
-                            EndDate = new DateTime(2024, 10, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            IsFloater = false,
-                            Name = "Dussehra",
-                            StartDate = new DateTime(2024, 10, 12, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 6,
-                            EndDate = new DateTime(2024, 10, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            IsFloater = false,
-                            Name = "Diwali",
-                            StartDate = new DateTime(2024, 10, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 7,
-                            EndDate = new DateTime(2024, 12, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            IsFloater = false,
-                            Name = "Christmas",
-                            StartDate = new DateTime(2024, 12, 25, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        });
                 });
 
             modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeave", b =>
@@ -525,50 +419,6 @@ namespace WorkManagement.EFCore.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("EmployeeLeaveType");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            IsDeleted = false,
-                            IsPaid = true,
-                            Name = "Privilege Leave"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            IsDeleted = false,
-                            IsPaid = true,
-                            Name = "Sick Leave"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            IsDeleted = false,
-                            IsPaid = true,
-                            Name = "Casual Leave"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            IsDeleted = false,
-                            IsPaid = true,
-                            Name = "Maternity Leave"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            IsDeleted = false,
-                            IsPaid = true,
-                            Name = "Bereavement Leave"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            IsDeleted = false,
-                            IsPaid = true,
-                            Name = "Compensatory Leave"
-                        });
                 });
 
             modelBuilder.Entity("WorkManagement.Domain.Entity.Project", b =>
@@ -780,43 +630,25 @@ namespace WorkManagement.EFCore.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AddressLine1")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AddressLine2")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Country")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<string>("MailingAddressLine1")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MailingAddressLine2")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long?>("MailingAddressPinCode")
+                    b.Property<long?>("PinCode")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("MailingCity")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MailingCountry")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MailingState")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserAddressLine1")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserAddressLine2")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long?>("UserAddressPinCode")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("UserCity")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserCountry")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserState")
+                    b.Property<string>("State")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
