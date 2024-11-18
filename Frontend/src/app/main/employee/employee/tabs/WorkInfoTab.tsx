@@ -36,6 +36,7 @@ function WorkInfoTab() {
   const routeParams = useParams();
   const { employeeId } = routeParams as unknown;
   const departmentId = watch("employeeDepartmentId");
+  const salaryType = watch("employeeWorkInformation.salaryType");
   const [useDefaultLeaves, setUseDefaultLeaves] = useState(true);
 
   const { data: employeesDepartmentsOptions = [] } =
@@ -329,7 +330,9 @@ function WorkInfoTab() {
                 {...field}
                 label="Basic"
                 type="number"
-                className="mx-4"
+                className={
+                  salaryType == "OnRoll" ? "mx-4" : "mx-4 salaryHiddenClass"
+                }
                 InputProps={{
                   inputProps: {
                     min: 1,
@@ -354,7 +357,9 @@ function WorkInfoTab() {
                 {...field}
                 label="HR Allowances"
                 type="number"
-                className="mx-4"
+                className={
+                  salaryType == "OnRoll" ? "mx-4" : "mx-4 salaryHiddenClass"
+                }
                 InputProps={{
                   inputProps: {
                     min: 1,
@@ -380,7 +385,9 @@ function WorkInfoTab() {
                 {...field}
                 label="Bonus"
                 type="number"
-                className="mx-4"
+                className={
+                  salaryType == "OnRoll" ? "mx-4" : "mx-4 salaryHiddenClass"
+                }
                 InputProps={{
                   inputProps: {
                     min: 1,
@@ -407,7 +414,9 @@ function WorkInfoTab() {
                 {...field}
                 label="Gratuity"
                 type="number"
-                className="mx-4"
+                className={
+                  salaryType == "OnRoll" ? "mx-4" : "mx-4 salaryHiddenClass"
+                }
                 InputProps={{
                   inputProps: {
                     min: 1,
@@ -432,7 +441,9 @@ function WorkInfoTab() {
                 {...field}
                 label="PF"
                 type="number"
-                className="mx-4"
+                className={
+                  salaryType == "OnRoll" ? "mx-4" : "mx-4 salaryHiddenClass"
+                }
                 InputProps={{
                   inputProps: {
                     min: 1,
@@ -457,7 +468,9 @@ function WorkInfoTab() {
                 {...field}
                 label="ESI"
                 type="number"
-                className="mx-4"
+                className={
+                  salaryType == "OnRoll" ? "mx-4" : "mx-4 salaryHiddenClass"
+                }
                 InputProps={{
                   inputProps: {
                     min: 1,
@@ -482,7 +495,9 @@ function WorkInfoTab() {
                 {...field}
                 label="PT"
                 type="number"
-                className="mx-4"
+                className={
+                  salaryType == "OnRoll" ? "mx-4" : "mx-4 salaryHiddenClass"
+                }
                 InputProps={{
                   inputProps: {
                     min: 1,

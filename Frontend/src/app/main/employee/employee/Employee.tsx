@@ -27,7 +27,7 @@ import IdentityInfoTab from "./tabs/IdentityInfoTab";
 import FileUpload from "./tabs/FileUpload";
 import EmployeeModelClone from "../models/EmployeeModelClone";
 import TeamTab from "./tabs/TeamTab";
-
+import "./Employee.css";
 const schema = yup.object({
   firstName: yup.string().required("First Name is required"),
   middleName: yup.string().required("Middle Name is required"),
@@ -68,8 +68,6 @@ const schema = yup.object({
   employeeDepartmentId: yup.string().required("Department is required"),
   employeeDesignationId: yup.string().required("Designation is required"),
 });
-
-  
 
 // The product page.
 type EmployeeFormValues = yup.InferType<typeof schema>;
