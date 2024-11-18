@@ -1,3 +1,7 @@
 .salaryHiddenClass{
     display: none;
 }
+
+.hideAddContextButton{
+    display: none;
+}

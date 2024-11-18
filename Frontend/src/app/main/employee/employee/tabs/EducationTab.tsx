@@ -97,7 +97,7 @@ export default function EducationTab() {
               sx={{ mt: 2, display: "flex", justifyContent: "space-between" }}
             >
               <Button
-                className=""
+                className={index > 0 ? "hideAddContextButton" : ""}
                 variant="contained"
                 color="secondary"
                 size="small"
