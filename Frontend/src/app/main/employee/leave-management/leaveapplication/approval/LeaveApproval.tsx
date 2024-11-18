@@ -1,8 +1,11 @@
-import GlobalStyles from '@mui/material/GlobalStyles';
-import AdvanceSearchCriteria, { convertModelToList } from 'app/shared-components/AdvanceSearchCriteria';
-import { useState } from 'react';
-import EmployeesHeader from './EmployeesHeader';
-import EmployeesTable from './LeaveApprovalTable';
+import GlobalStyles from "@mui/material/GlobalStyles";
+import AdvanceSearchCriteria, {
+  convertModelToList,
+} from "app/shared-components/AdvanceSearchCriteria";
+import { useState } from "react";
+import EmployeesHeader from "./EmployeesHeader";
+import EmployeesTable from "./LeaveApprovalTable";
+import LeaveApprovalTable from "./LeaveApprovalTable";
 // import { EmployeeModel, Criterion, usePostApiEmployeesSearchMutation } from '../EmployeeApi';
 // import EmployeeModelClone from '../models/EmployeeModelClone';
 
@@ -11,30 +14,30 @@ import EmployeesTable from './LeaveApprovalTable';
  */
 
 function LeaveApproval() {
-	// const [SearchEmployee] = usePostApiEmployeesSearchMutation();
-	// const [toggleAdvanceSearch, settoggleAdvanceSearch] = useState(false);
-	return (
-		<>
-			<GlobalStyles
-				styles={() => ({
-					'#root': {
-						maxHeight: '100vh'
-					}
-				})}
-			/>
+  // const [SearchEmployee] = usePostApiEmployeesSearchMutation();
+  // const [toggleAdvanceSearch, settoggleAdvanceSearch] = useState(false);
+  return (
+    <>
+      <GlobalStyles
+        styles={() => ({
+          "#root": {
+            maxHeight: "100vh",
+          },
+        })}
+      />
 
-			<div className="w-full h-full flex flex-col px-16">
-				{/* <EmployeesHeader handleSwitch={(e) => settoggleAdvanceSearch(e)} />
+      <div className="w-full h-full flex flex-col px-16">
+        {/* <EmployeesHeader handleSwitch={(e) => settoggleAdvanceSearch(e)} />
 				{toggleAdvanceSearch && (
 					<AdvanceSearchCriteria
 						onSubmit={(json) => SearchEmployee({ body: json as Criterion[] })}
 						fields={convertModelToList<EmployeeModel>(EmployeeModelClone({}))}
 					/>
 				)} */}
-				<LeaveApprovalTable />
-			</div>
-		</>
-	);
+        <LeaveApprovalTable />
+      </div>
+    </>
+  );
 }
 
-export default Employees;
+export default LeaveApproval;

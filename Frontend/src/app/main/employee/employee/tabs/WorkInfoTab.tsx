@@ -23,52 +23,15 @@ import {
 } from "../../EmployeeApi";
 import EnhancedAutocomplete from "../EnhancedAutocomplete";
 import { SalaryType } from "../../models/EmployeeDropdownModels";
-import { TextField, MenuItem, InputAdornment, Typography, Autocomplete, FormControlLabel, Checkbox } from '@mui/material';
-import { Controller, useFieldArray, useFormContext } from 'react-hook-form';
-import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
-import { DatePicker } from '@mui/x-date-pickers';
-import { SalaryType, useGetApiEmployeesDepartmentsQuery, useGetApiEmployeesLeavesCurrentQuery, useGetApiEmployeesSitesQuery, usePostApiEmployeesAddNewSiteMutation } from '../../EmployeeApi';
-import EnhancedAutocomplete from '../EnhancedAutocomplete';
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 /**
  * The basic info tab.
  */
 
 function WorkInfoTab() {
-	const methods = useFormContext();
-	const { control, watch,formState,setValue } = methods;
-	const { errors } = formState;
-	const { data: employeesDepartmentsOptions = [] } = useGetApiEmployeesDepartmentsQuery();
-	const { data: employeesSiteOptions = [] } = useGetApiEmployeesSitesQuery();
-	const { data: employeeLeaveTypes = [] } = useGetApiEmployeesLeavesCurrentQuery();
-	const [useDefaultLeaves, setUseDefaultLeaves] = useState(true);
-
-	
-	const { fields, append, remove } = useFieldArray({
-		control,
-		name: 'employeeLeaves'
-	});
-
-	
-	useEffect(() => {
-		if(employeeLeaveTypes){
-			setValue(
-				'employeeLeaves',
-				employeeLeaveTypes.map((x, i) => ({
-					employeeLeaveTypeId:x.id,
-					employeeLeaveType: x.employeeLeaveType,
-					totalLeaves: x.totalLeaves
-				}))
-			);
-		}
-	  },[employeeLeaveTypes])
-	  
-
-
-	const [AddSite] = usePostApiEmployeesAddNewSiteMutation();
   const methods = useFormContext();
-  const { control, formState } = methods;
+  const { control, watch, formState, setValue } = methods;
   const { errors } = formState;
   const routeParams = useParams();
   const { employeeId } = routeParams as unknown;
@@ -80,17 +43,33 @@ function WorkInfoTab() {
   const { data: employeesSiteOptions = [] } = useGetApiEmployeesSitesQuery();
   const { data: employeeLeaveTypes = [] } =
     useGetApiEmployeesLeavesCurrentQuery();
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "employeeLeaves",
+  });
+
+  useEffect(() => {
+    if (employeeLeaveTypes) {
+      setValue(
+        "employeeLeaves",
+        employeeLeaveTypes.map((x, i) => ({
+          employeeLeaveTypeId: x.id,
+          employeeLeaveType: x.employeeLeaveType,
+          totalLeaves: x.totalLeaves,
+        }))
+      );
+    }
+  }, [employeeLeaveTypes]);
+
   const { data: employeesDesignationsOptions = [] } =
     useGetApiEmployeesDesignationsQuery();
 
- const { data: employeesReportToOptions = [] } =
+  const { data: employeesReportToOptions = [] } =
     useGetApiEmployeesReportToEmployeeListQuery({
       departmentId: departmentId,
       employeeId: employeeId,
     });
-
-  const routeParams = useParams();
-  const { employeeId } = routeParams as unknown;
 
   const [AddSite] = usePostApiEmployeesAddNewSiteMutation();
   const [AddDesignation] = usePostApiEmployeesAddNewDesignationMutation();
@@ -115,11 +94,6 @@ function WorkInfoTab() {
       throw error;
     }
   };
-
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "employeeLeaves",
-  });
 
   return (
     <div className="space-y-48">

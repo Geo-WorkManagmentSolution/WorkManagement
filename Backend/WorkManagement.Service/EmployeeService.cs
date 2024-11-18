@@ -616,6 +616,27 @@ namespace WorkManagement.Service
                         }
                     }
 
+                    var defaultLeaves = (from ed in _dbContext.EmployeeDefaultLeave
+                                         select new EmployeeLeaveSummaryModel
+                                         {
+                                             Id = ed.EmployeeLeaveTypeId.HasValue ? ed.EmployeeLeaveTypeId.Value : 0,
+                                             EmployeeLeaveType = ed.EmployeeLeaveTypes.Name,
+                                             TotalLeaves = ed.TotalLeaves,
+                                             RemainingLeaves = ed.TotalLeaves
+                                         }).ToList();
+
+                    if(defaultLeaves.Any())
+                    {
+                        var employeeLeave = new EmployeeLeaveSummary();
+
+                        employeeLeave.EmployeeLeaveTypeId = defaultLeaves[0].Id;
+                        employeeLeave.RemainingLeaves = defaultLeaves[0].RemainingLeaves;
+                        employeeLeave.TotalLeaves = defaultLeaves[0].TotalLeaves;
+
+                        newEmployee.EmployeeLeaves.Add(employeeLeave);
+                        
+                    }
+
 
                     newEmployee.UserId = user.Id;
                     newEmployee.CreatedBy = user.Id;
