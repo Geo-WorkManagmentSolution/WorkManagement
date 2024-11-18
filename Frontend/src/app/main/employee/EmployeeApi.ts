@@ -158,24 +158,14 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: () => ({ url: `/api/Employees/leaves/current` }),
     }),
-    postApiEmployeesLeavesAddLeave: build.mutation<
-      PostApiEmployeesLeavesAddLeaveApiResponse,
-      PostApiEmployeesLeavesAddLeaveApiArg
+    putApiEmployeesLeavesAddLeave: build.mutation<
+      PutApiEmployeesLeavesAddLeaveApiResponse,
+      PutApiEmployeesLeavesAddLeaveApiArg
     >({
       query: (queryArg) => ({
         url: `/api/Employees/leaves/addLeave`,
-        method: "POST",
-        body: queryArg.employeeLeaveModel,
-      }),
-    }),
-    putApiEmployeesLeavesUpdateLeave: build.mutation<
-      PutApiEmployeesLeavesUpdateLeaveApiResponse,
-      PutApiEmployeesLeavesUpdateLeaveApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/Employees/leaves/updateLeave`,
         method: "PUT",
-        body: queryArg.employeeLeaveModel,
+        body: queryArg.employeeLeave,
       }),
     }),
     deleteApiEmployeesLeavesCancelLeave: build.mutation<
@@ -186,6 +176,16 @@ const injectedRtkApi = api.injectEndpoints({
         url: `/api/Employees/leaves/cancelLeave`,
         method: "DELETE",
         params: { employeeLeaveId: queryArg.employeeLeaveId },
+      }),
+    }),
+    putApiEmployeesLeavesUpdateLeave: build.mutation<
+      PutApiEmployeesLeavesUpdateLeaveApiResponse,
+      PutApiEmployeesLeavesUpdateLeaveApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/leaves/updateLeave`,
+        method: "PUT",
+        body: queryArg.employeeLeave,
       }),
     }),
   }),
@@ -499,6 +499,26 @@ export enum FileType {
   Csv = "CSV",
   Other = "Other",
 }
+export enum SalaryType {
+  M = "M",
+  F = "F",
+}
+export enum RelationshipType {
+  Parent = "Parent",
+  Spouse = "Spouse",
+  FamilyMember = "FamilyMember",
+  Friend = "Friend",
+  Other = "Other",
+}
+export enum FileType {
+  Pdf = "PDF",
+  Docx = "DOCX",
+  Txt = "TXT",
+  Zip = "ZIP",
+  Xlsx = "XLSX",
+  Csv = "CSV",
+  Other = "Other",
+}
 export enum LeaveStatus {
   Approved = "Approved",
   Pending = "Pending",
@@ -534,7 +554,7 @@ export const {
   usePostApiEmployeesAddNewDesignationMutation,
   useGetApiEmployeesLeavesCurrentQuery,
   useLazyGetApiEmployeesLeavesCurrentQuery,
-  usePostApiEmployeesLeavesAddLeaveMutation,
-  usePutApiEmployeesLeavesUpdateLeaveMutation,
+  usePutApiEmployeesLeavesAddLeaveMutation,
   useDeleteApiEmployeesLeavesCancelLeaveMutation,
+  usePutApiEmployeesLeavesUpdateLeaveMutation,
 } = injectedRtkApi;

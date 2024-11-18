@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WorkManagmentSolution.EFCore;
 
@@ -11,9 +12,11 @@ using WorkManagmentSolution.EFCore;
 namespace WorkManagement.EFCore.Migrations
 {
     [DbContext(typeof(WorkManagementDbContext))]
-    partial class WorkManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241103174721_LeaveManagement")]
+    partial class LeaveManagement
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -266,311 +269,6 @@ namespace WorkManagement.EFCore.Migrations
                         });
                 });
 
-            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeDefaultLeaveSummary", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("EmployeeLeaveTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("TotalLeaves")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmployeeLeaveTypeId");
-
-                    b.ToTable("EmployeeDefaultLeave");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            EmployeeLeaveTypeId = 1,
-                            IsDeleted = false,
-                            TotalLeaves = 5
-                        },
-                        new
-                        {
-                            Id = 2,
-                            EmployeeLeaveTypeId = 2,
-                            IsDeleted = false,
-                            TotalLeaves = 5
-                        },
-                        new
-                        {
-                            Id = 3,
-                            EmployeeLeaveTypeId = 3,
-                            IsDeleted = false,
-                            TotalLeaves = 5
-                        },
-                        new
-                        {
-                            Id = 4,
-                            EmployeeLeaveTypeId = 4,
-                            IsDeleted = false,
-                            TotalLeaves = 5
-                        },
-                        new
-                        {
-                            Id = 5,
-                            EmployeeLeaveTypeId = 5,
-                            IsDeleted = false,
-                            TotalLeaves = 5
-                        },
-                        new
-                        {
-                            Id = 6,
-                            EmployeeLeaveTypeId = 6,
-                            IsDeleted = false,
-                            TotalLeaves = 5
-                        });
-                });
-
-            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeHoliday", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsFloater")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("EmployeeHolidays");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            EndDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            IsFloater = false,
-                            Name = "New Year's Day",
-                            StartDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 2,
-                            EndDate = new DateTime(2024, 1, 26, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            IsFloater = false,
-                            Name = "Republic Day",
-                            StartDate = new DateTime(2024, 1, 26, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 3,
-                            EndDate = new DateTime(2024, 3, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            IsFloater = true,
-                            Name = "Holi",
-                            StartDate = new DateTime(2024, 3, 25, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 4,
-                            EndDate = new DateTime(2024, 8, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            IsFloater = false,
-                            Name = "Independence Day",
-                            StartDate = new DateTime(2024, 8, 15, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 5,
-                            EndDate = new DateTime(2024, 10, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            IsFloater = false,
-                            Name = "Dussehra",
-                            StartDate = new DateTime(2024, 10, 12, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 6,
-                            EndDate = new DateTime(2024, 10, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            IsFloater = false,
-                            Name = "Diwali",
-                            StartDate = new DateTime(2024, 10, 31, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 7,
-                            EndDate = new DateTime(2024, 12, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            IsFloater = false,
-                            Name = "Christmas",
-                            StartDate = new DateTime(2024, 12, 25, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        });
-                });
-
-            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeave", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("EmployeeId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EmployeeLeaveTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<double>("LeaveDays")
-                        .HasColumnType("float");
-
-                    b.Property<string>("Reason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.HasIndex("EmployeeLeaveTypeId");
-
-                    b.ToTable("EmployeeLeaves");
-                });
-
-            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeaveSummary", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("EmployeeId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("EmployeeLeaveTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<double>("RemainingLeaves")
-                        .HasColumnType("float");
-
-                    b.Property<int>("TotalLeaves")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.HasIndex("EmployeeLeaveTypeId");
-
-                    b.ToTable("EmployeeLeaveSummary");
-                });
-
-            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeaveType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsPaid")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("EmployeeLeaveType");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            IsDeleted = false,
-                            IsPaid = true,
-                            Name = "Privilege Leave"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            IsDeleted = false,
-                            IsPaid = true,
-                            Name = "Sick Leave"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            IsDeleted = false,
-                            IsPaid = true,
-                            Name = "Casual Leave"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            IsDeleted = false,
-                            IsPaid = true,
-                            Name = "Maternity Leave"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            IsDeleted = false,
-                            IsPaid = true,
-                            Name = "Bereavement Leave"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            IsDeleted = false,
-                            IsPaid = true,
-                            Name = "Compensatory Leave"
-                        });
-                });
-
             modelBuilder.Entity("WorkManagement.Domain.Entity.Project", b =>
                 {
                     b.Property<int>("Id")
@@ -692,9 +390,6 @@ namespace WorkManagement.EFCore.Migrations
                     b.Property<int?>("EmployeeDesignationId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("EmployeeIdentityInfoId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("EmployeeInsuranceDetailsId")
                         .HasColumnType("int");
 
@@ -733,6 +428,9 @@ namespace WorkManagement.EFCore.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("MotherName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<long?>("PhoneNumber")
                         .HasColumnType("bigint");
 
@@ -754,8 +452,6 @@ namespace WorkManagement.EFCore.Migrations
                     b.HasIndex("EmployeeDepartmentId");
 
                     b.HasIndex("EmployeeDesignationId");
-
-                    b.HasIndex("EmployeeIdentityInfoId");
 
                     b.HasIndex("EmployeeInsuranceDetailsId");
 
@@ -780,46 +476,33 @@ namespace WorkManagement.EFCore.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AddressLine1")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AddressLine2")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Country")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("EmployeeId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<string>("MailingAddressLine1")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MailingAddressLine2")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long?>("MailingAddressPinCode")
+                    b.Property<long?>("PinCode")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("MailingCity")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MailingCountry")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MailingState")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserAddressLine1")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserAddressLine2")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long?>("UserAddressPinCode")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("UserCity")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserCountry")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserState")
+                    b.Property<string>("State")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
 
                     b.ToTable("EmployeeAddresses");
                 });
@@ -831,6 +514,11 @@ namespace WorkManagement.EFCore.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(34)
+                        .HasColumnType("nvarchar(34)");
 
                     b.Property<int?>("EmployeeLeaveTypeId")
                         .HasColumnType("int");
@@ -846,6 +534,10 @@ namespace WorkManagement.EFCore.Migrations
                     b.HasIndex("EmployeeLeaveTypeId");
 
                     b.ToTable("EmployeeDefaultLeave");
+
+                    b.HasDiscriminator().HasValue("EmployeeDefaultLeaveSummary");
+
+                    b.UseTphMappingStrategy();
 
                     b.HasData(
                         new
@@ -1174,6 +866,9 @@ namespace WorkManagement.EFCore.Migrations
                     b.Property<string>("Branch")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("EmployeeId")
+                        .HasColumnType("int");
+
                     b.Property<string>("EmployeeStateInsuranceNumber")
                         .HasColumnType("nvarchar(max)");
 
@@ -1193,6 +888,10 @@ namespace WorkManagement.EFCore.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .IsUnique()
+                        .HasFilter("[EmployeeId] IS NOT NULL");
 
                     b.ToTable("EmployeeIdentityInfos");
                 });
@@ -1220,6 +919,9 @@ namespace WorkManagement.EFCore.Migrations
                     b.Property<int?>("EmployeeDesignationId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("EmployeeId")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("GrossSalary")
                         .HasColumnType("decimal(18,2)");
 
@@ -1230,6 +932,7 @@ namespace WorkManagement.EFCore.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SerialNumber")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("TotalSIWider")
@@ -1238,6 +941,8 @@ namespace WorkManagement.EFCore.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("EmployeeDesignationId");
+
+                    b.HasIndex("EmployeeId");
 
                     b.ToTable("EmployeeInsuranceDetails");
                 });
@@ -1284,38 +989,6 @@ namespace WorkManagement.EFCore.Migrations
                     b.HasIndex("EmployeeLeaveTypeId");
 
                     b.ToTable("EmployeeLeaves");
-                });
-
-            modelBuilder.Entity("WorkManagementSolution.Employee.EmployeeLeaveSummary", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("EmployeeId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("EmployeeLeaveTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<double>("RemainingLeaves")
-                        .HasColumnType("float");
-
-                    b.Property<int>("TotalLeaves")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.HasIndex("EmployeeLeaveTypeId");
-
-                    b.ToTable("EmployeeLeaveSummary");
                 });
 
             modelBuilder.Entity("WorkManagementSolution.Employee.EmployeeLeaveType", b =>
@@ -1396,6 +1069,9 @@ namespace WorkManagement.EFCore.Migrations
                     b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("EmployeeId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Gender")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -1413,6 +1089,8 @@ namespace WorkManagement.EFCore.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
 
                     b.ToTable("EmployeePersonalDetails");
                 });
@@ -1461,13 +1139,7 @@ namespace WorkManagement.EFCore.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("Basic")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<decimal?>("Bond")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("Bonus")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime?>("ConfirmationDate")
@@ -1476,29 +1148,17 @@ namespace WorkManagement.EFCore.Migrations
                     b.Property<string>("Designation")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("ESI")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int?>("EmployeeId")
+                        .HasColumnType("int");
 
                     b.Property<string>("GRPHead")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Gratuity")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("HRAllowances")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime?>("HireDate")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<decimal>("PF")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("PT")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime?>("PreviousDateOfJoiningInGDR")
                         .HasColumnType("datetime2");
@@ -1542,6 +1202,21 @@ namespace WorkManagement.EFCore.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Sites");
+                });
+
+            modelBuilder.Entity("WorkManagementSolution.Employee.EmployeeLeaveSummary", b =>
+                {
+                    b.HasBaseType("WorkManagementSolution.Employee.EmployeeDefaultLeaveSummary");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("RemainingLeaves")
+                        .HasColumnType("float");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasDiscriminator().HasValue("EmployeeLeaveSummary");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -1595,51 +1270,6 @@ namespace WorkManagement.EFCore.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeDefaultLeaveSummary", b =>
-                {
-                    b.HasOne("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeaveType", "EmployeeLeaveTypes")
-                        .WithMany()
-                        .HasForeignKey("EmployeeLeaveTypeId");
-
-                    b.Navigation("EmployeeLeaveTypes");
-                });
-
-            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeave", b =>
-                {
-                    b.HasOne("WorkManagementSolution.Employee.Employee", "employee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeaveType", "EmployeeLeaveTypes")
-                        .WithMany()
-                        .HasForeignKey("EmployeeLeaveTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("EmployeeLeaveTypes");
-
-                    b.Navigation("employee");
-                });
-
-            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeaveSummary", b =>
-                {
-                    b.HasOne("WorkManagementSolution.Employee.Employee", "Employee")
-                        .WithMany("EmployeeLeaves")
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeaveType", "EmployeeLeaveTypes")
-                        .WithMany()
-                        .HasForeignKey("EmployeeLeaveTypeId");
-
-                    b.Navigation("Employee");
-
-                    b.Navigation("EmployeeLeaveTypes");
-                });
-
             modelBuilder.Entity("WorkManagement.Domain.Entity.ProjectEmployee", b =>
                 {
                     b.HasOne("WorkManagementSolution.Employee.Employee", "Employee")
@@ -1676,10 +1306,6 @@ namespace WorkManagement.EFCore.Migrations
                     b.HasOne("WorkManagementSolution.Employee.EmployeeDesignation", "EmployeeDesignation")
                         .WithMany()
                         .HasForeignKey("EmployeeDesignationId");
-
-                    b.HasOne("WorkManagementSolution.Employee.EmployeeIdentityInfo", "EmployeeIdentityInfos")
-                        .WithMany()
-                        .HasForeignKey("EmployeeIdentityInfoId");
 
                     b.HasOne("WorkManagementSolution.Employee.EmployeeInsuranceDetail", "EmployeeInsuranceDetails")
                         .WithMany()
@@ -1721,8 +1347,6 @@ namespace WorkManagement.EFCore.Migrations
 
                     b.Navigation("EmployeeDesignation");
 
-                    b.Navigation("EmployeeIdentityInfos");
-
                     b.Navigation("EmployeeInsuranceDetails");
 
                     b.Navigation("EmployeePersonalDetails");
@@ -1730,6 +1354,15 @@ namespace WorkManagement.EFCore.Migrations
                     b.Navigation("EmployeeReportTo");
 
                     b.Navigation("EmployeeWorkInformation");
+                });
+
+            modelBuilder.Entity("WorkManagementSolution.Employee.EmployeeAddress", b =>
+                {
+                    b.HasOne("WorkManagementSolution.Employee.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId");
+
+                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("WorkManagementSolution.Employee.EmployeeDefaultLeaveSummary", b =>
@@ -1759,11 +1392,26 @@ namespace WorkManagement.EFCore.Migrations
                     b.Navigation("Employee");
                 });
 
+            modelBuilder.Entity("WorkManagementSolution.Employee.EmployeeIdentityInfo", b =>
+                {
+                    b.HasOne("WorkManagementSolution.Employee.Employee", "Employee")
+                        .WithOne("EmployeeIdentityInfos")
+                        .HasForeignKey("WorkManagementSolution.Employee.EmployeeIdentityInfo", "EmployeeId");
+
+                    b.Navigation("Employee");
+                });
+
             modelBuilder.Entity("WorkManagementSolution.Employee.EmployeeInsuranceDetail", b =>
                 {
                     b.HasOne("WorkManagementSolution.Employee.EmployeeDesignation", "EmployeeDesignation")
                         .WithMany()
                         .HasForeignKey("EmployeeDesignationId");
+
+                    b.HasOne("WorkManagementSolution.Employee.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId");
+
+                    b.Navigation("Employee");
 
                     b.Navigation("EmployeeDesignation");
                 });
@@ -1785,21 +1433,13 @@ namespace WorkManagement.EFCore.Migrations
                     b.Navigation("employee");
                 });
 
-            modelBuilder.Entity("WorkManagementSolution.Employee.EmployeeLeaveSummary", b =>
+            modelBuilder.Entity("WorkManagementSolution.Employee.EmployeePersonalDetails", b =>
                 {
-                    b.HasOne("WorkManagementSolution.Employee.Employee", "employee")
-                        .WithMany("EmployeeLeaves")
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WorkManagementSolution.Employee.EmployeeLeaveType", "EmployeeLeaveTypes")
+                    b.HasOne("WorkManagementSolution.Employee.Employee", "Employee")
                         .WithMany()
-                        .HasForeignKey("EmployeeLeaveTypeId");
+                        .HasForeignKey("EmployeeId");
 
-                    b.Navigation("EmployeeLeaveTypes");
-
-                    b.Navigation("employee");
+                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("WorkManagementSolution.Employee.EmployeeRelationshipDetail", b =>
@@ -1820,11 +1460,24 @@ namespace WorkManagement.EFCore.Migrations
                     b.Navigation("Site");
                 });
 
+            modelBuilder.Entity("WorkManagementSolution.Employee.EmployeeLeaveSummary", b =>
+                {
+                    b.HasOne("WorkManagementSolution.Employee.Employee", "employee")
+                        .WithMany("EmployeeLeaves")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("employee");
+                });
+
             modelBuilder.Entity("WorkManagementSolution.Employee.Employee", b =>
                 {
                     b.Navigation("EmployeeDocuments");
 
                     b.Navigation("EmployeeEducationDetail");
+
+                    b.Navigation("EmployeeIdentityInfos");
 
                     b.Navigation("EmployeeLeaves");
 

@@ -106,6 +106,8 @@ try
     builder.Services.AddTransient<AdvanceSearchService>();
     builder.Services.AddTransient<ProjectServices>();
     builder.Services.AddTransient<EmailService>();
+    builder.Services.AddTransient<LeavesService>();
+
     builder.Services.AddAutoMapper(typeof(WorkManagement.Domain.AutoMapper.Profiles.EmployeeProfile).Assembly);
 
     builder.AddJWTAuthetication();

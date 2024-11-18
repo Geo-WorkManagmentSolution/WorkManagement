@@ -36,7 +36,7 @@ namespace WorkManagement.Domain.Contracts
         public Task<List<EmployeeDashboardDataModel>> GetAllEmployeesAsync();
         public Task<EmployeeModel> GetEmployeeByIdAsync(int id);
         public Task<EmployeeModel> CreateEmployeeAsync(EmployeeModel employee);
-        public Task<EmployeeModel> UpdateEmployeeAsync(int id, EmployeeModel employee);     
+        public Task<EmployeeModel> UpdateEmployeeAsync(int id, EmployeeModel employee);
         public Task<bool> DeleteEmployeeAsync(int id);
 
         #endregion        
@@ -53,6 +53,5 @@ namespace WorkManagement.Domain.Contracts
         public Task<bool> CheckEmailExists(string email);
 
         public Task SendEmail();
-        
     }
 }

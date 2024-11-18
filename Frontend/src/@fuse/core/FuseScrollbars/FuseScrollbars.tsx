@@ -89,23 +89,41 @@ const FuseScrollbars = forwardRef<HTMLDivElement, FuseScrollbarsProps>((props, r
 	useEffect(() => {
 		if (customScrollbars && containerRef.current && !isMobile) {
 			psRef.current = new PerfectScrollbar(containerRef.current, option);
-			hookUpEvents();
+		  hookUpEvents();
 		}
 
 		return () => {
-			if (psRef.current) {
-				psRef.current.destroy();
-				psRef.current = null;
-				unHookUpEvents();
-			}
+		  if (psRef.current) {
+			psRef.current.destroy();
+			psRef.current = null;
+			unHookUpEvents();
+		  }
 		};
-	}, [customScrollbars, hookUpEvents, option, unHookUpEvents]);
+	  }, [customScrollbars, hookUpEvents, option, unHookUpEvents]);
+
+	// const scrollToTop = useCallback(() => {
+	// 	if (containerRef.current) {
+	// 		containerRef.current.scrollTop = 0;
+			
+	// 	}
+	// }, []);
 
 	const scrollToTop = useCallback(() => {
 		if (containerRef.current) {
-			containerRef.current.scrollTop = 0;
+		  containerRef.current.scrollTo({
+			top: 0,
+			behavior: 'smooth'
+			
+		  });
 		}
-	}, []);
+	  }, []);
+
+
+
+
+
+
+	
 
 	useEffect(() => {
 		if (scrollToTopOnChildChange) {

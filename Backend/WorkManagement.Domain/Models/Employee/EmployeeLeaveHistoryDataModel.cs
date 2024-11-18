@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WorkManagement.Domain.Entity.EmployeeLeaveTables;
+using WorkManagementSolution.Employee;
 
 namespace WorkManagement.Domain.Models.Employee
 {
@@ -25,5 +28,6 @@ namespace WorkManagement.Domain.Models.Employee
         public string? Reason { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
+        public LeaveStatus status { get; set; } 
     }
 }

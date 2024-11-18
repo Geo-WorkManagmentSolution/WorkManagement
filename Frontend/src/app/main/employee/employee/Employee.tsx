@@ -69,6 +69,8 @@ const schema = yup.object({
   employeeDesignationId: yup.string().required("Designation is required"),
 });
 
+  
+
 // The product page.
 type EmployeeFormValues = yup.InferType<typeof schema>;
 

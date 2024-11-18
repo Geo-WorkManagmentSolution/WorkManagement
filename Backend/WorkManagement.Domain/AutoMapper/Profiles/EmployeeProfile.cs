@@ -26,11 +26,13 @@ namespace WorkManagement.Domain.AutoMapper.Profiles
 
 
             CreateMap<EmployeeDefaultLeaveSummary, EmployeeLeaveSummary>()
-                .ForMember(dest => dest.RemainingLeaves, src => src.MapFrom(x => x.TotalLeaves));
+                .ForMember(dest=>dest.RemainingLeaves,src=>src.MapFrom(x=>x.TotalLeaves));
 
             CreateMap<EmployeeLeaveSummary, EmployeeLeaveSummaryModel>()
                                 .ForMember(dest => dest.Id, src => src.MapFrom(x => x.EmployeeLeaveTypeId))
                                 .ForMember(dest => dest.EmployeeLeaveType, src => src.MapFrom(x => x.EmployeeLeaveTypes.Name));
+                                
+            ;
 
         }
     }

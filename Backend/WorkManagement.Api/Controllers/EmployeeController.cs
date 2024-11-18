@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +19,7 @@ namespace WorkManagement.API.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
-    public class EmployeesController : ControllerBase
+    public class EmployeesController : APIControllerBase
     {
         private readonly IEmployeeService employeeService;
         private readonly IEmailService _emailService;
@@ -151,7 +152,7 @@ namespace WorkManagement.API.Controllers
             }
 
 
-            await employeeService.UpdateEmployeeAsync(id,employee);
+            await employeeService.UpdateEmployeeAsync(id, employee);
             return NoContent();
         }
 
@@ -232,6 +233,6 @@ namespace WorkManagement.API.Controllers
             await employeeService.CancelLeave(employeeLeaveId, User.FindFirst(ClaimTypes.NameIdentifier).Value);
             return Ok(true);
         }
-    }
 
+    }
 }

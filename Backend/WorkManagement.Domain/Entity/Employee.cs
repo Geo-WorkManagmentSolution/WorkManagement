@@ -22,7 +22,7 @@ namespace WorkManagementSolution.Employee
         [Required]
         public string MiddleName { get; set; }
         [Required]
-        public string LastName { get; set; }       
+        public string LastName { get; set; }
 
         [EmailAddress]
         [Required]
@@ -53,7 +53,7 @@ namespace WorkManagementSolution.Employee
 
         [ForeignKey(nameof(EmployeePersonalDetails))]
         public int? EmployeePersonalDetailsId { get; set; }
-        
+
         [ForeignKey(nameof(EmployeeWorkInformation))]
         public int? EmployeeWorkInformationId { get; set; }
 
@@ -68,11 +68,11 @@ namespace WorkManagementSolution.Employee
 
         #endregion
 
-        public EmployeeDepartment? EmployeeDepartment { get; set; }             
-        public EmployeeDesignation? EmployeeDesignation { get; set; }        
+        public EmployeeDepartment? EmployeeDepartment { get; set; }
+        public EmployeeDesignation? EmployeeDesignation { get; set; }
         public Employee? EmployeeReportTo { get; set; }
         public ApplicationUser? ApplicationUser { get; set; }
-        public ApplicationRole? ApplicationRole { get; set; }        
+        public ApplicationRole? ApplicationRole { get; set; }
         public EmployeeCategory? EmployeeCategory { get; set; }
         public EmployeePersonalDetails? EmployeePersonalDetails { get; set; }
         public EmployeeWorkInformation? EmployeeWorkInformation { get; set; }
@@ -83,7 +83,6 @@ namespace WorkManagementSolution.Employee
         public List<EmployeeRelationshipDetail>? EmployeeRelationshipDetails { get; set; }
         public List<EmployeeDocuments>? EmployeeDocuments { get; set; }
         public List<EmployeeLeaveSummary> EmployeeLeaves { get; set; }
-
     }
 
     public class EmployeeDocuments : BaseEntity
@@ -305,8 +304,4 @@ namespace WorkManagementSolution.Employee
         [Display(Name = "O-")]
         ONegative
     }
-
 }
-
-
-
