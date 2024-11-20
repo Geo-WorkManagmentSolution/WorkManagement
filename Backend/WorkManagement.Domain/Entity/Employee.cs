@@ -160,6 +160,7 @@ namespace WorkManagementSolution.Employee
         [DataType(DataType.Date)]
         public DateTime? ConfirmationDate { get; set; }
         public decimal TotalPreviousExperience { get; set; }
+        public bool UseDefaultLeaves { get; set; }
         public decimal Salary { get; set; }
         public decimal Basic { get; set; }
         public decimal HRAllowances { get; set; }

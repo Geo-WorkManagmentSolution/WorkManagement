@@ -188,6 +188,24 @@ const injectedRtkApi = api.injectEndpoints({
         params: { employeeLeaveId: queryArg.employeeLeaveId },
       }),
     }),
+    putApiEmployeesApproveByLeaveId: build.mutation<
+      PutApiEmployeesApproveByLeaveIdApiResponse,
+      PutApiEmployeesApproveByLeaveIdApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/approve/${queryArg.leaveId}`,
+        method: "PUT",
+      }),
+    }),
+    putApiEmployeesRejectByLeaveId: build.mutation<
+      PutApiEmployeesRejectByLeaveIdApiResponse,
+      PutApiEmployeesRejectByLeaveIdApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/reject/${queryArg.leaveId}`,
+        method: "PUT",
+      }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -280,6 +298,16 @@ export type DeleteApiEmployeesLeavesCancelLeaveApiResponse =
 export type DeleteApiEmployeesLeavesCancelLeaveApiArg = {
   employeeLeaveId?: number;
 };
+export type PutApiEmployeesApproveByLeaveIdApiResponse =
+  /** status 200 OK */ EmployeeLeave;
+export type PutApiEmployeesApproveByLeaveIdApiArg = {
+  leaveId: number;
+};
+export type PutApiEmployeesRejectByLeaveIdApiResponse =
+  /** status 200 OK */ EmployeeLeave;
+export type PutApiEmployeesRejectByLeaveIdApiArg = {
+  leaveId: number;
+};
 export type EmployeeDashboardDataModel = {
   id?: number;
   employeeNumber?: number | null;
@@ -318,6 +346,7 @@ export type EmployeeWorkInformationModel = {
   hireDate?: string | null;
   confirmationDate?: string | null;
   totalPreviousExperience?: number;
+  useDefaultLeaves?: boolean;
 };
 export type EmployeeInsuranceDetailModel = {
   employeeDesignationId?: number | null;
@@ -453,6 +482,21 @@ export type EmployeeLeaveModel = {
   endDate?: string | null;
   leaveDays?: number;
   employeeLeaveTypeId?: number;
+  leaveType?: string | null;
+  employeeName?: string | null;
+  employeeNumber?: number;
+};
+export type EmployeeLeave = {
+  id?: number;
+  isDeleted?: boolean;
+  employeeId?: number;
+  status?: LeaveStatus;
+  description?: string | null;
+  reason?: string | null;
+  startDate?: string;
+  endDate?: string;
+  leaveDays?: number;
+  employeeLeaveTypeId?: number;
 };
 export enum MaritalStatus {
   Unknown = "Unknown",
@@ -537,4 +581,6 @@ export const {
   usePostApiEmployeesLeavesAddLeaveMutation,
   usePutApiEmployeesLeavesUpdateLeaveMutation,
   useDeleteApiEmployeesLeavesCancelLeaveMutation,
+  usePutApiEmployeesApproveByLeaveIdMutation,
+  usePutApiEmployeesRejectByLeaveIdMutation,
 } = injectedRtkApi;

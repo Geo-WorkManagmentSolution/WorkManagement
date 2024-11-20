@@ -38,15 +38,50 @@ namespace WorkManagement.Service
             return await _dbContext.EmployeeHolidays.ToListAsync();
         }
 
-        public async Task<List<EmployeeLeave>> GetAssignedEmployeeLeaves(string loggedUserId)
-        {
-            var ManagerId = _dbContext.Employees.First(x => x.UserId == Guid.Parse(loggedUserId)).Id;
+        //public async Task<List<EmployeeLeave>> GetAssignedEmployeeLeaves(string loggedUserId)
+        //{
+        //    var ManagerId = _dbContext.Employees.First(x => x.UserId == Guid.Parse(loggedUserId)).Id;
 
-            var assignedLeaves = from emp in _dbContext.Employees.Where(x => x.EmployeeReportToId == ManagerId)
-                                 join empLeave in _dbContext.EmployeeLeaves on emp.Id equals empLeave.EmployeeId
-                                 select empLeave;
-            return assignedLeaves.ToList();
+        //    var assignedLeaves = from emp in _dbContext.Employees.Where(x => x.EmployeeReportToId == ManagerId)
+        //                         join empLeave in _dbContext.EmployeeLeaves on emp.Id equals empLeave.EmployeeId
+        //                         select empLeave;
+        //    return assignedLeaves.ToList();
+        //}
+
+
+        public async Task<List<EmployeeLeaveModel>> GetAssignedEmployeeLeaves(string loggedUserId)
+        {
+            var ManagerId = await _dbContext.Employees
+                .Where(x => x.UserId == Guid.Parse(loggedUserId))
+                .Select(x => x.Id)
+                .FirstOrDefaultAsync();
+
+            var assignedLeaves = await (from emp in _dbContext.Employees
+                                        join empLeave in _dbContext.EmployeeLeaves on emp.Id equals empLeave.EmployeeId
+                                        join leaveType in _dbContext.EmployeeLeaveType on empLeave.EmployeeLeaveTypeId equals leaveType.Id
+                                        where emp.EmployeeReportToId == ManagerId
+                                        select new EmployeeLeaveModel
+                                        {
+                                            EmployeeLeaveId = empLeave.Id,
+                                            EmployeeId = empLeave.EmployeeId,
+                                            EmployeeNumber=emp.EmployeeNumber,
+                                            Status = empLeave.Status,
+                                            Description = empLeave.Description,
+                                            Reason = empLeave.Reason,
+                                            StartDate = empLeave.StartDate,
+                                            EndDate = empLeave.EndDate,
+                                            LeaveDays = empLeave.LeaveDays,
+                                            EmployeeLeaveTypeId = empLeave.EmployeeLeaveTypeId,
+                                            LeaveType = empLeave.EmployeeLeaveTypes.Name,
+                                            EmployeeName = emp.FirstName + " " + emp.LastName
+                                        }).ToListAsync();
+
+            return assignedLeaves;
         }
+
+
+
+
 
         public async Task<List<EmployeeLeaveHistoryDTO>> GetEmployeeLeaveHistory(EmployeeLeaveHistoryDataModel data,string loggedUserId)
         {
@@ -79,6 +114,7 @@ namespace WorkManagement.Service
 
             return returnData;
         }
+       
 
         #region Private Methods
 
@@ -98,8 +134,7 @@ namespace WorkManagement.Service
                     EmployeeLeaveId=l.Id,
                     status=l.Status
                     
-                    
-                    
+                                        
                 })
                 .ToList();
         }
@@ -120,6 +155,7 @@ namespace WorkManagement.Service
                 .ToList();
         }
 
+       
         #endregion
 
 

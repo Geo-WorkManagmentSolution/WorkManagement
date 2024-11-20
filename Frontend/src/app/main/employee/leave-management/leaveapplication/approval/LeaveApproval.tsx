@@ -14,8 +14,7 @@ import LeaveApprovalTable from "./LeaveApprovalTable";
  */
 
 function LeaveApproval() {
-  // const [SearchEmployee] = usePostApiEmployeesSearchMutation();
-  // const [toggleAdvanceSearch, settoggleAdvanceSearch] = useState(false);
+
   return (
     <>
       <GlobalStyles

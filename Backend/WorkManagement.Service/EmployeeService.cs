@@ -626,17 +626,27 @@ namespace WorkManagement.Service
                     newEmployee.EmployeeLeaves = new List<EmployeeLeaveSummary>();
                     if (defaultLeaves.Any())
                     {
-                        foreach (var leave in defaultLeaves)
-                        {
+                        if (employee.EmployeeWorkInformation.UseDefaultLeaves) {
+                            newEmployee.EmployeeLeaves = new List<EmployeeLeaveSummary>();
+                           var leaves= _dbContext.EmployeeDefaultLeave.Select(x => new EmployeeLeaveSummary()
+                            {
+                                EmployeeLeaveTypeId = x.Id,
+                                RemainingLeaves = x.TotalLeaves ,
+                                TotalLeaves = x.TotalLeaves
+                            });
+                            newEmployee.EmployeeLeaves.AddRange(leaves.ToList());
+
+                        }
+                        else {
                             var employeeLeave = new EmployeeLeaveSummary();
 
-                            employeeLeave.EmployeeLeaveTypeId = leave.Id;
-                            employeeLeave.RemainingLeaves = leave.RemainingLeaves;
-                            employeeLeave.TotalLeaves = leave.TotalLeaves;
+                            employeeLeave.EmployeeLeaveTypeId = defaultLeaves[0].Id;
+                            employeeLeave.RemainingLeaves = defaultLeaves[0].RemainingLeaves;
+                            employeeLeave.TotalLeaves = defaultLeaves[0].TotalLeaves;
 
                             newEmployee.EmployeeLeaves.Add(employeeLeave);
-                        }
 
+                        }
 
                     }
 
@@ -758,7 +768,7 @@ namespace WorkManagement.Service
                             employeeWorkInformationData.ESI = employee.EmployeeWorkInformation.ESI;
                             employeeWorkInformationData.PT = employee.EmployeeWorkInformation.PT;
                             employeeWorkInformationData.TotalPreviousExperience = employee.EmployeeWorkInformation.TotalPreviousExperience;
-
+                            employeeWorkInformationData.UseDefaultLeaves = employee.EmployeeWorkInformation.UseDefaultLeaves;
                             grossSalary = employeeWorkInformationData.Salary;
 
                             employeeData.EmployeeWorkInformation = employeeWorkInformationData;
@@ -1047,8 +1057,7 @@ namespace WorkManagement.Service
                     throw new Exception("Invalid User data");
                 }
 
-                var leaveSummary = await _dbContext.EmployeeLeaveSummary.FirstAsync(x => x.EmployeeId == employeeId && x.EmployeeLeaveTypeId == employeeLeaveData.EmployeeLeaveTypeId);
-                leaveSummary.RemainingLeaves -= employeeLeaveData.LeaveDays;
+               
 
                 if (leaveSummary.RemainingLeaves <= 0)
                 {
@@ -1059,7 +1068,7 @@ namespace WorkManagement.Service
                 {
                     _dbContext.EmployeeLeaveSummary.Update(leaveSummary);
                 }
-
+                leaveSummary.RemainingLeaves = leaveSummary.RemainingLeaves - employeeLeaveData.LeaveDays;
                 employeeLeaveData.EmployeeId = employeeId;
 
                 EmployeeLeave employeeLeave = new EmployeeLeave();
@@ -1290,8 +1299,112 @@ namespace WorkManagement.Service
 
             return (true, string.Empty);
         }
+        //public async Task<EmployeeLeave> ApproveLeave(int leaveId)
+        //{
+        //    var employeeLeave = await _dbContext.EmployeeLeaves.FindAsync(leaveId);
+        //    if (employeeLeave != null)
+        //    {
+        //        employeeLeave.Status = LeaveStatus.Approved;
+        //        await _dbContext.SaveChangesAsync();
+        //    }
+        //    return employeeLeave;
+        //}
 
 
+
+
+        public async Task<EmployeeLeave> ApproveLeave(int leaveId)
+        {
+            var employeeLeave = await _dbContext.EmployeeLeaves
+                .Include(l => l.employee)
+                .Include(l => l.EmployeeLeaveTypes)
+                .FirstOrDefaultAsync(l => l.Id == leaveId);
+
+            if (employeeLeave != null)
+            {
+                employeeLeave.Status = LeaveStatus.Approved;
+                await _dbContext.SaveChangesAsync();
+
+                var emailModel = new EmailModel<LeaveApprovalModel>
+                {
+                    From = "hr@company.com",
+                    To = employeeLeave.employee.Email,
+                    Subject = "Leave Approval Notification",
+                    repModel = new LeaveApprovalModel
+                    {
+                        EmployeeName = $"{employeeLeave.employee.FirstName} {employeeLeave.employee.LastName}",
+                        StartDate = employeeLeave.StartDate,
+                        EndDate = employeeLeave.EndDate,
+                        LeaveType = employeeLeave.EmployeeLeaveTypes.Name
+                    }
+                };
+
+                await _emailService.SendLeaveApprovalEmail(emailModel);
+            }
+            return employeeLeave;
+        }
+
+
+
+
+
+
+
+
+
+
+
+        //public async Task<EmployeeLeave> RejectLeave(int leaveId)
+        //{
+        //    var employeeLeave = await _dbContext.EmployeeLeaves.FindAsync(leaveId);
+        //    if (employeeLeave != null)
+        //    {
+        //        employeeLeave.Status = LeaveStatus.Rejected;
+        //        var leaveSummary = await _dbContext.EmployeeLeaveSummary.FirstAsync(x => x.EmployeeId == employeeLeave.EmployeeId && x.EmployeeLeaveTypeId == employeeLeave.EmployeeLeaveTypeId);
+        //        leaveSummary.RemainingLeaves += employeeLeave.LeaveDays;
+        //        _dbContext.EmployeeLeaves.Remove(employeeLeave);
+        //        _dbContext.EmployeeLeaveSummary.Update(leaveSummary);
+
+        //        await _dbContext.SaveChangesAsync();
+        //    }
+        //    return employeeLeave;
+        //}
+        public async Task<EmployeeLeave> RejectLeave(int leaveId)
+        {
+            var employeeLeave = await _dbContext.EmployeeLeaves
+                .Include(l => l.employee)
+                .Include(l => l.EmployeeLeaveTypes)
+                .FirstOrDefaultAsync(l => l.Id == leaveId);
+
+            if (employeeLeave != null)
+            {
+                employeeLeave.Status = LeaveStatus.Rejected;
+                var leaveSummary = await _dbContext.EmployeeLeaveSummary
+                    .FirstAsync(x => x.EmployeeId == employeeLeave.EmployeeId && x.EmployeeLeaveTypeId == employeeLeave.EmployeeLeaveTypeId);
+                leaveSummary.RemainingLeaves += employeeLeave.LeaveDays;
+                _dbContext.EmployeeLeaves.Update(employeeLeave);
+                _dbContext.EmployeeLeaveSummary.Update(leaveSummary);
+
+                await _dbContext.SaveChangesAsync();
+
+                var emailModel = new EmailModel<LeaveRejectionModel>
+                {
+                    From = "hr@company.com",
+                    To = employeeLeave.employee.Email,
+                    Subject = "Leave Rejection Notification",
+                    repModel = new LeaveRejectionModel
+                    {
+                        EmployeeName = $"{employeeLeave.employee.FirstName} {employeeLeave.employee.LastName}",
+                        StartDate = employeeLeave.StartDate,
+                        EndDate = employeeLeave.EndDate,
+                        LeaveType = employeeLeave.EmployeeLeaveTypes.Name
+                    }
+                };
+
+                await _emailService.SendLeaveRejectionEmail(emailModel);
+            }
+            return employeeLeave;
+        }
 
 
     }

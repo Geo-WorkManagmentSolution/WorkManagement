@@ -5,7 +5,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
-import { EmployeeLeave, LeaveStatus } from '../../LeavesApi';
+import { EmployeeLeave, EmployeeLeaveModel, LeaveStatus } from '../../LeavesApi';
 import EventLabelSelect from './EventLabelSelect';
 
 interface EventDialogProps {
@@ -13,7 +13,7 @@ interface EventDialogProps {
 	isNewEvent: boolean;
 	anchorEl: HTMLElement | null;
 	onClose: () => void;
-	onSave: (event: EmployeeLeave) => void;
+	onSave: (event: EmployeeLeaveModel) => void;
 	onDelete: (eventId: number) => void;
 	leaveBalance: Record<number, number>;
 	eventColors: Record<number, string>;
@@ -170,8 +170,9 @@ export default function EventDialog({
 	const onSubmit = handleSubmit(handleSave);
 
 	const isSaveButtonDisabled = !reasonValue || !descriptionValue || !!dateError || !!leaveBalanceError;
-	const isUpdateButtonDisabled = !reasonValue || !descriptionValue || !!dateError;
-
+	const isUpdateButtonDisabled = !reasonValue || !descriptionValue || !!dateError || (event?.status === LeaveStatus.Rejected);
+	const isCancelButtonDisabled = (event?.status === LeaveStatus.Rejected);
+	
 	const handleDelete = () => {
 		if (event) {
 			onDelete(event.id);
@@ -378,6 +379,7 @@ export default function EventDialog({
 					{!isNewEvent && (
 						<Button
 							onClick={handleDelete}
+							disabled={isCancelButtonDisabled}
 							variant="contained"
 							color="secondary"
 						>

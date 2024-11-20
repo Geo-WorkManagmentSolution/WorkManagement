@@ -44,6 +44,12 @@ const navigationConfig: FuseNavItemType[] = [
             type: "item",
             url: "/apps/employees/leave-management",
           },
+          {
+            id: "applicationmanagement.employees.leave-approval",
+            title: "Leave Approval",
+            type: "item",
+            url: "/apps/employees/leave-approval",
+          }
         ],
       },
       {

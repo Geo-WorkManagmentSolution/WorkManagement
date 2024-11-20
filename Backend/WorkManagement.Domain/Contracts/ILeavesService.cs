@@ -13,7 +13,7 @@ namespace WorkManagement.Domain.Contracts
     public interface ILeavesService
     {
         public Task<List<EmployeeHoliday>> GetHolidays();
-        public Task<List<EmployeeLeave>> GetAssignedEmployeeLeaves(string LoggedInUserId);
+        public Task<List<EmployeeLeaveModel>> GetAssignedEmployeeLeaves(string LoggedInUserId);
         public Task<List<EmployeeLeaveHistoryDTO>> GetEmployeeLeaveHistory(EmployeeLeaveHistoryDataModel data, string loggedUserId);
     }
 }

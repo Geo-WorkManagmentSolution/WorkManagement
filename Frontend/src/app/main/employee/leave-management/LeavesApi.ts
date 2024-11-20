@@ -85,7 +85,7 @@ export type GetApiLeavesHolidaysApiResponse =
   /** status 200 OK */ EmployeeHoliday[];
 export type GetApiLeavesHolidaysApiArg = void;
 export type GetApiLeavesLeavesAllApiResponse =
-  /** status 200 OK */ EmployeeLeave[];
+  /** status 200 OK */ EmployeeLeaveModel[];
 export type GetApiLeavesLeavesAllApiArg = void;
 export type PostApiLeavesLeavesEmployeeLeaveHistoryApiResponse =
   /** status 200 OK */ EmployeeLeaveHistoryDto[];
@@ -99,7 +99,7 @@ export type EmployeeLeaveSummaryModel = {
   remainingLeaves?: number;
 };
 export type EmployeeLeaveModel = {
-  id?: number;
+  employeeLeaveId?: number;
   employeeId?: number;
   status?: LeaveStatus;
   description?: string | null;
@@ -108,6 +108,9 @@ export type EmployeeLeaveModel = {
   endDate?: string | null;
   leaveDays?: number;
   employeeLeaveTypeId?: number;
+  leaveType?: string | null;
+  employeeName?: string | null;
+  employeeNumber?: number;
 };
 export type EmployeeHoliday = {
   id?: number;

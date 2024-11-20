@@ -38,7 +38,7 @@ namespace WorkManagement.API.Controllers
 
         // GET api/leaves/assignedLeaves
         [HttpGet("leaves/all")]
-        public async Task<ActionResult<IEnumerable<EmployeeLeave>>> GetAllLeves()
+        public async Task<ActionResult<IEnumerable<EmployeeLeaveModel>>> GetAllLeves()
         {
             
             var leaves = await leavesService.GetAssignedEmployeeLeaves(User.FindFirst(ClaimTypes.NameIdentifier).Value);
@@ -53,7 +53,7 @@ namespace WorkManagement.API.Controllers
             return Ok(leaves);
         }
 
-
+       
 
     }
 }

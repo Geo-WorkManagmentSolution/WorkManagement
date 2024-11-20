@@ -631,15 +631,18 @@ function WorkInfoTab() {
             Leave Information
           </Typography>
         </div>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={useDefaultLeaves}
-              onChange={(e) => setUseDefaultLeaves(e.target.checked)}
-            />
-          }
-          label="Use Default Leaves"
-        />
+
+        <Controller
+        name="employeeAddresses.UseDefaultLeaves"
+        control={control}
+        render={({ field }) => (
+          <FormControlLabel
+            control={<Checkbox {...field} />}
+            label="Use Default Leaves"
+            onChange={(e) => setUseDefaultLeaves(e.target.checked)}
+          />
+        )}
+      />
         {!useDefaultLeaves && (
           <div className="space-y-4">
             {employeeLeaveTypes.map((field1, index) => (

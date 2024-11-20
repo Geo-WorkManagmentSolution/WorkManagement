@@ -1213,6 +1213,9 @@ namespace WorkManagement.EFCore.Migrations
                     b.Property<decimal>("TotalPreviousExperience")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<bool>("UseDefaultLeaves")
+                        .HasColumnType("bit");
+
                     b.HasKey("Id");
 
                     b.HasIndex("SiteId");

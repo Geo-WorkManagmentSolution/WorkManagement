@@ -234,5 +234,19 @@ namespace WorkManagement.API.Controllers
             return Ok(true);
         }
 
+        [HttpPut("approve/{leaveId}")]
+        public async Task<ActionResult<EmployeeLeave>> ApproveLeave(int leaveId)
+        {
+            var employeeLeave = await employeeService.ApproveLeave(leaveId);
+            return Ok(employeeLeave);
+        }
+
+        [HttpPut("reject/{leaveId}")]
+        public async Task<ActionResult<EmployeeLeave>> RejectLeave(int leaveId)
+        {
+            var employeeLeave = await employeeService.RejectLeave(leaveId);
+            return Ok(employeeLeave);
+        }
+
     }
 }

@@ -12,6 +12,8 @@ namespace WorkManagement.Domain.Models.Employee
     {
         public int Id { get; set; }
         public int EmployeeId { get; set; }
+
+        public int EmployeeNumber { get; set; }
         public LeaveStatus Status { get; set; }
         public string? Description { get; set; }
         public string? Reason { get; set; }
@@ -19,6 +21,8 @@ namespace WorkManagement.Domain.Models.Employee
         public DateTime? EndDate { get; set; }
         public double LeaveDays { get; set; }
         public int EmployeeLeaveTypeId { get; set; }
+        public string? LeaveType { get; set; }
+        public string? EmployeeName { get; set; }
     }
 
     public class EmployeeLeaveSummaryModel

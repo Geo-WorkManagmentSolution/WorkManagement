@@ -71,6 +71,8 @@ namespace WorkManagement.Domain.Models.Employee
         public string? HireDate { get; set; }
         public string? ConfirmationDate { get; set; }
         public decimal TotalPreviousExperience { get; set; }
+        public bool UseDefaultLeaves { get; set; }
+
     }
 
     public class EmployeeInsuranceDetailModel

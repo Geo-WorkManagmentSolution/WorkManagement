@@ -101,7 +101,6 @@ function LeaveSummary({ openDialoge, onSave, onDelete, refetchEvents, eventColor
 			{
 				accessorKey: 'description',
 				header: 'Description'
-				
 			},
 			{
 				accessorKey: 'status',
@@ -116,7 +115,12 @@ function LeaveSummary({ openDialoge, onSave, onDelete, refetchEvents, eventColor
 							variant="body1"
 							sx={{
 								textAlign: 'center',
-								backgroundColor: row.original.status === 'Approved' ? 'success.main' : 'info.main',
+								backgroundColor:
+									row.original.status === 'Approved'
+										? 'success.main'
+										: row.original.status === 'Rejected'
+											? 'red'
+											: 'info.main',
 								color:
 									row.original.status === 'Approved' ? 'success.contrastText' : 'info.contrastText',
 								padding: '2px 4px',
@@ -187,6 +191,7 @@ function LeaveSummary({ openDialoge, onSave, onDelete, refetchEvents, eventColor
 				</div>
 				<div className="w-full h-auto bg-grey-200 m-12 rounded-2xl p-6">
 					<DataTable
+						enableRowSelection={false}
 						enableMultiRemove={false}
 						data={upcomingEvents}
 						columns={columns}
@@ -254,6 +259,7 @@ function LeaveSummary({ openDialoge, onSave, onDelete, refetchEvents, eventColor
 				</div>
 				<div className="w-full h-auto bg-grey-200 m-12 rounded-2xl p-6">
 					<DataTable
+						enableRowSelection={false}
 						enableMultiRemove={false}
 						data={pastEvents}
 						columns={columns}

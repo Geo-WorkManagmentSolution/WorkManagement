@@ -92,6 +92,7 @@ export type EmployeeWorkInformationModel = {
   hireDate?: string | null;
   confirmationDate?: string | null;
   totalPreviousExperience?: number;
+  useDefaultLeaves?: boolean;
 };
 export type EmployeeInsuranceDetailModel = {
   employeeDesignationId?: number | null;

@@ -47,6 +47,9 @@ namespace WorkManagement.Domain.Contracts
         public Task<EmployeeLeaveModel> AddLeave(EmployeeLeaveModel employeeLeave, string loggedUserId);
         public Task<EmployeeLeaveModel> UpdateLeave(EmployeeLeaveModel employeeLeaveData, string loggedUserId);
         public Task CancelLeave(int employeeLeaveId, string value);
+        public Task<EmployeeLeave> ApproveLeave(int leaveId);
+        public Task<EmployeeLeave> RejectLeave(int leaveId);
+
 
         #endregion
 

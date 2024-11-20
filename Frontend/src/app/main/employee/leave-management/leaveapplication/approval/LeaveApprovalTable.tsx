@@ -3,36 +3,56 @@ import { useMemo } from 'react';
 import { type MRT_ColumnDef } from 'material-react-table';
 import DataTable from 'app/shared-components/data-table/DataTable';
 import FuseLoading from '@fuse/core/FuseLoading';
-import {ListItemIcon, MenuItem, Paper } from '@mui/material';
-import * as React from 'react';
-import _ from '@lodash';
+import { ListItemIcon, MenuItem, Paper, Typography } from '@mui/material';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
-import { Link } from 'react-router-dom';
-import Typography from '@mui/material/Typography';
-// import { EmployeeModel, useDeleteApiEmployeesByIdMutation, useGetApiEmployeesQuery } from '../EmployeeApi';
-import { EmployeeLeave,useGetApiEmployeesLeavesCurrentQuery } from '../../LeavesApi';
-import { useDeleteApiEmployeesByIdMutation, useGetApiEmployeesQuery } from '../../../EmployeeApi';
+import { format } from 'date-fns';
+import { EmployeeLeaveModel, useGetApiLeavesLeavesAllQuery } from '../../LeavesApi';
+import {
+	usePutApiEmployeesApproveByLeaveIdMutation,
+	usePutApiEmployeesRejectByLeaveIdMutation
+} from '../../../EmployeeApi';
 
 function LeaveApprovalTable() {
-	const { data: employees, isLoading,} = useGetApiEmployeesQuery();
-	const [removeEmployees] = useDeleteApiEmployeesByIdMutation();
+	const { isLoading, data: allLeaves, refetch } = useGetApiLeavesLeavesAllQuery();
+	const [leaveApprove] = usePutApiEmployeesApproveByLeaveIdMutation();
+	const [leaveReject] = usePutApiEmployeesRejectByLeaveIdMutation();
 
-	const columns = useMemo<MRT_ColumnDef<EmployeeLeave>[]>(
+	const approveLeave = async (id: number) => {
+		await leaveApprove({ leaveId: id });
+		refetch();
+	};
+
+	const rejectLeave = async (id: number) => {
+		await leaveReject({ leaveId: id });
+		refetch();
+	};
+
+	const columns = useMemo<MRT_ColumnDef<EmployeeLeaveModel>[]>(
 		() => [
+			{
+				accessorKey: 'employeeNumber',
+				header: 'Employee Number',
+				accessorFn: (row) => `${row.employeeNumber}`
+			},
+			{
+				accessorKey: 'employeeName',
+				header: 'Employee Name',
+				accessorFn: (row) => `${row.employeeName}`
+			},
 			{
 				accessorKey: 'employeeLeaveTypes',
 				header: 'Leave Type',
-				accessorFn: (row) => `${row.employeeLeaveTypes}`
+				accessorFn: (row) => `${row.leaveType}`
 			},
 			{
 				accessorKey: 'startDate',
 				header: 'Start Date',
-				accessorFn: (row) => `${row.startDate}`
+				accessorFn: (row) => format(new Date(row.startDate), 'dd/MM/yyyy')
 			},
 			{
 				accessorKey: 'endDate',
 				header: 'EndDate',
-				accessorFn: (row) => `${row.endDate}`
+				accessorFn: (row) => format(new Date(row.endDate), 'dd/MM/yyyy')
 			},
 			{
 				accessorKey: 'leaveDays',
@@ -52,7 +72,28 @@ function LeaveApprovalTable() {
 			{
 				accessorKey: 'status',
 				header: 'Status',
-				accessorFn: (row) => `${row.status}`
+				Cell: ({ row }) => {
+					return (
+						<Typography
+							variant="body1"
+							sx={{
+								textAlign: 'center',
+								backgroundColor:
+									row.original.status === 'Approved'
+										? 'success.main'
+										: row.original.status === 'Rejected'
+											? 'red'
+											: 'info.main',
+								color:
+									row.original.status === 'Approved' ? 'success.contrastText' : 'info.contrastText',
+								padding: '2px 4px',
+								borderRadius: '4px'
+							}}
+						>
+							{row.original.status}
+						</Typography>
+					);
+				}
 			}
 		],
 		[]
@@ -68,23 +109,38 @@ function LeaveApprovalTable() {
 			elevation={0}
 		>
 			<DataTable
-				enableMultiRemove= {false}
-				data={employees}
+				enableRowSelection={false}
+				data={allLeaves}
 				columns={columns}
 				renderRowActionMenuItems={({ closeMenu, row, table }) => [
-					<MenuItem
-						key={0}
-						onClick={() => {
-							removeEmployees({id:row.original.id});
-							closeMenu();
-							table.resetRowSelection();
-						}}
-					>
-						<ListItemIcon>
-							<FuseSvgIcon>heroicons-outline:trash</FuseSvgIcon>
-						</ListItemIcon>
-						Delete
-					</MenuItem>
+					<>
+						<MenuItem
+							key={0}
+							onClick={() => {
+								approveLeave(row.original.employeeLeaveId);
+								closeMenu();
+								table.resetRowSelection();
+							}}
+						>
+							<ListItemIcon>
+								<FuseSvgIcon>heroicons-outline:check</FuseSvgIcon>
+							</ListItemIcon>
+							Approve
+						</MenuItem>
+						<MenuItem
+							key={0}
+							onClick={() => {
+								rejectLeave(row.original.employeeLeaveId);
+								closeMenu();
+								table.resetRowSelection();
+							}}
+						>
+							<ListItemIcon>
+								<FuseSvgIcon>heroicons-outline:x-mark</FuseSvgIcon>
+							</ListItemIcon>
+							Reject
+						</MenuItem>
+					</>
 				]}
 			/>
 		</Paper>
