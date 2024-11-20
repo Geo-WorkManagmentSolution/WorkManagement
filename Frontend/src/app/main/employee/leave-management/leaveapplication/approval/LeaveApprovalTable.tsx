@@ -11,10 +11,11 @@ import { Link } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 // import { EmployeeModel, useDeleteApiEmployeesByIdMutation, useGetApiEmployeesQuery } from '../EmployeeApi';
 import { EmployeeLeave,useGetApiEmployeesLeavesCurrentQuery } from '../../LeavesApi';
+import { useDeleteApiEmployeesByIdMutation, useGetApiEmployeesQuery } from '../../../EmployeeApi';
 
 function LeaveApprovalTable() {
-	// const { data: employees, isLoading,} = useGetApiEmployeesQuery();
-	// const [removeEmployees] = useDeleteApiEmployeesByIdMutation();
+	const { data: employees, isLoading,} = useGetApiEmployeesQuery();
+	const [removeEmployees] = useDeleteApiEmployeesByIdMutation();
 
 	const columns = useMemo<MRT_ColumnDef<EmployeeLeave>[]>(
 		() => [

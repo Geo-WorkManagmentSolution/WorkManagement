@@ -15,6 +15,5 @@ namespace WorkManagement.Domain.Contracts
         public Task<List<EmployeeHoliday>> GetHolidays();
         public Task<List<EmployeeLeave>> GetAssignedEmployeeLeaves(string LoggedInUserId);
         public Task<List<EmployeeLeaveHistoryDTO>> GetEmployeeLeaveHistory(EmployeeLeaveHistoryDataModel data, string loggedUserId);
-
     }
 }
