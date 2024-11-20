@@ -114,8 +114,8 @@ namespace WorkManagement.Service
                     EndDate = h.EndDate,
                     EmployeeId = employeeId,
                     Description=h.Name,
-                    Name="Holiday"
-                    
+                    Name="Holiday - " + h.Name,
+
                 })
                 .ToList();
         }

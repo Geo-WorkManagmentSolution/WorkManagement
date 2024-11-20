@@ -23,7 +23,7 @@ namespace WorkManagement.Domain.Models.Employee
         public string LastName { get; set; }
         [EmailAddress]
         public string Email { get; set; }
-        public string AlternateEmail { get; set; }
+        public string? AlternateEmail { get; set; }
         public long? PhoneNumber { get; set; }
         public long? AlternateNumber { get; set; }
         public bool? IsDeleted { get; set; }
@@ -48,7 +48,7 @@ namespace WorkManagement.Domain.Models.Employee
 
     public class EmployeePersonalDetailsModel
     {
-        public string DateOfBirth { get; set; }
+        public string? DateOfBirth { get; set; }
         public string Gender { get; set; }
         public MaritalStatus? MaritalStatus { get; set; }
         public BloodGroup? bloodGroup { get; set; }
@@ -131,9 +131,9 @@ namespace WorkManagement.Domain.Models.Employee
     public class EmployeeRelationshipDetailModel
     {
         public RelationshipType? RelationshipType { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public string PhoneNumber { get; set; }
+        public string? Name { get; set; }
+        public string? Email { get; set; }
+        public string? PhoneNumber { get; set; }
     }
 
     public class EmployeeDocumentsModel

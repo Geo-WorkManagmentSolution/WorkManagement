@@ -444,7 +444,7 @@ export type Criterion = {
   nextOperator?: string | null;
 };
 export type EmployeeLeaveModel = {
-  employeeLeaveId?: number;
+  id?: number;
   employeeId?: number;
   status?: LeaveStatus;
   description?: string | null;

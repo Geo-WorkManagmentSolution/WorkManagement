@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Azure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WorkManagement.Domain.Contracts;
@@ -130,7 +129,7 @@ namespace WorkManagement.Service
             else
             {
                 var existingEmployee = _dbContext.Employees.FirstOrDefault(s => s.Id == employeeId.Value);
-                if(existingEmployee != null)
+                if (existingEmployee != null)
                 {
                     if (departmentId == null || departmentId == 0)
                     {
@@ -159,7 +158,7 @@ namespace WorkManagement.Service
                 {
                     return new List<EmployeeReportToModel>();
                 }
-                
+
             }
 
         }
@@ -538,7 +537,7 @@ namespace WorkManagement.Service
                     if (employee.EmployeeAddresses != null)
                     {
                         var employeeAddressData = new EmployeeAddress();
-                        if(employee.EmployeeAddresses.UserAddress != null)
+                        if (employee.EmployeeAddresses.UserAddress != null)
                         {
                             employeeAddressData.UserAddressLine1 = employee.EmployeeAddresses.UserAddress.AddressLine1;
                             employeeAddressData.UserAddressLine2 = employee.EmployeeAddresses.UserAddress.AddressLine2;
@@ -624,17 +623,21 @@ namespace WorkManagement.Service
                                              TotalLeaves = ed.TotalLeaves,
                                              RemainingLeaves = ed.TotalLeaves
                                          }).ToList();
-
-                    if(defaultLeaves.Any())
+                    newEmployee.EmployeeLeaves = new List<EmployeeLeaveSummary>();
+                    if (defaultLeaves.Any())
                     {
-                        var employeeLeave = new EmployeeLeaveSummary();
+                        foreach (var leave in defaultLeaves)
+                        {
+                            var employeeLeave = new EmployeeLeaveSummary();
 
-                        employeeLeave.EmployeeLeaveTypeId = defaultLeaves[0].Id;
-                        employeeLeave.RemainingLeaves = defaultLeaves[0].RemainingLeaves;
-                        employeeLeave.TotalLeaves = defaultLeaves[0].TotalLeaves;
+                            employeeLeave.EmployeeLeaveTypeId = leave.Id;
+                            employeeLeave.RemainingLeaves = leave.RemainingLeaves;
+                            employeeLeave.TotalLeaves = leave.TotalLeaves;
 
-                        newEmployee.EmployeeLeaves.Add(employeeLeave);
-                        
+                            newEmployee.EmployeeLeaves.Add(employeeLeave);
+                        }
+
+
                     }
 
 
@@ -786,7 +789,7 @@ namespace WorkManagement.Service
                         var employeeAddressData = _dbContext.EmployeeAddresses.FirstOrDefault(s => s.Id == employeeData.EmployeeAddressesId.Value);
                         if (employeeAddressData != null)
                         {
-                            if(employee.EmployeeAddresses.UserAddress != null)
+                            if (employee.EmployeeAddresses.UserAddress != null)
                             {
                                 employeeAddressData.UserAddressLine1 = employee.EmployeeAddresses.UserAddress.AddressLine1;
                                 employeeAddressData.UserAddressLine2 = employee.EmployeeAddresses.UserAddress.AddressLine2;
@@ -919,14 +922,15 @@ namespace WorkManagement.Service
                 var employee = await _dbContext.Employees.FindAsync(id);
                 if (employee == null)
                     return false;
-               
-                var employeeReportTo = _dbContext.Employees.Where(s=>s.EmployeeReportToId == id).ToList();
+
+                var employeeReportTo = _dbContext.Employees.Where(s => s.EmployeeReportToId == id).ToList();
+                var employeeEmail = employee.Email;
                 if (employeeReportTo.Any())
                 {
                     foreach (var e in employeeReportTo)
                     {
                         e.EmployeeReportToId = null;
-                        _dbContext.Employees.Update(e);                       
+                        _dbContext.Employees.Update(e);
                     }
 
                     _dbContext.SaveChanges();
@@ -935,9 +939,9 @@ namespace WorkManagement.Service
 
 
                 var employeeEducation = _dbContext.EmployeeEducationDetails.Where(e => e.EmployeeId == id).ToList();
-                if(employeeEducation.Any())
+                if (employeeEducation.Any())
                 {
-                    foreach(var e in employeeEducation)
+                    foreach (var e in employeeEducation)
                     {
                         _dbContext.EmployeeEducationDetails.Remove(e);
                     }
@@ -963,13 +967,20 @@ namespace WorkManagement.Service
 
                 _dbContext.Employees.Remove(employee);
                 await _dbContext.SaveChangesAsync();
+
+                var user = await userManager.FindByEmailAsync(employeeEmail);
+                if (user != null)
+                {
+                    await userManager.DeleteAsync(user);
+                }
+
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return false;
             }
-            
+
         }
 
         #region Leave management
@@ -979,10 +990,10 @@ namespace WorkManagement.Service
             try
             {
                 var employeeId = CheckValidEmployeeId(loggedUserId);
-                if (employeeId == -1)
+                /*if (employeeId == -1)
                 {
                     throw new Exception("Invalid User data");
-                }
+                }*/
 
 
                 //var defaultLeaves = await _dbContext.EmployeeDefaultLeave.Include(x => x.EmployeeLeaveTypes).ToListAsync();
@@ -1037,7 +1048,7 @@ namespace WorkManagement.Service
                 }
 
                 var leaveSummary = await _dbContext.EmployeeLeaveSummary.FirstAsync(x => x.EmployeeId == employeeId && x.EmployeeLeaveTypeId == employeeLeaveData.EmployeeLeaveTypeId);
-                leaveSummary.RemainingLeaves = leaveSummary.RemainingLeaves - employeeLeaveData.LeaveDays;
+                leaveSummary.RemainingLeaves -= employeeLeaveData.LeaveDays;
 
                 if (leaveSummary.RemainingLeaves <= 0)
                 {
@@ -1065,6 +1076,27 @@ namespace WorkManagement.Service
 
                 _dbContext.SaveChanges();
 
+                var employee = await _dbContext.Employees.FirstAsync(s => s.Id == employeeId);
+                if (employee.EmployeeReportToId.HasValue)
+                {
+                    var employeeLeaveType = await _dbContext.EmployeeLeaveType.FirstAsync(s => s.Id == employeeLeaveData.EmployeeLeaveTypeId);
+                    var reportToEmployee = await _dbContext.Employees.FirstAsync(s => s.Id == employee.EmployeeReportToId.Value);
+                    var pendingRequestEmailModel = new LeaveEmailModel();
+                    pendingRequestEmailModel.LeaveEmailType = "Pending Request";
+                    pendingRequestEmailModel.EmployeeName = employee.FirstName + " " + employee.LastName;
+                    pendingRequestEmailModel.ApprovalStatus = "Pending";
+                    pendingRequestEmailModel.RequestType = (employeeLeaveType == null) ? "" : employeeLeaveType.Name;
+                    pendingRequestEmailModel.ManagerName = reportToEmployee.FirstName;
+                    pendingRequestEmailModel.TotalDays = (int)employeeLeaveData.LeaveDays;
+                    pendingRequestEmailModel.Reason = string.IsNullOrEmpty(employeeLeaveData.Reason) ? "" : employeeLeaveData.Reason;
+                    pendingRequestEmailModel.StartDate = employeeLeaveData.StartDate.HasValue ? employeeLeaveData.StartDate.Value : DateTime.Now;
+                    pendingRequestEmailModel.EndDate = employeeLeaveData.EndDate.HasValue ? employeeLeaveData.EndDate.Value : DateTime.Now;
+
+                   
+
+                    SendPendingRequestEmailToManager(reportToEmployee.Email, pendingRequestEmailModel);
+                }
+
                 return employeeLeaveData;
             }
             catch (Exception ex)
@@ -1091,20 +1123,20 @@ namespace WorkManagement.Service
 
                 employeeLeaveData.EmployeeId = employeeId;
 
-                var leaveSummary = await _dbContext.EmployeeLeaveSummary.FirstAsync(x => x.EmployeeId == employeeId && x.EmployeeLeaveTypeId == employeeLeaveData.EmployeeLeaveTypeId);
-                leaveSummary.RemainingLeaves = leaveSummary.RemainingLeaves - employeeLeaveData.LeaveDays;
+                //var leaveSummary = await _dbContext.EmployeeLeaveSummary.FirstAsync(x => x.EmployeeId == employeeId && x.EmployeeLeaveTypeId == employeeLeaveData.EmployeeLeaveTypeId);
+                //leaveSummary.RemainingLeaves = leaveSummary.RemainingLeaves - employeeLeaveData.LeaveDays;
 
-                if (leaveSummary.RemainingLeaves <= 0)
-                {
-                    return employeeLeaveData;
-                    throw new Exception("Applied leavs are more than available leave for employee. Can not add more leaves");
-                }
-                else
-                {
-                    _dbContext.EmployeeLeaveSummary.Update(leaveSummary);
-                }
+                //if (leaveSummary.RemainingLeaves <= 0)
+                //{
+                //    return employeeLeaveData;
+                //    throw new Exception("Applied leavs are more than available leave for employee. Can not add more leaves");
+                //}
+                //else
+                //{
+                //    _dbContext.EmployeeLeaveSummary.Update(leaveSummary);
+                //}
 
-                var employeeLeave = _dbContext.EmployeeLeaves.FirstOrDefault(x => x.Id == employeeLeaveData.EmployeeLeaveId);
+                var employeeLeave = _dbContext.EmployeeLeaves.FirstOrDefault(x => x.Id == employeeLeaveData.Id);
 
                 if (employeeLeave != null)
                 {
@@ -1149,6 +1181,13 @@ namespace WorkManagement.Service
                 var leaveSummary = await _dbContext.EmployeeLeaveSummary.FirstAsync(x => x.EmployeeId == employeeId && x.EmployeeLeaveTypeId == employeeLeave.EmployeeLeaveTypeId);
                 leaveSummary.RemainingLeaves += employeeLeave.LeaveDays;
 
+                var defaultLeaves = await _dbContext.EmployeeDefaultLeave.FirstAsync(x => x.EmployeeLeaveTypeId == employeeLeave.EmployeeLeaveTypeId);
+
+                if (leaveSummary.RemainingLeaves > defaultLeaves.TotalLeaves)
+                {
+                    leaveSummary.RemainingLeaves = defaultLeaves.TotalLeaves;
+                }
+
                 _dbContext.EmployeeLeaves.Remove(employeeLeave);
                 _dbContext.EmployeeLeaveSummary.Update(leaveSummary);
 
@@ -1170,7 +1209,7 @@ namespace WorkManagement.Service
 
         #region Private methods
 
-        private async Task SendEmail(ApplicationUser user,string password)
+        private async Task SendEmail(ApplicationUser user, string password)
         {
             var WelcomeModelCredentials = new WelcomeModel();
             WelcomeModelCredentials.Username = user.UserName;
@@ -1182,6 +1221,17 @@ namespace WorkManagement.Service
             emailModel.Subject = "Welcome to Geo!";
             emailModel.repModel = WelcomeModelCredentials;
             _emailService.SendWelcomeMail(emailModel);
+        }
+
+        private async Task SendPendingRequestEmailToManager(string userEmail, LeaveEmailModel pendingRequestEmailModel)
+        {
+
+            var emailModel = new EmailModel<LeaveEmailModel>();
+            emailModel.From = "naupul30@gmail.com";
+            emailModel.To = userEmail;
+            emailModel.Subject = $"Leave request from: {pendingRequestEmailModel.EmployeeName}";
+            emailModel.repModel = pendingRequestEmailModel;
+            _emailService.SendLeaveEmail(emailModel);
         }
 
         private int CheckValidEmployeeId(string loggedUserId)

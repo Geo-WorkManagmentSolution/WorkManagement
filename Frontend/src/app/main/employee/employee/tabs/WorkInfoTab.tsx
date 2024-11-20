@@ -67,10 +67,15 @@ function WorkInfoTab() {
     useGetApiEmployeesDesignationsQuery();
 
   const { data: employeesReportToOptions = [] } =
-    useGetApiEmployeesReportToEmployeeListQuery({
-      departmentId: departmentId,
-      employeeId: employeeId,
-    });
+    useGetApiEmployeesReportToEmployeeListQuery(
+      {
+        departmentId: departmentId,
+        employeeId: employeeId,
+      },
+      {
+        skip: !employeeId || employeeId === "new",
+      }
+    );
 
   const [AddSite] = usePostApiEmployeesAddNewSiteMutation();
   const [AddDesignation] = usePostApiEmployeesAddNewDesignationMutation();

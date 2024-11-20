@@ -31,14 +31,6 @@ namespace WorkManagement.Service
                     DeliveryMethod = SmtpDeliveryMethod.Network
                 });
 
-
-                /*var email = await Email
-                            .From("your_email@gmail.com")
-                            .To("new_employee@example.com")
-                            .Subject("Welcome to Our Company!")
-                            .UsingTemplateFromFile("Welcome_EmailTemplate.cshtml", emailModel.repModel)
-                            .SendAsync();*/
-
                 Email.DefaultSender = sender;
                 Email.DefaultRenderer = new RazorRenderer();
 
@@ -49,6 +41,53 @@ namespace WorkManagement.Service
                             .UsingTemplateFromFile(@"EmailTemplate\Welcome_EmailTemplate.cshtml", emailModel.repModel)
                             .SendAsync();
                 Log.Information("Email sent successfully.");
+            }
+            catch (Exception ex)
+            {
+                Log.Information(ex.Message);
+            }
+
+        }
+
+        public async Task SendLeaveEmail(EmailModel<LeaveEmailModel> emailModel)
+        {
+            try
+            {
+                var sender = new SmtpSender(() => new SmtpClient("smtp.gmail.com")
+                {
+                    UseDefaultCredentials = false,
+                    Port = _smtpsettings.Value.Port,
+                    Credentials = new NetworkCredential(_smtpsettings.Value.Sender, _smtpsettings.Value.Password),
+                    EnableSsl = true,
+                    DeliveryMethod = SmtpDeliveryMethod.Network
+                });
+
+                Email.DefaultSender = sender;
+                Email.DefaultRenderer = new RazorRenderer();
+
+                if(emailModel.repModel.LeaveEmailType == "Approval")
+                {
+                    var email = await Email
+                            .From(emailModel.From)
+                            .To(emailModel.To)
+                            .Subject(emailModel.Subject)
+                            .UsingTemplateFromFile(@"EmailTemplate\LeaveApproval_EmailTemplate.cshtml", emailModel.repModel)
+                            .SendAsync();
+                    Log.Information("Leave approval email sent successfully.");
+                }
+
+                if(emailModel.repModel.LeaveEmailType == "Pending Request")
+                {
+                    var email = await Email
+                            .From(emailModel.From)
+                            .To(emailModel.To)
+                            .Subject(emailModel.Subject)
+                            .UsingTemplateFromFile(@"EmailTemplate\LeavePendingRequest_EmailTemplate.cshtml", emailModel.repModel)
+                            .SendAsync();
+                    Log.Information("Leave approval email sent successfully.");
+                }
+
+
             }
             catch (Exception ex)
             {

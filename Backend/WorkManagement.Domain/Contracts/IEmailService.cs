@@ -11,5 +11,6 @@ namespace WorkManagement.Domain.Contracts
     public interface IEmailService
     {
         public Task SendWelcomeMail(EmailModel<WelcomeModel> emailModel);
+        public Task SendLeaveEmail(EmailModel<LeaveEmailModel> emailModel);
     }
 }

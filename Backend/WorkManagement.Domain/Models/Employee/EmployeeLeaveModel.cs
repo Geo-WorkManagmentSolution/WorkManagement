@@ -10,7 +10,7 @@ namespace WorkManagement.Domain.Models.Employee
 {
     public class EmployeeLeaveModel
     {
-        public int EmployeeLeaveId { get; set; }
+        public int Id { get; set; }
         public int EmployeeId { get; set; }
         public LeaveStatus Status { get; set; }
         public string? Description { get; set; }

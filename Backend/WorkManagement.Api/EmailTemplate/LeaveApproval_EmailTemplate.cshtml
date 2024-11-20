@@ -1,0 +1,57 @@
+﻿@using WorkManagement.Domain.Models.Email
+@model LeaveEmailModel 
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Leave Approval</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        .container {
+            margin: 20px;
+        }
+
+        .header {
+            background-color: #f8f8f8;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .content {
+            margin-top: 20px;
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="container"> <div class="header"> 
+        <h1>Leave Approval Notification</h1> 
+        </div> 
+        <div class="content"> 
+            <p>Dear @Model.EmployeeName,</p> 
+            <p>Your leave request has been <strong>@Model.ApprovalStatus</strong>.</p> 
+            <p>Details of your leave request are as follows:</p> 
+            <ul> 
+                <li><strong>Start Date:</strong> @Model.StartDate.ToString("MMMM dd, yyyy")</li> 
+                <li><strong>End Date:</strong> @Model.EndDate.ToString("MMMM dd, yyyy")</li> 
+                <li><strong>Reason:</strong> @Model.Reason</li> 
+            </ul> 
+            <p>If you have any questions, please contact HR.</p> 
+        </div> 
+        <div class="footer"> 
+            <p>Best regards,</p> 
+            <p>Your Company Name</p> 
+        </div> 
+    </div>
+</body>
+</html>
