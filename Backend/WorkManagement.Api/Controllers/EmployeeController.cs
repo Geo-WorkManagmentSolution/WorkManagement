@@ -237,8 +237,14 @@ namespace WorkManagement.API.Controllers
         [HttpPut("approve/{leaveId}")]
         public async Task<ActionResult<EmployeeLeave>> ApproveLeave(int leaveId)
         {
-            var employeeLeave = await employeeService.ApproveLeave(leaveId);
-            return Ok(employeeLeave);
+            try
+            {
+                var employeeLeave = await employeeService.ApproveLeave(leaveId);
+                return Ok(employeeLeave);
+            }
+            catch(Exception e) {
+                return BadRequest(new { message = e.Message });
+            }
         }
 
         [HttpPut("reject/{leaveId}")]

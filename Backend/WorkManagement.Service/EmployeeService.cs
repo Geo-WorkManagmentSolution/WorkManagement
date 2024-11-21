@@ -1223,28 +1223,40 @@ namespace WorkManagement.Service
 
             if (employeeLeave != null)
             {
-                employeeLeave.Status = LeaveStatus.Approved;
-                await _dbContext.SaveChangesAsync();
+                if (employeeLeave.Status == LeaveStatus.Approved) {
+                    return employeeLeave;
+                }
 
-                //    var emailModel = new EmailModel<LeaveApprovalModel>
-                //    {
-                //        From = "hr@company.com",
-                //        To = employeeLeave.employee.Email,
-                //        Subject = "Leave Approval Notification",
-                //        repModel = new LeaveApprovalModel
-                //        {
-                //            EmployeeName = $"{employeeLeave.employee.FirstName} {employeeLeave.employee.LastName}",
-                //            StartDate = employeeLeave.StartDate,
-                //            EndDate = employeeLeave.EndDate,
-                //            LeaveType = employeeLeave.EmployeeLeaveTypes.Name
-                //        }
-                //    };
+                if (employeeLeave.Status == LeaveStatus.Pending)
+                {
+                    employeeLeave.Status = LeaveStatus.Approved;
+                    await _dbContext.SaveChangesAsync();
 
-                //    await _emailService.SendLeaveApprovalEmail(emailModel);
-                //}
+                    var emailModel = new EmailModel<LeaveEmailModel>
+                    {
+                        From = "hr@company.com",
+                        To = employeeLeave.employee.Email,
+                        Subject = "Leave Approval Notification",
+                        repModel = new LeaveEmailModel
+                        {
+                            LeaveEmailType = "Approval",
+                            EmployeeName = $"{employeeLeave.employee.FirstName} {employeeLeave.employee.LastName}",
+                            ApprovalStatus = "Approved",
+                            StartDate = employeeLeave.StartDate,
+                            EndDate = employeeLeave.EndDate,
+                            TotalDays = (int)employeeLeave.LeaveDays,
+                            Reason = employeeLeave.Reason,
+                            RequestType = employeeLeave.EmployeeLeaveTypes.Name
+                        }
+                    };
+
+                    await _emailService.SendLeaveEmail(emailModel);
+                }
+                else {
+                    throw new Exception("Cannot Approve Rejected Leave");
+                }
             }
             return employeeLeave;
-
         }
         public async Task<EmployeeLeave> RejectLeave(int leaveId)
         {
@@ -1264,21 +1276,25 @@ namespace WorkManagement.Service
 
                 await _dbContext.SaveChangesAsync();
 
-                //var emailModel = new EmailModel<LeaveRejectionModel>
-                //{
-                //    From = "hr@company.com",
-                //    To = employeeLeave.employee.Email,
-                //    Subject = "Leave Rejection Notification",
-                //    repModel = new LeaveRejectionModel
-                //    {
-                //        EmployeeName = $"{employeeLeave.employee.FirstName} {employeeLeave.employee.LastName}",
-                //        StartDate = employeeLeave.StartDate,
-                //        EndDate = employeeLeave.EndDate,
-                //        LeaveType = employeeLeave.EmployeeLeaveTypes.Name
-                //    }
-                //};
+                var emailModel = new EmailModel<LeaveEmailModel>
+                {
+                    From = "hr@company.com",
+                    To = employeeLeave.employee.Email,
+                    Subject = "Leave Rejection Notification",
+                    repModel = new LeaveEmailModel
+                    {
+                        LeaveEmailType = "Approval",
+                        EmployeeName = $"{employeeLeave.employee.FirstName} {employeeLeave.employee.LastName}",
+                        ApprovalStatus = "Rejected",
+                        StartDate = employeeLeave.StartDate,
+                        EndDate = employeeLeave.EndDate,
+                        TotalDays = (int)employeeLeave.LeaveDays,
+                        Reason = employeeLeave.Reason,
+                        RequestType = employeeLeave.EmployeeLeaveTypes.Name
+                    }
+                };
 
-                //await _emailService.SendLeaveRejectionEmail(emailModel);
+                await _emailService.SendLeaveEmail(emailModel);
             }
             return employeeLeave;
         }
@@ -1368,49 +1384,6 @@ namespace WorkManagement.Service
 
             return (true, string.Empty);
         }
-        //public async Task<EmployeeLeave> ApproveLeave(int leaveId)
-        //{
-        //    var employeeLeave = await _dbContext.EmployeeLeaves.FindAsync(leaveId);
-        //    if (employeeLeave != null)
-        //    {
-        //        employeeLeave.Status = LeaveStatus.Approved;
-        //        await _dbContext.SaveChangesAsync();
-        //    }
-        //    return employeeLeave;
-        //}
-
-
-
-
-        
-
-
-
-
-
-
-
-
-
-
-
-        //public async Task<EmployeeLeave> RejectLeave(int leaveId)
-        //{
-        //    var employeeLeave = await _dbContext.EmployeeLeaves.FindAsync(leaveId);
-        //    if (employeeLeave != null)
-        //    {
-        //        employeeLeave.Status = LeaveStatus.Rejected;
-        //        var leaveSummary = await _dbContext.EmployeeLeaveSummary.FirstAsync(x => x.EmployeeId == employeeLeave.EmployeeId && x.EmployeeLeaveTypeId == employeeLeave.EmployeeLeaveTypeId);
-        //        leaveSummary.RemainingLeaves += employeeLeave.LeaveDays;
-        //        _dbContext.EmployeeLeaves.Remove(employeeLeave);
-        //        _dbContext.EmployeeLeaveSummary.Update(leaveSummary);
-
-        //        await _dbContext.SaveChangesAsync();
-        //    }
-        //    return employeeLeave;
-        //}
-        
-
 
     }
 }

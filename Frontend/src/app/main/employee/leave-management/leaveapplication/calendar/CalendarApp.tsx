@@ -213,8 +213,6 @@ export default function CalendarApp() {
 	}, []);
 
 	const handleSaveEvent = async (data: EmployeeLeaveModel) => {
-		
-
 		try {
 			const newStartDate = parseISO(data.startDate);
 			const newEndDate = parseISO(data.endDate);
@@ -271,7 +269,6 @@ export default function CalendarApp() {
 				leaveDays: data.leaveDays,
 				employeeLeaveTypeId: data.employeeLeaveTypeId
 			};
-			
 
 			if (isNewEvent) {
 				await addLeaveApi({ employeeLeaveModel }).unwrap();
@@ -452,7 +449,11 @@ export default function CalendarApp() {
 	const eventSource: EventSourceFunc = useCallback(
 		(fetchInfo, successCallback) => {
 			const relevantEvents = calendarEvents.filter(
-				(event) => new Date(event.start) >= fetchInfo.start && new Date(event.end) <= fetchInfo.end
+				(event) =>
+					new Date(event.start) >= fetchInfo.start &&
+					new Date(event.end) <= fetchInfo.end
+          //  &&
+					// event.extendedProps.status !== 'Rejected'
 			);
 			successCallback(relevantEvents);
 		},

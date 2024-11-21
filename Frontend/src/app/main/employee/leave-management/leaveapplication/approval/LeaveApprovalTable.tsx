@@ -1,12 +1,12 @@
 /* eslint-disable react/no-unstable-nested-components */
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { type MRT_ColumnDef } from 'material-react-table';
 import DataTable from 'app/shared-components/data-table/DataTable';
 import FuseLoading from '@fuse/core/FuseLoading';
 import { ListItemIcon, MenuItem, Paper, Typography } from '@mui/material';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { format } from 'date-fns';
-import { EmployeeLeaveModel, useGetApiLeavesLeavesAllQuery } from '../../LeavesApi';
+import { EmployeeLeaveModel, LeaveStatus, useGetApiLeavesLeavesAllQuery } from '../../LeavesApi';
 import {
 	usePutApiEmployeesApproveByLeaveIdMutation,
 	usePutApiEmployeesRejectByLeaveIdMutation
@@ -14,13 +14,12 @@ import {
 
 function LeaveApprovalTable() {
 	const { isLoading, data: allLeaves, refetch } = useGetApiLeavesLeavesAllQuery();
-	const [leaveApprove] = usePutApiEmployeesApproveByLeaveIdMutation();
-	const [leaveReject] = usePutApiEmployeesRejectByLeaveIdMutation();
+	const [leaveApprove, { isLoading:approveLoading}] = usePutApiEmployeesApproveByLeaveIdMutation();
+	const [leaveReject,{ isLoading:rejectLoading}] = usePutApiEmployeesRejectByLeaveIdMutation();
+	
 
 	const approveLeave = async (id: number) => {
-		console.log(id);
-		
-		await leaveApprove({ leaveId: id });
+		 await leaveApprove({ leaveId: id })
 		refetch();
 	};
 
@@ -81,13 +80,16 @@ function LeaveApprovalTable() {
 							sx={{
 								textAlign: 'center',
 								backgroundColor:
-									row.original.status === 'Approved'
+									// eslint-disable-next-line no-nested-ternary
+									row.original.status === LeaveStatus.Approved
 										? 'success.main'
-										: row.original.status === 'Rejected'
+										: row.original.status === LeaveStatus.Rejected
 											? 'red'
 											: 'info.main',
 								color:
-									row.original.status === 'Approved' ? 'success.contrastText' : 'info.contrastText',
+									row.original.status === LeaveStatus.Approved
+										? 'success.contrastText'
+										: 'info.contrastText',
 								padding: '2px 4px',
 								borderRadius: '4px'
 							}}
@@ -101,7 +103,7 @@ function LeaveApprovalTable() {
 		[]
 	);
 
-	if (isLoading) {
+	if (isLoading || approveLoading || rejectLoading) {
 		return <FuseLoading />;
 	}
 
@@ -110,39 +112,44 @@ function LeaveApprovalTable() {
 			className="flex flex-col flex-auto shadow-1 rounded-t-lg overflow-hidden rounded-b-0 w-full h-full"
 			elevation={0}
 		>
+		
 			<DataTable
 				enableRowSelection={false}
 				data={allLeaves}
 				columns={columns}
 				renderRowActionMenuItems={({ closeMenu, row, table }) => [
-					<>
-						<MenuItem
-							key={0}
-							onClick={() => {
-								approveLeave(row.original.id);
-								closeMenu();
-								table.resetRowSelection();
-							}}
-						>
-							<ListItemIcon>
-								<FuseSvgIcon>heroicons-outline:check</FuseSvgIcon>
-							</ListItemIcon>
-							Approve
-						</MenuItem>
-						<MenuItem
-							key={0}
-							onClick={() => {
-								rejectLeave(row.original.id);
-								closeMenu();
-								table.resetRowSelection();
-							}}
-						>
-							<ListItemIcon>
-								<FuseSvgIcon>heroicons-outline:x-mark</FuseSvgIcon>
-							</ListItemIcon>
-							Reject
-						</MenuItem>
-					</>
+					<MenuItem
+					disabled={row.original.status === LeaveStatus.Rejected}
+						key={`approve-${row.original.id}`}
+						onClick={() => {
+							approveLeave(row.original.id);
+							closeMenu();
+							table.resetRowSelection();
+						}}
+					>
+						{' '}
+						<ListItemIcon>
+							{' '}
+							<FuseSvgIcon>heroicons-outline:check</FuseSvgIcon>{' '}
+						</ListItemIcon>{' '}
+						Approve{' '}
+					</MenuItem>,
+					<MenuItem
+						key={`reject-${row.original.id}`}
+						disabled={row.original.status === LeaveStatus.Rejected}
+						onClick={() => {
+							rejectLeave(row.original.id);
+							closeMenu();
+							table.resetRowSelection();
+						}}
+					>
+						{' '}
+						<ListItemIcon>
+							{' '}
+							<FuseSvgIcon>heroicons-outline:x-mark</FuseSvgIcon>{' '}
+						</ListItemIcon>{' '}
+						Reject{' '}
+					</MenuItem>
 				]}
 			/>
 		</Paper>
