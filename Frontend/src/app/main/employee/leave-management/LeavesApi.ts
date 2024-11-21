@@ -99,8 +99,9 @@ export type EmployeeLeaveSummaryModel = {
   remainingLeaves?: number;
 };
 export type EmployeeLeaveModel = {
-  employeeLeaveId?: number;
+  id?: number;
   employeeId?: number;
+  employeeNumber?: number;
   status?: LeaveStatus;
   description?: string | null;
   reason?: string | null;
@@ -110,7 +111,6 @@ export type EmployeeLeaveModel = {
   employeeLeaveTypeId?: number;
   leaveType?: string | null;
   employeeName?: string | null;
-  employeeNumber?: number;
 };
 export type EmployeeHoliday = {
   id?: number;
@@ -119,18 +119,6 @@ export type EmployeeHoliday = {
   isFloater?: boolean;
   startDate?: string;
   endDate?: string;
-};
-export type EmployeeLeave = {
-  id?: number;
-  isDeleted?: boolean;
-  employeeId?: number;
-  status?: LeaveStatus;
-  description?: string | null;
-  reason?: string | null;
-  startDate?: string;
-  endDate?: string;
-  leaveDays?: number;
-  employeeLeaveTypeId?: number;
 };
 export type EmployeeLeaveHistoryDto = {
   employeeId?: number;

@@ -33,7 +33,7 @@ namespace WorkManagement.Domain.AutoMapper.Profiles
                                 .ForMember(dest => dest.EmployeeLeaveType, src => src.MapFrom(x => x.EmployeeLeaveTypes.Name));
 
             CreateMap<EmployeeLeave, EmployeeLeaveModel>()
-              .ForMember(dest => dest.EmployeeLeaveId, opt => opt.MapFrom(src => src.Id))
+              .ForMember(dest => dest.EmployeeLeaveTypeId, opt => opt.MapFrom(src => src.Id))
               .ForMember(dest => dest.LeaveType, opt => opt.MapFrom(src => src.EmployeeLeaveTypes != null ? src.EmployeeLeaveTypes.Name : null));
 
 

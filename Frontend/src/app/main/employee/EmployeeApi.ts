@@ -475,6 +475,7 @@ export type Criterion = {
 export type EmployeeLeaveModel = {
   id?: number;
   employeeId?: number;
+  employeeNumber?: number;
   status?: LeaveStatus;
   description?: string | null;
   reason?: string | null;
@@ -484,7 +485,6 @@ export type EmployeeLeaveModel = {
   employeeLeaveTypeId?: number;
   leaveType?: string | null;
   employeeName?: string | null;
-  employeeNumber?: number;
 };
 export type EmployeeLeave = {
   id?: number;

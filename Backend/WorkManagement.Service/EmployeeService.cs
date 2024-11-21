@@ -1058,6 +1058,7 @@ namespace WorkManagement.Service
                 }
 
                
+              var leaveSummary = await _dbContext.EmployeeLeaveSummary.FirstAsync(x => x.EmployeeId == employeeId && x.EmployeeLeaveTypeId == employeeLeaveData.EmployeeLeaveTypeId);
 
                 if (leaveSummary.RemainingLeaves <= 0)
                 {
@@ -1213,6 +1214,74 @@ namespace WorkManagement.Service
             }
         }
 
+        public async Task<EmployeeLeave> ApproveLeave(int leaveId)
+        {
+            var employeeLeave = await _dbContext.EmployeeLeaves
+                .Include(l => l.employee)
+                .Include(l => l.EmployeeLeaveTypes)
+                .FirstOrDefaultAsync(l => l.Id == leaveId);
+
+            if (employeeLeave != null)
+            {
+                employeeLeave.Status = LeaveStatus.Approved;
+                await _dbContext.SaveChangesAsync();
+
+                //    var emailModel = new EmailModel<LeaveApprovalModel>
+                //    {
+                //        From = "hr@company.com",
+                //        To = employeeLeave.employee.Email,
+                //        Subject = "Leave Approval Notification",
+                //        repModel = new LeaveApprovalModel
+                //        {
+                //            EmployeeName = $"{employeeLeave.employee.FirstName} {employeeLeave.employee.LastName}",
+                //            StartDate = employeeLeave.StartDate,
+                //            EndDate = employeeLeave.EndDate,
+                //            LeaveType = employeeLeave.EmployeeLeaveTypes.Name
+                //        }
+                //    };
+
+                //    await _emailService.SendLeaveApprovalEmail(emailModel);
+                //}
+            }
+            return employeeLeave;
+
+        }
+        public async Task<EmployeeLeave> RejectLeave(int leaveId)
+        {
+            var employeeLeave = await _dbContext.EmployeeLeaves
+                .Include(l => l.employee)
+                .Include(l => l.EmployeeLeaveTypes)
+                .FirstOrDefaultAsync(l => l.Id == leaveId);
+
+            if (employeeLeave != null)
+            {
+                employeeLeave.Status = LeaveStatus.Rejected;
+                var leaveSummary = await _dbContext.EmployeeLeaveSummary
+                    .FirstAsync(x => x.EmployeeId == employeeLeave.EmployeeId && x.EmployeeLeaveTypeId == employeeLeave.EmployeeLeaveTypeId);
+                leaveSummary.RemainingLeaves += employeeLeave.LeaveDays;
+                _dbContext.EmployeeLeaves.Update(employeeLeave);
+                _dbContext.EmployeeLeaveSummary.Update(leaveSummary);
+
+                await _dbContext.SaveChangesAsync();
+
+                //var emailModel = new EmailModel<LeaveRejectionModel>
+                //{
+                //    From = "hr@company.com",
+                //    To = employeeLeave.employee.Email,
+                //    Subject = "Leave Rejection Notification",
+                //    repModel = new LeaveRejectionModel
+                //    {
+                //        EmployeeName = $"{employeeLeave.employee.FirstName} {employeeLeave.employee.LastName}",
+                //        StartDate = employeeLeave.StartDate,
+                //        EndDate = employeeLeave.EndDate,
+                //        LeaveType = employeeLeave.EmployeeLeaveTypes.Name
+                //    }
+                //};
+
+                //await _emailService.SendLeaveRejectionEmail(emailModel);
+            }
+            return employeeLeave;
+        }
 
         #endregion
 
@@ -1313,36 +1382,7 @@ namespace WorkManagement.Service
 
 
 
-        public async Task<EmployeeLeave> ApproveLeave(int leaveId)
-        {
-            var employeeLeave = await _dbContext.EmployeeLeaves
-                .Include(l => l.employee)
-                .Include(l => l.EmployeeLeaveTypes)
-                .FirstOrDefaultAsync(l => l.Id == leaveId);
-
-            if (employeeLeave != null)
-            {
-                employeeLeave.Status = LeaveStatus.Approved;
-                await _dbContext.SaveChangesAsync();
-
-                var emailModel = new EmailModel<LeaveApprovalModel>
-                {
-                    From = "hr@company.com",
-                    To = employeeLeave.employee.Email,
-                    Subject = "Leave Approval Notification",
-                    repModel = new LeaveApprovalModel
-                    {
-                        EmployeeName = $"{employeeLeave.employee.FirstName} {employeeLeave.employee.LastName}",
-                        StartDate = employeeLeave.StartDate,
-                        EndDate = employeeLeave.EndDate,
-                        LeaveType = employeeLeave.EmployeeLeaveTypes.Name
-                    }
-                };
-
-                await _emailService.SendLeaveApprovalEmail(emailModel);
-            }
-            return employeeLeave;
-        }
+        
 
 
 
@@ -1369,42 +1409,7 @@ namespace WorkManagement.Service
         //    }
         //    return employeeLeave;
         //}
-        public async Task<EmployeeLeave> RejectLeave(int leaveId)
-        {
-            var employeeLeave = await _dbContext.EmployeeLeaves
-                .Include(l => l.employee)
-                .Include(l => l.EmployeeLeaveTypes)
-                .FirstOrDefaultAsync(l => l.Id == leaveId);
-
-            if (employeeLeave != null)
-            {
-                employeeLeave.Status = LeaveStatus.Rejected;
-                var leaveSummary = await _dbContext.EmployeeLeaveSummary
-                    .FirstAsync(x => x.EmployeeId == employeeLeave.EmployeeId && x.EmployeeLeaveTypeId == employeeLeave.EmployeeLeaveTypeId);
-                leaveSummary.RemainingLeaves += employeeLeave.LeaveDays;
-                _dbContext.EmployeeLeaves.Update(employeeLeave);
-                _dbContext.EmployeeLeaveSummary.Update(leaveSummary);
-
-                await _dbContext.SaveChangesAsync();
-
-                var emailModel = new EmailModel<LeaveRejectionModel>
-                {
-                    From = "hr@company.com",
-                    To = employeeLeave.employee.Email,
-                    Subject = "Leave Rejection Notification",
-                    repModel = new LeaveRejectionModel
-                    {
-                        EmployeeName = $"{employeeLeave.employee.FirstName} {employeeLeave.employee.LastName}",
-                        StartDate = employeeLeave.StartDate,
-                        EndDate = employeeLeave.EndDate,
-                        LeaveType = employeeLeave.EmployeeLeaveTypes.Name
-                    }
-                };
-
-                await _emailService.SendLeaveRejectionEmail(emailModel);
-            }
-            return employeeLeave;
-        }
+        
 
 
     }

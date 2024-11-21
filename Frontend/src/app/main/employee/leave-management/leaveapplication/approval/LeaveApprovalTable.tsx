@@ -18,6 +18,8 @@ function LeaveApprovalTable() {
 	const [leaveReject] = usePutApiEmployeesRejectByLeaveIdMutation();
 
 	const approveLeave = async (id: number) => {
+		console.log(id);
+		
 		await leaveApprove({ leaveId: id });
 		refetch();
 	};
@@ -117,7 +119,7 @@ function LeaveApprovalTable() {
 						<MenuItem
 							key={0}
 							onClick={() => {
-								approveLeave(row.original.employeeLeaveId);
+								approveLeave(row.original.id);
 								closeMenu();
 								table.resetRowSelection();
 							}}
@@ -130,7 +132,7 @@ function LeaveApprovalTable() {
 						<MenuItem
 							key={0}
 							onClick={() => {
-								rejectLeave(row.original.employeeLeaveId);
+								rejectLeave(row.original.id);
 								closeMenu();
 								table.resetRowSelection();
 							}}

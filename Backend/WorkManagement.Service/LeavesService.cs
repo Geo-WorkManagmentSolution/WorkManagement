@@ -62,7 +62,7 @@ namespace WorkManagement.Service
                                         where emp.EmployeeReportToId == ManagerId
                                         select new EmployeeLeaveModel
                                         {
-                                            EmployeeLeaveId = empLeave.Id,
+                                            Id = empLeave.Id,
                                             EmployeeId = empLeave.EmployeeId,
                                             EmployeeNumber=emp.EmployeeNumber,
                                             Status = empLeave.Status,

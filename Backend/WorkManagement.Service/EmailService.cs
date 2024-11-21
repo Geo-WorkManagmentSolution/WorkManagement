@@ -48,65 +48,65 @@ namespace WorkManagement.Service
             }
 
         }
-        public async Task SendLeaveApprovalEmail(EmailModel<LeaveApprovalModel> emailModel)
-        {
-            try
-            {
-                var sender = new SmtpSender(() => new SmtpClient("smtp.gmail.com")
-                {
-                    UseDefaultCredentials = false,
-                    Port = _smtpsettings.Value.Port,
-                    Credentials = new NetworkCredential(_smtpsettings.Value.Sender, _smtpsettings.Value.Password),
-                    EnableSsl = true,
-                    DeliveryMethod = SmtpDeliveryMethod.Network
-                });
+        //public async Task SendLeaveApprovalEmail(EmailModel<LeaveApprovalModel> emailModel)
+        //{
+        //    try
+        //    {
+        //        var sender = new SmtpSender(() => new SmtpClient("smtp.gmail.com")
+        //        {
+        //            UseDefaultCredentials = false,
+        //            Port = _smtpsettings.Value.Port,
+        //            Credentials = new NetworkCredential(_smtpsettings.Value.Sender, _smtpsettings.Value.Password),
+        //            EnableSsl = true,
+        //            DeliveryMethod = SmtpDeliveryMethod.Network
+        //        });
 
-                Email.DefaultSender = sender;
-                Email.DefaultRenderer = new RazorRenderer();
+        //        Email.DefaultSender = sender;
+        //        Email.DefaultRenderer = new RazorRenderer();
 
-                var email = await Email
-                            .From(emailModel.From)
-                            .To(emailModel.To)
-                            .Subject(emailModel.Subject)
-                            .UsingTemplateFromFile(@"EmailTemplate\LeaveApproval_EmailTemplate.cshtml", emailModel.repModel)
-                            .SendAsync();
-                Log.Information("Leave approval email sent successfully.");
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Error sending leave approval email");
-            }
-        }
+        //        var email = await Email
+        //                    .From(emailModel.From)
+        //                    .To(emailModel.To)
+        //                    .Subject(emailModel.Subject)
+        //                    .UsingTemplateFromFile(@"EmailTemplate\LeaveApproval_EmailTemplate.cshtml", emailModel.repModel)
+        //                    .SendAsync();
+        //        Log.Information("Leave approval email sent successfully.");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log.Error(ex, "Error sending leave approval email");
+        //    }
+        //}
 
-        public async Task SendLeaveRejectionEmail(EmailModel<LeaveRejectionModel> emailModel)
-        {
-            try
-            {
-                var sender = new SmtpSender(() => new SmtpClient("smtp.gmail.com")
-                {
-                    UseDefaultCredentials = false,
-                    Port = _smtpsettings.Value.Port,
-                    Credentials = new NetworkCredential(_smtpsettings.Value.Sender, _smtpsettings.Value.Password),
-                    EnableSsl = true,
-                    DeliveryMethod = SmtpDeliveryMethod.Network
-                });
+        //public async Task SendLeaveRejectionEmail(EmailModel<LeaveRejectionModel> emailModel)
+        //{
+        //    try
+        //    {
+        //        var sender = new SmtpSender(() => new SmtpClient("smtp.gmail.com")
+        //        {
+        //            UseDefaultCredentials = false,
+        //            Port = _smtpsettings.Value.Port,
+        //            Credentials = new NetworkCredential(_smtpsettings.Value.Sender, _smtpsettings.Value.Password),
+        //            EnableSsl = true,
+        //            DeliveryMethod = SmtpDeliveryMethod.Network
+        //        });
 
-                Email.DefaultSender = sender;
-                Email.DefaultRenderer = new RazorRenderer();
+        //        Email.DefaultSender = sender;
+        //        Email.DefaultRenderer = new RazorRenderer();
 
-                var email = await Email
-                            .From(emailModel.From)
-                            .To(emailModel.To)
-                            .Subject(emailModel.Subject)
-                            .UsingTemplateFromFile(@"EmailTemplate\LeaveRejection_EmailTemplate.cshtml", emailModel.repModel)
-                            .SendAsync();
-                Log.Information("Leave rejection email sent successfully.");
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Error sending leave rejection email");
-            }
-        }
+        //        var email = await Email
+        //                    .From(emailModel.From)
+        //                    .To(emailModel.To)
+        //                    .Subject(emailModel.Subject)
+        //                    .UsingTemplateFromFile(@"EmailTemplate\LeaveRejection_EmailTemplate.cshtml", emailModel.repModel)
+        //                    .SendAsync();
+        //        Log.Information("Leave rejection email sent successfully.");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log.Error(ex, "Error sending leave rejection email");
+        //    }
+        //}
 
         public async Task SendLeaveEmail(EmailModel<LeaveEmailModel> emailModel)
         {
