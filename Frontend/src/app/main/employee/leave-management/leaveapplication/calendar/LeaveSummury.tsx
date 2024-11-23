@@ -6,7 +6,8 @@ import DataTable from 'app/shared-components/data-table/DataTable';
 import {
 	EmployeeLeave,
 	usePostApiLeavesLeavesEmployeeLeaveHistoryMutation,
-	EmployeeLeaveHistoryDto
+	EmployeeLeaveHistoryDto,
+	LeaveStatus
 } from '../../LeavesApi';
 
 interface LeaveSummaryProps {
@@ -22,7 +23,7 @@ function LeaveSummary({ openDialoge, onSave, onDelete, refetchEvents, eventColor
 	const [pastOptions, setPastOptions] = useState('Past Leaves');
 	const pastOptionsArray = ['Past Leaves', 'Past Holidays', 'Past Leave and Holidays'];
 	const upcomingOptionsArray = ['Upcoming Leaves', 'Upcoming Holidays', 'Upcoming Leave and Holidays'];
-
+	
 	const [upcomingRequestBody, setUpcomingRequestBody] = useState({
 		getLeaveData: true,
 		getHolidayData: false,
@@ -96,7 +97,7 @@ function LeaveSummary({ openDialoge, onSave, onDelete, refetchEvents, eventColor
 			{
 				accessorKey: 'reason',
 				header: 'Reason',
-				Cell: ({ row }) => (row.original.name === 'Holiday' ? 'N/A' : row.original.reason)
+				Cell: ({ row }) => (row.original.name.startsWith("Holiday") ? 'N/A' : row.original.reason)
 			},
 			{
 				accessorKey: 'description',
@@ -106,7 +107,7 @@ function LeaveSummary({ openDialoge, onSave, onDelete, refetchEvents, eventColor
 				accessorKey: 'status',
 				header: 'Status',
 				Cell: ({ row }) => {
-					if (row.original.name === 'Holiday') {
+					if (row.original.name.startsWith("Holiday")) {
 						return <Typography variant="body1">N/A</Typography>;
 					}
 
@@ -116,13 +117,15 @@ function LeaveSummary({ openDialoge, onSave, onDelete, refetchEvents, eventColor
 							sx={{
 								textAlign: 'center',
 								backgroundColor:
-									row.original.status === 'Approved'
+									row.original.status === LeaveStatus.Approved
 										? 'success.main'
-										: row.original.status === 'Rejected'
+										: row.original.status === LeaveStatus.Rejected
 											? 'red'
 											: 'info.main',
 								color:
-									row.original.status === 'Approved' ? 'success.contrastText' : 'info.contrastText',
+									row.original.status === LeaveStatus.Approved
+										? 'success.contrastText'
+										: 'info.contrastText',
 								padding: '2px 4px',
 								borderRadius: '4px'
 							}}
@@ -165,6 +168,7 @@ function LeaveSummary({ openDialoge, onSave, onDelete, refetchEvents, eventColor
 		await fetchPastEvents();
 	};
 
+	
 	return (
 		<>
 			<Paper

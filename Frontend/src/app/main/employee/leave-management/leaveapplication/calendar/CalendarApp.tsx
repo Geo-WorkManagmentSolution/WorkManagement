@@ -177,22 +177,22 @@ export default function CalendarApp() {
 	};
 
 	const handleEventClick = (clickInfo: EventClickArg) => {
-		const eventData = clickInfo.event;
+		const eventData: EmployeeLeaveHistoryDto = clickInfo.event.extendedProps;
 
-		if (eventData.extendedProps.name === 'Holiday') {
+		if (typeof eventData.name === 'string' && eventData.name.startsWith('Holiday')) {
 			return;
 		}
 
 		setIsNewEvent(false);
 		setSelectedEvent({
-			id: eventData.extendedProps.employeeLeaveId,
-			status: eventData.extendedProps.status as LeaveStatus,
-			description: eventData.extendedProps.description || '',
-			reason: eventData.extendedProps.reason || '',
-			startDate: eventData.extendedProps.startDate || new Date().toISOString(),
-			endDate: eventData.extendedProps.endDate,
-			leaveDays: eventData.extendedProps.leaveDays,
-			employeeLeaveTypeId: eventData.extendedProps.leaveTypeId
+			id: eventData.employeeLeaveId,
+			status: eventData.status,
+			description: eventData.description || '',
+			reason: eventData.reason || '',
+			startDate: eventData.startDate || new Date().toISOString(),
+			endDate: eventData.endDate,
+			//  leaveDays: eventData.leaveDays,
+			employeeLeaveTypeId: eventData.leaveTypeId
 		});
 		setAnchorEl(clickInfo.jsEvent.target as HTMLElement);
 	};
@@ -449,11 +449,9 @@ export default function CalendarApp() {
 	const eventSource: EventSourceFunc = useCallback(
 		(fetchInfo, successCallback) => {
 			const relevantEvents = calendarEvents.filter(
-				(event) =>
-					new Date(event.start) >= fetchInfo.start &&
-					new Date(event.end) <= fetchInfo.end
-          //  &&
-					// event.extendedProps.status !== 'Rejected'
+				(event) => new Date(event.start) >= fetchInfo.start && new Date(event.end) <= fetchInfo.end
+				//  &&
+				// event.extendedProps.status !== 'Rejected'
 			);
 			successCallback(relevantEvents);
 		},

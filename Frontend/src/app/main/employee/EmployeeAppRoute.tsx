@@ -1,15 +1,15 @@
-import { lazy } from "react";
-import { Navigate } from "react-router-dom";
-import { FuseRouteItemType } from "@fuse/utils/FuseUtils";
-import LeaveApplication from "./leave-management/leaveapplication/LeaveApplication";
-import LeaveSummury from "./leave-management/leaveapplication/calendar/LeaveSummury";
-import LeaveApproval from "./leave-management/leaveapplication/approval/LeaveApproval";
+import { lazy } from 'react';
+import { Navigate } from 'react-router-dom';
+import { FuseRouteItemType } from '@fuse/utils/FuseUtils';
+import LeaveApplication from './leave-management/leaveapplication/LeaveApplication';
+import LeaveApprovalTable from './leave-management/leaveapplication/approval/LeaveApprovalTable';
+import EmployeeLeaveHistory from './leave-management/leaveapplication/approval/EmployeeLeaveHistory';
 // import Employees from './employees/Employees';
 
-const EmployeeApp = lazy(() => import("./EmployeeApp"));
+const EmployeeApp = lazy(() => import('./EmployeeApp'));
 // const Product = lazy(() => import('./product/Product'));
-const Employees = lazy(() => import("./employees/Employees"));
-const Employee = lazy(() => import("./employee/Employee"));
+const Employees = lazy(() => import('./employees/Employees'));
+const Employee = lazy(() => import('./employee/Employee'));
 
 // const Order = lazy(() => import('./order/Order'));
 // const Orders = lazy(() => import('./orders/Orders'));
@@ -29,35 +29,44 @@ const Employee = lazy(() => import("./employee/Employee"));
 // };
 
 const EmployeeAppRoute: FuseRouteItemType = {
-  path: "apps/employees",
-  element: <EmployeeApp />,
-  children: [
-    {
-      path: "",
-      element: <Navigate to="employeesSearch" />,
-    },
-    {
-      path: "employeesSearch",
-      children: [
-        {
-          path: "",
-          element: <Employees />,
-        },
-        {
-          path: ":employeeId",
-          element: <Employee />,
-        },
-      ],
-    },
-    {
-      path: "leave-management",
-      element: <LeaveApplication />,
-    },
-    {
-      path: "leave-approval",
-      element: <LeaveApproval />,
-    },
-  ],
+	path: 'apps/employees',
+	element: <EmployeeApp />,
+	children: [
+		{
+			path: '',
+			element: <Navigate to="employeesSearch" />
+		},
+		{
+			path: 'employeesSearch',
+			children: [
+				{
+					path: '',
+					element: <Employees />
+				},
+				{
+					path: ':employeeId',
+					element: <Employee />
+				}
+			]
+		},
+		{
+			path: 'leave-management',
+			element: <LeaveApplication />
+		},
+		{
+			path: 'leave-approval',
+			children: [
+				{
+					path: '',
+					element: <LeaveApprovalTable />
+				},
+				{
+					path: ':employeeId',
+					element: <EmployeeLeaveHistory />
+				}
+			]
+		}
+	]
 };
 
 export default EmployeeAppRoute;

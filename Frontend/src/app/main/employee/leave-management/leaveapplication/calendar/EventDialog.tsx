@@ -5,11 +5,12 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
-import { EmployeeLeave, EmployeeLeaveModel, LeaveStatus } from '../../LeavesApi';
+import { EmployeeLeaveSummaryModel } from 'src/app/main/Project/ProjectApi';
+import { EmployeeLeaveModel, LeaveStatus } from '../../LeavesApi';
 import EventLabelSelect from './EventLabelSelect';
 
 interface EventDialogProps {
-	event: EmployeeLeave | null;
+	event: EmployeeLeaveModel | null;
 	isNewEvent: boolean;
 	anchorEl: HTMLElement | null;
 	onClose: () => void;
@@ -17,7 +18,7 @@ interface EventDialogProps {
 	onDelete: (eventId: number) => void;
 	leaveBalance: Record<number, number>;
 	eventColors: Record<number, string>;
-	currentLeaves: any[]; // Replace 'any' with the correct type from your API
+	currentLeaves: EmployeeLeaveSummaryModel[]; // Replace 'any' with the correct type from your API
 }
 
 const eventSchema = z.object({
@@ -49,7 +50,7 @@ export default function EventDialog({
 		watch,
 		setValue,
 		formState: { errors }
-	} = useForm<EmployeeLeave>({
+	} = useForm<EmployeeLeaveModel>({
 		resolver: zodResolver(eventSchema),
 		mode: 'onChange',
 		defaultValues: event || {
@@ -63,7 +64,6 @@ export default function EventDialog({
 			leaveDays: 1
 		}
 	});
-	const [apiError, setApiError] = useState<string | null>(null);
 
 	const [dateError, setDateError] = useState<string | null>(null);
 	const [leaveBalanceError, setLeaveBalanceError] = useState<string | null>(null);
@@ -120,7 +120,7 @@ export default function EventDialog({
 		setValue('leaveDays', diffDays);
 	}, [startDate, endDate, employeeLeaveTypeId, currentLeaves, setValue]);
 
-	const handleSave = (data: EmployeeLeave) => {
+	const handleSave = (data: EmployeeLeaveModel) => {
 		if (dateError || leaveBalanceError) {
 			return;
 		}
@@ -170,9 +170,10 @@ export default function EventDialog({
 	const onSubmit = handleSubmit(handleSave);
 
 	const isSaveButtonDisabled = !reasonValue || !descriptionValue || !!dateError || !!leaveBalanceError;
-	const isUpdateButtonDisabled = !reasonValue || !descriptionValue || !!dateError || (event?.status === LeaveStatus.Rejected);
-	const isCancelButtonDisabled = (event?.status === LeaveStatus.Rejected);
-	
+	const isUpdateButtonDisabled =
+		!reasonValue || !descriptionValue || !!dateError || event?.status !== LeaveStatus.Pending;
+	const isCancelButtonDisabled = event?.status !== LeaveStatus.Pending;
+
 	const handleDelete = () => {
 		if (event) {
 			onDelete(event.id);
@@ -205,9 +206,14 @@ export default function EventDialog({
 				}}
 				className="flex flex-col max-w-full p-24 pt-32 sm:pt-40 sm:p-32 w-480"
 			>
-        {!isNewEvent && (
-          <Alert className='mb-10' severity="info">You Cannot Change Dates and Leave Type during Update. Consider Canceling Leave and Re-Apply</Alert>
-        )}
+				{!isNewEvent && (
+					<Alert
+						className="mb-10"
+						severity="info"
+					>
+						You Cannot Change Dates and Leave Type during Update. Consider Canceling Leave and Re-Apply
+					</Alert>
+				)}
 				<div className="flex sm:space-x-24 mb-16">
 					<FuseSvgIcon
 						className="sm:inline-flex mt-16"

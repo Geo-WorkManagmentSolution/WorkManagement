@@ -1133,18 +1133,6 @@ namespace WorkManagement.Service
 
                 employeeLeaveData.EmployeeId = employeeId;
 
-                //var leaveSummary = await _dbContext.EmployeeLeaveSummary.FirstAsync(x => x.EmployeeId == employeeId && x.EmployeeLeaveTypeId == employeeLeaveData.EmployeeLeaveTypeId);
-                //leaveSummary.RemainingLeaves = leaveSummary.RemainingLeaves - employeeLeaveData.LeaveDays;
-
-                //if (leaveSummary.RemainingLeaves <= 0)
-                //{
-                //    return employeeLeaveData;
-                //    throw new Exception("Applied leavs are more than available leave for employee. Can not add more leaves");
-                //}
-                //else
-                //{
-                //    _dbContext.EmployeeLeaveSummary.Update(leaveSummary);
-                //}
 
                 var employeeLeave = _dbContext.EmployeeLeaves.FirstOrDefault(x => x.Id == employeeLeaveData.Id);
 
@@ -1227,7 +1215,7 @@ namespace WorkManagement.Service
                     return employeeLeave;
                 }
 
-                if (employeeLeave.Status == LeaveStatus.Pending)
+               else if (employeeLeave.Status == LeaveStatus.Pending)
                 {
                     employeeLeave.Status = LeaveStatus.Approved;
                     await _dbContext.SaveChangesAsync();
@@ -1264,6 +1252,9 @@ namespace WorkManagement.Service
                 .Include(l => l.employee)
                 .Include(l => l.EmployeeLeaveTypes)
                 .FirstOrDefaultAsync(l => l.Id == leaveId);
+            if (employeeLeave.Status == LeaveStatus.Rejected) {
+                return employeeLeave;
+            }
 
             if (employeeLeave != null)
             {
