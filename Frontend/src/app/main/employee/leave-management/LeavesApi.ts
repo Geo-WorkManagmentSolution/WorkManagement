@@ -43,6 +43,16 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: () => ({ url: `/api/Leaves/holidays` }),
     }),
+    postApiLeavesHolidays: build.mutation<
+      PostApiLeavesHolidaysApiResponse,
+      PostApiLeavesHolidaysApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Leaves/holidays`,
+        method: "POST",
+        body: queryArg.body,
+      }),
+    }),
     getApiLeavesLeavesAll: build.query<
       GetApiLeavesLeavesAllApiResponse,
       GetApiLeavesLeavesAllApiArg
@@ -58,6 +68,28 @@ const injectedRtkApi = api.injectEndpoints({
         method: "POST",
         body: queryArg.employeeLeaveHistoryDataModel,
       }),
+    }),
+    getApiLeavesDefaultLeaves: build.query<
+      GetApiLeavesDefaultLeavesApiResponse,
+      GetApiLeavesDefaultLeavesApiArg
+    >({
+      query: () => ({ url: `/api/Leaves/default-leaves` }),
+    }),
+    putApiLeavesDefaultLeaves: build.mutation<
+      PutApiLeavesDefaultLeavesApiResponse,
+      PutApiLeavesDefaultLeavesApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Leaves/default-leaves`,
+        method: "PUT",
+        body: queryArg.body,
+      }),
+    }),
+    getApiLeavesHolidaysByYear: build.query<
+      GetApiLeavesHolidaysByYearApiResponse,
+      GetApiLeavesHolidaysByYearApiArg
+    >({
+      query: (queryArg) => ({ url: `/api/Leaves/holidays/${queryArg.year}` }),
     }),
   }),
   overrideExisting: false,
@@ -84,6 +116,10 @@ export type DeleteApiEmployeesLeavesCancelLeaveApiArg = {
 export type GetApiLeavesHolidaysApiResponse =
   /** status 200 OK */ EmployeeHoliday[];
 export type GetApiLeavesHolidaysApiArg = void;
+export type PostApiLeavesHolidaysApiResponse = /** status 200 OK */ boolean;
+export type PostApiLeavesHolidaysApiArg = {
+  body: EmployeeHoliday[];
+};
 export type GetApiLeavesLeavesAllApiResponse =
   /** status 200 OK */ EmployeeLeaveModel[];
 export type GetApiLeavesLeavesAllApiArg = void;
@@ -91,6 +127,18 @@ export type PostApiLeavesLeavesEmployeeLeaveHistoryApiResponse =
   /** status 200 OK */ EmployeeLeaveHistoryDto[];
 export type PostApiLeavesLeavesEmployeeLeaveHistoryApiArg = {
   employeeLeaveHistoryDataModel: EmployeeLeaveHistoryDataModel;
+};
+export type GetApiLeavesDefaultLeavesApiResponse =
+  /** status 200 OK */ EmployeeDefaultLeaveSummary[];
+export type GetApiLeavesDefaultLeavesApiArg = void;
+export type PutApiLeavesDefaultLeavesApiResponse = /** status 200 OK */ boolean;
+export type PutApiLeavesDefaultLeavesApiArg = {
+  body: EmployeeDefaultLeaveSummary[];
+};
+export type GetApiLeavesHolidaysByYearApiResponse =
+  /** status 200 OK */ EmployeeHoliday[];
+export type GetApiLeavesHolidaysByYearApiArg = {
+  year: number;
 };
 export type EmployeeLeaveSummaryModel = {
   id?: number;
@@ -137,6 +185,19 @@ export type EmployeeLeaveHistoryDataModel = {
   getHolidayData?: boolean;
   getFutureLeaveData?: boolean;
 };
+export type EmployeeLeaveType = {
+  id?: number;
+  isDeleted?: boolean;
+  name?: string | null;
+  isPaid?: boolean;
+};
+export type EmployeeDefaultLeaveSummary = {
+  id?: number;
+  isDeleted?: boolean;
+  employeeLeaveTypeId?: number | null;
+  employeeLeaveTypes?: EmployeeLeaveType;
+  totalLeaves?: number;
+};
 export enum LeaveStatus {
   Approved = "Approved",
   Pending = "Pending",
@@ -150,7 +211,13 @@ export const {
   useDeleteApiEmployeesLeavesCancelLeaveMutation,
   useGetApiLeavesHolidaysQuery,
   useLazyGetApiLeavesHolidaysQuery,
+  usePostApiLeavesHolidaysMutation,
   useGetApiLeavesLeavesAllQuery,
   useLazyGetApiLeavesLeavesAllQuery,
   usePostApiLeavesLeavesEmployeeLeaveHistoryMutation,
+  useGetApiLeavesDefaultLeavesQuery,
+  useLazyGetApiLeavesDefaultLeavesQuery,
+  usePutApiLeavesDefaultLeavesMutation,
+  useGetApiLeavesHolidaysByYearQuery,
+  useLazyGetApiLeavesHolidaysByYearQuery,
 } = injectedRtkApi;
