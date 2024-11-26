@@ -1,168 +1,3 @@
-// import List from "@mui/material/List";
-// import ListItem from "@mui/material/ListItem";
-// import IconButton from "@mui/material/IconButton";
-// import { useParams } from "react-router-dom";
-// import FuseSvgIcon from "@fuse/core/FuseSvgIcon";
-// import ListItemAvatar from "@mui/material/ListItemAvatar";
-// import ListItemText from "@mui/material/ListItemText/ListItemText";
-// import Avatar from "@mui/material/Avatar";
-// import TextField from "@mui/material/TextField";
-// import Divider from "@mui/material/Divider";
-// import Typography from "@mui/material/Typography";
-// import { useState } from "react";
-// import { Autocomplete, InputAdornment } from "@mui/material";
-// import { showMessage } from "@fuse/core/FuseMessage/fuseMessageSlice";
-// import { useGetApiEmployeesTeamMembersListQuery } from "../../EmployeeApi";
-
-// // import { useGetTeamMembersSettingsQuery, useUpdateTeamMemberSettingsMutation } from '../SettingsApi';
-// import { useDispatch } from "react-redux";
-
-// function TeamTab() {
-//   const routeParams = useParams();
-//   const { employeeId } = routeParams as unknown;
-
-//   const {
-//     data: employeeTeamMembersList,
-//     isLoading,
-//     isError,
-//   } = useGetApiEmployeesTeamMembersListQuery(
-//     { employeeId: employeeId },
-//     {
-//       skip: !employeeId || employeeId === "new",
-//     }
-//   );
-
-//   // const { data: teamMembers } = useGetTeamMembersSettingsQuery({onCompleted: setTeamMember});
-//   // const [updateTeamMembers] = useUpdateTeamMemberSettingsMutation();
-//   const init = employeeTeamMembersList || [];
-//   const [selectedCard, setSelectedCard] = useState<(typeof init)[0] | null>(null);
-//   const [teamMembers, setTeamMember] = useState<(typeof init)[]>();
-  
-//   const dispatch = useDispatch();
-
-//   function handleRemoveMember(email: string) {
-//     // updateTeamMembers(teamMembers?.filter((member) => member.email !== email));
-//     return setTeamMember(
-//       teamMembers?.filter((member) => member.email !== email)
-//     );
-//   }
-
-//   const handleSearch = (
-//     event: React.SyntheticEvent,
-//     value: (typeof init)[0] | null
-//   ) => {
-//     setSelectedCard(value);
-//   };
-
-//   const addTeamMember = (event: React.SyntheticEvent) => {
-//     if (teamMembers.some((e, i, a) => e.email === selectedCard.email)) {
-//       dispatch(
-//         showMessage({
-//           message: "Team member is already added.",
-//           variant: "error",
-//         })
-//       );
-//     } else setTeamMember((prev) => [...prev, selectedCard]);
-//   };
-
-//   return (
-//     <div>
-//       <Autocomplete
-//         options={employeeTeamMembersList}
-//         getOptionLabel={(option) => option.email}
-//         renderOption={(props, option) => (
-//           <ListItem
-//             {...props}
-//             divider
-//             key={option.email}
-//             disablePadding
-//             className="py-12 ml-5 cursor-pointer flex flex-col items-start sm:items-center  sm:flex-row space-y-16 sm:space-y-0"
-//           >
-//             <div className="flex flex-1 items-center">
-//               <ListItemAvatar>
-//                 <Avatar src={option.avatar} alt={`Avatar °${option.name}`} />
-//               </ListItemAvatar>
-//               <ListItemText
-//                 primary={option.name}
-//                 secondary={option.email}
-//                 classes={{ secondary: "truncate" }}
-//               />
-//             </div>
-//           </ListItem>
-//         )}
-//         renderInput={(params) => (
-//           <TextField
-//             {...params}
-//             label="Search team member"
-//             variant="outlined"
-//             InputLabelProps={{
-//               shrink: true,
-//             }}
-//             value={params.value || ""}
-//             placeholder="Enter email or name"
-//             InputProps={{
-//               ...params.InputProps,
-//               startAdornment: (
-//                 <InputAdornment position="start">
-//                   <FuseSvgIcon size={20}>heroicons-outline:user</FuseSvgIcon>
-//                 </InputAdornment>
-//               ),
-//               endAdornment: (
-//                 <InputAdornment position="end">
-//                   <IconButton onClick={(e) => addTeamMember(e)}>
-//                     <FuseSvgIcon size={20}>
-//                       heroicons-outline:plus-circle
-//                     </FuseSvgIcon>
-//                   </IconButton>
-//                 </InputAdornment>
-//               ),
-//             }}
-//           />
-//         )}
-//         onChange={handleSearch}
-//         value={selectedCard}
-//         className="w-full mb-24"
-//         fullWidth
-//       />
-
-//       <Divider />
-//       {teamMembers?.length === 0 && (
-//         <Typography className="text-center my-32" color="textSecondary">
-//           No team members found.
-//         </Typography>
-//       )}
-//       <List>
-//         {teamMembers?.map((member) => (
-//           <ListItem
-//             divider
-//             key={member.email}
-//             disablePadding
-//             className="py-12 flex flex-col items-start sm:items-center  sm:flex-row space-y-16 sm:space-y-0"
-//           >
-//             <div className="flex flex-1 items-center">
-//               <ListItemAvatar>
-//                 <Avatar src={member.avatar} alt={`Avatar °${member.name}`} />
-//               </ListItemAvatar>
-//               <ListItemText
-//                 primary={member.name}
-//                 secondary={member.email}
-//                 classes={{ secondary: "truncate" }}
-//               />
-//             </div>
-
-//             <div className="flex items-center space-x-4">
-//               <IconButton onClick={() => handleRemoveMember(member.email)}>
-//                 <FuseSvgIcon>heroicons-outline:trash</FuseSvgIcon>
-//               </IconButton>
-//             </div>
-//           </ListItem>
-//         ))}
-//       </List>
-//     </div>
-//   );
-// }
-
-// export default TeamTab;
 import { useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -244,29 +79,30 @@ function TeamTab() {
       },{
         accessorKey: 'designation',
         header: 'Designation',
-      },
-      {
-        id: 'actions',
-        header: 'Actions',
-        Cell: ({ row }) => (
-          <IconButton
-            onClick={() => {
-              if (teamMembers.some((member) => member.email === row.original.email)) {
-                dispatch(
-                  showMessage({
-                    message: 'Team member is already added.',
-                    variant: 'error',
-                  })
-                );
-              } else {
-                setTeamMembers([...teamMembers, row.original]);
-              }
-            }}
-          >
-            <FuseSvgIcon>heroicons-outline:plus-circle</FuseSvgIcon>
-          </IconButton>
-        ),
-      },
+      }
+      // ,
+      // {
+      //   id: 'actions',
+      //   header: 'Actions',
+      //   Cell: ({ row }) => (
+      //     <IconButton
+      //       onClick={() => {
+      //         if (teamMembers.some((member) => member.email === row.original.email)) {
+      //           dispatch(
+      //             showMessage({
+      //               message: 'Team member is already added.',
+      //               variant: 'error',
+      //             })
+      //           );
+      //         } else {
+      //           setTeamMembers([...teamMembers, row.original]);
+      //         }
+      //       }}
+      //     >
+      //       <FuseSvgIcon>heroicons-outline:plus-circle</FuseSvgIcon>
+      //     </IconButton>
+      //   ),
+      // },
     ],
     [teamMembers, dispatch]
   );
@@ -281,7 +117,22 @@ function TeamTab() {
 
   return (
     <div className="flex flex-col space-y-24">
+      <div className="flex items-center border-b-1 space-x-8 pb-8">
+					<FuseSvgIcon
+						color="action"
+						size={24}
+					>
+						heroicons-outline:user-group
+					</FuseSvgIcon>
+					<Typography
+						className="text-2xl"
+						color="text.secondary"
+					>
+						Team Members
+					</Typography>
+				</div>
       <Paper className="flex flex-col flex-auto shadow rounded-lg overflow-hidden w-full">
+      
         <DataTable
         enableRowActions={false}  
           columns={columns}
@@ -290,11 +141,9 @@ function TeamTab() {
         />
       </Paper>
 
-      <Typography variant="h6" className="mt-32 mb-16">
-        Team Members
-      </Typography>
+     
 
-      {teamMembers.length === 0 ? (
+      {/* {teamMembers.length === 0 ? (
         <Typography className="text-center my-32" color="textSecondary">
           No team members added.
         </Typography>
@@ -316,7 +165,7 @@ function TeamTab() {
             </ListItem>
           ))}
         </List>
-      )}
+      )} */}
     </div>
   );
 }
