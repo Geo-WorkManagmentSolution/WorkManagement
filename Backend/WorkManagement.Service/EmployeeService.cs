@@ -109,11 +109,14 @@ namespace WorkManagement.Service
             {
 
                 var data = (from e in _dbContext.Employees.Where(e => !e.IsDeleted && e.EmployeeReportToId == employeeId)
+                            .Include(x=>x.EmployeeDesignation)
                             select new EmployeeTeamMemberList
                             {
                                 Name = e.FirstName + " " + e.LastName,
                                 Email = e.Email,
                                 Avatar = "",
+                                Designation = e.EmployeeDesignation != null ? e.EmployeeDesignation.Name : "",
+                                EmployeeId =e.Id
                             }).ToList();
 
                 return data;

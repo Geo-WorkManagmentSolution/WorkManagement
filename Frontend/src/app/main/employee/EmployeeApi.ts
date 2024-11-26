@@ -465,6 +465,8 @@ export type EmployeeTeamMemberList = {
   name?: string | null;
   email?: string | null;
   avatar?: string | null;
+  designation?: string | null;
+  employeeId?: number;
 };
 export type Criterion = {
   field?: string | null;

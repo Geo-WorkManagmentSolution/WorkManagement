@@ -157,6 +157,9 @@ namespace WorkManagement.Domain.Models.Employee
         public string Name { set; get; }
         public string Email { set; get; }
         public string Avatar { set; get; }
+
+        public string Designation { set; get; }
+        public int EmployeeId { set; get; }
     }
 }
 

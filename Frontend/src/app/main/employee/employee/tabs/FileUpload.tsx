@@ -1,217 +1,217 @@
-import React, { useState, useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import React, { useState, useCallback } from 'react';
+import { useFormContext, Controller } from 'react-hook-form';
 import { Box, Button, Card, CardContent, Typography, IconButton, Grid, Input } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DeleteIcon from '@mui/icons-material/Delete';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
-import { FileType } from '../../models/EmployeeDropdownModels';
+import { FileType } from '../../EmployeeApi';
 
 interface FileInfo {
-	id: string;
-	name: string;
-	size: number;
-	type: string;
-	url: string;
+	fileName: string;
+	fileSize: number;
+	fileContent: string;
+	fileType: FileType;
 }
 
-const FileCard: React.FC<{ file: FileInfo; onRemove: () => void; onDownload: () => void }> = ({
-	file,
-	onRemove,
-	onDownload
-}) => {
-	const getFileIcon = (type: string) => {
-		if (type.startsWith('image/')) {
+const FileCard: React.FC<{ file: FileInfo; onRemove: () => void; onDownload: () => void }> = React.memo(
+	({ file, onRemove, onDownload }) => {
+		const getFileIcon = useCallback(() => {
+			if (file.fileType === FileType.Pdf || file.fileType === FileType.Docx || file.fileType === FileType.Txt) {
+				return <InsertDriveFileIcon style={{ fontSize: 48 }} />;
+			}
+
 			return (
 				<img
-					src={file.url}
-					alt={file.name}
+					src={file.fileContent}
+					alt={file.fileName}
 					style={{ width: 48, height: 48, objectFit: 'cover' }}
 				/>
 			);
-		}
+		}, [file]);
 
-		return <InsertDriveFileIcon style={{ fontSize: 48 }} />;
-	};
-
-	return (
-		<Card
-			variant="outlined"
-			style={{ marginBottom: 16 }}
-		>
-			<CardContent>
-				<Grid
-					container
-					alignItems="center"
-					spacing={2}
-				>
-					<Grid item>{getFileIcon(file.type)}</Grid>
+		return (
+			<Card
+				variant="outlined"
+				style={{ marginBottom: 16 }}
+			>
+				<CardContent>
 					<Grid
-						item
-						xs
+						container
+						alignItems="center"
+						spacing={2}
 					>
-						<Typography variant="subtitle1">{file.name}</Typography>
-						<Typography
-							variant="body2"
-							color="textSecondary"
+						<Grid item>{getFileIcon()}</Grid>
+						<Grid
+							item
+							xs
 						>
-							{(file.size / 1024).toFixed(2)} KB
-						</Typography>
+							<Typography variant="subtitle1">{file.fileName}</Typography>
+							<Typography
+								variant="body2"
+								color="textSecondary"
+							>
+								{(file.fileSize / 1024).toFixed(2)} KB
+							</Typography>
+						</Grid>
+						<Grid item>
+							<IconButton
+								onClick={onDownload}
+								size="small"
+								aria-label="Download file"
+							>
+								<GetAppIcon />
+							</IconButton>
+							<IconButton
+								onClick={onRemove}
+								size="small"
+								aria-label="Remove file"
+							>
+								<DeleteIcon />
+							</IconButton>
+						</Grid>
 					</Grid>
-					<Grid item>
-						<IconButton
-							onClick={onDownload}
-							size="small"
-							aria-label="Download file"
-						>
-							<GetAppIcon />
-						</IconButton>
-						<IconButton
-							onClick={onRemove}
-							size="small"
-							aria-label="Remove file"
-						>
-							<DeleteIcon />
-						</IconButton>
-					</Grid>
-				</Grid>
-			</CardContent>
-		</Card>
-	);
-};
+				</CardContent>
+			</Card>
+		);
+	}
+);
+
+FileCard.displayName = 'FileCard';
 
 export default function FileUpload() {
-	const [allFiles, setAllFiles] = useState<FileInfo[]>([]);
-	const { control, handleSubmit } = useForm();
+	const [files, setFiles] = useState<FileInfo[]>([]);
+	const { control, setValue } = useFormContext();
 
-	useEffect(() => {
-		// Simulating fetching existing files from the server
-		const fetchExistingFiles = async () => {
-			// Replace this with actual API call to fetch existing files
-			const mockFiles: FileInfo[] = [
-				{
-					id: '1',
-					name: 'example.doc',
-					size: 1024 * 50,
-					type: 'application/msword',
-					url: '/placeholder.svg?height=48&width=48'
-				},
-				{
-					id: '2',
-					name: 'image.jpg',
-					size: 1024 * 100,
-					type: 'image/jpeg',
-					url: '/placeholder.svg?height=48&width=48'
-				}
-			];
-			setAllFiles(mockFiles);
-		};
+	const handleFileChange = useCallback(
+		(event: React.ChangeEvent<HTMLInputElement>) => {
+			const { files: uploadedFiles } = event.target;
 
-		fetchExistingFiles();
+			if (uploadedFiles) {
+				Array.from(uploadedFiles).forEach((file) => {
+					const reader = new FileReader();
+					reader.onload = (e) => {
+						const newFile: FileInfo = {
+							fileName: file.name,
+							fileSize: file.size,
+							fileContent: e.target?.result as string,
+							fileType: getFileType(file.type)
+						};
+						setFiles((prevFiles) => {
+							const updatedFiles = [...prevFiles, newFile];
+							setValue('employeeDocuments', updatedFiles);
+							return updatedFiles;
+						});
+					};
+					reader.readAsDataURL(file);
+				});
+			}
+		},
+		[setValue]
+	);
+
+	const handleRemoveFile = useCallback(
+		(fileName: string) => {
+			setFiles((prevFiles) => {
+				const updatedFiles = prevFiles.filter((file) => file.fileName !== fileName);
+				setValue('employeeDocuments', updatedFiles);
+				return updatedFiles;
+			});
+		},
+		[setValue]
+	);
+
+	const handleDownloadFile = useCallback((file: FileInfo) => {
+		const link = document.createElement('a');
+		link.href = file.fileContent;
+		link.download = file.fileName;
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
 	}, []);
 
-	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const { files } = event.target;
+	const getFileType = (mimeType: string): FileType => {
+		if (mimeType.includes('pdf')) return FileType.Pdf;
 
-		if (files) {
-			const newFiles: FileInfo[] = Array.from(files).map((file) => ({
-				id: `new-${Date.now()}-${file.name}`,
-				name: file.name,
-				size: file.size,
-				type: file.type,
-				url: URL.createObjectURL(file)
-			}));
-			setAllFiles((prevFiles) => [...prevFiles, ...newFiles]);
-		}
+		if (mimeType.includes('word')) return FileType.Docx;
+
+		if (mimeType.includes('text')) return FileType.Txt;
+
+		if (mimeType.includes('zip')) return FileType.Zip;
+
+		if (mimeType.includes('excel') || mimeType.includes('spreadsheet')) return FileType.Xlsx;
+
+		if (mimeType.includes('csv')) return FileType.Csv;
+
+		return FileType.Other;
 	};
 
-	const onSubmit = (data: any) => {
-		console.log('Form submitted:', data);
-		console.log('All files:', allFiles);
-	};
-
-	const handleRemoveFile = (fileId: string) => {
-		setAllFiles((prevFiles) => prevFiles.filter((file) => file.id !== fileId));
-	};
-
-	const handleDownloadFile = (file: FileInfo) => {
-		// Download file logic here
-		console.log('Downloading file:', file.name);
-	};
-
-	const acceptedFileTypes = '.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.zip';
+	const acceptedFileTypes = '.pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.zip,.xlsx,.csv';
 
 	return (
 		<Box sx={{ margin: 'auto', padding: 2 }}>
-			<form onSubmit={handleSubmit(onSubmit)}>
-				<Controller
-					name="files"
-					control={control}
-					defaultValue={[]}
-					render={({ field }) => (
-						<Box
-							sx={{
-								border: '2px dashed #cccccc !important',
-								borderRadius: 2,
-								padding: 2,
-								textAlign: 'center',
-								marginBottom: 2
+			<Controller
+				name="employeeDocuments"
+				control={control}
+				defaultValue={[]}
+				render={({ field }) => (
+					<Box
+						sx={{
+							border: '2px dashed #cccccc',
+							borderRadius: 2,
+							padding: 2,
+							textAlign: 'center',
+							marginBottom: 2
+						}}
+					>
+						<Input
+							type="file"
+							inputProps={{
+								multiple: true,
+								accept: acceptedFileTypes
 							}}
-						>
-							<Input
-								type="file"
-								inputProps={{
-									multiple: true,
-									accept: acceptedFileTypes
-								}}
-								onChange={handleFileChange}
-								sx={{ display: 'none' }}
-								id="file-input"
-							/>
-							<label htmlFor="file-input">
-								<Button
-									component="span"
-									startIcon={<CloudUploadIcon />}
-									variant="contained"
-									color="primary"
-								>
-									Upload Files
-								</Button>
-							</label>
-							<Typography
-								variant="caption"
-								display="block"
-								sx={{ marginTop: 1 }}
+							onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+								handleFileChange(event);
+								field.onChange(event.target.files);
+							}}
+							sx={{ display: 'none' }}
+							id="file-input"
+						/>
+						<label htmlFor="file-input">
+							<Button
+								component="span"
+								startIcon={<CloudUploadIcon />}
+								variant="contained"
+								color="primary"
 							>
-								Only doc, text, image, and zip files are allowed
-							</Typography>
-						</Box>
-					)}
+								Upload Files
+							</Button>
+						</label>
+						<Typography
+							variant="caption"
+							display="block"
+							sx={{ marginTop: 1 }}
+						>
+							Only PDF, DOC, DOCX, TXT, JPG, JPEG, PNG, GIF, ZIP, XLSX, and CSV files are allowed
+						</Typography>
+					</Box>
+				)}
+			/>
+
+			<Typography
+				variant="h6"
+				gutterBottom
+			>
+				Uploaded Files
+			</Typography>
+			{files.map((file) => (
+				<FileCard
+					key={file.fileName}
+					file={file}
+					onRemove={() => handleRemoveFile(file.fileName)}
+					onDownload={() => handleDownloadFile(file)}
 				/>
-
-				<Typography
-					variant="h6"
-					gutterBottom
-				>
-					All Files
-				</Typography>
-				{allFiles.map((file) => (
-					<FileCard
-						key={file.id}
-						file={file}
-						onRemove={() => handleRemoveFile(file.id)}
-						onDownload={() => handleDownloadFile(file)}
-					/>
-				))}
-
-				{/* <Button
-					type="submit"
-					variant="contained"
-					color="primary"
-				>
-					Submit
-				</Button> */}
-			</form>
+			))}
 		</Box>
 	);
 }

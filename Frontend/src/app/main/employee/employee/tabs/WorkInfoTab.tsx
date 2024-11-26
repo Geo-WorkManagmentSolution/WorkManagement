@@ -120,13 +120,13 @@ function WorkInfoTab() {
               fullWidth
               options={employeesDepartmentsOptions}
               getOptionLabel={(option) => option?.name}
-              isOptionEqualToValue={(option, value) => option.id === value}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
               value={
                 employeesDepartmentsOptions?.find((c) => c.id === value) || null
               }
               onChange={(_, newValue) => {
                 onChange(newValue ? newValue.id : null);
-                setDepartmentId(newValue ? newValue.id : null);
+                // setDepartmentId(newValue ? newValue.id : null);
               }}
               renderInput={(params) => (
                 <TextField
@@ -158,7 +158,7 @@ function WorkInfoTab() {
               onChange={(_, newValue) => {
                 field.onChange(newValue ? newValue.id : null);
               }}
-              isOptionEqualToValue={(option, value) => option.id === value}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
               placeholder="Type to search or add"
               renderInput={(params) => (
                 <TextField
@@ -205,7 +205,7 @@ function WorkInfoTab() {
               fullWidth
               options={employeesReportToOptions}
               getOptionLabel={(option) => option?.name}
-              isOptionEqualToValue={(option, value) => option.id === value}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
               value={
                 employeesReportToOptions?.find((c) => c.id === value) || null
               }
