@@ -26,6 +26,7 @@ namespace WorkManagement.API.Controllers
         private readonly AdvanceSearchService advanceSearchService;
         private IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper mapper;
+        private readonly string _storagePath = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles");
 
         public EmployeesController(IEmployeeService employeeService, AdvanceSearchService AdvanceSearchService, IHttpContextAccessor httpContextAccessor, IMapper mapper, IEmailService emailService)
         {
@@ -34,6 +35,11 @@ namespace WorkManagement.API.Controllers
             _httpContextAccessor = httpContextAccessor;
             this.mapper = mapper;
             _emailService = emailService;
+
+            if (!Directory.Exists(_storagePath))
+            {
+                Directory.CreateDirectory(_storagePath);
+            }
         }
 
         // GET: api/employees
@@ -252,6 +258,80 @@ namespace WorkManagement.API.Controllers
         {
             var employeeLeave = await employeeService.RejectLeave(leaveId);
             return Ok(employeeLeave);
+        }
+
+        [HttpPost("documnet/upload")]
+        public async Task<ActionResult<string>> Upload(int id,IFormFile file)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                    return BadRequest("No file uploaded.");
+
+                var employeeFilePath = await employeeService.GetEmployeeDocumentFileName(id, file.FileName);
+
+                var filePath = Path.Combine(_storagePath, employeeFilePath);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+
+                    await employeeService.UpdateEmployeeDocumentData(id, file.FileName, filePath);
+                }
+
+
+                return Ok(filePath);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
+            
+        }
+
+        [HttpGet("download/{fileName}")]
+        public IActionResult Download(int id, string fileName)
+        {
+            var filePath = employeeService.GetEmployeeFilePath(id, fileName);
+
+            if (!System.IO.File.Exists(filePath))
+                return NotFound();
+
+            var memory = new MemoryStream();
+            using (var stream = new FileStream(filePath, FileMode.Open))
+            {
+                stream.CopyTo(memory);
+            }
+            memory.Position = 0;
+
+            return File(memory, GetContentType(filePath), fileName);
+        }
+
+
+
+        private string GetContentType(string path)
+        {
+            var types = GetMimeTypes();
+            var ext = Path.GetExtension(path).ToLowerInvariant();
+            return types.ContainsKey(ext) ? types[ext] : "application/octet-stream";
+        }
+
+        private Dictionary<string, string> GetMimeTypes()
+        {
+            return new Dictionary<string, string>
+            {
+                { ".txt", "text/plain" },
+                { ".pdf", "application/pdf" },
+                { ".doc", "application/vnd.ms-word" },
+                { ".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
+                { ".xls", "application/vnd.ms-excel" },
+                { ".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
+                { ".png", "image/png" },
+                { ".jpg", "image/jpeg" },
+                { ".jpeg", "image/jpeg" },
+                { ".gif", "image/gif" },
+                { ".csv", "text/csv" }
+            };
         }
 
     }
