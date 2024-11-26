@@ -88,6 +88,7 @@ namespace WorkManagementSolution.Employee
     public class EmployeeDocuments : BaseEntity
     {
         public string? FileName { get; set; }
+        public string? FilePath { get; set; }
         public int? FileSize { get; set; }
         public byte[]? FileContent { get; set; }
         public FileType? FileType { get; set; }

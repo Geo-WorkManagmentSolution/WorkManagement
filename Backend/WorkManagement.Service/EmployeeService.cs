@@ -925,6 +925,66 @@ namespace WorkManagement.Service
             }
         }
 
+        public async Task<string> GetEmployeeDocumentFileName(int id, string fileName)
+        {
+            var returnFilePath = fileName;
+            var employee = _dbContext.Employees.FirstOrDefault(s=>s.Id == id && !s.IsDeleted);
+            if(employee != null)
+            {
+                returnFilePath = employee.FirstName + "_" + employee.LastName + "_" + fileName;
+            }
+
+            return returnFilePath;
+        }
+
+        public string GetEmployeeFilePath(int id, string fileName)
+        {
+            var retunrFilePath = "";
+            var employee = _dbContext.Employees.FirstOrDefault(s => s.Id == id && !s.IsDeleted);
+            if (employee != null)
+            {
+                var employeeDocument = _dbContext.EmployeeDocuments.FirstOrDefault(s=>s.FileName == fileName && s.EmployeeId == id && !s.IsDeleted);
+                if(employeeDocument != null)
+                {
+                    retunrFilePath = employeeDocument.FilePath;
+                }
+            }
+
+            return retunrFilePath;
+        }
+
+        public async Task<string> UpdateEmployeeDocumentData(int id,string fileName, string filePath)
+        {
+            var employee = _dbContext.Employees.FirstOrDefault(s => s.Id == id && !s.IsDeleted);
+            if (employee != null)
+            {
+                var availableEmployeeDocument = _dbContext.EmployeeDocuments.FirstOrDefault(s=>s.EmployeeId == id && s.FileName == fileName);
+                if(availableEmployeeDocument == null)
+                {
+                    var employeeDocument = new EmployeeDocuments();
+                    employeeDocument.EmployeeId = employee.Id;
+                    employeeDocument.FileName = fileName;
+                    employeeDocument.FilePath = filePath;
+                    employeeDocument.IsDeleted = false;
+
+                    _dbContext.EmployeeDocuments.Add(employeeDocument);
+                }
+                else
+                {
+                    availableEmployeeDocument.EmployeeId = employee.Id;
+                    availableEmployeeDocument.FileName = fileName;
+                    availableEmployeeDocument.FilePath = filePath;
+                    availableEmployeeDocument.IsDeleted = false;
+
+                    _dbContext.EmployeeDocuments.Update(availableEmployeeDocument);
+                }
+
+                _dbContext.SaveChanges();
+            }
+
+            return fileName;
+        }
+
         public async Task<bool> DeleteEmployeeAsync(int id)
         {
             try
@@ -975,6 +1035,24 @@ namespace WorkManagement.Service
                     }
                 }
 
+                var employeeLeave = _dbContext.EmployeeLeaves.Where(e => e.EmployeeId == id).ToList();
+                if (employeeLeave.Any())
+                {
+                    foreach (var e in employeeLeave)
+                    {
+                        _dbContext.EmployeeLeaves.Remove(e);
+                    }
+                }
+
+                var employeeLeaveSummary = _dbContext.EmployeeLeaveSummary.Where(e => e.EmployeeId == id).ToList();
+                if (employeeLeaveSummary.Any())
+                {
+                    foreach (var e in employeeLeaveSummary)
+                    {
+                        _dbContext.EmployeeLeaveSummary.Remove(e);
+                    }
+                }
+
                 _dbContext.Employees.Remove(employee);
                 await _dbContext.SaveChangesAsync();
 
@@ -1020,6 +1098,7 @@ namespace WorkManagement.Service
                 var employeeLeaveData = (from el in _dbContext.EmployeeLeaveSummary.Where(s => s.EmployeeId == employeeId)
                                          select new EmployeeLeaveSummaryModel
                                          {
+                                             EmployeeLeaveSummaryId = el.Id,
                                              Id = el.EmployeeLeaveTypeId.HasValue ? el.EmployeeLeaveTypeId.Value : 0,
                                              EmployeeLeaveType = el.EmployeeLeaveTypes.Name,
                                              TotalLeaves = el.TotalLeaves,
@@ -1028,6 +1107,32 @@ namespace WorkManagement.Service
 
                 if (employeeLeaveData.Count > 0)
                 {
+                    var employeeLeaveHistory = _dbContext.EmployeeLeaves.Where(s => s.EmployeeId == employeeId).ToList();
+                    var isLeaveMismatch = false;
+                    if (employeeLeaveHistory.Count > 0)
+                    {
+                        foreach(var e in employeeLeaveData)
+                        {
+                            var employeeLeave = employeeLeaveHistory.Where(s => s.EmployeeLeaveTypeId == e.Id).Sum(s => s.LeaveDays);
+                            var remainingLeaves = e.TotalLeaves - employeeLeave;
+                            if(e.RemainingLeaves != remainingLeaves)
+                            {
+                                isLeaveMismatch = true;
+                                e.RemainingLeaves = remainingLeaves;
+                                var employeeLeaveSummary = _dbContext.EmployeeLeaveSummary.FirstOrDefault(s => s.Id == e.EmployeeLeaveSummaryId);
+                                if (employeeLeaveSummary != null)
+                                {
+                                    employeeLeaveSummary.RemainingLeaves = remainingLeaves;
+                                    _dbContext.EmployeeLeaveSummary.Update(employeeLeaveSummary);
+                                }
+                            }
+                        }
+
+                        if (isLeaveMismatch)
+                        {
+                            _dbContext.SaveChanges();
+                        }
+                    }
                     return employeeLeaveData;
                 }
                 else

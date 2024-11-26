@@ -56,5 +56,8 @@ namespace WorkManagement.Domain.Contracts
         public Task<bool> CheckEmailExists(string email);
 
         public Task SendEmail();
+        public Task<string> GetEmployeeDocumentFileName(int id,string fileName);
+        public Task<string> UpdateEmployeeDocumentData(int id, string fileName, string filePath);
+        public string GetEmployeeFilePath(int id, string fileName);
     }
 }
