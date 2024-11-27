@@ -50,14 +50,6 @@ function EmployeeHeader() {
 		  return;
 		}
 	
-		// Convert file content to byte array
-		if (data.employeeDocuments) {
-		  data.employeeDocuments = data.employeeDocuments.map(doc => ({
-			...doc,
-			fileContent: new Uint8Array(atob(doc.fileContent.split(',')[1]).split('').map(char => char.charCodeAt(0)))
-		  }));
-		}
-	
 		updateEmployee({
 		  id: parseInt(employeeId, 10),
 		  employeeModel: data
@@ -85,14 +77,6 @@ function EmployeeHeader() {
 		  return;
 		}
 	
-		// Convert file content to byte array
-		if (data.employeeDocuments) {
-		  data.employeeDocuments = data.employeeDocuments.map(doc => ({
-			...doc,
-			fileContent: new Uint8Array(atob(doc.fileContent.split(',')[1]).split('').map(char => char.charCodeAt(0)))
-		  }));
-		}
-	
 		createEmployee({ employeeModel: data })
 		  .unwrap()
 		  .then((data) => {
@@ -108,6 +92,7 @@ function EmployeeHeader() {
 			dispatch(showMessage({ message: 'Error creating employee', variant: 'error' }));
 		  });
 	  }
+	
 	
 	  function handleDeleteEmployee() {
 		deleteEmployee({

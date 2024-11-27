@@ -141,6 +141,7 @@ export type GetApiLeavesHolidaysByYearApiArg = {
   year: number;
 };
 export type EmployeeLeaveSummaryModel = {
+  employeeLeaveSummaryId?: number;
   id?: number;
   employeeLeaveType?: string | null;
   totalLeaves?: number;

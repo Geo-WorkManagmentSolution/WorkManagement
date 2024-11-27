@@ -150,6 +150,7 @@ export type EmployeeDocumentsModel = {
   fileType?: FileType;
 };
 export type EmployeeLeaveSummaryModel = {
+  employeeLeaveSummaryId?: number;
   id?: number;
   employeeLeaveType?: string | null;
   totalLeaves?: number;

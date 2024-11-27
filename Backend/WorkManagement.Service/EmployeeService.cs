@@ -305,6 +305,48 @@ namespace WorkManagement.Service
                                                  grade = e.grade
                                              }).ToList();
 
+                var employeeDocumentData = (from e in _dbContext.EmployeeDocuments.Where(s => s.EmployeeId == returnEployeeData.Id)
+                                            select new EmployeeDocumentsModel
+                                            {
+                                                FileContent = e.FileContent,
+                                                FileName = e.FileName,
+                                                FileSize = e.FileSize,
+                                                FileType = e.FileType
+                                            }).ToList();
+
+
+                if (employeeDocumentData != null)
+                {
+                    if (employeeDocumentData.Count == 0)
+                    {
+                        var documentData = new EmployeeDocumentsModel();
+                        documentData.FileContent = null;
+                        documentData.FileName = "";
+                        documentData.FileName = "";
+                        documentData.FileSize = null;
+                        returnEployeeData.EmployeeDocuments.Add(documentData);
+                    }
+                    else
+                    {
+                        returnEployeeData.EmployeeDocuments = employeeDocumentData;
+                    }
+                }
+                else {
+                    var documentData = new EmployeeDocumentsModel();
+                    documentData.FileContent = null;
+                    documentData.FileName = "";
+                    documentData.FileName = "";
+                    documentData.FileSize = null;
+                    returnEployeeData.EmployeeDocuments.Add(documentData);
+                }
+
+
+
+
+
+
+
+
 
                 if (employeeEducationData != null)
                 {
@@ -939,7 +981,7 @@ namespace WorkManagement.Service
 
             return returnFilePath;
         }
-
+        
         public string GetEmployeeFilePath(int id, string fileName)
         {
             var retunrFilePath = "";
@@ -956,7 +998,7 @@ namespace WorkManagement.Service
             return retunrFilePath;
         }
 
-        public async Task<string> UpdateEmployeeDocumentData(int id,string fileName, string filePath)
+        public async Task<string> UpdateEmployeeDocumentData(int id, string fileName, string filePath)
         {
             var employee = _dbContext.Employees.FirstOrDefault(s => s.Id == id && !s.IsDeleted);
             if (employee != null)
@@ -969,6 +1011,8 @@ namespace WorkManagement.Service
                     employeeDocument.FileName = fileName;
                     employeeDocument.FilePath = filePath;
                     employeeDocument.IsDeleted = false;
+                    
+
 
                     _dbContext.EmployeeDocuments.Add(employeeDocument);
                 }
@@ -977,7 +1021,8 @@ namespace WorkManagement.Service
                     availableEmployeeDocument.EmployeeId = employee.Id;
                     availableEmployeeDocument.FileName = fileName;
                     availableEmployeeDocument.FilePath = filePath;
-                    availableEmployeeDocument.IsDeleted = false;
+                    availableEmployeeDocument.IsDeleted = false; 
+                    
 
                     _dbContext.EmployeeDocuments.Update(availableEmployeeDocument);
                 }
@@ -987,6 +1032,34 @@ namespace WorkManagement.Service
 
             return fileName;
         }
+
+
+        public async Task<bool> DeleteEmployeeFile(int employeeId, string fileName)
+        {
+            var filePath = GetEmployeeFilePath(employeeId, fileName);
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+
+                // Remove the file entry from the database
+                var employeeDocument = await _dbContext.EmployeeDocuments
+                    .FirstOrDefaultAsync(d => d.EmployeeId == employeeId && d.FileName == fileName);
+
+                if (employeeDocument != null)
+                {
+                    _dbContext.EmployeeDocuments.Remove(employeeDocument);
+                    await _dbContext.SaveChangesAsync();
+                }
+
+                return true;
+            }
+            return false;
+        }
+
+
+
+
+
 
         public async Task<bool> DeleteEmployeeAsync(int id)
         {

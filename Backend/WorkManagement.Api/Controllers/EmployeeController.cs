@@ -289,6 +289,17 @@ namespace WorkManagement.API.Controllers
             
         }
 
+        [HttpDelete("document/{fileName}")]
+        public async Task<IActionResult> DeleteDocument(int id, string fileName)
+        {
+            var result = await employeeService.DeleteEmployeeFile(id, fileName);
+            if (result)
+            {
+                return Ok(new { message = "File deleted successfully" });
+            }
+            return NotFound(new { message = "File not found" });
+        }
+
         [HttpGet("download/{fileName}")]
         public IActionResult Download(int id, string fileName)
         {

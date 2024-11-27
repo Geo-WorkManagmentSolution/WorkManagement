@@ -206,6 +206,36 @@ const injectedRtkApi = api.injectEndpoints({
         method: "PUT",
       }),
     }),
+    postApiEmployeesDocumnetUpload: build.mutation<
+      PostApiEmployeesDocumnetUploadApiResponse,
+      PostApiEmployeesDocumnetUploadApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/documnet/upload`,
+        method: "POST",
+        body: queryArg.body,
+        params: { id: queryArg.id },
+      }),
+    }),
+    deleteApiEmployeesDocumentByFileName: build.mutation<
+      DeleteApiEmployeesDocumentByFileNameApiResponse,
+      DeleteApiEmployeesDocumentByFileNameApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/document/${queryArg.fileName}`,
+        method: "DELETE",
+        params: { id: queryArg.id },
+      }),
+    }),
+    getApiEmployeesDownloadByFileName: build.query<
+      GetApiEmployeesDownloadByFileNameApiResponse,
+      GetApiEmployeesDownloadByFileNameApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/download/${queryArg.fileName}`,
+        params: { id: queryArg.id },
+      }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -308,6 +338,24 @@ export type PutApiEmployeesRejectByLeaveIdApiResponse =
 export type PutApiEmployeesRejectByLeaveIdApiArg = {
   leaveId: number;
 };
+export type PostApiEmployeesDocumnetUploadApiResponse =
+  /** status 200 OK */ string;
+export type PostApiEmployeesDocumnetUploadApiArg = {
+  id?: number;
+  body: {
+    file?: Blob;
+  };
+};
+export type DeleteApiEmployeesDocumentByFileNameApiResponse = unknown;
+export type DeleteApiEmployeesDocumentByFileNameApiArg = {
+  id?: number;
+  fileName: string;
+};
+export type GetApiEmployeesDownloadByFileNameApiResponse = unknown;
+export type GetApiEmployeesDownloadByFileNameApiArg = {
+  id?: number;
+  fileName: string;
+};
 export type EmployeeDashboardDataModel = {
   id?: number;
   employeeNumber?: number | null;
@@ -404,6 +452,7 @@ export type EmployeeDocumentsModel = {
   fileType?: FileType;
 };
 export type EmployeeLeaveSummaryModel = {
+  employeeLeaveSummaryId?: number;
   id?: number;
   employeeLeaveType?: string | null;
   totalLeaves?: number;
@@ -585,4 +634,8 @@ export const {
   useDeleteApiEmployeesLeavesCancelLeaveMutation,
   usePutApiEmployeesApproveByLeaveIdMutation,
   usePutApiEmployeesRejectByLeaveIdMutation,
+  usePostApiEmployeesDocumnetUploadMutation,
+  useDeleteApiEmployeesDocumentByFileNameMutation,
+  useGetApiEmployeesDownloadByFileNameQuery,
+  useLazyGetApiEmployeesDownloadByFileNameQuery,
 } = injectedRtkApi;

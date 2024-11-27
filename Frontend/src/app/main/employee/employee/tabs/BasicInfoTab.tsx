@@ -336,7 +336,7 @@ function BasicInfoTab() {
 						render={({ field }) => (
 							<TextField
 								{...field}
-								value={field.value}
+								value={field.value || ""}
 								label="Alternate Email"
 								fullWidth
 								type="email"

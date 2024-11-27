@@ -37,7 +37,7 @@ function IdentityInfoTab() {
 							{...field}
 							label="Account Holder Name"
 							className=" mx-4"
-
+							value={field.value || ''}
 							fullWidth
 							error={!!errors.employeeIdentityInfos?.accountHolderName}
 							helperText={errors.employeeIdentityInfos?.accountHolderName?.message as string}
@@ -54,7 +54,7 @@ function IdentityInfoTab() {
 								label="Bank Account Number"
 								fullWidth
 								className=" mx-4"
-
+								value={field.value || ''}
 								error={!!errors.employeeIdentityInfos?.bankAccountNumber}
 								helperText={errors.employeeIdentityInfos?.bankAccountNumber?.message as string}
 							/>
@@ -71,7 +71,7 @@ function IdentityInfoTab() {
 								{...field}
 								label="Bank Name"
 								className=" mx-4"
-
+								value={field.value || ''}
 								fullWidth
 								error={!!errors.employeeIdentityInfos?.bankName}
 								helperText={errors.employeeIdentityInfos?.bankName?.message as string}
@@ -86,7 +86,7 @@ function IdentityInfoTab() {
 								{...field}
 								label="Branch"
 								className=" mx-4"
-
+								value={field.value || ''}
 								fullWidth
 								error={!!errors.employeeIdentityInfos?.branch}
 								helperText={errors.employeeIdentityInfos?.branch?.message as string}
@@ -102,7 +102,7 @@ function IdentityInfoTab() {
 								{...field}
 								label="IFSC"
 								className=" mx-4"
-
+								value={field.value || ''}
 								fullWidth
 								error={!!errors.employeeIdentityInfos?.ifsc}
 								helperText={errors.employeeIdentityInfos?.ifsc?.message as string}
@@ -137,6 +137,7 @@ function IdentityInfoTab() {
 							{...field}
 							label="UID"
 							fullWidth
+							value={field.value || ''}
 							error={!!errors.employeeIdentityInfos?.uid}
 							helperText={errors.employeeIdentityInfos?.uid?.message as string}
 						/>
@@ -150,6 +151,7 @@ function IdentityInfoTab() {
 							{...field}
 							label="PAN"
 							fullWidth
+							value={field.value || ''}
 							error={!!errors.employeeIdentityInfos?.pan}
 							helperText={errors.employeeIdentityInfos?.pan?.message as string}
 						/>
@@ -164,6 +166,7 @@ function IdentityInfoTab() {
 							{...field}
 							label="Provident Fund Number"
 							fullWidth
+							value={field.value || ''}
 							error={!!errors.employeeIdentityInfos?.providentFundNumber}
 							helperText={errors.employeeIdentityInfos?.providentFundNumber?.message as string}
 						/>
@@ -178,6 +181,7 @@ function IdentityInfoTab() {
 							{...field}
 							label="Employee State Insurance Number"
 							fullWidth
+							value={field.value || ''}
 							error={!!errors.employeeIdentityInfos?.employeeStateInsuranceNumber}
 							helperText={errors.employeeIdentityInfos?.employeeStateInsuranceNumber?.message as string}
 						/>
@@ -192,6 +196,7 @@ function IdentityInfoTab() {
 							{...field}
 							label="Biometric Code"
 							fullWidth
+							value={field.value || ''}
 							error={!!errors.employeeIdentityInfos?.biometricCode}
 							helperText={errors.employeeIdentityInfos?.biometricCode?.message as string}
 						/>

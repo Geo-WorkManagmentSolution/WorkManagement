@@ -59,5 +59,6 @@ namespace WorkManagement.Domain.Contracts
         public Task<string> GetEmployeeDocumentFileName(int id,string fileName);
         public Task<string> UpdateEmployeeDocumentData(int id, string fileName, string filePath);
         public string GetEmployeeFilePath(int id, string fileName);
+        public Task<bool> DeleteEmployeeFile(int employeeId, string fileName);
     }
 }

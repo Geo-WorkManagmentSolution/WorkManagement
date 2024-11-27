@@ -26,7 +26,9 @@ function IdentityInfoTab() {
       const result = await AddDesignation({
         employeeDesignation: newOption,
       }).unwrap();
-      return { ...newOption, id: result.id };
+      console.log(result);
+      
+      return { ...newOption, id: result };
     } catch (error) {
       console.error("Failed to add new option:", error);
       throw error;

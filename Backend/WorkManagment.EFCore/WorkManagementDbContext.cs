@@ -18,7 +18,7 @@ namespace WorkManagmentSolution.EFCore
 
         public WorkManagementDbContext(DbContextOptions<WorkManagementDbContext> options) : base(options)
         {
-        }
+}
 
 
         public virtual DbSet<Employee> Employees { get; set; }

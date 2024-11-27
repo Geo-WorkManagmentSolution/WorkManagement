@@ -136,6 +136,7 @@ function WorkInfoTab() {
                   label="Department"
                   variant="outlined"
                   required
+                  
                   InputLabelProps={{
                     shrink: true,
                   }}
@@ -153,6 +154,7 @@ function WorkInfoTab() {
             <EnhancedAutocomplete
               {...field}
               fullWidth
+              value={field.value ?? ''}
               label="Select or add Designation"
               options={employeesDesignationsOptions}
               onChange={(_, newValue) => {
@@ -163,10 +165,11 @@ function WorkInfoTab() {
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  value={params.value || ""}
+                  // value={params.value || ""}
                   placeholder="Select or Add Designation"
                   label="Designation"
                   required
+                  value={field.value ?? ''}
                   variant="outlined"
                   InputLabelProps={{
                     shrink: true,
@@ -218,6 +221,7 @@ function WorkInfoTab() {
                   value={params.value || ""}
                   placeholder="Select Employee Report To"
                   label="Report To"
+                  // value={field.value ?? ''}
                   variant="outlined"
                   InputLabelProps={{
                     shrink: true,
@@ -250,6 +254,7 @@ function WorkInfoTab() {
                   value={params.value || ""}
                   placeholder="Select or Add Site"
                   label="Site"
+                  // value={field.value ?? ''}
                   variant="outlined"
                   InputLabelProps={{
                     shrink: true,
@@ -284,6 +289,8 @@ function WorkInfoTab() {
                 select
                 className="mx-4"
                 label="Salary Type"
+                // value={field.value || field.name}
+                value={field.value ?? ''}
                 fullWidth
                 required
                 error={!!errors.employeeWorkInformation?.salaryType}
@@ -309,6 +316,7 @@ function WorkInfoTab() {
                 {...field}
                 label="Salary"
                 type="number"
+                value={field.value ?? ''}
                 className="mx-4"
                 required
                 InputProps={{
