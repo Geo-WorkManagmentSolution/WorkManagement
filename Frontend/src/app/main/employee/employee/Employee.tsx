@@ -66,14 +66,7 @@ const schema = yup.object({
 	}),
 	employeeDepartmentId: yup.string().required('Department is required'),
 	employeeDesignationId: yup.string().required('Designation is required'),
-	// employeeDocuments: yup.array().of(
-	// 	yup.object().shape({
-	// 	  fileName: yup.string().required(),
-	// 	  fileSize: yup.number().required(),
-	// 	  fileContent: yup.string().required(),
-	// 	  fileType: yup.mixed<FileType>().required().oneOf(Object.values(FileType))
-	// 	})
-	//   ).notRequired()
+	
 	});
 
 

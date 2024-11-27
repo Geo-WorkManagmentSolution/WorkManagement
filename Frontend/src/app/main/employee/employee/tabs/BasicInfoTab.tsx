@@ -3,6 +3,7 @@ import { Avatar, Box, Autocomplete, Typography, InputAdornment, Grid, Button, Me
 import TextField from '@mui/material/TextField';
 import { useRef } from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useParams } from 'react-router-dom';
 import { Controller, useFieldArray, useFormContext } from 'react-hook-form';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import { useGetApiAuthRolesQuery } from 'src/app/auth/services/AuthApi';
@@ -21,7 +22,7 @@ function BasicInfoTab() {
 	// const relationShipTypes = ['Parent', 'Spouse', 'Family', 'Friend', 'Other'];
 	const { data: employeesRolesOptions = [] } = useGetApiAuthRolesQuery();
 	const [AddCategory] = usePostApiEmployeesAddNewCategoryMutation();
-
+	const { employeeId } = useParams();
 	const handleOptionAdd = async (newOption: Omit<Option, 'id'>) => {
 		try {
 			const result = await AddCategory({
@@ -329,7 +330,7 @@ function BasicInfoTab() {
 							/>
 						)}
 					/> */}
-					<EmailCheckerInput />
+					 <EmailCheckerInput disabled={employeeId !== 'new'} />
 					<Controller
 						name="alternateEmail"
 						control={control}

@@ -9,9 +9,12 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { useGetApiEmployeesCheckEmailExistsQuery } from '../EmployeeApi';
 import FuseSvgIcon from '../../../../@fuse/core/FuseSvgIcon/FuseSvgIcon';
 
-export default function EmailCheckerInput() {
-	const methods = useFormContext();
-	const { control, formState } = methods;
+interface EmailCheckerInputProps {
+	disabled?: boolean;
+  }
+  
+  export default function EmailCheckerInput({ disabled = false }: EmailCheckerInputProps) {
+	const { control, formState } = useFormContext();
 	const { errors } = formState;
 
 	const [debouncedEmail, setDebouncedEmail] = useState('');
@@ -100,6 +103,7 @@ export default function EmailCheckerInput() {
 					variant="outlined"
 					margin="normal"
 					required
+					disabled={disabled}
 					placeholder='Email'
 					error={!!errors.email || emailExistsData}
 					helperText={getHelperText(errors.email?.message)}
