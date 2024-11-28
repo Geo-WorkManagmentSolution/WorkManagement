@@ -56,15 +56,13 @@ const EnhancedAutocomplete = forwardRef<HTMLDivElement, EnhancedAutocompleteProp
 		const [newOption, setNewOption] = useState<Omit<Option, 'id'> | null>(null);
 		const [isAdding, setIsAdding] = useState(false);
 		const [localOptions, setLocalOptions] = useState<Option[]>(options);
-
 		useEffect(() => {
 			setLocalOptions(options);
 		}, [options]);
-
 		const handleChange = async (
 			event: React.SyntheticEvent,
 			newValue: Option | Option[] | null,
-			reason: AutocompleteChangeReason  
+			reason: AutocompleteChangeReason
 		) => {
 			if (typeof newValue === 'string') {
 				return;
@@ -77,7 +75,6 @@ const EnhancedAutocomplete = forwardRef<HTMLDivElement, EnhancedAutocompleteProp
 				onChange(event, newValue, reason);
 			}
 		};
-
 		const handleConfirmNewOption = async () => {
 			if (newOption && onOptionAdd) {
 				setIsAdding(true);
@@ -98,121 +95,114 @@ const EnhancedAutocomplete = forwardRef<HTMLDivElement, EnhancedAutocompleteProp
 			setDialogOpen(false);
 			setNewOption(null);
 		};
-
 		const canAddNewOption = !multiple || (Array.isArray(value) && value.length === 0);
-
 		return (
 			<>
+				{' '}
 				<Autocomplete
-					{...props}
-					ref={ref}
-					options={localOptions}
-					value={localOptions?.find((c) => c.id === value) || null}
-					multiple={multiple}
-					getOptionLabel={(option: Option | string) => {
-						if (typeof option === 'string') {
-							return option;
-						}
+          {...props}
+          ref={ref}
+          options={localOptions}
+          value={localOptions?.find((c) => c.id === value) || null}
+          multiple={multiple}
+          getOptionLabel={(option: Option | string) => {
+            if (typeof option === 'string') {
+              return option;
+            }
 
-						if (option.inputValue) {
-							return option.inputValue;
-						}
+            if (option.inputValue) {
+              return option.inputValue;
+            }
 
-						return option.name;
-					}}
-					isOptionEqualToValue={(option: Option, value: Option) => option.id === value?.id}
-					filterOptions={(options: Option[], params) => {
-						const filtered = filter(options, params);
-						const { inputValue } = params;
-						const isExisting = options.some((option) => inputValue === option.name);
+            return option.name;
+          }}
+          isOptionEqualToValue={(option: Option, value: Option) => option.id === value?.id}
+          filterOptions={(options: Option[], params) => {
+            const filtered = filter(options, params);
+            const { inputValue } = params;
+            const isExisting = options.some((option) => inputValue === option.name);
 
-						if (inputValue !== '' && !isExisting && canAddNewOption) {
-							filtered.push({
-								inputValue,
-								name: `Add "${inputValue}"`,
-								id: 'new'
-							});
-						}
+            if (inputValue !== '' && !isExisting && canAddNewOption) {
+              filtered.push({ inputValue, name: `Add "${inputValue}"`, id: 'new' });
+            }
 
-						return filtered;
-					}}
-					renderOption={(props, option: Option) => (
-						<li {...props}>
-							{option.inputValue ? (
-								<>
-									<AddIcon sx={{ mr: 1 }} />
-									{option.name}
-								</>
-							) : (
-								option.name
-							)}
-						</li>
-					)}
-					renderInput={(params) =>
-						renderInput({
-							...params,
-							label,
-							placeholder
-						})
-					}
-					renderTags={(value: Option[], getTagProps) =>
-						value.map((option: Option, index: number) => (
-							<Chip
-								variant="outlined"
-								label={option.name}
-								{...getTagProps({ index })}
-								key={option.id}
-							/>
-						))
-					}
-					onChange={handleChange}
-					noOptionsText={
-						canAddNewOption ? (
-							'No options'
-						) : (
-							<Typography color="text.secondary">Remove the selected option to add a new one</Typography>
-						)
-					}
-				/>
+            return filtered;
+          }}
+          renderOption={(props, option: Option) => (
+            <li {...props} key={option.id}>
+              {option.inputValue ? (
+                <>
+                  <AddIcon sx={{ mr: 1 }} /> {option.name}
+                </>
+              ) : (
+                option.name
+              )}
+            </li>
+          )}
+          renderInput={(params) => renderInput({ ...params, label, placeholder })}
+          renderTags={(value: Option[], getTagProps) =>
+            value.map((option: Option, index: number) => (
+              <Chip
+                variant="outlined"
+                label={option.name}
+                {...getTagProps({ index })}
+                key={option.id}
+              />
+            ))
+          }
+          onChange={handleChange}
+          noOptionsText={
+            canAddNewOption ? (
+              'No options'
+            ) : (
+              <Typography color="text.secondary">Remove the selected option to add a new one</Typography>
+            )
+          }
+        />{' '}
 				<Dialog
 					open={dialogOpen}
 					onClose={() => setDialogOpen(false)}
 				>
-					<DialogTitle>Add New Option</DialogTitle>
+					{' '}
+					<DialogTitle>Add New Option</DialogTitle>{' '}
 					<DialogContent>
+						{' '}
 						<Typography>
-							Do you want to add "{newOption?.name}" as a new option?
+							{' '}
+							Do you want to add "{newOption?.name}" as a new option?{' '}
 							{attachedLabel && (
 								<Typography
 									variant="body2"
 									color="text.secondary"
 								>
-									{attachedLabel}
+									{' '}
+									{attachedLabel}{' '}
 								</Typography>
-							)}
-						</Typography>
-					</DialogContent>
+							)}{' '}
+						</Typography>{' '}
+					</DialogContent>{' '}
 					<DialogActions>
+						{' '}
 						<Button
 							onClick={() => setDialogOpen(false)}
 							disabled={isAdding}
 						>
-							Cancel
-						</Button>
+							{' '}
+							Cancel{' '}
+						</Button>{' '}
 						<Button
 							onClick={handleConfirmNewOption}
 							autoFocus
 							disabled={isAdding}
 						>
-							{isAdding ? 'Adding...' : 'Add'}
-						</Button>
-					</DialogActions>
-				</Dialog>
+							{' '}
+							{isAdding ? 'Adding...' : 'Add'}{' '}
+						</Button>{' '}
+					</DialogActions>{' '}
+				</Dialog>{' '}
 			</>
 		);
 	}
 );
-
 EnhancedAutocomplete.displayName = 'EnhancedAutocomplete';
-
 export default EnhancedAutocomplete;

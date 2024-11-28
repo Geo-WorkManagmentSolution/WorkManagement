@@ -7,12 +7,12 @@ import { ListItemIcon, MenuItem, Paper, Typography } from '@mui/material';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
-import { EmployeeLeaveModel, LeaveStatus, useGetApiLeavesLeavesAllQuery } from '../../LeavesApi';
+import { EmployeeLeaveModel, LeaveStatus, useGetApiLeavesLeavesAllQuery } from '../LeavesApi';
 import {
 	usePutApiEmployeesApproveByLeaveIdMutation,
 	usePutApiEmployeesRejectByLeaveIdMutation
-} from '../../../EmployeeApi';
-import LeaveApprovalHeader from './LeaveApprovalHeader';
+} from '../../EmployeeApi';
+import LeaveApprovalHeader from '../LeaveDetailsHeader';
 
 function LeaveApprovalTable() {
 	const { isLoading, data: allLeaves, refetch } = useGetApiLeavesLeavesAllQuery();

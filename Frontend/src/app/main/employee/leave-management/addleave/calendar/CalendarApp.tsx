@@ -123,7 +123,7 @@ export default function CalendarApp() {
 	const theme = useTheme();
 
 	// API hooks
-	const { data: currentLeaves, refetch: refetchCurrentLeaves } = useGetApiEmployeesLeavesCurrentQuery();
+	const { data: currentLeaves, refetch: refetchCurrentLeaves } = useGetApiEmployeesLeavesCurrentQuery({employeeId: null });
 	const [addLeaveApi] = usePostApiEmployeesLeavesAddLeaveMutation();
 	const [cancelLeaveApi] = useDeleteApiEmployeesLeavesCancelLeaveMutation();
 	const [postLeaveHistory] = usePostApiLeavesLeavesEmployeeLeaveHistoryMutation();

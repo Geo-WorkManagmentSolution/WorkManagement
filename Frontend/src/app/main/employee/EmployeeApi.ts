@@ -156,7 +156,10 @@ const injectedRtkApi = api.injectEndpoints({
       GetApiEmployeesLeavesCurrentApiResponse,
       GetApiEmployeesLeavesCurrentApiArg
     >({
-      query: () => ({ url: `/api/Employees/leaves/current` }),
+      query: (queryArg) => ({
+        url: `/api/Employees/leaves/current`,
+        params: { employeeId: queryArg.employeeId },
+      }),
     }),
     postApiEmployeesLeavesAddLeave: build.mutation<
       PostApiEmployeesLeavesAddLeaveApiResponse,
@@ -312,7 +315,9 @@ export type PostApiEmployeesAddNewDesignationApiArg = {
 };
 export type GetApiEmployeesLeavesCurrentApiResponse =
   /** status 200 OK */ EmployeeLeaveSummaryModel[];
-export type GetApiEmployeesLeavesCurrentApiArg = void;
+export type GetApiEmployeesLeavesCurrentApiArg = {
+  employeeId?: number;
+};
 export type PostApiEmployeesLeavesAddLeaveApiResponse =
   /** status 200 OK */ EmployeeLeaveModel;
 export type PostApiEmployeesLeavesAddLeaveApiArg = {

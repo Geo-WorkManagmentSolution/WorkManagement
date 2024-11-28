@@ -1,107 +1,46 @@
-// import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
-// import { Typography } from '@mui/material';
-// import React from 'react';
-// import { useParams } from 'react-router';
-// import FuseLoading from '@fuse/core/FuseLoading';
-// import { useGetApiEmployeesByIdQuery, useGetApiEmployeesDesignationsQuery } from '../../../EmployeeApi';
-
-// function EmployeeLeaveHistory() {
-//     const routeParams = useParams();
-//     const { employeeId } = routeParams;
-
-//     const { data: employee, isLoading: employeeLoading } = useGetApiEmployeesByIdQuery({ id: parseInt(employeeId) });
-//     const { data: designations, isLoading: designationsLoading } = useGetApiEmployeesDesignationsQuery();
-//     const designation = designations?.find((d) => d.id === employee?.employeeDesignationId);
-
-//     if (employeeLoading || designationsLoading) {
-//         return <FuseLoading />;
-//     }
-
-//     return (
-//         <div className="w-full m-10 space-y-48">
-//             <div className="space-y-16">
-//                 <div className="flex items-center border-b-1 space-x-8 pb-8">
-//                     <FuseSvgIcon color="action" size={24}>
-//                         heroicons-outline:user-circle
-//                     </FuseSvgIcon>
-//                     <Typography className="text-2xl" color="text.secondary">
-//                         Employee Leave History
-//                     </Typography>
-//                 </div>
-//                 <div className="space-y-16">
-//                     <div className="table-responsive border rounded-md">
-//                         <table className="table dense simple">
-//                             <thead>
-//                                 <tr>
-//                                     <th>
-//                                         <Typography className="font-semibold">Name</Typography>
-//                                     </th>
-//                                     <th>
-//                                         <Typography className="font-semibold">Employee Number</Typography>
-//                                     </th>
-//                                     <th>
-//                                         <Typography className="font-semibold">Designation</Typography>
-//                                     </th>
-//                                     <th>
-//                                         <Typography className="font-semibold">Email</Typography>
-//                                     </th>
-//                                 </tr>
-//                             </thead>
-//                             <tbody>
-//                                 <tr>
-//                                     <td>
-//                                         <div className="flex items-center">
-//                                             <Typography className="truncate mx-8">
-//                                                 {employee?.firstName} {employee?.lastName}
-//                                             </Typography>
-//                                         </div>
-//                                     </td>
-//                                     <td>
-//                                         <Typography className="truncate">{employee?.employeeNumber}</Typography>
-//                                     </td>
-//                                     <td>
-//                                         <Typography className="truncate">{designation?.name || "Unknown"}</Typography>
-//                                     </td>
-//                                     <td>
-//                                         <span className="truncate">{employee?.email}</span>
-//                                     </td>
-//                                 </tr>
-//                             </tbody>
-//                         </table>
-//                     </div>
-//                 </div>
-
-// 			{/* ADD DATATABLE HERE */}
-
-//             </div>
-//         </div>
-//     );
-// }
-
-// export default EmployeeLeaveHistory;
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
-import { Typography, Paper, MenuItem, ListItemIcon } from '@mui/material';
+import {
+	Typography,
+	Paper,
+	MenuItem,
+	ListItemIcon,
+	Accordion,
+	AccordionSummary,
+	AccordionDetails
+} from '@mui/material';
 import React, { useMemo } from 'react';
 import { useParams } from 'react-router';
 import FuseLoading from '@fuse/core/FuseLoading';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import DataTable from 'app/shared-components/data-table/DataTable';
 import { type MRT_ColumnDef } from 'material-react-table';
 import { format } from 'date-fns';
-import PageBreadcrumb from 'app/shared-components/PageBreadcrumb';
+
 import {
 	useGetApiEmployeesByIdQuery,
 	useGetApiEmployeesDesignationsQuery,
 	usePutApiEmployeesApproveByLeaveIdMutation,
 	usePutApiEmployeesRejectByLeaveIdMutation
-} from '../../../EmployeeApi';
-import { EmployeeLeaveModel, LeaveStatus, useGetApiLeavesLeavesAllQuery } from '../../LeavesApi';
-import LeaveApprovalHeader from './LeaveApprovalHeader';
+} from '../../EmployeeApi';
+import {
+	EmployeeLeaveModel,
+	EmployeeLeaveSummaryModel,
+	LeaveStatus,
+	useGetApiEmployeesLeavesCurrentQuery,
+	useGetApiLeavesLeavesAllQuery
+} from '../LeavesApi';
+import LeaveApprovalHeader from '../LeaveDetailsHeader';
 
-function EmployeeLeaveHistory() {
+function EmployeeLeaveHistoryWithApproval() {
 	const routeParams = useParams();
-	const { employeeId } = routeParams;
-
-	const { data: employee, isLoading: employeeLoading } = useGetApiEmployeesByIdQuery({ id: parseInt(employeeId) });
+	const employeeId = routeParams.employeeId;
+	const parsedEmployeeId = employeeId ? parseInt(employeeId, 10) : undefined;
+	console.log("employee id ", employeeId);
+	
+	const { data: currentLeaves, isLoading: leavesBalanceLoading } = useGetApiEmployeesLeavesCurrentQuery({ employeeId: parsedEmployeeId })
+	console.log("currunt leaves",currentLeaves);
+	
+	const { data: employee, isLoading: employeeLoading } = useGetApiEmployeesByIdQuery({ id: parsedEmployeeId });
 	const { data: designations, isLoading: designationsLoading } = useGetApiEmployeesDesignationsQuery();
 	const designation = designations?.find((d) => d.id === employee?.employeeDesignationId);
 
@@ -192,12 +131,9 @@ function EmployeeLeaveHistory() {
 	return (
 		<div className="w-full m-10 space-y-48">
 			<div className="space-y-16">
-            <div className="w-full h-full flexpx-16">
-	<LeaveApprovalHeader/>
-</div>
-
-
-
+				<div className="w-full h-full flexpx-16">
+					<LeaveApprovalHeader />
+				</div>
 				<div className="space-y-16">
 					<Paper
 						className="flex flex-col flex-auto shadow-1 rounded-xl overflow-hidden rounded-b-0 w-full h-full"
@@ -247,6 +183,56 @@ function EmployeeLeaveHistory() {
 						</div>
 					</Paper>
 				</div>
+				 {/* <Accordion>
+					<AccordionSummary
+						expandIcon={<ExpandMoreIcon />}
+						aria-controls="panel1-content"
+						id="panel1-header"
+					>
+						<Typography>Employee Leave Balance</Typography>
+					</AccordionSummary>
+					<AccordionDetails>
+						<div className="flex justify-between ">
+							{leavesBalanceLoading ? (
+								<FuseLoading />
+							) : (
+								currentLeaves?.map((eachData: EmployeeLeaveSummaryModel) => (
+									<div
+										key={eachData.id}
+										className="grid grid-cols-1  "
+									>
+										<Paper className="flex flex-col flex-auto shadow-md rounded-xl overflow-hidden bg-white p-6 w-224">
+											<div className="flex items-center justify-between px-8 pt-8">
+												<Typography
+													className="px-12 text-lg font-medium tracking-tight leading-6 truncate"
+													color="text.secondary"
+												>
+													{eachData.employeeLeaveType} :
+												</Typography>
+												
+											</div>
+											<div className="text-center mt-16">
+												<Typography className="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-yellow-400">
+													{eachData.remainingLeaves}
+												</Typography>
+												<Typography className="text-lg font-medium text-yellow-600">
+													Remaining Leaves
+												</Typography>
+											</div>
+											<Typography
+												className="flex items-baseline justify-center w-full mt-20 mb-24 space-x-8"
+												color="text.secondary"
+											>
+												<span className="truncate">Openning Balance : </span>
+												<b>{eachData.totalLeaves}</b>
+											</Typography>
+										</Paper>
+									</div>
+								))
+							)}
+						</div>
+					</AccordionDetails>
+				</Accordion>  */}
 
 				<Paper
 					className="flex flex-col flex-auto shadow-1 rounded-t-lg overflow-hidden rounded-b-0 w-full h-full"
@@ -293,4 +279,4 @@ function EmployeeLeaveHistory() {
 	);
 }
 
-export default EmployeeLeaveHistory;
+export default EmployeeLeaveHistoryWithApproval;

@@ -41,14 +41,28 @@ const navigationConfig: FuseNavItemType[] = [
 					{
 						id: 'applicationmanagement.employees.leavemanagement',
 						title: 'Leave Management',
-						type: 'item',
-						url: '/apps/employees/leave-management'
-					},
-					{
-						id: 'applicationmanagement.employees.leave-approval',
-						title: 'Leave Approval',
-						type: 'item',
-						url: '/apps/employees/leave-approval'
+						type: 'collapse',
+						children: [
+							{
+								id: 'applicationmanagement.employees.leave-management.add-leave',
+								title: 'Add Leave',
+								type: 'item',
+								url: '/apps/employees/leave-management/addleave',
+								end: true
+							},
+							{
+								id: 'applicationmanagement.employees.leave-management.leave-approval',
+								title: 'Leave Approval',
+								type: 'item',
+								url: '/apps/employees/leave-management/leave-approval'
+							},
+							{
+								id: 'applicationmanagement.employees.leave-management.leave-history',
+                                title: 'Employee Leave History',
+                                type: 'item',
+                                url: '/apps/employees/leave-management/leave-history'
+							}
+						]
 					}
 				]
 			},
@@ -78,7 +92,7 @@ const navigationConfig: FuseNavItemType[] = [
 				title: 'Settings',
 				type: 'item',
 				icon: 'heroicons-outline:cog-8-tooth',
-        url: '/apps/settings'
+				url: '/apps/settings'
 			}
 		]
 	}

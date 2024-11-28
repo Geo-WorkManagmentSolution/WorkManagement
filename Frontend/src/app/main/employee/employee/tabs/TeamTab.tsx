@@ -134,6 +134,14 @@ function TeamTab() {
       <Paper className="flex flex-col flex-auto shadow rounded-lg overflow-hidden w-full">
       
         <DataTable
+        enableSorting={false}
+        enableTopToolbar={false}
+        enableColumnActions={false}
+        // enableMultiSort={false}
+         // enableCellActions={false}
+        enableColumnDragging={false}
+       
+        enableRowDragging={false}
         enableRowActions={false}  
           columns={columns}
           data={employeeTeamMembersList}

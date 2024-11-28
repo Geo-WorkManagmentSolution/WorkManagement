@@ -210,14 +210,21 @@ namespace WorkManagement.API.Controllers
 
         // GET api/employee/leaves/current
         [HttpGet("leaves/current")]
-        public async Task<ActionResult<IEnumerable<EmployeeLeaveSummaryModel>>> GetEmployeeLeaves()
+        public async Task<ActionResult<IEnumerable<EmployeeLeaveSummaryModel>>> GetEmployeeLeaves([FromQuery] int? employeeId = null)
         {
-            var leaves = await employeeService.GetEmployeeLeaves(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            return Ok(leaves);
+            List<EmployeeLeaveSummaryModel> leaves; if (employeeId.HasValue)
+            { // Fetch data based on employeeId
+              leaves = await employeeService.GetEmployeeLeaves(null, employeeId); 
+            } else 
+            { 
+                // Fetch data based on loggedUserId
+                var loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                leaves = await employeeService.GetEmployeeLeaves(loggedUserId, null); 
+            } return Ok(leaves); 
         }
 
-        // GET api/employee/leaves/addLeave
-        [HttpPost("leaves/addLeave")]
+                // GET api/employee/leaves/addLeave
+                [HttpPost("leaves/addLeave")]
         public async Task<ActionResult<EmployeeLeaveModel>> AddLeave(EmployeeLeaveModel employeeLeaveData)
         {
             var leaves = await employeeService.AddLeave(employeeLeaveData, User.FindFirst(ClaimTypes.NameIdentifier).Value);

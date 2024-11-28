@@ -1149,71 +1149,159 @@ namespace WorkManagement.Service
 
         #region Leave management
 
-        public async Task<List<EmployeeLeaveSummaryModel>> GetEmployeeLeaves(string loggedUserId)
+
+        //public async Task<List<EmployeeLeaveSummaryModel>> GetEmployeeLeaves(string loggedUserId)
+        //{
+        //    try
+        //    {
+        //        var employeeId = CheckValidEmployeeId(loggedUserId);
+        //        /*if (employeeId == -1)
+        //        {
+        //            throw new Exception("Invalid User data");
+        //        }*/
+
+
+        //        //var defaultLeaves = await _dbContext.EmployeeDefaultLeave.Include(x => x.EmployeeLeaveTypes).ToListAsync();
+
+        //        var defaultLeaves = (from ed in _dbContext.EmployeeDefaultLeave
+        //                             select new EmployeeLeaveSummaryModel
+        //                             {
+        //                                 Id = ed.EmployeeLeaveTypeId.HasValue ? ed.EmployeeLeaveTypeId.Value : 0,
+        //                                 EmployeeLeaveType = ed.EmployeeLeaveTypes.Name,
+        //                                 TotalLeaves = ed.TotalLeaves,
+        //                                 RemainingLeaves = ed.TotalLeaves
+        //                             }).ToList();
+
+        //        var employeeLeaveData = (from el in _dbContext.EmployeeLeaveSummary.Where(s => s.EmployeeId == employeeId)
+        //                                 select new EmployeeLeaveSummaryModel
+        //                                 {
+        //                                     EmployeeLeaveSummaryId = el.Id,
+        //                                     Id = el.EmployeeLeaveTypeId.HasValue ? el.EmployeeLeaveTypeId.Value : 0,
+        //                                     EmployeeLeaveType = el.EmployeeLeaveTypes.Name,
+        //                                     TotalLeaves = el.TotalLeaves,
+        //                                     RemainingLeaves = el.RemainingLeaves
+        //                                 }).ToList();
+
+        //        if (employeeLeaveData.Count > 0)
+        //        {
+        //            var employeeLeaveHistory = _dbContext.EmployeeLeaves.Where(s => s.EmployeeId == employeeId).ToList();
+        //            var isLeaveMismatch = false;
+        //            if (employeeLeaveHistory.Count > 0)
+        //            {
+        //                foreach(var e in employeeLeaveData)
+        //                {
+        //                    var employeeLeave = employeeLeaveHistory.Where(s => s.EmployeeLeaveTypeId == e.Id).Sum(s => s.LeaveDays);
+        //                    var remainingLeaves = e.TotalLeaves - employeeLeave;
+        //                    if(e.RemainingLeaves != remainingLeaves)
+        //                    {
+        //                        isLeaveMismatch = true;
+        //                        e.RemainingLeaves = remainingLeaves;
+        //                        var employeeLeaveSummary = _dbContext.EmployeeLeaveSummary.FirstOrDefault(s => s.Id == e.EmployeeLeaveSummaryId);
+        //                        if (employeeLeaveSummary != null)
+        //                        {
+        //                            employeeLeaveSummary.RemainingLeaves = remainingLeaves;
+        //                            _dbContext.EmployeeLeaveSummary.Update(employeeLeaveSummary);
+        //                        }
+        //                    }
+        //                }
+
+        //                if (isLeaveMismatch)
+        //                {
+        //                    _dbContext.SaveChanges();
+        //                }
+        //            }
+        //            return employeeLeaveData;
+        //        }
+        //        else
+        //        {
+        //            return defaultLeaves;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Log the exception (use your preferred logging framework)
+        //        Console.WriteLine(ex.ToString());
+
+        //        // Optionally, rethrow the exception or handle it accordingly
+        //        throw new Exception("An error occurred while fetching the employee leaves.", ex);
+        //    }
+
+        //}
+
+
+
+        public async Task<List<EmployeeLeaveSummaryModel>> GetEmployeeLeaves(string loggedUserId, int? employeeId)
         {
             try
             {
-                var employeeId = CheckValidEmployeeId(loggedUserId);
-                /*if (employeeId == -1)
+                // If employeeId is not provided or invalid, check for a valid loggedUserId
+                if (!employeeId.HasValue || employeeId.Value == -1)
                 {
-                    throw new Exception("Invalid User data");
-                }*/
+                    if (!string.IsNullOrEmpty(loggedUserId))
+                    {
+                        employeeId = CheckValidEmployeeId(loggedUserId);
+                    }
+                }
 
-
-                //var defaultLeaves = await _dbContext.EmployeeDefaultLeave.Include(x => x.EmployeeLeaveTypes).ToListAsync();
-
-                var defaultLeaves = (from ed in _dbContext.EmployeeDefaultLeave
-                                     select new EmployeeLeaveSummaryModel
-                                     {
-                                         Id = ed.EmployeeLeaveTypeId.HasValue ? ed.EmployeeLeaveTypeId.Value : 0,
-                                         EmployeeLeaveType = ed.EmployeeLeaveTypes.Name,
-                                         TotalLeaves = ed.TotalLeaves,
-                                         RemainingLeaves = ed.TotalLeaves
-                                     }).ToList();
-
-                var employeeLeaveData = (from el in _dbContext.EmployeeLeaveSummary.Where(s => s.EmployeeId == employeeId)
+                if (employeeId.HasValue && employeeId.Value != -1)
+                {
+                    var defaultLeaves = (from ed in _dbContext.EmployeeDefaultLeave
                                          select new EmployeeLeaveSummaryModel
                                          {
-                                             EmployeeLeaveSummaryId = el.Id,
-                                             Id = el.EmployeeLeaveTypeId.HasValue ? el.EmployeeLeaveTypeId.Value : 0,
-                                             EmployeeLeaveType = el.EmployeeLeaveTypes.Name,
-                                             TotalLeaves = el.TotalLeaves,
-                                             RemainingLeaves = el.RemainingLeaves
+                                             Id = ed.EmployeeLeaveTypeId.HasValue ? ed.EmployeeLeaveTypeId.Value : 0,
+                                             EmployeeLeaveType = ed.EmployeeLeaveTypes.Name,
+                                             TotalLeaves = ed.TotalLeaves,
+                                             RemainingLeaves = ed.TotalLeaves
                                          }).ToList();
 
-                if (employeeLeaveData.Count > 0)
-                {
-                    var employeeLeaveHistory = _dbContext.EmployeeLeaves.Where(s => s.EmployeeId == employeeId).ToList();
-                    var isLeaveMismatch = false;
-                    if (employeeLeaveHistory.Count > 0)
+                    var employeeLeaveData = (from el in _dbContext.EmployeeLeaveSummary.Where(s => s.EmployeeId == employeeId.Value)
+                                             select new EmployeeLeaveSummaryModel
+                                             {
+                                                 EmployeeLeaveSummaryId = el.Id,
+                                                 Id = el.EmployeeLeaveTypeId.HasValue ? el.EmployeeLeaveTypeId.Value : 0,
+                                                 EmployeeLeaveType = el.EmployeeLeaveTypes.Name,
+                                                 TotalLeaves = el.TotalLeaves,
+                                                 RemainingLeaves = el.RemainingLeaves
+                                             }).ToList();
+
+                    if (employeeLeaveData.Count > 0)
                     {
-                        foreach(var e in employeeLeaveData)
+                        var employeeLeaveHistory = _dbContext.EmployeeLeaves.Where(s => s.EmployeeId == employeeId.Value).ToList();
+                        var isLeaveMismatch = false;
+                        if (employeeLeaveHistory.Count > 0)
                         {
-                            var employeeLeave = employeeLeaveHistory.Where(s => s.EmployeeLeaveTypeId == e.Id).Sum(s => s.LeaveDays);
-                            var remainingLeaves = e.TotalLeaves - employeeLeave;
-                            if(e.RemainingLeaves != remainingLeaves)
+                            foreach (var e in employeeLeaveData)
                             {
-                                isLeaveMismatch = true;
-                                e.RemainingLeaves = remainingLeaves;
-                                var employeeLeaveSummary = _dbContext.EmployeeLeaveSummary.FirstOrDefault(s => s.Id == e.EmployeeLeaveSummaryId);
-                                if (employeeLeaveSummary != null)
+                                var employeeLeave = employeeLeaveHistory.Where(s => s.EmployeeLeaveTypeId == e.Id).Sum(s => s.LeaveDays);
+                                var remainingLeaves = e.TotalLeaves - employeeLeave;
+                                if (e.RemainingLeaves != remainingLeaves)
                                 {
-                                    employeeLeaveSummary.RemainingLeaves = remainingLeaves;
-                                    _dbContext.EmployeeLeaveSummary.Update(employeeLeaveSummary);
+                                    isLeaveMismatch = true;
+                                    e.RemainingLeaves = remainingLeaves;
+                                    var employeeLeaveSummary = _dbContext.EmployeeLeaveSummary.FirstOrDefault(s => s.Id == e.EmployeeLeaveSummaryId);
+                                    if (employeeLeaveSummary != null)
+                                    {
+                                        employeeLeaveSummary.RemainingLeaves = remainingLeaves;
+                                        _dbContext.EmployeeLeaveSummary.Update(employeeLeaveSummary);
+                                    }
                                 }
                             }
-                        }
 
-                        if (isLeaveMismatch)
-                        {
-                            _dbContext.SaveChanges();
+                            if (isLeaveMismatch)
+                            {
+                                _dbContext.SaveChanges();
+                            }
                         }
+                        return employeeLeaveData;
                     }
-                    return employeeLeaveData;
+                    else
+                    {
+                        return defaultLeaves;
+                    }
                 }
                 else
                 {
-                    return defaultLeaves;
+                    throw new Exception(" leave data was not found.");
                 }
             }
             catch (Exception ex)
@@ -1224,8 +1312,12 @@ namespace WorkManagement.Service
                 // Optionally, rethrow the exception or handle it accordingly
                 throw new Exception("An error occurred while fetching the employee leaves.", ex);
             }
-
         }
+
+
+
+
+
 
         public async Task<EmployeeLeaveModel> AddLeave(EmployeeLeaveModel employeeLeaveData, string loggedUserId)
         {
@@ -1557,5 +1649,6 @@ namespace WorkManagement.Service
             return (true, string.Empty);
         }
 
+       
     }
 }
