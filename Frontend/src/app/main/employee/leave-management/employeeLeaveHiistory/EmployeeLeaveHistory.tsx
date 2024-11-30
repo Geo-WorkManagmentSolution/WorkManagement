@@ -31,9 +31,9 @@ import {
 } from '../LeavesApi';
 import LeaveApprovalHeader from '../LeaveDetailsHeader';
 
-function EmployeeLeaveHitory() {
+function EmployeeLeaveHistory() {
 	const routeParams = useParams();
-	const employeeId = routeParams.employeeId;
+	const { employeeId } = routeParams;
 	const parsedEmployeeId = employeeId ? parseInt(employeeId, 10) : undefined;
 	console.log("employee id ", employeeId);
 	
@@ -258,6 +258,7 @@ function EmployeeLeaveHitory() {
 					elevation={0}
 				>
 					<DataTable
+			 enableRowActions={false}  
 						enableRowSelection={false}
 						data={employeeLeaves}
 						columns={columns}
@@ -298,4 +299,4 @@ function EmployeeLeaveHitory() {
 	);
 }
 
-export default EmployeeLeaveHitory;
+export default EmployeeLeaveHistory;

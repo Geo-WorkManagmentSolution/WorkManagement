@@ -3,7 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { FuseRouteItemType } from '@fuse/utils/FuseUtils';
 import LeaveApplication from './leave-management/addleave/LeaveApplication';
 import LeaveApprovalTable from './leave-management/approval/LeaveApprovalTable';
-import EmployeeLeaveHistory from './leave-management/employeeLeaveHiistory/EmployeeLeaveHitory';
+import EmployeeLeaveHistory from './leave-management/employeeLeaveHiistory/EmployeeLeaveHistory';
 import EmployeeLeaveHistoryWithApproval from './leave-management/approval/EmployeeLeaveHistoryWithApproval';
 import EmployeesLeaveHistories from './leave-management/employeeLeaveHiistory/EmployeesLeaveHistories';
 // import Employees from './employees/Employees';
