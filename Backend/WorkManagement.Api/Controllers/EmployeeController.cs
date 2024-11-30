@@ -90,9 +90,10 @@ namespace WorkManagement.API.Controllers
 
 
         [HttpGet("TeamMembersList")]
-        public async Task<ActionResult<IEnumerable<EmployeeTeamMemberList>>> GetTeamMembersList(int? employeeId)
+        public async Task<ActionResult<IEnumerable<EmployeeTeamMemberList>>> GetTeamMembersList([FromQuery] int? employeeId = null)
         {
-            var teamMembersList = await employeeService.GetTeamMembersList(employeeId);
+            string loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var teamMembersList = await employeeService.GetTeamMembersList(loggedUserId, employeeId);
             return Ok(teamMembersList);
         }
 

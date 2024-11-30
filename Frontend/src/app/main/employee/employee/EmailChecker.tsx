@@ -103,6 +103,7 @@ interface EmailCheckerInputProps {
 					variant="outlined"
 					margin="normal"
 					required
+					value={field.value || ''}
 					disabled={disabled}
 					placeholder='Email'
 					error={!!errors.email || emailExistsData}

@@ -99,27 +99,68 @@ namespace WorkManagement.Service
             return await _dbContext.Sites.ToListAsync();
         }
 
-        public async Task<List<EmployeeTeamMemberList>> GetTeamMembersList(int? employeeId)
-        {
-            if (employeeId == null)
-            {
-                return new List<EmployeeTeamMemberList>();
-            }
-            else
-            {
+        //public async Task<List<EmployeeTeamMemberList>> GetTeamMembersList(int? employeeId)
+        //{
+        //    if (employeeId == null)
+        //    {
+        //        return new List<EmployeeTeamMemberList>();
+        //    }
+        //    else
+        //    {
 
-                var data = (from e in _dbContext.Employees.Where(e => !e.IsDeleted && e.EmployeeReportToId == employeeId)
-                            .Include(x=>x.EmployeeDesignation)
-                            select new EmployeeTeamMemberList
-                            {
-                                Name = e.FirstName + " " + e.LastName,
-                                Email = e.Email,
-                                Avatar = "",
-                                Designation = e.EmployeeDesignation != null ? e.EmployeeDesignation.Name : "",
-                                EmployeeId =e.Id
-                            }).ToList();
+        //        var data = (from e in _dbContext.Employees.Where(e => !e.IsDeleted && e.EmployeeReportToId == employeeId)
+        //                    .Include(x=>x.EmployeeDesignation)
+        //                    select new EmployeeTeamMemberList
+        //                    {
+        //                        Name = e.FirstName + " " + e.LastName,
+        //                        Email = e.Email,
+        //                        Avatar = "",
+        //                        Designation = e.EmployeeDesignation != null ? e.EmployeeDesignation.Name : "",
+        //                        EmployeeId =e.Id
+        //                    }).ToList();
+
+        //        return data;
+        //    }
+        //}
+
+        public async Task<List<EmployeeTeamMemberList>> GetTeamMembersList(string loggedUserId, int? employeeId)
+        {
+            try
+            {
+                int targetEmployeeId;
+
+                if (employeeId.HasValue)
+                {
+                    targetEmployeeId = employeeId.Value;
+                }
+                else
+                {
+                    targetEmployeeId = CheckValidEmployeeId(loggedUserId);
+                    if (targetEmployeeId == -1)
+                    {
+                        throw new Exception("Invalid User data");
+                    }
+                }
+
+                var data = await (from e in _dbContext.Employees
+                                  where !e.IsDeleted && e.EmployeeReportToId == targetEmployeeId
+                                  select new EmployeeTeamMemberList
+                                  {
+                                      Name = e.FirstName + " " + e.LastName,
+                                      Email = e.Email,
+                                      Avatar = "",
+                                      Designation = e.EmployeeDesignation != null ? e.EmployeeDesignation.Name : "",
+                                      EmployeeId = e.Id,
+                                      EmployeeNumber=e.EmployeeNumber
+                                  }).ToListAsync();
 
                 return data;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine(ex.ToString());
+                throw new Exception("An error occurred while fetching the team members list.", ex);
             }
         }
 

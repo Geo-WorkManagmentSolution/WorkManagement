@@ -19,7 +19,7 @@ namespace WorkManagement.Domain.Contracts
         public Task<List<EmployeeDesignation>> GetEmployeeDesignations();
         public Task<List<Site>> GetSites();
         public Task<List<EmployeeReportToModel>> GetReportToEmployeeList(int? departmentId, int? employeeId);
-        public Task<List<EmployeeTeamMemberList>> GetTeamMembersList(int? employeeId);
+        public Task<List<EmployeeTeamMemberList>> GetTeamMembersList(string loggedUserId, int? employeeId);
 
         #endregion
 
