@@ -363,7 +363,7 @@ function BasicInfoTab() {
 						render={({ field }) => (
 							<TextField
 								{...field}
-								value={field.value}
+								value={field.value || ""}
 								label="Phone Number"
 								fullWidth
 								type="number"
@@ -390,7 +390,7 @@ function BasicInfoTab() {
 						render={({ field }) => (
 							<TextField
 								{...field}
-								value={field.value}
+								value={field.value || ""}
 								label="Alternate Number"
 								type="number"
 								className="mx-4"

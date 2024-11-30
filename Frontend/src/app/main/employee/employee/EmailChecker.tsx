@@ -80,16 +80,16 @@ interface EmailCheckerInputProps {
 			);
 		}
 
-		if (debouncedEmail && !emailExistsData) {
-			return <CheckCircleOutlineIcon sx={{ color: green[500] }} />;
-		}
-
 		if (error || emailExistsData) {
 			return <ErrorOutlineIcon sx={{ color: red[500] }} />;
-		}
-
-		return null;
-	};
+		  }
+	  
+		  if (debouncedEmail && !emailExistsData) {
+			return <CheckCircleOutlineIcon sx={{ color: green[500] }} />;
+		  }
+	  
+		  return null;
+		};
 
 	return (
 		<Controller
