@@ -32,24 +32,13 @@ namespace WorkManagement.Service
             _emailService = emailService;
         }
 
-        public async Task<List<EmployeeDashboardDataModel>> GetAllEmployeesAsync(string loggedUserId,string userRole)
+        public async Task<List<EmployeeDashboardDataModel>> GetAllEmployeesAsync()
         {
             try
             {
-                var targetEmployeeId = CheckValidEmployeeId(loggedUserId);
-                if (targetEmployeeId == -1)
-                {
-                    throw new Exception("Invalid User data");
-                }
-
-                var employeeData = new List<EmployeeDashboardDataModel>();
-
                 //var Employee = await _dbContext.Employees.ToListAsync();
                 //return mapper.Map<List<EmployeeModel>>(Employee);
-
-                if(userRole != "HR Admin")
-                {
-                    employeeData = (from e in _dbContext.Employees.Where(s => !s.IsDeleted && (s.EmployeeReportToId == targetEmployeeId || s.Id == targetEmployeeId))
+                var employeeData = (from e in _dbContext.Employees.Where(s => !s.IsDeleted)
                                     select new EmployeeDashboardDataModel
                                     {
                                         Id = e.Id,
@@ -66,29 +55,6 @@ namespace WorkManagement.Service
                                         Site = e.EmployeeWorkInformation == null ? "" : (e.EmployeeWorkInformation.Site == null ? "" : e.EmployeeWorkInformation.Site.Name),
                                         HireDate = e.EmployeeWorkInformation == null ? "" : (e.EmployeeWorkInformation.HireDate.HasValue ? e.EmployeeWorkInformation.HireDate.Value.ToString("yyyy-MM-dd") : ""),
                                     }).ToList();
-                }
-                else
-                {
-                    employeeData = (from e in _dbContext.Employees.Where(s => !s.IsDeleted)
-                                    select new EmployeeDashboardDataModel
-                                    {
-                                        Id = e.Id,
-                                        EmployeeNumber = e.EmployeeNumber,
-                                        FirstName = e.FirstName,
-                                        MiddleName = e.MiddleName,
-                                        LastName = e.LastName,
-                                        Email = e.Email,
-                                        PhoneNumber = e.PhoneNumber,
-                                        Gender = e.EmployeePersonalDetails == null ? "" : e.EmployeePersonalDetails.Gender.ToUpper(),
-                                        DepartmentName = e.EmployeeDepartment == null ? "" : e.EmployeeDepartment.Name,
-                                        DesignationName = e.EmployeeDesignation == null ? "" : e.EmployeeDesignation.Name,
-                                        CategoryName = e.EmployeeCategory == null ? "" : e.EmployeeCategory.Name,
-                                        Site = e.EmployeeWorkInformation == null ? "" : (e.EmployeeWorkInformation.Site == null ? "" : e.EmployeeWorkInformation.Site.Name),
-                                        HireDate = e.EmployeeWorkInformation == null ? "" : (e.EmployeeWorkInformation.HireDate.HasValue ? e.EmployeeWorkInformation.HireDate.Value.ToString("yyyy-MM-dd") : ""),
-                                    }).ToList();
-                }
-
-               
 
 
                 if (employeeData != null)
