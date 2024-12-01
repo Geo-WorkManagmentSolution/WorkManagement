@@ -519,9 +519,9 @@ export type EmployeeTeamMemberList = {
   name?: string | null;
   email?: string | null;
   avatar?: string | null;
+  employeeNumber?: number;
   designation?: string | null;
   employeeId?: number;
-  employeeNumber?: number;
 };
 export type Criterion = {
   field?: string | null;
