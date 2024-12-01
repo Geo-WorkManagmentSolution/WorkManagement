@@ -43,10 +43,14 @@ namespace WorkManagement.API.Controllers
         }
 
         // GET: api/employees
+        [Authorize(Roles = "Employee")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EmployeeDashboardDataModel>>> GetEmployees()
         {
-            var employees = await employeeService.GetAllEmployeesAsync();
+            var userRole = this.User.FindFirst(ClaimTypes.Role).Value;
+            string loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var employees = await employeeService.GetAllEmployeesAsync(loggedUserId,userRole);
             return Ok(employees);
         }
 
@@ -122,6 +126,11 @@ namespace WorkManagement.API.Controllers
         [HttpPost]
         public async Task<ActionResult<EmployeeModel>> CreateEmployee([FromBody] EmployeeModel employeeModel)
         {
+            var userRole = this.User.FindFirst(ClaimTypes.Role).Value;
+            
+            if(userRole == "Employee") {
+                return BadRequest("Employee user can not add new employee");            
+            }
             var createdEmployee = await employeeService.CreateEmployeeAsync(employeeModel);
             return CreatedAtAction(nameof(GetEmployee), new { id = createdEmployee.Id }, createdEmployee);
         }

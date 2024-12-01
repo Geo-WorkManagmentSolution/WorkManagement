@@ -33,7 +33,7 @@ namespace WorkManagement.Domain.Contracts
 
         #region Employee Dashboard
 
-        public Task<List<EmployeeDashboardDataModel>> GetAllEmployeesAsync();
+        public Task<List<EmployeeDashboardDataModel>> GetAllEmployeesAsync(string loggedUserId,string userRole);
         public Task<EmployeeModel> GetEmployeeByIdAsync(int id);
         public Task<EmployeeModel> CreateEmployeeAsync(EmployeeModel employee);
         public Task<EmployeeModel> UpdateEmployeeAsync(int id, EmployeeModel employee);
