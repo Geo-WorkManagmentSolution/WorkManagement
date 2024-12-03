@@ -11,6 +11,7 @@ import { Alert, Box, Snackbar, Typography } from '@mui/material';
 import clsx from 'clsx';
 import FusePageSimple from '@fuse/core/FusePageSimple';
 import { isSameDay, parseISO } from 'date-fns';
+import FuseLoading from '@fuse/core/FuseLoading';
 import CalendarHeader from './CalendarHeader';
 import EventDialog from './EventDialog';
 
@@ -123,11 +124,13 @@ export default function CalendarApp() {
 	const theme = useTheme();
 
 	// API hooks
-	const { data: currentLeaves, refetch: refetchCurrentLeaves } = useGetApiEmployeesLeavesCurrentQuery({employeeId: null });
-	const [addLeaveApi] = usePostApiEmployeesLeavesAddLeaveMutation();
-	const [cancelLeaveApi] = useDeleteApiEmployeesLeavesCancelLeaveMutation();
-	const [postLeaveHistory] = usePostApiLeavesLeavesEmployeeLeaveHistoryMutation();
-	const [updateLeaveApi] = usePutApiEmployeesLeavesUpdateLeaveMutation();
+	const { data: currentLeaves, refetch: refetchCurrentLeaves } = useGetApiEmployeesLeavesCurrentQuery({
+		employeeId: null
+	});
+	const [addLeaveApi, { isLoading: isAdding }] = usePostApiEmployeesLeavesAddLeaveMutation();
+	const [cancelLeaveApi, { isLoading: isCancelling }] = useDeleteApiEmployeesLeavesCancelLeaveMutation();
+	const [postLeaveHistory, { isLoading: isFetching }] = usePostApiLeavesLeavesEmployeeLeaveHistoryMutation();
+	const [updateLeaveApi, { isLoading: isUpdating }] = usePutApiEmployeesLeavesUpdateLeaveMutation();
 
 	useEffect(() => {
 		if (currentLeaves) {
@@ -466,6 +469,14 @@ export default function CalendarApp() {
 	const showSummary = () => {
 		setTabValue('Summary View');
 	};
+
+	if (isUpdating  || isAdding || isCancelling) {
+		return (
+		<div className="flex  justify-center h-screen w-screen">
+			<FuseLoading />
+		</div>
+		);
+	}
 
 	return (
 		<Root
