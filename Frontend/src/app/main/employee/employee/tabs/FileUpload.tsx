@@ -330,7 +330,7 @@ const FileCard: React.FC<{ file: FileInfo; onRemove: () => void; onDownload: () 
 
 FileCard.displayName = 'FileCard';
 
-export default function FileUpload() {
+export default function FileUpload({UserRole}) {
 	const [files, setFiles] = useState<FileInfo[]>([]);
 	const { control, setValue, watch } = useFormContext();
 	const [uploadFile] = usePostApiEmployeesDocumnetUploadMutation();

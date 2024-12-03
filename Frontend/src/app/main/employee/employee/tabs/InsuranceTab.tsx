@@ -13,7 +13,7 @@ import EnhancedAutocomplete from "../EnhancedAutocomplete";
 /**
  * The basic info tab.
  */
-function IdentityInfoTab() {
+function IdentityInfoTab({UserRole}) {
   const methods = useFormContext();
   const { control, formState } = methods;
   const { errors } = formState;

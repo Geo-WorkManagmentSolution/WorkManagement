@@ -4,7 +4,7 @@ import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import AddressFields from './AddressFields';
 
-export default function AddressInfoTab() {
+export default function AddressInfoTab({UserRole}) {
   const methods = useFormContext();
   const { watch, setValue } = methods;
 

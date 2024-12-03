@@ -16,7 +16,7 @@ import EmailCheckerInput from '../EmailChecker';
 /**
  * The basic info tab.
  */
-function BasicInfoTab() {
+function BasicInfoTab({UserRole}) {
 	const { data: employeesCategoriesOptions = [] } = useGetApiEmployeesCategoriesQuery();
 	// const { data: employeesCategoriesOptions,refetch } = useGetApiEmployeesCategoriesQuery();
 	// const relationShipTypes = ['Parent', 'Spouse', 'Family', 'Friend', 'Other'];
@@ -42,7 +42,8 @@ function BasicInfoTab() {
 	const handlePhotoUpload = (file: File | null, onChange: (value: string) => void) => {
 		const MAX_FILE_SIZE = 5000000; // 5MB
 		const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-
+		
+		
 		if (file) {
 			if (file.size > MAX_FILE_SIZE) {
 				alert('File size should be less than 5MB');
@@ -209,6 +210,7 @@ function BasicInfoTab() {
             fullWidth
             options={employeesRolesOptions}
             getOptionLabel={(option) => option?.name || ''}
+			disabled={UserRole === 'Employee'}
             isOptionEqualToValue={(option, value) => option.id === value?.id}
             value={employeesRolesOptions.find((c) => c.id === value) || null}
             onChange={(_, newValue) => {

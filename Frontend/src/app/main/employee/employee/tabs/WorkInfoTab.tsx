@@ -37,7 +37,7 @@ import { getJobLevels, getLeaveTypes, JobLevel } from '../../../settings/dummyAp
 // const getJobLevels = () => Promise.resolve([{id:1, name: 'Level 1'}, {id:2, name: 'Level 2'}]); // Replace with actual API call
 // const getLeaveTypes = (jobLevelId) => Promise.resolve([{id:1, employeeLeaveType: 'Sick Leave', totalLeaves: 10}, {id:2, employeeLeaveType: 'Casual Leave', totalLeaves: 5}]); // Replace with actual API call
 
-function WorkInfoTab() {
+function WorkInfoTab({UserRole}) {
 	const methods = useFormContext();
 	const { control, watch, formState, setValue } = methods;
 	const { errors } = formState;

@@ -15,7 +15,7 @@ import { BloodGroup, MaritalStatus } from '../../models/EmployeeDropdownModels';
 /**
  * The basic info tab.
  */
-function PersonalInfoTab() {
+function PersonalInfoTab({UserRole}) {
 	const methods = useFormContext();
 	const { control, formState } = methods;
 	const { errors } = formState;

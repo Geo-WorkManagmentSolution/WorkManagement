@@ -16,7 +16,7 @@ const educationTypes = [
   "Other",
 ];
 
-export default function EducationTab() {
+export default function EducationTab({UserRole}) {
   const methods = useFormContext();
   const { control, formState } = methods;
   const { errors } = formState;
