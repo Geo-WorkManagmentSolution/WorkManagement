@@ -21,6 +21,6 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Restore dependencies
-      run: dotnet restore Backend\WorkManagementSolution.sln 
+      run: dotnet restore Backend/WorkManagementSolution.sln 
     - name: Build
-      run: dotnet build --no-restore Backend\WorkManagementSolution.sln 
+      run: dotnet build --no-restore Backend/WorkManagementSolution.sln 
