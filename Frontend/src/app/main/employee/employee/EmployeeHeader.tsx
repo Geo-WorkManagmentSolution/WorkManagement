@@ -66,7 +66,8 @@ function EmployeeHeader() {
 	
 	  function handleCreateEmployee() {
 		const data = getValues() as EmployeeModel;
-	
+		console.log("employeeData: ", data);
+		
 		if (_.isEmpty(dirtyFields) || !isValid) {
 		  dispatch(
 			showMessage({

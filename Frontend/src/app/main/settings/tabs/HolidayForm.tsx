@@ -285,7 +285,7 @@ function HolidayForm() {
 			</form>
 			<DataTable
 				// enableColumnOrdering={true}
-				// enableRowSelection={false}
+				enableRowSelection={false}
 				data={holidays}
 				columns={columns}
 				renderRowActionMenuItems={({ closeMenu, row, table }) => [

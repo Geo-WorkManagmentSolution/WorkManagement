@@ -716,21 +716,28 @@ namespace WorkManagement.Service
                             newEmployee.EmployeeLeaves = new List<EmployeeLeaveSummary>();
                            var leaves= _dbContext.EmployeeDefaultLeave.Select(x => new EmployeeLeaveSummary()
                             {
-                                EmployeeLeaveTypeId = x.Id,
+                                EmployeeLeaveTypeId = x.EmployeeLeaveTypeId,
                                 RemainingLeaves = x.TotalLeaves ,
                                 TotalLeaves = x.TotalLeaves
                             });
                             newEmployee.EmployeeLeaves.AddRange(leaves.ToList());
 
                         }
-                        else {
-                            var employeeLeave = new EmployeeLeaveSummary();
+                        else
+                        {
 
-                            employeeLeave.EmployeeLeaveTypeId = defaultLeaves[0].Id;
-                            employeeLeave.RemainingLeaves = defaultLeaves[0].RemainingLeaves;
-                            employeeLeave.TotalLeaves = defaultLeaves[0].TotalLeaves;
 
-                            newEmployee.EmployeeLeaves.Add(employeeLeave);
+                            foreach (var leave in defaultLeaves)
+                            {
+                                var employeeLeave = new EmployeeLeaveSummary();
+                                employeeLeave.EmployeeLeaveTypeId = leave.Id;
+                                employeeLeave.RemainingLeaves = leave.RemainingLeaves;
+                                employeeLeave.TotalLeaves = leave.TotalLeaves;
+
+                                newEmployee.EmployeeLeaves.Add(employeeLeave);
+                            }
+
+
 
                         }
 

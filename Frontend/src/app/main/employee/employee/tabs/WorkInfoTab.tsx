@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import React, { useEffect, useState } from 'react';
 import {
 	TextField,
 	MenuItem,
@@ -6,13 +6,19 @@ import {
 	Typography,
 	Autocomplete,
 	FormControlLabel,
-	Checkbox
+	Checkbox,
+	FormControl,
+	InputLabel,
+	Select,
+	IconButton,
+	Button
 } from '@mui/material';
 import { Controller, useFormContext, useFieldArray } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
 import { DatePicker } from '@mui/x-date-pickers';
-import { useEffect, useState } from 'react';
 import {
 	useGetApiEmployeesDepartmentsQuery,
 	useGetApiEmployeesDesignationsQuery,
@@ -24,24 +30,30 @@ import {
 } from '../../EmployeeApi';
 import EnhancedAutocomplete from '../EnhancedAutocomplete';
 import { SalaryType } from '../../models/EmployeeDropdownModels';
+import { getJobLevels, getLeaveTypes, JobLevel } from '../../../settings/dummyApi';
 
-/**
- * The basic info tab.
- */
+// Added imports
+// Assuming getJobLevels and getLeaveTypes are defined elsewhere
+// const getJobLevels = () => Promise.resolve([{id:1, name: 'Level 1'}, {id:2, name: 'Level 2'}]); // Replace with actual API call
+// const getLeaveTypes = (jobLevelId) => Promise.resolve([{id:1, employeeLeaveType: 'Sick Leave', totalLeaves: 10}, {id:2, employeeLeaveType: 'Casual Leave', totalLeaves: 5}]); // Replace with actual API call
 
 function WorkInfoTab() {
 	const methods = useFormContext();
 	const { control, watch, formState, setValue } = methods;
 	const { errors } = formState;
 	const { employeeId } = useParams();
-  const parsedEmployeeId = employeeId ? parseInt(employeeId, 10) : undefined;
+	const parsedEmployeeId = employeeId ? parseInt(employeeId, 10) : undefined;
 	const departmentId = watch('employeeDepartmentId');
 	const salaryType = watch('employeeWorkInformation.salaryType');
 	const [useDefaultLeaves, setUseDefaultLeaves] = useState(true);
+	const [jobLevels, setJobLevels] = useState<JobLevel[]>([]);
+	const [selectedJobLevel, setSelectedJobLevel] = useState(null);
+	const [defaultLeaveTypes, setDefaultLeaveTypes] = useState([]);
 
 	const { data: employeesDepartmentsOptions = [] } = useGetApiEmployeesDepartmentsQuery();
 	const { data: employeesSiteOptions = [] } = useGetApiEmployeesSitesQuery();
-	const { data: employeeLeaveTypes = [] } = useGetApiEmployeesLeavesCurrentQuery({employeeId:null});
+	const { data: employeeLeaveTypes = [] } = useGetApiEmployeesLeavesCurrentQuery({ employeeId: null });
+	const { data: employeesDesignationsOptions = [] } = useGetApiEmployeesDesignationsQuery();
 
 	const { fields, append, remove } = useFieldArray({
 		control,
@@ -49,24 +61,50 @@ function WorkInfoTab() {
 	});
 
 	useEffect(() => {
+		const loadJobLevels = async () => {
+			const levels:JobLevel[]  = await getJobLevels();
+			setJobLevels(levels);
+		};
+		loadJobLevels();
+	}, []);
+
+	useEffect(() => {
+		if (selectedJobLevel) {
+			const loadLeaveTypes = async () => {
+				const leaveTypes = await getLeaveTypes(selectedJobLevel.id);
+				setDefaultLeaveTypes(leaveTypes);
+
+				if (useDefaultLeaves) {
+					setValue(
+						'employeeLeaves',
+						leaveTypes.map((lt) => ({
+							employeeLeaveTypeId: lt.id,
+							employeeLeaveType: lt.employeeLeaveType,
+							totalLeaves: lt.totalLeaves
+						}))
+					);
+				}
+			};
+			loadLeaveTypes();
+		}
+	}, [selectedJobLevel, useDefaultLeaves, setValue]);
+
+	useEffect(() => {
 		if (employeeLeaveTypes) {
 			setValue(
 				'employeeLeaves',
-				employeeLeaveTypes.map((x, i) => ({
-
+				employeeLeaveTypes.map((x) => ({
 					employeeLeaveType: x.employeeLeaveType,
 					totalLeaves: x.totalLeaves
 				}))
 			);
 		}
-	}, [employeeLeaveTypes]);
-
-	const { data: employeesDesignationsOptions = [] } = useGetApiEmployeesDesignationsQuery();
+	}, [employeeLeaveTypes, setValue]);
 
 	const { data: employeesReportToOptions = [] } = useGetApiEmployeesReportToEmployeeListQuery(
 		{
 			departmentId,
-     employeeId:parsedEmployeeId
+			employeeId: parsedEmployeeId
 		},
 		{
 			skip: !employeeId || employeeId === 'new'
@@ -85,6 +123,7 @@ function WorkInfoTab() {
 			throw error;
 		}
 	};
+
 	const handleDesignationOptionAdd = async (newOption: Omit<Option, 'id'>) => {
 		try {
 			const result = await AddDesignation({
@@ -126,7 +165,6 @@ function WorkInfoTab() {
 							value={employeesDepartmentsOptions?.find((c) => c.id === value) || null}
 							onChange={(_, newValue) => {
 								onChange(newValue ? newValue.id : null);
-								// setDepartmentId(newValue ? newValue.id : null);
 							}}
 							renderInput={(params) => (
 								<TextField
@@ -164,7 +202,6 @@ function WorkInfoTab() {
 							renderInput={(params) => (
 								<TextField
 									{...params}
-									// value={params.value || ""}
 									placeholder="Select or Add Designation"
 									label="Designation"
 									required
@@ -182,20 +219,6 @@ function WorkInfoTab() {
 						/>
 					)}
 				/>
-				{/* <Controller
-					name="employeeWorkInformation.grpHead"
-					control={control}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							label="GRP Head"
-							fullWidth
-							error={!!errors.employeeWorkInformation?.grpHead}
-							helperText={errors.employeeWorkInformation?.grpHead?.message as string}
-						/>
-					)}
-				/> */}
-
 				<Controller
 					name="employeeReportToId"
 					control={control}
@@ -215,7 +238,6 @@ function WorkInfoTab() {
 									value={params.value || ''}
 									placeholder="Select Employee Report To"
 									label="Report To"
-									// value={field.value ?? ''}
 									variant="outlined"
 									InputLabelProps={{
 										shrink: true
@@ -227,7 +249,6 @@ function WorkInfoTab() {
 						/>
 					)}
 				/>
-
 				<Controller
 					name="employeeWorkInformation.siteId"
 					control={control}
@@ -248,7 +269,6 @@ function WorkInfoTab() {
 									value={params.value || ''}
 									placeholder="Select or Add Site"
 									label="Site"
-									// value={field.value ?? ''}
 									variant="outlined"
 									InputLabelProps={{
 										shrink: true
@@ -289,7 +309,6 @@ function WorkInfoTab() {
 								select
 								className="mx-4"
 								label="Salary Type"
-								// value={field.value || field.name}
 								value={field.value ?? ''}
 								fullWidth
 								required
@@ -340,7 +359,7 @@ function WorkInfoTab() {
 								{...field}
 								label="Basic"
 								type="number"
-								className={salaryType == 'OnRoll' ? 'mx-4' : 'mx-4 salaryHiddenClass'}
+								className={salaryType === 'OnRoll' ? 'mx-4' : 'mx-4 salaryHiddenClass'}
 								InputProps={{
 									inputProps: {
 										min: 1
@@ -361,7 +380,7 @@ function WorkInfoTab() {
 								{...field}
 								label="HR Allowances"
 								type="number"
-								className={salaryType == 'OnRoll' ? 'mx-4' : 'mx-4 salaryHiddenClass'}
+								className={salaryType === 'OnRoll' ? 'mx-4' : 'mx-4 salaryHiddenClass'}
 								InputProps={{
 									inputProps: {
 										min: 1
@@ -382,7 +401,7 @@ function WorkInfoTab() {
 								{...field}
 								label="Bonus"
 								type="number"
-								className={salaryType == 'OnRoll' ? 'mx-4' : 'mx-4 salaryHiddenClass'}
+								className={salaryType === 'OnRoll' ? 'mx-4' : 'mx-4 salaryHiddenClass'}
 								InputProps={{
 									inputProps: {
 										min: 1
@@ -405,7 +424,7 @@ function WorkInfoTab() {
 								{...field}
 								label="Gratuity"
 								type="number"
-								className={salaryType == 'OnRoll' ? 'mx-4' : 'mx-4 salaryHiddenClass'}
+								className={salaryType === 'OnRoll' ? 'mx-4' : 'mx-4 salaryHiddenClass'}
 								InputProps={{
 									inputProps: {
 										min: 1
@@ -426,7 +445,7 @@ function WorkInfoTab() {
 								{...field}
 								label="PF"
 								type="number"
-								className={salaryType == 'OnRoll' ? 'mx-4' : 'mx-4 salaryHiddenClass'}
+								className={salaryType === 'OnRoll' ? 'mx-4' : 'mx-4 salaryHiddenClass'}
 								InputProps={{
 									inputProps: {
 										min: 1
@@ -447,7 +466,7 @@ function WorkInfoTab() {
 								{...field}
 								label="ESI"
 								type="number"
-								className={salaryType == 'OnRoll' ? 'mx-4' : 'mx-4 salaryHiddenClass'}
+								className={salaryType === 'OnRoll' ? 'mx-4' : 'mx-4 salaryHiddenClass'}
 								InputProps={{
 									inputProps: {
 										min: 1
@@ -468,7 +487,7 @@ function WorkInfoTab() {
 								{...field}
 								label="PT"
 								type="number"
-								className={salaryType == 'OnRoll' ? 'mx-4' : 'mx-4 salaryHiddenClass'}
+								className={salaryType === 'OnRoll' ? 'mx-4' : 'mx-4 salaryHiddenClass'}
 								InputProps={{
 									inputProps: {
 										min: 1
@@ -600,65 +619,113 @@ function WorkInfoTab() {
 				</div>
 
 				<Controller
-					name="employeeAddresses.UseDefaultLeaves"
+					name="useDefaultLeaves"
 					control={control}
 					render={({ field }) => (
 						<FormControlLabel
-							control={<Checkbox {...field} />}
+							control={
+								<Checkbox
+									{...field}
+									checked={useDefaultLeaves}
+									onChange={(e) => {
+										setUseDefaultLeaves(e.target.checked);
+										field.onChange(e.target.checked);
+									}}
+								/>
+							}
 							label="Use Default Leaves"
-							onChange={(e) => setUseDefaultLeaves(e.target.checked)}
 						/>
 					)}
 				/>
-				{!useDefaultLeaves && (
-					<div className="space-y-4">
-						{employeeLeaveTypes.map((field1, index) => (
-							<div
-								key={index}
-								className="flex space-x-4 mb-4"
+				<FormControl fullWidth>
+					<InputLabel id="job-level-select-label">Job Level</InputLabel>
+					<Controller
+						name="jobLevelId"
+						control={control}
+						render={({ field }) => (
+							<Select
+								{...field}
+								labelId="job-level-select-label"
+								label="Job Level"
+                value={field.value || jobLevels[1]?.id}
+								onChange={(e) => {
+									field.onChange(e.target.value);
+									setSelectedJobLevel(jobLevels.find((jl) => jl.id === parseInt(e.target.value, 10)));
+								}}
 							>
-								<div className="flex-1">
-									<Controller
-										name={`employeeLeaves.${index}.employeeLeaveTypeId`}
-										control={control}
-										render={({ field }) => (
-											<TextField
-												{...field}
-												value={field1.employeeLeaveType}
-												label="Employee Leave Type"
-												fullWidth
-												type="text"
-												InputLabelProps={{ shrink: true }}
-												InputProps={{
-													readOnly: true
-												}}
-												margin="normal"
-												className="mx-4"
-											/>
-										)}
-									/>
-								</div>
-								<div className="flex-1">
-									<Controller
-										name={`employeeLeaves.${index}.totalLeaves`}
-										control={control}
-										render={({ field }) => (
-											<TextField
-												{...field}
-												label="Total Leaves"
-												type="number"
-												margin="normal"
-												variant="outlined"
-												InputLabelProps={{ shrink: !!field1.totalLeaves }}
-												placeholder="Total Leaves"
-												className="mx-4"
-											/>
-										)}
-									/>
-								</div>
+								{jobLevels.map((jobLevel) => (
+									<MenuItem
+										key={jobLevel.id}
+										value={jobLevel.id}
+									>
+										{jobLevel.name}
+									</MenuItem>
+								))}
+							</Select>
+						)}
+					/>
+				</FormControl>
+				<div className="space-y-4">
+					{fields.map((field, index) => (
+						<div
+							key={field.id}
+							className="flex space-x-4 m-4"
+						>
+							<div className="flex-1 m-4">
+								<Controller
+									name={`employeeLeaves.${index}.employeeLeaveType`}
+									control={control}
+									render={({ field }) => (
+										<TextField
+											{...field}
+											label="Employee Leave Type"
+											fullWidth
+											InputProps={{
+												readOnly: useDefaultLeaves
+											}}
+										/>
+									)}
+								/>
 							</div>
-						))}
-					</div>
+							<div className="flex-1 m-4">
+								<Controller
+									name={`employeeLeaves.${index}.totalLeaves`}
+									control={control}
+									render={({ field }) => (
+										<TextField
+											{...field}
+											label="Total Leaves"
+											type="number"
+											fullWidth
+											InputProps={{
+												readOnly: useDefaultLeaves
+											}}
+										/>
+									)}
+								/>
+							</div>
+							{!useDefaultLeaves && (
+								<IconButton
+									aria-label="delete"
+									color="error"
+									type="button"
+									onClick={() => remove(index)}
+								>
+									{' '}
+									<DeleteIcon />
+								</IconButton>
+							)}
+						</div>
+					))}
+				</div>
+				{!useDefaultLeaves && (
+					<Button
+						type="button"
+						startIcon={<AddIcon />}
+						onClick={() => append({ employeeLeaveType: '', totalLeaves: 0 })}
+					>
+						Add Leave Type
+					</Button>
 				)}
 			</div>
 		</div>
