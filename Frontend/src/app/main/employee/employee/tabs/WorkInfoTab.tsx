@@ -52,7 +52,7 @@ function WorkInfoTab({UserRole}) {
 
 	const { data: employeesDepartmentsOptions = [] } = useGetApiEmployeesDepartmentsQuery();
 	const { data: employeesSiteOptions = [] } = useGetApiEmployeesSitesQuery();
-	const { data: employeeLeaveTypes = [] } = useGetApiEmployeesLeavesCurrentQuery({ employeeId: null });
+	// const { data: employeeLeaveTypes = [] } = useGetApiEmployeesLeavesCurrentQuery({ employeeId: null });
 	const { data: employeesDesignationsOptions = [] } = useGetApiEmployeesDesignationsQuery();
 
 	const { fields, append, remove } = useFieldArray({
@@ -89,17 +89,17 @@ function WorkInfoTab({UserRole}) {
 		}
 	}, [selectedJobLevel, useDefaultLeaves, setValue]);
 
-	useEffect(() => {
-		if (employeeLeaveTypes) {
-			setValue(
-				'employeeLeaves',
-				employeeLeaveTypes.map((x) => ({
-					employeeLeaveType: x.employeeLeaveType,
-					totalLeaves: x.totalLeaves
-				}))
-			);
-		}
-	}, [employeeLeaveTypes, setValue]);
+	// useEffect(() => {
+	// 	if (employeeLeaveTypes) {
+	// 		setValue(
+	// 			'employeeLeaves',
+	// 			employeeLeaveTypes.map((x) => ({
+	// 				employeeLeaveType: x.employeeLeaveType,
+	// 				totalLeaves: x.totalLeaves
+	// 			}))
+	// 		);
+	// 	}
+	// }, [employeeLeaveTypes, setValue]);
 
 	const { data: employeesReportToOptions = [] } = useGetApiEmployeesReportToEmployeeListQuery(
 		{
