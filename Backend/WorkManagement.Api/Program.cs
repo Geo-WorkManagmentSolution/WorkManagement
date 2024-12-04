@@ -176,7 +176,7 @@ try
     app.MapControllers();
 
     app.UseMiddleware<ErrorHandlingMiddleware>();
-    app.Run(async context =>
+    app.Map("/",async context =>
     {
         await context.Response.WriteAsync("Api is Up & running!");
     });
