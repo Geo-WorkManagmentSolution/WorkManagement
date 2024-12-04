@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Azure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WorkManagement.Domain.Contracts;
@@ -100,24 +99,68 @@ namespace WorkManagement.Service
             return await _dbContext.Sites.ToListAsync();
         }
 
-        public async Task<List<EmployeeTeamMemberList>> GetTeamMembersList(int? employeeId)
-        {
-            if (employeeId == null)
-            {
-                return new List<EmployeeTeamMemberList>();
-            }
-            else
-            {
+        //public async Task<List<EmployeeTeamMemberList>> GetTeamMembersList(int? employeeId)
+        //{
+        //    if (employeeId == null)
+        //    {
+        //        return new List<EmployeeTeamMemberList>();
+        //    }
+        //    else
+        //    {
 
-                var data = (from e in _dbContext.Employees.Where(e => !e.IsDeleted && e.EmployeeReportToId == employeeId)
-                            select new EmployeeTeamMemberList
-                            {
-                                Name = e.FirstName + " " + e.LastName,
-                                Email = e.Email,
-                                Avatar = "",
-                            }).ToList();
+        //        var data = (from e in _dbContext.Employees.Where(e => !e.IsDeleted && e.EmployeeReportToId == employeeId)
+        //                    .Include(x=>x.EmployeeDesignation)
+        //                    select new EmployeeTeamMemberList
+        //                    {
+        //                        Name = e.FirstName + " " + e.LastName,
+        //                        Email = e.Email,
+        //                        Avatar = "",
+        //                        Designation = e.EmployeeDesignation != null ? e.EmployeeDesignation.Name : "",
+        //                        EmployeeId =e.Id
+        //                    }).ToList();
+
+        //        return data;
+        //    }
+        //}
+
+        public async Task<List<EmployeeTeamMemberList>> GetTeamMembersList(string loggedUserId, int? employeeId)
+        {
+            try
+            {
+                int targetEmployeeId;
+
+                if (employeeId.HasValue)
+                {
+                    targetEmployeeId = employeeId.Value;
+                }
+                else
+                {
+                    targetEmployeeId = CheckValidEmployeeId(loggedUserId);
+                    if (targetEmployeeId == -1)
+                    {
+                        throw new Exception("Invalid User data");
+                    }
+                }
+
+                var data = await (from e in _dbContext.Employees
+                                  where !e.IsDeleted && e.EmployeeReportToId == targetEmployeeId
+                                  select new EmployeeTeamMemberList
+                                  {
+                                      Name = e.FirstName + " " + e.LastName,
+                                      Email = e.Email,
+                                      Avatar = "",
+                                      Designation = e.EmployeeDesignation != null ? e.EmployeeDesignation.Name : "",
+                                      EmployeeId = e.Id,
+                                      EmployeeNumber=e.EmployeeNumber
+                                  }).ToListAsync();
 
                 return data;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine(ex.ToString());
+                throw new Exception("An error occurred while fetching the team members list.", ex);
             }
         }
 
@@ -129,15 +172,37 @@ namespace WorkManagement.Service
             }
             else
             {
+                var existingEmployee = _dbContext.Employees.FirstOrDefault(s => s.Id == employeeId.Value);
+                if (existingEmployee != null)
+                {
+                    if (departmentId == null || departmentId == 0)
+                    {
+                        var data = (from e in _dbContext.Employees.Where(e => !e.IsDeleted && e.EmployeeDepartmentId == existingEmployee.EmployeeDepartmentId && e.Id != employeeId)
+                                    select new EmployeeReportToModel
+                                    {
+                                        Name = e.FirstName + " " + e.LastName,
+                                        Id = e.Id,
+                                    }).ToList();
 
-                var data = (from e in _dbContext.Employees.Where(e => !e.IsDeleted && e.EmployeeDepartmentId == departmentId && e.Id != employeeId)
-                            select new EmployeeReportToModel
-                            {
-                                Name = e.FirstName + " " + e.LastName,
-                                Id = e.Id,
-                            }).ToList();
+                        return data;
+                    }
+                    else
+                    {
+                        var data = (from e in _dbContext.Employees.Where(e => !e.IsDeleted && e.EmployeeDepartmentId == departmentId && e.Id != employeeId)
+                                    select new EmployeeReportToModel
+                                    {
+                                        Name = e.FirstName + " " + e.LastName,
+                                        Id = e.Id,
+                                    }).ToList();
 
-                return data;
+                        return data;
+                    }
+                }
+                else
+                {
+                    return new List<EmployeeReportToModel>();
+                }
+
             }
 
         }
@@ -230,12 +295,25 @@ namespace WorkManagement.Service
                                     },
                                     EmployeeAddresses = new EmployeeAddressModel
                                     {
-                                        AddressLine1 = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.AddressLine1,
-                                        AddressLine2 = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.AddressLine2,
-                                        City = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.City,
-                                        Country = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.Country,
-                                        State = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.State,
-                                        PinCode = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.PinCode,
+                                        UserAddress = new AddressModel
+                                        {
+                                            AddressLine1 = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.UserAddressLine1,
+                                            AddressLine2 = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.UserAddressLine2,
+                                            City = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.UserCity,
+                                            Country = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.UserCountry,
+                                            State = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.UserState,
+                                            PinCode = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.UserAddressPinCode,
+                                        },
+                                        MailingAddress = new AddressModel
+                                        {
+                                            AddressLine1 = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.MailingAddressLine1,
+                                            AddressLine2 = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.MailingAddressLine2,
+                                            City = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.MailingCity,
+                                            Country = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.MailingCountry,
+                                            State = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.MailingState,
+                                            PinCode = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.MailingAddressPinCode,
+                                        }
+
                                     },
                                     EmployeeIdentityInfos = new EmployeeBankingDataModel
                                     {
@@ -267,6 +345,48 @@ namespace WorkManagement.Service
                                                  University = e.University,
                                                  grade = e.grade
                                              }).ToList();
+
+                var employeeDocumentData = (from e in _dbContext.EmployeeDocuments.Where(s => s.EmployeeId == returnEployeeData.Id)
+                                            select new EmployeeDocumentsModel
+                                            {
+                                                FileContent = e.FileContent,
+                                                FileName = e.FileName,
+                                                FileSize = e.FileSize,
+                                                FileType = e.FileType
+                                            }).ToList();
+
+
+                if (employeeDocumentData != null)
+                {
+                    if (employeeDocumentData.Count == 0)
+                    {
+                        var documentData = new EmployeeDocumentsModel();
+                        documentData.FileContent = null;
+                        documentData.FileName = "";
+                        documentData.FileName = "";
+                        documentData.FileSize = null;
+                        returnEployeeData.EmployeeDocuments.Add(documentData);
+                    }
+                    else
+                    {
+                        returnEployeeData.EmployeeDocuments = employeeDocumentData;
+                    }
+                }
+                else {
+                    var documentData = new EmployeeDocumentsModel();
+                    documentData.FileContent = null;
+                    documentData.FileName = "";
+                    documentData.FileName = "";
+                    documentData.FileSize = null;
+                    returnEployeeData.EmployeeDocuments.Add(documentData);
+                }
+
+
+
+
+
+
+
 
 
                 if (employeeEducationData != null)
@@ -503,12 +623,26 @@ namespace WorkManagement.Service
                     if (employee.EmployeeAddresses != null)
                     {
                         var employeeAddressData = new EmployeeAddress();
-                        employeeAddressData.AddressLine1 = employee.EmployeeAddresses.AddressLine1;
-                        employeeAddressData.AddressLine2 = employee.EmployeeAddresses.AddressLine2;
-                        employeeAddressData.City = employee.EmployeeAddresses.City;
-                        employeeAddressData.Country = employee.EmployeeAddresses.Country;
-                        employeeAddressData.State = employee.EmployeeAddresses.State;
-                        employeeAddressData.PinCode = employee.EmployeeAddresses.PinCode;
+                        if (employee.EmployeeAddresses.UserAddress != null)
+                        {
+                            employeeAddressData.UserAddressLine1 = employee.EmployeeAddresses.UserAddress.AddressLine1;
+                            employeeAddressData.UserAddressLine2 = employee.EmployeeAddresses.UserAddress.AddressLine2;
+                            employeeAddressData.UserCity = employee.EmployeeAddresses.UserAddress.City;
+                            employeeAddressData.UserCountry = employee.EmployeeAddresses.UserAddress.Country;
+                            employeeAddressData.UserState = employee.EmployeeAddresses.UserAddress.State;
+                            employeeAddressData.UserAddressPinCode = employee.EmployeeAddresses.UserAddress.PinCode;
+                        }
+
+                        if (employee.EmployeeAddresses.MailingAddress != null)
+                        {
+                            employeeAddressData.MailingAddressLine1 = employee.EmployeeAddresses.MailingAddress.AddressLine1;
+                            employeeAddressData.MailingAddressLine2 = employee.EmployeeAddresses.MailingAddress.AddressLine2;
+                            employeeAddressData.MailingCity = employee.EmployeeAddresses.MailingAddress.City;
+                            employeeAddressData.MailingCountry = employee.EmployeeAddresses.MailingAddress.Country;
+                            employeeAddressData.MailingState = employee.EmployeeAddresses.MailingAddress.State;
+                            employeeAddressData.MailingAddressPinCode = employee.EmployeeAddresses.MailingAddress.PinCode;
+                        }
+
 
                         newEmployee.EmployeeAddresses = employeeAddressData;
                     }
@@ -565,6 +699,48 @@ namespace WorkManagement.Service
                                 newEmployee.EmployeeRelationshipDetails.Add(relationshipData);
                             }
                         }
+                    }
+
+                    var defaultLeaves = (from ed in _dbContext.EmployeeDefaultLeave
+                                         select new EmployeeLeaveSummaryModel
+                                         {
+                                             Id = ed.EmployeeLeaveTypeId.HasValue ? ed.EmployeeLeaveTypeId.Value : 0,
+                                             EmployeeLeaveType = ed.EmployeeLeaveTypes.Name,
+                                             TotalLeaves = ed.TotalLeaves,
+                                             RemainingLeaves = ed.TotalLeaves
+                                         }).ToList();
+                    newEmployee.EmployeeLeaves = new List<EmployeeLeaveSummary>();
+                    if (defaultLeaves.Any())
+                    {
+                        if (employee.EmployeeWorkInformation.UseDefaultLeaves) {
+                            newEmployee.EmployeeLeaves = new List<EmployeeLeaveSummary>();
+                           var leaves= _dbContext.EmployeeDefaultLeave.Select(x => new EmployeeLeaveSummary()
+                            {
+                                EmployeeLeaveTypeId = x.EmployeeLeaveTypeId,
+                                RemainingLeaves = x.TotalLeaves ,
+                                TotalLeaves = x.TotalLeaves
+                            });
+                            newEmployee.EmployeeLeaves.AddRange(leaves.ToList());
+
+                        }
+                        else
+                        {
+
+
+                            foreach (var leave in defaultLeaves)
+                            {
+                                var employeeLeave = new EmployeeLeaveSummary();
+                                employeeLeave.EmployeeLeaveTypeId = leave.Id;
+                                employeeLeave.RemainingLeaves = leave.RemainingLeaves;
+                                employeeLeave.TotalLeaves = leave.TotalLeaves;
+
+                                newEmployee.EmployeeLeaves.Add(employeeLeave);
+                            }
+
+
+
+                        }
+
                     }
 
 
@@ -685,7 +861,7 @@ namespace WorkManagement.Service
                             employeeWorkInformationData.ESI = employee.EmployeeWorkInformation.ESI;
                             employeeWorkInformationData.PT = employee.EmployeeWorkInformation.PT;
                             employeeWorkInformationData.TotalPreviousExperience = employee.EmployeeWorkInformation.TotalPreviousExperience;
-
+                            employeeWorkInformationData.UseDefaultLeaves = employee.EmployeeWorkInformation.UseDefaultLeaves;
                             grossSalary = employeeWorkInformationData.Salary;
 
                             employeeData.EmployeeWorkInformation = employeeWorkInformationData;
@@ -716,12 +892,37 @@ namespace WorkManagement.Service
                         var employeeAddressData = _dbContext.EmployeeAddresses.FirstOrDefault(s => s.Id == employeeData.EmployeeAddressesId.Value);
                         if (employeeAddressData != null)
                         {
-                            employeeAddressData.AddressLine1 = employee.EmployeeAddresses.AddressLine1;
-                            employeeAddressData.AddressLine2 = employee.EmployeeAddresses.AddressLine2;
-                            employeeAddressData.City = employee.EmployeeAddresses.City;
-                            employeeAddressData.Country = employee.EmployeeAddresses.Country;
-                            employeeAddressData.State = employee.EmployeeAddresses.State;
-                            employeeAddressData.PinCode = employee.EmployeeAddresses.PinCode;
+                            if (employee.EmployeeAddresses.UserAddress != null)
+                            {
+                                employeeAddressData.UserAddressLine1 = employee.EmployeeAddresses.UserAddress.AddressLine1;
+                                employeeAddressData.UserAddressLine2 = employee.EmployeeAddresses.UserAddress.AddressLine2;
+                                employeeAddressData.UserCity = employee.EmployeeAddresses.UserAddress.City;
+                                employeeAddressData.UserCountry = employee.EmployeeAddresses.UserAddress.Country;
+                                employeeAddressData.UserState = employee.EmployeeAddresses.UserAddress.State;
+                                employeeAddressData.UserAddressPinCode = employee.EmployeeAddresses.UserAddress.PinCode;
+                            }
+
+                            if (employee.EmployeeAddresses.UseUserAddressForMailing && employee.EmployeeAddresses.UserAddress != null)
+                            {
+                                employeeAddressData.MailingAddressLine1 = employee.EmployeeAddresses.UserAddress.AddressLine1;
+                                employeeAddressData.MailingAddressLine2 = employee.EmployeeAddresses.UserAddress.AddressLine2;
+                                employeeAddressData.MailingCity = employee.EmployeeAddresses.UserAddress.City;
+                                employeeAddressData.MailingCountry = employee.EmployeeAddresses.UserAddress.Country;
+                                employeeAddressData.MailingState = employee.EmployeeAddresses.UserAddress.State;
+                                employeeAddressData.MailingAddressPinCode = employee.EmployeeAddresses.UserAddress.PinCode;
+                            }
+                            else
+                            {
+                                if (employee.EmployeeAddresses.MailingAddress != null)
+                                {
+                                    employeeAddressData.MailingAddressLine1 = employee.EmployeeAddresses.MailingAddress.AddressLine1;
+                                    employeeAddressData.MailingAddressLine2 = employee.EmployeeAddresses.MailingAddress.AddressLine2;
+                                    employeeAddressData.MailingCity = employee.EmployeeAddresses.MailingAddress.City;
+                                    employeeAddressData.MailingCountry = employee.EmployeeAddresses.MailingAddress.Country;
+                                    employeeAddressData.MailingState = employee.EmployeeAddresses.MailingAddress.State;
+                                    employeeAddressData.MailingAddressPinCode = employee.EmployeeAddresses.MailingAddress.PinCode;
+                                }
+                            }
 
                             employeeData.EmployeeAddresses = employeeAddressData;
                         }
@@ -817,57 +1018,338 @@ namespace WorkManagement.Service
             }
         }
 
+        public async Task<string> GetEmployeeDocumentFileName(int id, string fileName)
+        {
+            var returnFilePath = fileName;
+            var employee = _dbContext.Employees.FirstOrDefault(s=>s.Id == id && !s.IsDeleted);
+            if(employee != null)
+            {
+                returnFilePath = employee.FirstName + "_" + employee.LastName + "_" + fileName;
+            }
+
+            return returnFilePath;
+        }
+        
+        public string GetEmployeeFilePath(int id, string fileName)
+        {
+            var retunrFilePath = "";
+            var employee = _dbContext.Employees.FirstOrDefault(s => s.Id == id && !s.IsDeleted);
+            if (employee != null)
+            {
+                var employeeDocument = _dbContext.EmployeeDocuments.FirstOrDefault(s=>s.FileName == fileName && s.EmployeeId == id && !s.IsDeleted);
+                if(employeeDocument != null)
+                {
+                    retunrFilePath = employeeDocument.FilePath;
+                }
+            }
+
+            return retunrFilePath;
+        }
+
+        public async Task<string> UpdateEmployeeDocumentData(int id, string fileName, string filePath)
+        {
+            var employee = _dbContext.Employees.FirstOrDefault(s => s.Id == id && !s.IsDeleted);
+            if (employee != null)
+            {
+                var availableEmployeeDocument = _dbContext.EmployeeDocuments.FirstOrDefault(s=>s.EmployeeId == id && s.FileName == fileName);
+                if(availableEmployeeDocument == null)
+                {
+                    var employeeDocument = new EmployeeDocuments();
+                    employeeDocument.EmployeeId = employee.Id;
+                    employeeDocument.FileName = fileName;
+                    employeeDocument.FilePath = filePath;
+                    employeeDocument.IsDeleted = false;
+                    
+
+
+                    _dbContext.EmployeeDocuments.Add(employeeDocument);
+                }
+                else
+                {
+                    availableEmployeeDocument.EmployeeId = employee.Id;
+                    availableEmployeeDocument.FileName = fileName;
+                    availableEmployeeDocument.FilePath = filePath;
+                    availableEmployeeDocument.IsDeleted = false; 
+                    
+
+                    _dbContext.EmployeeDocuments.Update(availableEmployeeDocument);
+                }
+
+                _dbContext.SaveChanges();
+            }
+
+            return fileName;
+        }
+
+
+        public async Task<bool> DeleteEmployeeFile(int employeeId, string fileName)
+        {
+            var filePath = GetEmployeeFilePath(employeeId, fileName);
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+
+                // Remove the file entry from the database
+                var employeeDocument = await _dbContext.EmployeeDocuments
+                    .FirstOrDefaultAsync(d => d.EmployeeId == employeeId && d.FileName == fileName);
+
+                if (employeeDocument != null)
+                {
+                    _dbContext.EmployeeDocuments.Remove(employeeDocument);
+                    await _dbContext.SaveChangesAsync();
+                }
+
+                return true;
+            }
+            return false;
+        }
+
+
+
+
+
+
         public async Task<bool> DeleteEmployeeAsync(int id)
         {
-            var employee = await _dbContext.Employees.FindAsync(id);
-            if (employee == null)
-                return false;
+            try
+            {
+                var employee = await _dbContext.Employees.FindAsync(id);
+                if (employee == null)
+                    return false;
 
-            _dbContext.Employees.Remove(employee);
-            await _dbContext.SaveChangesAsync();
-            return true;
+                var employeeReportTo = _dbContext.Employees.Where(s => s.EmployeeReportToId == id).ToList();
+                var employeeEmail = employee.Email;
+                if (employeeReportTo.Any())
+                {
+                    foreach (var e in employeeReportTo)
+                    {
+                        e.EmployeeReportToId = null;
+                        _dbContext.Employees.Update(e);
+                    }
+
+                    _dbContext.SaveChanges();
+                }
+
+
+
+                var employeeEducation = _dbContext.EmployeeEducationDetails.Where(e => e.EmployeeId == id).ToList();
+                if (employeeEducation.Any())
+                {
+                    foreach (var e in employeeEducation)
+                    {
+                        _dbContext.EmployeeEducationDetails.Remove(e);
+                    }
+                }
+
+                var employeeRelation = _dbContext.EmployeeRelationshipDetails.Where(e => e.EmployeeId == id).ToList();
+                if (employeeRelation.Any())
+                {
+                    foreach (var e in employeeRelation)
+                    {
+                        _dbContext.EmployeeRelationshipDetails.Remove(e);
+                    }
+                }
+
+                var employeeDocuments = _dbContext.EmployeeDocuments.Where(e => e.EmployeeId == id).ToList();
+                if (employeeDocuments.Any())
+                {
+                    foreach (var e in employeeDocuments)
+                    {
+                        _dbContext.EmployeeDocuments.Remove(e);
+                    }
+                }
+
+                var employeeLeave = _dbContext.EmployeeLeaves.Where(e => e.EmployeeId == id).ToList();
+                if (employeeLeave.Any())
+                {
+                    foreach (var e in employeeLeave)
+                    {
+                        _dbContext.EmployeeLeaves.Remove(e);
+                    }
+                }
+
+                var employeeLeaveSummary = _dbContext.EmployeeLeaveSummary.Where(e => e.EmployeeId == id).ToList();
+                if (employeeLeaveSummary.Any())
+                {
+                    foreach (var e in employeeLeaveSummary)
+                    {
+                        _dbContext.EmployeeLeaveSummary.Remove(e);
+                    }
+                }
+
+                _dbContext.Employees.Remove(employee);
+                await _dbContext.SaveChangesAsync();
+
+                var user = await userManager.FindByEmailAsync(employeeEmail);
+                if (user != null)
+                {
+                    await userManager.DeleteAsync(user);
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+
         }
 
         #region Leave management
 
-        public async Task<List<EmployeeLeaveSummaryModel>> GetEmployeeLeaves(string loggedUserId)
+
+        //public async Task<List<EmployeeLeaveSummaryModel>> GetEmployeeLeaves(string loggedUserId)
+        //{
+        //    try
+        //    {
+        //        var employeeId = CheckValidEmployeeId(loggedUserId);
+        //        /*if (employeeId == -1)
+        //        {
+        //            throw new Exception("Invalid User data");
+        //        }*/
+
+
+        //        //var defaultLeaves = await _dbContext.EmployeeDefaultLeave.Include(x => x.EmployeeLeaveTypes).ToListAsync();
+
+        //        var defaultLeaves = (from ed in _dbContext.EmployeeDefaultLeave
+        //                             select new EmployeeLeaveSummaryModel
+        //                             {
+        //                                 Id = ed.EmployeeLeaveTypeId.HasValue ? ed.EmployeeLeaveTypeId.Value : 0,
+        //                                 EmployeeLeaveType = ed.EmployeeLeaveTypes.Name,
+        //                                 TotalLeaves = ed.TotalLeaves,
+        //                                 RemainingLeaves = ed.TotalLeaves
+        //                             }).ToList();
+
+        //        var employeeLeaveData = (from el in _dbContext.EmployeeLeaveSummary.Where(s => s.EmployeeId == employeeId)
+        //                                 select new EmployeeLeaveSummaryModel
+        //                                 {
+        //                                     EmployeeLeaveSummaryId = el.Id,
+        //                                     Id = el.EmployeeLeaveTypeId.HasValue ? el.EmployeeLeaveTypeId.Value : 0,
+        //                                     EmployeeLeaveType = el.EmployeeLeaveTypes.Name,
+        //                                     TotalLeaves = el.TotalLeaves,
+        //                                     RemainingLeaves = el.RemainingLeaves
+        //                                 }).ToList();
+
+        //        if (employeeLeaveData.Count > 0)
+        //        {
+        //            var employeeLeaveHistory = _dbContext.EmployeeLeaves.Where(s => s.EmployeeId == employeeId).ToList();
+        //            var isLeaveMismatch = false;
+        //            if (employeeLeaveHistory.Count > 0)
+        //            {
+        //                foreach(var e in employeeLeaveData)
+        //                {
+        //                    var employeeLeave = employeeLeaveHistory.Where(s => s.EmployeeLeaveTypeId == e.Id).Sum(s => s.LeaveDays);
+        //                    var remainingLeaves = e.TotalLeaves - employeeLeave;
+        //                    if(e.RemainingLeaves != remainingLeaves)
+        //                    {
+        //                        isLeaveMismatch = true;
+        //                        e.RemainingLeaves = remainingLeaves;
+        //                        var employeeLeaveSummary = _dbContext.EmployeeLeaveSummary.FirstOrDefault(s => s.Id == e.EmployeeLeaveSummaryId);
+        //                        if (employeeLeaveSummary != null)
+        //                        {
+        //                            employeeLeaveSummary.RemainingLeaves = remainingLeaves;
+        //                            _dbContext.EmployeeLeaveSummary.Update(employeeLeaveSummary);
+        //                        }
+        //                    }
+        //                }
+
+        //                if (isLeaveMismatch)
+        //                {
+        //                    _dbContext.SaveChanges();
+        //                }
+        //            }
+        //            return employeeLeaveData;
+        //        }
+        //        else
+        //        {
+        //            return defaultLeaves;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Log the exception (use your preferred logging framework)
+        //        Console.WriteLine(ex.ToString());
+
+        //        // Optionally, rethrow the exception or handle it accordingly
+        //        throw new Exception("An error occurred while fetching the employee leaves.", ex);
+        //    }
+
+        //}
+
+
+
+        public async Task<List<EmployeeLeaveSummaryModel>> GetEmployeeLeaves(string loggedUserId, int? employeeId)
         {
             try
             {
-                var employeeId = CheckValidEmployeeId(loggedUserId);
-                if (employeeId == -1)
+                // If employeeId is not provided or invalid, check for a valid loggedUserId
+                if (!employeeId.HasValue || employeeId.Value == -1)
                 {
-                    throw new Exception("Invalid User data");
+                    if (!string.IsNullOrEmpty(loggedUserId))
+                    {
+                        employeeId = CheckValidEmployeeId(loggedUserId);
+                    }
                 }
 
-
-                //var defaultLeaves = await _dbContext.EmployeeDefaultLeave.Include(x => x.EmployeeLeaveTypes).ToListAsync();
-
-                var defaultLeaves = (from ed in _dbContext.EmployeeDefaultLeave
-                                     select new EmployeeLeaveSummaryModel
-                                     {
-                                         Id = ed.EmployeeLeaveTypeId.HasValue ? ed.EmployeeLeaveTypeId.Value : 0,
-                                         EmployeeLeaveType = ed.EmployeeLeaveTypes.Name,
-                                         TotalLeaves = ed.TotalLeaves,
-                                         RemainingLeaves = 0
-                                     }).ToList();
-
-                var employeeLeaveData = (from el in _dbContext.EmployeeLeaveSummary.Where(s => s.EmployeeId == employeeId)
+                if (employeeId.HasValue && employeeId.Value != -1)
+                {
+                    var defaultLeaves = (from ed in _dbContext.EmployeeDefaultLeave
                                          select new EmployeeLeaveSummaryModel
                                          {
-                                             Id = el.EmployeeLeaveTypeId.HasValue ? el.EmployeeLeaveTypeId.Value : 0,
-                                             EmployeeLeaveType = el.EmployeeLeaveTypes.Name,
-                                             TotalLeaves = el.TotalLeaves,
-                                             RemainingLeaves = el.RemainingLeaves
+                                             Id = ed.EmployeeLeaveTypeId.HasValue ? ed.EmployeeLeaveTypeId.Value : 0,
+                                             EmployeeLeaveType = ed.EmployeeLeaveTypes.Name,
+                                             TotalLeaves = ed.TotalLeaves,
+                                             RemainingLeaves = ed.TotalLeaves
                                          }).ToList();
 
-                if (employeeLeaveData.Count > 0)
-                {
-                    return employeeLeaveData;
+                    var employeeLeaveData = (from el in _dbContext.EmployeeLeaveSummary.Where(s => s.EmployeeId == employeeId.Value)
+                                             select new EmployeeLeaveSummaryModel
+                                             {
+                                                 EmployeeLeaveSummaryId = el.Id,
+                                                 Id = el.EmployeeLeaveTypeId.HasValue ? el.EmployeeLeaveTypeId.Value : 0,
+                                                 EmployeeLeaveType = el.EmployeeLeaveTypes.Name,
+                                                 TotalLeaves = el.TotalLeaves,
+                                                 RemainingLeaves = el.RemainingLeaves
+                                             }).ToList();
+
+                    if (employeeLeaveData.Count > 0)
+                    {
+                        var employeeLeaveHistory = _dbContext.EmployeeLeaves.Where(s => s.EmployeeId == employeeId.Value).ToList();
+                        var isLeaveMismatch = false;
+                        if (employeeLeaveHistory.Count > 0)
+                        {
+                            foreach (var e in employeeLeaveData)
+                            {
+                                var employeeLeave = employeeLeaveHistory.Where(s => s.EmployeeLeaveTypeId == e.Id).Sum(s => s.LeaveDays);
+                                var remainingLeaves = e.TotalLeaves - employeeLeave;
+                                if (e.RemainingLeaves != remainingLeaves)
+                                {
+                                    isLeaveMismatch = true;
+                                    e.RemainingLeaves = remainingLeaves;
+                                    var employeeLeaveSummary = _dbContext.EmployeeLeaveSummary.FirstOrDefault(s => s.Id == e.EmployeeLeaveSummaryId);
+                                    if (employeeLeaveSummary != null)
+                                    {
+                                        employeeLeaveSummary.RemainingLeaves = remainingLeaves;
+                                        _dbContext.EmployeeLeaveSummary.Update(employeeLeaveSummary);
+                                    }
+                                }
+                            }
+
+                            if (isLeaveMismatch)
+                            {
+                                _dbContext.SaveChanges();
+                            }
+                        }
+                        return employeeLeaveData;
+                    }
+                    else
+                    {
+                        return defaultLeaves;
+                    }
                 }
                 else
                 {
-                    return defaultLeaves;
+                    throw new Exception(" leave data was not found.");
                 }
             }
             catch (Exception ex)
@@ -878,8 +1360,12 @@ namespace WorkManagement.Service
                 // Optionally, rethrow the exception or handle it accordingly
                 throw new Exception("An error occurred while fetching the employee leaves.", ex);
             }
-
         }
+
+
+
+
+
 
         public async Task<EmployeeLeaveModel> AddLeave(EmployeeLeaveModel employeeLeaveData, string loggedUserId)
         {
@@ -892,8 +1378,8 @@ namespace WorkManagement.Service
                     throw new Exception("Invalid User data");
                 }
 
-                var leaveSummary = await _dbContext.EmployeeLeaveSummary.FirstAsync(x => x.EmployeeId == employeeId && x.EmployeeLeaveTypeId == employeeLeaveData.EmployeeLeaveTypeId);
-                leaveSummary.RemainingLeaves = leaveSummary.RemainingLeaves - employeeLeaveData.LeaveDays;
+               
+              var leaveSummary = await _dbContext.EmployeeLeaveSummary.FirstAsync(x => x.EmployeeId == employeeId && x.EmployeeLeaveTypeId == employeeLeaveData.EmployeeLeaveTypeId);
 
                 if (leaveSummary.RemainingLeaves <= 0)
                 {
@@ -904,7 +1390,7 @@ namespace WorkManagement.Service
                 {
                     _dbContext.EmployeeLeaveSummary.Update(leaveSummary);
                 }
-
+                leaveSummary.RemainingLeaves = leaveSummary.RemainingLeaves - employeeLeaveData.LeaveDays;
                 employeeLeaveData.EmployeeId = employeeId;
 
                 EmployeeLeave employeeLeave = new EmployeeLeave();
@@ -920,6 +1406,27 @@ namespace WorkManagement.Service
                 _dbContext.EmployeeLeaves.Add(employeeLeave);
 
                 _dbContext.SaveChanges();
+
+                var employee = await _dbContext.Employees.FirstAsync(s => s.Id == employeeId);
+                if (employee.EmployeeReportToId.HasValue)
+                {
+                    var employeeLeaveType = await _dbContext.EmployeeLeaveType.FirstAsync(s => s.Id == employeeLeaveData.EmployeeLeaveTypeId);
+                    var reportToEmployee = await _dbContext.Employees.FirstAsync(s => s.Id == employee.EmployeeReportToId.Value);
+                    var pendingRequestEmailModel = new LeaveEmailModel();
+                    pendingRequestEmailModel.LeaveEmailType = "Pending Request";
+                    pendingRequestEmailModel.EmployeeName = employee.FirstName + " " + employee.LastName;
+                    pendingRequestEmailModel.ApprovalStatus = "Pending";
+                    pendingRequestEmailModel.RequestType = (employeeLeaveType == null) ? "" : employeeLeaveType.Name;
+                    pendingRequestEmailModel.ManagerName = reportToEmployee.FirstName;
+                    pendingRequestEmailModel.TotalDays = (int)employeeLeaveData.LeaveDays;
+                    pendingRequestEmailModel.Reason = string.IsNullOrEmpty(employeeLeaveData.Reason) ? "" : employeeLeaveData.Reason;
+                    pendingRequestEmailModel.StartDate = employeeLeaveData.StartDate.HasValue ? employeeLeaveData.StartDate.Value : DateTime.Now;
+                    pendingRequestEmailModel.EndDate = employeeLeaveData.EndDate.HasValue ? employeeLeaveData.EndDate.Value : DateTime.Now;
+
+                   
+
+                    SendPendingRequestEmailToManager(reportToEmployee.Email, pendingRequestEmailModel);
+                }
 
                 return employeeLeaveData;
             }
@@ -947,20 +1454,8 @@ namespace WorkManagement.Service
 
                 employeeLeaveData.EmployeeId = employeeId;
 
-                var leaveSummary = await _dbContext.EmployeeLeaveSummary.FirstAsync(x => x.EmployeeId == employeeId && x.EmployeeLeaveTypeId == employeeLeaveData.EmployeeLeaveTypeId);
-                leaveSummary.RemainingLeaves = leaveSummary.RemainingLeaves - employeeLeaveData.LeaveDays;
 
-                if (leaveSummary.RemainingLeaves <= 0)
-                {
-                    return employeeLeaveData;
-                    throw new Exception("Applied leavs are more than available leave for employee. Can not add more leaves");
-                }
-                else
-                {
-                    _dbContext.EmployeeLeaveSummary.Update(leaveSummary);
-                }
-
-                var employeeLeave = _dbContext.EmployeeLeaves.FirstOrDefault(x => x.Id == employeeLeaveData.EmployeeLeaveId);
+                var employeeLeave = _dbContext.EmployeeLeaves.FirstOrDefault(x => x.Id == employeeLeaveData.Id);
 
                 if (employeeLeave != null)
                 {
@@ -1005,6 +1500,13 @@ namespace WorkManagement.Service
                 var leaveSummary = await _dbContext.EmployeeLeaveSummary.FirstAsync(x => x.EmployeeId == employeeId && x.EmployeeLeaveTypeId == employeeLeave.EmployeeLeaveTypeId);
                 leaveSummary.RemainingLeaves += employeeLeave.LeaveDays;
 
+                var defaultLeaves = await _dbContext.EmployeeDefaultLeave.FirstAsync(x => x.EmployeeLeaveTypeId == employeeLeave.EmployeeLeaveTypeId);
+
+                if (leaveSummary.RemainingLeaves > defaultLeaves.TotalLeaves)
+                {
+                    leaveSummary.RemainingLeaves = defaultLeaves.TotalLeaves;
+                }
+
                 _dbContext.EmployeeLeaves.Remove(employeeLeave);
                 _dbContext.EmployeeLeaveSummary.Update(leaveSummary);
 
@@ -1021,12 +1523,99 @@ namespace WorkManagement.Service
             }
         }
 
+        public async Task<EmployeeLeave> ApproveLeave(int leaveId)
+        {
+            var employeeLeave = await _dbContext.EmployeeLeaves
+                .Include(l => l.employee)
+                .Include(l => l.EmployeeLeaveTypes)
+                .FirstOrDefaultAsync(l => l.Id == leaveId);
+
+            if (employeeLeave != null)
+            {
+                if (employeeLeave.Status == LeaveStatus.Approved) {
+                    return employeeLeave;
+                }
+
+               else if (employeeLeave.Status == LeaveStatus.Pending)
+                {
+                    employeeLeave.Status = LeaveStatus.Approved;
+                    await _dbContext.SaveChangesAsync();
+
+                    var emailModel = new EmailModel<LeaveEmailModel>
+                    {
+                        From = "hr@company.com",
+                        To = employeeLeave.employee.Email,
+                        Subject = "Leave Approval Notification",
+                        repModel = new LeaveEmailModel
+                        {
+                            LeaveEmailType = "Approval",
+                            EmployeeName = $"{employeeLeave.employee.FirstName} {employeeLeave.employee.LastName}",
+                            ApprovalStatus = "Approved",
+                            StartDate = employeeLeave.StartDate,
+                            EndDate = employeeLeave.EndDate,
+                            TotalDays = (int)employeeLeave.LeaveDays,
+                            Reason = employeeLeave.Reason,
+                            RequestType = employeeLeave.EmployeeLeaveTypes.Name
+                        }
+                    };
+
+                    await _emailService.SendLeaveEmail(emailModel);
+                }
+                else {
+                    throw new Exception("Cannot Approve Rejected Leave");
+                }
+            }
+            return employeeLeave;
+        }
+        public async Task<EmployeeLeave> RejectLeave(int leaveId)
+        {
+            var employeeLeave = await _dbContext.EmployeeLeaves
+                .Include(l => l.employee)
+                .Include(l => l.EmployeeLeaveTypes)
+                .FirstOrDefaultAsync(l => l.Id == leaveId);
+            if (employeeLeave.Status == LeaveStatus.Rejected) {
+                return employeeLeave;
+            }
+
+            if (employeeLeave != null)
+            {
+                employeeLeave.Status = LeaveStatus.Rejected;
+                var leaveSummary = await _dbContext.EmployeeLeaveSummary
+                    .FirstAsync(x => x.EmployeeId == employeeLeave.EmployeeId && x.EmployeeLeaveTypeId == employeeLeave.EmployeeLeaveTypeId);
+                leaveSummary.RemainingLeaves += employeeLeave.LeaveDays;
+                _dbContext.EmployeeLeaves.Update(employeeLeave);
+                _dbContext.EmployeeLeaveSummary.Update(leaveSummary);
+
+                await _dbContext.SaveChangesAsync();
+
+                var emailModel = new EmailModel<LeaveEmailModel>
+                {
+                    From = "hr@company.com",
+                    To = employeeLeave.employee.Email,
+                    Subject = "Leave Rejection Notification",
+                    repModel = new LeaveEmailModel
+                    {
+                        LeaveEmailType = "Approval",
+                        EmployeeName = $"{employeeLeave.employee.FirstName} {employeeLeave.employee.LastName}",
+                        ApprovalStatus = "Rejected",
+                        StartDate = employeeLeave.StartDate,
+                        EndDate = employeeLeave.EndDate,
+                        TotalDays = (int)employeeLeave.LeaveDays,
+                        Reason = employeeLeave.Reason,
+                        RequestType = employeeLeave.EmployeeLeaveTypes.Name
+                    }
+                };
+
+                await _emailService.SendLeaveEmail(emailModel);
+            }
+            return employeeLeave;
+        }
 
         #endregion
 
         #region Private methods
 
-        private async void SendEmail(ApplicationUser user, string password)
+        private async Task SendEmail(ApplicationUser user, string password)
         {
             var WelcomeModelCredentials = new WelcomeModel();
             WelcomeModelCredentials.Username = user.UserName;
@@ -1038,6 +1627,17 @@ namespace WorkManagement.Service
             emailModel.Subject = "Welcome to Geo!";
             emailModel.repModel = WelcomeModelCredentials;
             _emailService.SendWelcomeMail(emailModel);
+        }
+
+        private async Task SendPendingRequestEmailToManager(string userEmail, LeaveEmailModel pendingRequestEmailModel)
+        {
+
+            var emailModel = new EmailModel<LeaveEmailModel>();
+            emailModel.From = "naupul30@gmail.com";
+            emailModel.To = userEmail;
+            emailModel.Subject = $"Leave request from: {pendingRequestEmailModel.EmployeeName}";
+            emailModel.repModel = pendingRequestEmailModel;
+            _emailService.SendLeaveEmail(emailModel);
         }
 
         private int CheckValidEmployeeId(string loggedUserId)
@@ -1097,8 +1697,6 @@ namespace WorkManagement.Service
             return (true, string.Empty);
         }
 
-
-
-
+       
     }
 }

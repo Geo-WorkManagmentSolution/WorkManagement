@@ -21,4 +21,17 @@ namespace WorkManagement.Domain.Models.Email
         public string FirstName { get; set; }
         public string LastName { get; set; }
     }
+
+    public class LeaveEmailModel
+    {
+        public string LeaveEmailType { get; set; }
+        public string EmployeeName { get; set; }
+        public string ApprovalStatus { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public int TotalDays { get; set; }
+        public string Reason { get; set; }
+        public string ManagerName { get; set; }
+        public string RequestType { get; set; }
+    }
 }

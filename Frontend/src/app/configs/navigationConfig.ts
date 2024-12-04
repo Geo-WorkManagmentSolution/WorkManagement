@@ -3,6 +3,7 @@ import { FuseNavItemType } from '@fuse/core/FuseNavigation/types/FuseNavItemType
 import ar from './navigation-i18n/ar';
 import en from './navigation-i18n/en';
 import tr from './navigation-i18n/tr';
+import { authRoles } from '../auth';
 
 i18next.addResourceBundle('en', 'navigation', en);
 i18next.addResourceBundle('tr', 'navigation', tr);
@@ -36,19 +37,36 @@ const navigationConfig: FuseNavItemType[] = [
 						id: 'applicationmanagement.employees.new',
 						title: 'Add Employee',
 						type: 'item',
+						auth:authRoles.admin,
 						url: '/apps/employees/employeesSearch/new'
 					},
 					{
-						id:'applicationmanagement.employees.leavemanagement',
-						title:'Leave Management',
-						type:'item',
-						url:'/apps/employees/leave-management'
-					},
-					{
-						id:'applicationmanagement.employees.leaveapprovals',
-						title:'Leave Approvals',
-						type:'item',
-						url:'/apps/employees/leave-approval'
+						id: 'applicationmanagement.employees.leavemanagement',
+						title: 'Leave Management',
+						type: 'collapse',
+						children: [
+							{
+								id: 'applicationmanagement.employees.leave-management.add-leave',
+								title: 'Add Leave',
+								type: 'item',
+								url: '/apps/employees/leave-management/addleave',
+								end: true
+							},
+							{
+								id: 'applicationmanagement.employees.leave-management.leave-approval',
+								title: 'Leave Approval',
+								type: 'item',
+								auth: authRoles.Manager,
+								url: '/apps/employees/leave-management/leave-approval'
+							},
+							{
+								id: 'applicationmanagement.employees.leave-management.leave-history',
+                                title: 'Employee Leave History',
+                                type: 'item',
+								auth: authRoles.Manager,
+                                url: '/apps/employees/leave-management/leave-history'
+							}
+						]
 					}
 				]
 			},
@@ -63,7 +81,7 @@ const navigationConfig: FuseNavItemType[] = [
 						title: 'Project Dashboard',
 						type: 'item',
 						url: '/apps/projects',
-						end: true,
+						end: true
 					},
 					{
 						id: 'applicationmanagement.projects.new',
@@ -72,6 +90,14 @@ const navigationConfig: FuseNavItemType[] = [
 						url: '/apps/projects/projectSearch/new'
 					}
 				]
+			},
+			{
+				id: 'applicationmanagement.settings',
+				title: 'Settings',
+				type: 'item',
+				auth: authRoles.admin,
+				icon: 'heroicons-outline:cog-8-tooth',
+				url: '/apps/settings'
 			}
 		]
 	}

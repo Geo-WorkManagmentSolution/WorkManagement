@@ -19,7 +19,7 @@ namespace WorkManagement.Domain.Contracts
         public Task<List<EmployeeDesignation>> GetEmployeeDesignations();
         public Task<List<Site>> GetSites();
         public Task<List<EmployeeReportToModel>> GetReportToEmployeeList(int? departmentId, int? employeeId);
-        public Task<List<EmployeeTeamMemberList>> GetTeamMembersList(int? employeeId);
+        public Task<List<EmployeeTeamMemberList>> GetTeamMembersList(string loggedUserId, int? employeeId);
 
         #endregion
 
@@ -38,20 +38,29 @@ namespace WorkManagement.Domain.Contracts
         public Task<EmployeeModel> CreateEmployeeAsync(EmployeeModel employee);
         public Task<EmployeeModel> UpdateEmployeeAsync(int id, EmployeeModel employee);
         public Task<bool> DeleteEmployeeAsync(int id);
-
+        public Task<string> GetEmployeeDocumentFileName(int id, string fileName);
+        public Task<string> UpdateEmployeeDocumentData(int id, string fileName, string filePath);
+        public string GetEmployeeFilePath(int id, string fileName);
+        public Task<bool> DeleteEmployeeFile(int employeeId, string fileName);
         #endregion        
 
         #region Employee Leave
 
-        public Task<List<EmployeeLeaveSummaryModel>> GetEmployeeLeaves(string loggedUserId);
+        public Task<List<EmployeeLeaveSummaryModel>> GetEmployeeLeaves(string loggedUserId,int? EmployeeId);
+
+        //public Task<List<EmployeeLeaveSummaryModel>> GetEmployeeLeavesByEmployeeID(int EmployeeId);
         public Task<EmployeeLeaveModel> AddLeave(EmployeeLeaveModel employeeLeave, string loggedUserId);
         public Task<EmployeeLeaveModel> UpdateLeave(EmployeeLeaveModel employeeLeaveData, string loggedUserId);
         public Task CancelLeave(int employeeLeaveId, string value);
+        public Task<EmployeeLeave> ApproveLeave(int leaveId);
+        public Task<EmployeeLeave> RejectLeave(int leaveId);
+      
 
         #endregion
 
         public Task<bool> CheckEmailExists(string email);
 
         public Task SendEmail();
+       
     }
 }

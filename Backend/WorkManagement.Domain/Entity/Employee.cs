@@ -88,6 +88,7 @@ namespace WorkManagementSolution.Employee
     public class EmployeeDocuments : BaseEntity
     {
         public string? FileName { get; set; }
+        public string? FilePath { get; set; }
         public int? FileSize { get; set; }
         public byte[]? FileContent { get; set; }
         public FileType? FileType { get; set; }
@@ -160,6 +161,7 @@ namespace WorkManagementSolution.Employee
         [DataType(DataType.Date)]
         public DateTime? ConfirmationDate { get; set; }
         public decimal TotalPreviousExperience { get; set; }
+        public bool UseDefaultLeaves { get; set; }
         public decimal Salary { get; set; }
         public decimal Basic { get; set; }
         public decimal HRAllowances { get; set; }
@@ -182,12 +184,18 @@ namespace WorkManagementSolution.Employee
 
     public class EmployeeAddress : BaseEntity
     {
-        public string? AddressLine1 { get; set; }
-        public string? AddressLine2 { get; set; }
-        public string? City { get; set; }
-        public string? Country { get; set; }
-        public string? State { get; set; }
-        public long? PinCode { get; set; }
+        public string? UserAddressLine1 { get; set; }
+        public string? UserAddressLine2 { get; set; }
+        public string? UserCity { get; set; }
+        public string? UserCountry { get; set; }
+        public string? UserState { get; set; }
+        public long? UserAddressPinCode { get; set; }
+        public string? MailingAddressLine1 { get; set; }
+        public string? MailingAddressLine2 { get; set; }
+        public string? MailingCity { get; set; }
+        public string? MailingCountry { get; set; }
+        public string? MailingState { get; set; }
+        public long? MailingAddressPinCode { get; set; }
         // Other address-related properties
     }
 
@@ -225,7 +233,7 @@ namespace WorkManagementSolution.Employee
         [ForeignKey(nameof(EmployeeDesignation))]
         public int? EmployeeDesignationId { get; set; }
         public EmployeeDesignation? EmployeeDesignation { get; set; }
-        public string SerialNumber { get; set; }
+        public string? SerialNumber { get; set; }
         public DateTime? DateOfJoining { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public decimal Age { get; set; }

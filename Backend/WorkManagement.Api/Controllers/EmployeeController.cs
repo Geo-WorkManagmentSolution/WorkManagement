@@ -26,6 +26,7 @@ namespace WorkManagement.API.Controllers
         private readonly AdvanceSearchService advanceSearchService;
         private IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper mapper;
+        private readonly string _storagePath = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles");
 
         public EmployeesController(IEmployeeService employeeService, AdvanceSearchService AdvanceSearchService, IHttpContextAccessor httpContextAccessor, IMapper mapper, IEmailService emailService)
         {
@@ -34,6 +35,11 @@ namespace WorkManagement.API.Controllers
             _httpContextAccessor = httpContextAccessor;
             this.mapper = mapper;
             _emailService = emailService;
+
+            if (!Directory.Exists(_storagePath))
+            {
+                Directory.CreateDirectory(_storagePath);
+            }
         }
 
         // GET: api/employees
@@ -84,9 +90,10 @@ namespace WorkManagement.API.Controllers
 
 
         [HttpGet("TeamMembersList")]
-        public async Task<ActionResult<IEnumerable<EmployeeTeamMemberList>>> GetTeamMembersList(int? employeeId)
+        public async Task<ActionResult<IEnumerable<EmployeeTeamMemberList>>> GetTeamMembersList([FromQuery] int? employeeId = null)
         {
-            var teamMembersList = await employeeService.GetTeamMembersList(employeeId);
+            string loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var teamMembersList = await employeeService.GetTeamMembersList(loggedUserId, employeeId);
             return Ok(teamMembersList);
         }
 
@@ -204,10 +211,146 @@ namespace WorkManagement.API.Controllers
 
         // GET api/employee/leaves/current
         [HttpGet("leaves/current")]
-        public async Task<ActionResult<IEnumerable<EmployeeLeaveSummaryModel>>> GetEmployeeLeaves()
+        public async Task<ActionResult<IEnumerable<EmployeeLeaveSummaryModel>>> GetEmployeeLeaves([FromQuery] int? employeeId = null)
         {
-            var leaves = await employeeService.GetEmployeeLeaves(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            List<EmployeeLeaveSummaryModel> leaves; if (employeeId.HasValue)
+            { // Fetch data based on employeeId
+              leaves = await employeeService.GetEmployeeLeaves(null, employeeId); 
+            } else 
+            { 
+                // Fetch data based on loggedUserId
+                var loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                leaves = await employeeService.GetEmployeeLeaves(loggedUserId, null); 
+            } return Ok(leaves); 
+        }
+
+                // GET api/employee/leaves/addLeave
+                [HttpPost("leaves/addLeave")]
+        public async Task<ActionResult<EmployeeLeaveModel>> AddLeave(EmployeeLeaveModel employeeLeaveData)
+        {
+            var leaves = await employeeService.AddLeave(employeeLeaveData, User.FindFirst(ClaimTypes.NameIdentifier).Value);
             return Ok(leaves);
+        }
+
+        // GET api/employee/leaves/updateLeave
+        [HttpPut("leaves/updateLeave")]
+        public async Task<ActionResult<EmployeeLeaveModel>> UpdateLeave(EmployeeLeaveModel employeeLeaveData)
+        {
+            var leaves = await employeeService.UpdateLeave(employeeLeaveData, User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            return Ok(leaves);
+        }
+
+        // GET api/employee/leaves/CancelLeave
+        [HttpDelete("leaves/cancelLeave")]
+        public async Task<ActionResult<bool>> CancelLeave(int employeeLeaveId)
+        {
+            await employeeService.CancelLeave(employeeLeaveId, User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            return Ok(true);
+        }
+
+        [HttpPut("approve/{leaveId}")]
+        public async Task<ActionResult<EmployeeLeave>> ApproveLeave(int leaveId)
+        {
+            try
+            {
+                var employeeLeave = await employeeService.ApproveLeave(leaveId);
+                return Ok(employeeLeave);
+            }
+            catch(Exception e) {
+                return BadRequest(new { message = e.Message });
+            }
+        }
+
+        [HttpPut("reject/{leaveId}")]
+        public async Task<ActionResult<EmployeeLeave>> RejectLeave(int leaveId)
+        {
+            var employeeLeave = await employeeService.RejectLeave(leaveId);
+            return Ok(employeeLeave);
+        }
+
+        [HttpPost("documnet/upload")]
+        public async Task<ActionResult<string>> Upload(int id,IFormFile file)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                    return BadRequest("No file uploaded.");
+
+                var employeeFilePath = await employeeService.GetEmployeeDocumentFileName(id, file.FileName);
+
+                var filePath = Path.Combine(_storagePath, employeeFilePath);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+
+                    await employeeService.UpdateEmployeeDocumentData(id, file.FileName, filePath);
+                }
+
+
+                return Ok(filePath);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
+            
+        }
+
+        [HttpDelete("document/{fileName}")]
+        public async Task<IActionResult> DeleteDocument(int id, string fileName)
+        {
+            var result = await employeeService.DeleteEmployeeFile(id, fileName);
+            if (result)
+            {
+                return Ok(new { message = "File deleted successfully" });
+            }
+            return NotFound(new { message = "File not found" });
+        }
+
+        [HttpGet("download/{fileName}")]
+        public IActionResult Download(int id, string fileName)
+        {
+            var filePath = employeeService.GetEmployeeFilePath(id, fileName);
+
+            if (!System.IO.File.Exists(filePath))
+                return NotFound();
+
+            var memory = new MemoryStream();
+            using (var stream = new FileStream(filePath, FileMode.Open))
+            {
+                stream.CopyTo(memory);
+            }
+            memory.Position = 0;
+
+            return File(memory, GetContentType(filePath), fileName);
+        }
+
+
+
+        private string GetContentType(string path)
+        {
+            var types = GetMimeTypes();
+            var ext = Path.GetExtension(path).ToLowerInvariant();
+            return types.ContainsKey(ext) ? types[ext] : "application/octet-stream";
+        }
+
+        private Dictionary<string, string> GetMimeTypes()
+        {
+            return new Dictionary<string, string>
+            {
+                { ".txt", "text/plain" },
+                { ".pdf", "application/pdf" },
+                { ".doc", "application/vnd.ms-word" },
+                { ".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
+                { ".xls", "application/vnd.ms-excel" },
+                { ".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
+                { ".png", "image/png" },
+                { ".jpg", "image/jpeg" },
+                { ".jpeg", "image/jpeg" },
+                { ".gif", "image/gif" },
+                { ".csv", "text/csv" }
+            };
         }
 
     }

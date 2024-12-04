@@ -33,7 +33,8 @@ const EmployeeModelClone = (data: PartialDeep<EmployeeModel>) =>
 			bond: null,
 			previousDateOfJoiningInGDR: null,
 			previousDateOfLeavingInGDR: null,
-			grpHead: ''
+			grpHead: '',
+			useDefaultLeaves:true
 		},
 		employeeAddresses: {
 			isDeleted: false,

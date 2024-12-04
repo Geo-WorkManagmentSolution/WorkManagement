@@ -25,4 +25,8 @@
     <ProjectReference Include="..\WorkManagement.Service\WorkManagement.Service.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="UploadedFiles\" />
+  </ItemGroup>
+
 </Project>

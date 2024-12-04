@@ -13,7 +13,7 @@ import EnhancedAutocomplete from "../EnhancedAutocomplete";
 /**
  * The basic info tab.
  */
-function IdentityInfoTab() {
+function IdentityInfoTab({UserRole}) {
   const methods = useFormContext();
   const { control, formState } = methods;
   const { errors } = formState;
@@ -26,7 +26,9 @@ function IdentityInfoTab() {
       const result = await AddDesignation({
         employeeDesignation: newOption,
       }).unwrap();
-      return { ...newOption, id: result.id };
+      console.log(result);
+      
+      return { ...newOption, id: result };
     } catch (error) {
       console.error("Failed to add new option:", error);
       throw error;
@@ -59,7 +61,7 @@ function IdentityInfoTab() {
                 onChange={(_, newValue) => {
                   field.onChange(newValue ? newValue.id : null);
                 }}
-                isOptionEqualToValue={(option, value) => option.id === value}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
                 placeholder="Type to search or add"
                 renderInput={(params) => (
                   <TextField
@@ -92,6 +94,7 @@ function IdentityInfoTab() {
                 label="Serial Number"
                 className=" mx-4"
                 fullWidth
+                value={field.value || ''}
                 error={!!errors.employeeInsuranceDetails?.serialNumber}
                 helperText={
                   errors.employeeInsuranceDetails?.serialNumber
@@ -172,7 +175,7 @@ function IdentityInfoTab() {
             render={({ field }) => (
               <TextField
                 {...field}
-                value={field.value}
+                value={field.value || ''}
                 label="Age"
                 fullWidth
                 type="number"
@@ -197,7 +200,7 @@ function IdentityInfoTab() {
             render={({ field }) => (
               <TextField
                 {...field}
-                value={field.value}
+                value={field.value || ''}
                 label="Gross Salary"
                 fullWidth
                 type="number"
@@ -221,7 +224,7 @@ function IdentityInfoTab() {
             render={({ field }) => (
               <TextField
                 {...field}
-                value={field.value}
+                value={field.value || ''}
                 label="Total SI Wider"
                 fullWidth
                 type="number"
@@ -244,7 +247,7 @@ function IdentityInfoTab() {
             render={({ field }) => (
               <TextField
                 {...field}
-                value={field.value}
+                value={field.value || ''}
                 label="Comprehensive"
                 fullWidth
                 type="number"
@@ -267,7 +270,7 @@ function IdentityInfoTab() {
             render={({ field }) => (
               <TextField
                 {...field}
-                value={field.value}
+                value={field.value || ''}
                 label="Risk"
                 fullWidth
                 type="text"

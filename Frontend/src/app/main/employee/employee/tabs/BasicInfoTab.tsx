@@ -3,28 +3,31 @@ import { Avatar, Box, Autocomplete, Typography, InputAdornment, Grid, Button, Me
 import TextField from '@mui/material/TextField';
 import { useRef } from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useParams } from 'react-router-dom';
 import { Controller, useFieldArray, useFormContext } from 'react-hook-form';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import { useGetApiAuthRolesQuery } from 'src/app/auth/services/AuthApi';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { useGetApiEmployeesCategoriesQuery, usePostApiEmployeesAddNewCategoryMutation } from '../../EmployeeApi';
-import EmailCheckerInput from '../EmailChecker';
 import EnhancedAutocomplete from '../EnhancedAutocomplete';
-import { RelationshipType} from '../../models/EmployeeDropdownModels';
+import { RelationshipType } from '../../models/EmployeeDropdownModels';
+import EmailCheckerInput from '../EmailChecker';
 
 /**
  * The basic info tab.
  */
-function BasicInfoTab() {
+function BasicInfoTab({UserRole}) {
 	const { data: employeesCategoriesOptions = [] } = useGetApiEmployeesCategoriesQuery();
 	// const { data: employeesCategoriesOptions,refetch } = useGetApiEmployeesCategoriesQuery();
-	//const relationShipTypes = ['Parent', 'Spouse', 'Family', 'Friend', 'Other'];
+	// const relationShipTypes = ['Parent', 'Spouse', 'Family', 'Friend', 'Other'];
 	const { data: employeesRolesOptions = [] } = useGetApiAuthRolesQuery();
 	const [AddCategory] = usePostApiEmployeesAddNewCategoryMutation();
-
+	const { employeeId } = useParams();
 	const handleOptionAdd = async (newOption: Omit<Option, 'id'>) => {
 		try {
-			const result = await AddCategory({ employeeCategory: newOption }).unwrap();
+			const result = await AddCategory({
+				employeeCategory: newOption
+			}).unwrap();
 			return { ...newOption, id: result.id };
 		} catch (error) {
 			console.error('Failed to add new option:', error);
@@ -39,7 +42,8 @@ function BasicInfoTab() {
 	const handlePhotoUpload = (file: File | null, onChange: (value: string) => void) => {
 		const MAX_FILE_SIZE = 5000000; // 5MB
 		const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-
+		
+		
 		if (file) {
 			if (file.size > MAX_FILE_SIZE) {
 				alert('File size should be less than 5MB');
@@ -142,6 +146,25 @@ function BasicInfoTab() {
 					<div className="flex flex-col mx-20">
 						<div className="flex -mx-4">
 							<Controller
+								name="employeeNumber"
+								control={control}
+								render={({ field }) => (
+									<TextField
+										{...field}
+										value={field.value || ''}
+										className=" mx-4"
+										disabled
+										label="Employee Number"
+										fullWidth
+										margin="normal"
+										error={!!errors?.employeeNumber}
+										helperText={errors?.employeeNumber?.message as string}
+									/>
+								)}
+							/>
+						</div>
+						<div className="flex -mx-4">
+							<Controller
 								name="employeeCategoryId"
 								control={control}
 								render={({ field }) => (
@@ -178,45 +201,34 @@ function BasicInfoTab() {
 									/>
 								)}
 							/>
-							<Controller
-								name="roleId"
-								control={control}
-								render={({ field: { onChange, value } }) => (
-									<Autocomplete
-										className="mt-8 mb-16 mx-4"
-										fullWidth
-										getOptionLabel={(option) => option?.name}
-										options={employeesRolesOptions}
-										isOptionEqualToValue={(option, value) => option.id === value}
-										value={employeesRolesOptions.find((c) => c.id === value) || null}
-										onChange={(_, newValue) => {
-											onChange(newValue ? newValue.id : null);
-										}}
-										renderInput={(params) => (
-											<TextField
-												{...params}
-												value={params.value || ''}
-												placeholder="Select role"
-												label="Role"
-												required
-												// InputProps={{
-												// 	startAdornment: (
-												// 		<InputAdornment position="start">
-												// 			<FuseSvgIcon size={20}>heroicons-solid:briefcase</FuseSvgIcon>
-												// 		</InputAdornment>
-												// 	)
-												// }}
-												variant="outlined"
-												InputLabelProps={{
-													shrink: true
-												}}
-												error={!!errors?.roleId}
-												helperText={errors?.roleId?.message as string}
-											/>
-										)}
-									/>
-								)}
-							/>
+							 <Controller
+        name="roleId"
+        control={control}
+        render={({ field: { onChange, value } }) => (
+          <Autocomplete
+            className="mt-8 mb-16 mx-4"
+            fullWidth
+            options={employeesRolesOptions}
+            getOptionLabel={(option) => option?.name || ''}
+			disabled={UserRole === 'Employee'}
+            isOptionEqualToValue={(option, value) => option.id === value?.id}
+            value={employeesRolesOptions.find((c) => c.id === value) || null}
+            onChange={(_, newValue) => {
+              onChange(newValue ? newValue.id : null);
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Role"
+                required
+                variant="outlined"
+                error={!!errors?.roleId}
+                helperText={errors?.roleId?.message as string}
+              />
+            )}
+          />
+        )}
+      />
 						</div>
 
 						<div className="flex -mx-4">
@@ -293,7 +305,7 @@ function BasicInfoTab() {
 					</Typography>
 				</div>
 				<div className="flex -mx-4">
-					<Controller
+					{/* <Controller
 						name="email"
 						control={control}
 						render={({ field }) => (
@@ -319,15 +331,15 @@ function BasicInfoTab() {
 								helperText={errors?.email?.message as string}
 							/>
 						)}
-					/>
-					{/* <EmailCheckerInput /> */}
+					/> */}
+					 <EmailCheckerInput disabled={employeeId !== 'new'} />
 					<Controller
 						name="alternateEmail"
 						control={control}
 						render={({ field }) => (
 							<TextField
 								{...field}
-								value={field.value}
+								value={field.value || ""}
 								label="Alternate Email"
 								fullWidth
 								type="email"
@@ -353,7 +365,7 @@ function BasicInfoTab() {
 						render={({ field }) => (
 							<TextField
 								{...field}
-								value={field.value}
+								value={field.value || ""}
 								label="Phone Number"
 								fullWidth
 								type="number"
@@ -380,7 +392,7 @@ function BasicInfoTab() {
 						render={({ field }) => (
 							<TextField
 								{...field}
-								value={field.value}
+								value={field.value || ""}
 								label="Alternate Number"
 								type="number"
 								className="mx-4"
@@ -441,7 +453,12 @@ function BasicInfoTab() {
 											select
 											fullWidth
 											label="Relationship Type"
-											SelectProps={{ MenuProps: { disableScrollLock: false,autoFocus: true } }}
+											SelectProps={{
+												MenuProps: {
+													disableScrollLock: false,
+													autoFocus: true
+												}
+											}}
 										>
 											{Object.values(RelationshipType).map((option) => (
 												<MenuItem
@@ -513,11 +530,18 @@ function BasicInfoTab() {
 
 						<Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
 							<Button
-								className=""
+								className={index > 0 ? 'hideAddContextButton' : ''}
 								variant="contained"
 								color="secondary"
 								size="small"
-								onClick={() => append({ relationshipType: '', name: '', email: '', phoneNumber: '' })}
+								onClick={() =>
+									append({
+										relationshipType: '',
+										name: '',
+										email: '',
+										phoneNumber: ''
+									})
+								}
 							>
 								<FuseSvgIcon size={20}>heroicons-outline:plus</FuseSvgIcon>
 								<span className="mx-4 sm:mx-8">Add Contact</span>

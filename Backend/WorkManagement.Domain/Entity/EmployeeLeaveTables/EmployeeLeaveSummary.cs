@@ -11,9 +11,8 @@ namespace WorkManagement.Domain.Entity.EmployeeLeaveTables
 {
     public class EmployeeLeaveSummary : BaseEntity
     {
-        public int EmployeeId { get; set; }
-
         [ForeignKey(nameof(EmployeeId))]
+        public int EmployeeId { get; set; }
         public Employee? Employee { get; set; }
         public double RemainingLeaves { get; set; }
 

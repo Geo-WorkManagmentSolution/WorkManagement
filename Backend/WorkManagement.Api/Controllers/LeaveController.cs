@@ -38,7 +38,7 @@ namespace WorkManagement.API.Controllers
 
         // GET api/leaves/assignedLeaves
         [HttpGet("leaves/all")]
-        public async Task<ActionResult<IEnumerable<EmployeeLeave>>> GetAllLeves()
+        public async Task<ActionResult<IEnumerable<EmployeeLeaveModel>>> GetAllLeves()
         {
             
             var leaves = await leavesService.GetAssignedEmployeeLeaves(User.FindFirst(ClaimTypes.NameIdentifier).Value);
@@ -53,6 +53,40 @@ namespace WorkManagement.API.Controllers
             return Ok(leaves);
         }
 
+        [HttpGet("default-leaves")]
+        public async Task<ActionResult<List<EmployeeDefaultLeaveSummary>>> GetDefaultLeave() 
+        {
+            var result = await leavesService.GetDefaultLeaveSummaries(); 
+            return Ok(result); 
+        }
+
+        [HttpPut("default-leaves")]
+        public async Task<ActionResult<bool>> UpdateDefaultLeave([FromBody] List<EmployeeDefaultLeaveSummary> defaultLeaves)
+        {
+            var result = await leavesService.UpdateDefaultLeave(defaultLeaves);
+            if (result)
+            {
+                return Ok(true);
+            }
+            return BadRequest("Failed to update default leaves");
+        }
+        [HttpPost("holidays")]
+        public async Task<ActionResult<bool>> AddHolidays([FromBody] List<EmployeeHoliday> holidays)
+        {
+            var result = await leavesService.AddHoliday(holidays);
+            if (result)
+            {
+                return Ok(true);
+            }
+            return BadRequest("Failed to add holidays");
+        }
+
+        [HttpGet("holidays/{year}")]
+        public async Task<ActionResult<List<EmployeeHoliday>>> GetHolidaysByYear(int year)
+        {
+            var holidays = await leavesService.GetHolidaysByYear(year);
+            return Ok(holidays);
+        }
 
 
     }

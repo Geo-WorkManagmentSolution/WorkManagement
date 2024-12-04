@@ -37,16 +37,39 @@ namespace WorkManagement.Service
         {
             return await _dbContext.EmployeeHolidays.ToListAsync();
         }
-
-        public async Task<List<EmployeeLeave>> GetAssignedEmployeeLeaves(string loggedUserId)
+        public async Task<List<EmployeeLeaveModel>> GetAssignedEmployeeLeaves(string loggedUserId)
         {
-            var ManagerId = _dbContext.Employees.First(x => x.UserId == Guid.Parse(loggedUserId)).Id;
+            var ManagerId = await _dbContext.Employees
+                .Where(x => x.UserId == Guid.Parse(loggedUserId))
+                .Select(x => x.Id)
+                .FirstOrDefaultAsync();
 
-            var assignedLeaves = from emp in _dbContext.Employees.Where(x => x.EmployeeReportToId == ManagerId)
-                                 join empLeave in _dbContext.EmployeeLeaves on emp.Id equals empLeave.EmployeeId
-                                 select empLeave;
-            return assignedLeaves.ToList();
+            var assignedLeaves = await (from emp in _dbContext.Employees
+                                        join empLeave in _dbContext.EmployeeLeaves on emp.Id equals empLeave.EmployeeId
+                                        join leaveType in _dbContext.EmployeeLeaveType on empLeave.EmployeeLeaveTypeId equals leaveType.Id
+                                        where emp.EmployeeReportToId == ManagerId
+                                        select new EmployeeLeaveModel
+                                        {
+                                            Id = empLeave.Id,
+                                            EmployeeId = empLeave.EmployeeId,
+                                            EmployeeNumber=emp.EmployeeNumber,
+                                            Status = empLeave.Status,
+                                            Description = empLeave.Description,
+                                            Reason = empLeave.Reason,
+                                            StartDate = empLeave.StartDate,
+                                            EndDate = empLeave.EndDate,
+                                            LeaveDays = empLeave.LeaveDays,
+                                            EmployeeLeaveTypeId = empLeave.EmployeeLeaveTypeId,
+                                            LeaveType = empLeave.EmployeeLeaveTypes.Name,
+                                            EmployeeName = emp.FirstName + " " + emp.LastName
+                                        }).ToListAsync();
+
+            return assignedLeaves;
         }
+
+
+
+
 
         public async Task<List<EmployeeLeaveHistoryDTO>> GetEmployeeLeaveHistory(EmployeeLeaveHistoryDataModel data,string loggedUserId)
         {
@@ -80,6 +103,114 @@ namespace WorkManagement.Service
             return returnData;
         }
 
+        public async Task<List<EmployeeDefaultLeaveSummary>> GetDefaultLeaveSummaries()
+{
+    var EmployeeDefaultLeaveSummary = await _dbContext.EmployeeDefaultLeave
+        .Include(x => x.EmployeeLeaveTypes)
+        .ToListAsync();
+
+    return EmployeeDefaultLeaveSummary;
+}
+        public async Task<bool> UpdateDefaultLeave(List<EmployeeDefaultLeaveSummary> defaultLeaves)
+        {
+            try
+            {
+                // Remove existing default leaves
+                var existingLeaves = await _dbContext.EmployeeDefaultLeave.ToListAsync();
+                _dbContext.EmployeeDefaultLeave.RemoveRange(existingLeaves);
+
+                // Add new default leaves
+                foreach (var leave in defaultLeaves)
+                {
+                    var leaveType = await _dbContext.EmployeeLeaveType.FirstOrDefaultAsync(lt => lt.Name == leave.EmployeeLeaveTypes.Name);
+                    if (leaveType == null)
+                    {
+                        leaveType = new EmployeeLeaveType
+                        {
+                            Name = leave.EmployeeLeaveTypes.Name,
+                            IsPaid = true
+                        };
+                        _dbContext.EmployeeLeaveType.Add(leaveType);
+                        await _dbContext.SaveChangesAsync();
+                    }
+
+                    var newDefaultLeave = new EmployeeDefaultLeaveSummary
+                    {
+                        EmployeeLeaveTypeId = leaveType.Id,
+                        TotalLeaves = leave.TotalLeaves
+                    };
+                    _dbContext.EmployeeDefaultLeave.Add(newDefaultLeave);
+                }
+
+                await _dbContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                // Log the exception
+                return false;
+            }
+        }
+        public async Task<bool> AddHoliday(List<EmployeeHoliday> holidays)
+        {
+            try
+            {
+                // Get existing holidays for the year of the first holiday in the list
+                // Assuming all holidays in the list are for the same year
+                int year = holidays.First().StartDate.Year;
+                var existingHolidays = await _dbContext.EmployeeHolidays
+                    .Where(h => h.StartDate.Year == year || h.EndDate.Year == year)
+                    .ToListAsync();
+
+                // Remove holidays that are not in the new list
+                var holidaysToRemove = existingHolidays
+                    .Where(eh => !holidays.Any(h =>
+                        h.StartDate.Date == eh.StartDate.Date &&
+                        h.EndDate.Date == eh.EndDate.Date &&
+                        h.Name == eh.Name))
+                    .ToList();
+
+                _dbContext.EmployeeHolidays.RemoveRange(holidaysToRemove);
+
+                foreach (var holiday in holidays)
+                {
+                    var existingHoliday = existingHolidays.FirstOrDefault(eh =>
+                        eh.StartDate.Date == holiday.StartDate.Date &&
+                        eh.EndDate.Date == holiday.EndDate.Date);
+
+                    if (existingHoliday != null)
+                    {
+                        // Update existing holiday
+                        existingHoliday.Name = holiday.Name;
+                        existingHoliday.IsFloater = holiday.IsFloater;
+                        _dbContext.EmployeeHolidays.Update(existingHoliday);
+                    }
+                    else
+                    {
+                        // Add new holiday
+                        await _dbContext.EmployeeHolidays.AddAsync(holiday);
+                    }
+                }
+
+                await _dbContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine($"Error in AddHoliday: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<List<EmployeeHoliday>> GetHolidaysByYear(int year)
+        {
+            return await _dbContext.EmployeeHolidays
+                .Where(h => h.StartDate.Year == year || h.EndDate.Year == year)
+                .ToListAsync();
+        }
+
+
         #region Private Methods
 
         private List<EmployeeLeaveHistoryDTO> GetLeaveData(int employeeId, DateTime startDate, bool isFutureData)
@@ -98,8 +229,7 @@ namespace WorkManagement.Service
                     EmployeeLeaveId=l.Id,
                     status=l.Status
                     
-                    
-                    
+                                        
                 })
                 .ToList();
         }
@@ -114,12 +244,13 @@ namespace WorkManagement.Service
                     EndDate = h.EndDate,
                     EmployeeId = employeeId,
                     Description=h.Name,
-                    Name="Holiday"
-                    
+                    Name="Holiday - " + h.Name,
+
                 })
                 .ToList();
         }
 
+       
         #endregion
 
 

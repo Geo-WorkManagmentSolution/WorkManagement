@@ -92,6 +92,7 @@ export type EmployeeWorkInformationModel = {
   hireDate?: string | null;
   confirmationDate?: string | null;
   totalPreviousExperience?: number;
+  useDefaultLeaves?: boolean;
 };
 export type EmployeeInsuranceDetailModel = {
   employeeDesignationId?: number | null;
@@ -104,13 +105,18 @@ export type EmployeeInsuranceDetailModel = {
   comprehensive?: number | null;
   risk?: string | null;
 };
-export type EmployeeAddressModel = {
+export type AddressModel = {
   addressLine1?: string | null;
   addressLine2?: string | null;
   city?: string | null;
   country?: string | null;
   state?: string | null;
   pinCode?: number | null;
+};
+export type EmployeeAddressModel = {
+  useUserAddressForMailing?: boolean;
+  userAddress?: AddressModel;
+  mailingAddress?: AddressModel;
 };
 export type EmployeeBankingDataModel = {
   uid?: string | null;
@@ -143,6 +149,13 @@ export type EmployeeDocumentsModel = {
   fileContent?: string | null;
   fileType?: FileType;
 };
+export type EmployeeLeaveSummaryModel = {
+  employeeLeaveSummaryId?: number;
+  id?: number;
+  employeeLeaveType?: string | null;
+  totalLeaves?: number;
+  remainingLeaves?: number;
+};
 export type EmployeeModel = {
   id?: number;
   photoURL?: string | null;
@@ -154,7 +167,6 @@ export type EmployeeModel = {
   alternateEmail?: string | null;
   phoneNumber?: number | null;
   alternateNumber?: number | null;
-  position?: string | null;
   isDeleted?: boolean | null;
   userId?: string | null;
   roleId?: string;
@@ -170,6 +182,7 @@ export type EmployeeModel = {
   employeeEducationDetail?: EmployeeEducationDetailModel[] | null;
   employeeRelationshipDetails?: EmployeeRelationshipDetailModel[] | null;
   employeeDocuments?: EmployeeDocumentsModel[] | null;
+  employeeLeaves?: EmployeeLeaveSummaryModel[] | null;
 };
 export enum MaritalStatus {
   Unknown = "Unknown",

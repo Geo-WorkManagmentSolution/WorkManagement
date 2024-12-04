@@ -127,8 +127,23 @@ try
     {
         try
         {
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
+
+            var roles = new[] { "admin", "Manager", "SuperUser", "HR Admin", "HR", "Employee" };
+
+            foreach(var role in roles)
+            {
+                if(!await roleManager.RoleExistsAsync(role))
+                {
+                    var newRole = new ApplicationRole { Name = role };
+                    await roleManager.CreateAsync(newRole);
+                }
+            }
+
+
             var db = scope.ServiceProvider.GetService<WorkManagementDbContext>();
             await db.Database.MigrateAsync();
+
         }
         catch (Exception e)
         {

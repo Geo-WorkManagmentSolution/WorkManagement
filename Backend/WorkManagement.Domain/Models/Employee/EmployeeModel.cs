@@ -23,10 +23,9 @@ namespace WorkManagement.Domain.Models.Employee
         public string LastName { get; set; }
         [EmailAddress]
         public string Email { get; set; }
-        public string AlternateEmail { get; set; }
+        public string? AlternateEmail { get; set; }
         public long? PhoneNumber { get; set; }
         public long? AlternateNumber { get; set; }
-        public string? Position { get; set; }
         public bool? IsDeleted { get; set; }
         public Guid? UserId { get; set; }
         public Guid RoleId { get; set; }
@@ -49,7 +48,7 @@ namespace WorkManagement.Domain.Models.Employee
 
     public class EmployeePersonalDetailsModel
     {
-        public string DateOfBirth { get; set; }
+        public string? DateOfBirth { get; set; }
         public string Gender { get; set; }
         public MaritalStatus? MaritalStatus { get; set; }
         public BloodGroup? bloodGroup { get; set; }
@@ -72,6 +71,8 @@ namespace WorkManagement.Domain.Models.Employee
         public string? HireDate { get; set; }
         public string? ConfirmationDate { get; set; }
         public decimal TotalPreviousExperience { get; set; }
+        public bool UseDefaultLeaves { get; set; }
+
     }
 
     public class EmployeeInsuranceDetailModel
@@ -89,6 +90,13 @@ namespace WorkManagement.Domain.Models.Employee
 
     public class EmployeeAddressModel
     {
+        public bool UseUserAddressForMailing {  get; set; }
+       public AddressModel? UserAddress { get; set; }
+       public AddressModel? MailingAddress { get; set; }
+    }
+
+    public class AddressModel
+    {
         public string? AddressLine1 { get; set; }
         public string? AddressLine2 { get; set; }
         public string? City { get; set; }
@@ -96,6 +104,8 @@ namespace WorkManagement.Domain.Models.Employee
         public string? State { get; set; }
         public long? PinCode { get; set; }
     }
+
+   
 
     public class EmployeeBankingDataModel
     {
@@ -123,9 +133,9 @@ namespace WorkManagement.Domain.Models.Employee
     public class EmployeeRelationshipDetailModel
     {
         public RelationshipType? RelationshipType { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public string PhoneNumber { get; set; }
+        public string? Name { get; set; }
+        public string? Email { get; set; }
+        public string? PhoneNumber { get; set; }
     }
 
     public class EmployeeDocumentsModel
@@ -147,6 +157,9 @@ namespace WorkManagement.Domain.Models.Employee
         public string Name { set; get; }
         public string Email { set; get; }
         public string Avatar { set; get; }
+        public int EmployeeNumber { set; get; }
+        public string Designation { set; get; }
+        public int EmployeeId { set; get; }
     }
 }
 

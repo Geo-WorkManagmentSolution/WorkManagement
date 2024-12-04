@@ -25,7 +25,7 @@
             {
                 Log.Error(ex,context.Request.ToString());
                 context.Response.StatusCode = 500;
-                await context.Response.WriteAsync("Something went wrong. Please try again later.");
+                await context.Response.WriteAsync("Something went wrong. Please try again later."+ ex.Message);
             }
         }
     }

@@ -1,8 +1,11 @@
 import { lazy } from 'react';
 import { Navigate } from 'react-router-dom';
 import { FuseRouteItemType } from '@fuse/utils/FuseUtils';
-import LeaveApplication from './leave-management/leaveapplication/LeaveApplication';
-import LeaveSummury from './leave-management/leaveapplication/calendar/LeaveSummury';
+import LeaveApplication from './leave-management/addleave/LeaveApplication';
+import LeaveApprovalTable from './leave-management/approval/LeaveApprovalTable';
+import EmployeeLeaveHistory from './leave-management/employeeLeaveHiistory/EmployeeLeaveHistory';
+import EmployeeLeaveHistoryWithApproval from './leave-management/approval/EmployeeLeaveHistoryWithApproval';
+import EmployeesLeaveHistories from './leave-management/employeeLeaveHiistory/EmployeesLeaveHistories';
 // import Employees from './employees/Employees';
 
 const EmployeeApp = lazy(() => import('./EmployeeApp'));
@@ -49,16 +52,41 @@ const EmployeeAppRoute: FuseRouteItemType = {
 			]
 		},
 		{
-			path:"leave-management",
-			element:<LeaveApplication/>
+			path: 'leave-management',
+			children: [
+				{
+					path: 'addleave',
+					element: <LeaveApplication />
+				},
+				{
+					path: 'leave-approval',
+					children: [
+						{
+							path: '',
+							element: <LeaveApprovalTable />
+						},
+						{
+							path: ':employeeId',
+							element: <EmployeeLeaveHistoryWithApproval />
+						}
+					]
+				},
+				{
+					path: 'leave-history',
+					children: [
+						{
+							path: '',
+							element: <EmployeesLeaveHistories />
+						},
+						{
+							path: ':employeeId',
+							element: <EmployeeLeaveHistory />
+						}
+					]
+				}
+			]
 		}
-		,{
-			path:"leave-approval",
-			element:<LeaveApproval/>
-		}
-		
 	]
 };
-
 
 export default EmployeeAppRoute;
