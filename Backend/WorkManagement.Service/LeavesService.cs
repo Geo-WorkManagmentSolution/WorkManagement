@@ -207,6 +207,7 @@ namespace WorkManagement.Service
         {
             return await _dbContext.EmployeeHolidays
                 .Where(h => h.StartDate.Year == year || h.EndDate.Year == year)
+                .OrderBy(s=>s.StartDate)
                 .ToListAsync();
         }
 

@@ -26,6 +26,7 @@ namespace WorkManagement.Domain.Models.Employee
         public string? AlternateEmail { get; set; }
         public long? PhoneNumber { get; set; }
         public long? AlternateNumber { get; set; }
+        public int? JobLevelLeaveType { get; set; }
         public bool? IsDeleted { get; set; }
         public Guid? UserId { get; set; }
         public Guid RoleId { get; set; }

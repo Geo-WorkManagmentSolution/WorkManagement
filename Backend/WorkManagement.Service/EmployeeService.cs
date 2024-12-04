@@ -735,7 +735,9 @@ namespace WorkManagement.Service
                         }
                     }
 
-                    var defaultLeaves = (from ed in _dbContext.EmployeeDefaultLeave
+                    employee.JobLevelLeaveType = employee.JobLevelLeaveType.HasValue ? employee.JobLevelLeaveType.Value : 1;
+
+                    var defaultLeaves = (from ed in _dbContext.EmployeeDefaultLeave.Where(s=>s.JobLevelLeaveType == employee.JobLevelLeaveType)
                                          select new EmployeeLeaveSummaryModel
                                          {
                                              Id = ed.EmployeeLeaveTypeId.HasValue ? ed.EmployeeLeaveTypeId.Value : 0,
@@ -747,14 +749,25 @@ namespace WorkManagement.Service
                     if (defaultLeaves.Any())
                     {
                         if (employee.EmployeeWorkInformation.UseDefaultLeaves) {
-                            newEmployee.EmployeeLeaves = new List<EmployeeLeaveSummary>();
+
+                            foreach (var leave in defaultLeaves)
+                            {
+                                var employeeLeave = new EmployeeLeaveSummary();
+                                employeeLeave.EmployeeLeaveTypeId = leave.Id;
+                                employeeLeave.RemainingLeaves = leave.RemainingLeaves;
+                                employeeLeave.TotalLeaves = leave.TotalLeaves;
+
+                                newEmployee.EmployeeLeaves.Add(employeeLeave);
+                            }
+
+                            /*newEmployee.EmployeeLeaves = new List<EmployeeLeaveSummary>();
                            var leaves= _dbContext.EmployeeDefaultLeave.Select(x => new EmployeeLeaveSummary()
                             {
                                 EmployeeLeaveTypeId = x.EmployeeLeaveTypeId,
                                 RemainingLeaves = x.TotalLeaves ,
                                 TotalLeaves = x.TotalLeaves
-                            });
-                            newEmployee.EmployeeLeaves.AddRange(leaves.ToList());
+                            });*/
+                            //newEmployee.EmployeeLeaves.AddRange(leaves.ToList());
 
                         }
                         else
