@@ -750,16 +750,18 @@ namespace WorkManagement.Service
                             newEmployee.EmployeeLeaves = new List<EmployeeLeaveSummary>();
                            var leaves= _dbContext.EmployeeDefaultLeave.Select(x => new EmployeeLeaveSummary()
                             {
-                                EmployeeLeaveTypeId = x.Id,
+                                EmployeeLeaveTypeId = x.EmployeeLeaveTypeId,
                                 RemainingLeaves = x.TotalLeaves ,
                                 TotalLeaves = x.TotalLeaves
                             });
                             newEmployee.EmployeeLeaves.AddRange(leaves.ToList());
 
                         }
-                        else { 
+                        else
+                        {
 
-                            foreach(var leave in defaultLeaves)
+
+                            foreach (var leave in defaultLeaves)
                             {
                                 var employeeLeave = new EmployeeLeaveSummary();
                                 employeeLeave.EmployeeLeaveTypeId = leave.Id;
@@ -768,6 +770,9 @@ namespace WorkManagement.Service
 
                                 newEmployee.EmployeeLeaves.Add(employeeLeave);
                             }
+
+
+
                         }
 
                     }

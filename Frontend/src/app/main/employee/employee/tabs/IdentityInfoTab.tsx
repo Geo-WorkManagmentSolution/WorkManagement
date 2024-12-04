@@ -5,7 +5,7 @@ import { Controller, useFormContext } from 'react-hook-form';
 /**
  * The basic info tab.
  */
-function IdentityInfoTab() {
+function IdentityInfoTab({UserRole}) {
 	const methods = useFormContext();
 	const { control, formState } = methods;
 	const { errors } = formState;

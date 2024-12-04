@@ -9,6 +9,7 @@ import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import PageBreadcrumb from 'app/shared-components/PageBreadcrumb';
 import { showMessage } from '@fuse/core/FuseMessage/fuseMessageSlice';
 import { useAppDispatch } from 'app/store/hooks';
+import FuseLoading from '@fuse/core/FuseLoading';
 import {
 	EmployeeModel,
 	usePostApiEmployeesMutation,
@@ -24,9 +25,9 @@ function EmployeeHeader() {
 	const { employeeId } = routeParams;
 	const dispatch = useAppDispatch();
 
-	const [createEmployee] = usePostApiEmployeesMutation();
-	const [updateEmployee] = usePutApiEmployeesByIdMutation();
-	const [deleteEmployee] = useDeleteApiEmployeesByIdMutation();
+	const [createEmployee, { isLoading: isCreating }] = usePostApiEmployeesMutation();
+	const [updateEmployee, { isLoading: isUpdating }] = usePutApiEmployeesByIdMutation();
+	const [deleteEmployee, { isLoading: isDeleting }] = useDeleteApiEmployeesByIdMutation();
 
 	const methods = useFormContext();
 	const { formState, watch, getValues } = methods;
@@ -39,71 +40,79 @@ function EmployeeHeader() {
 	function handleUpdateProduct() {
 		const data = getValues() as EmployeeModel;
 		console.log(data);
-	
+
 		if (_.isEmpty(dirtyFields) || !isValid) {
-		  dispatch(
-			showMessage({
-			  message: 'Required fields must be filled out',
-			  variant: 'warning'
-			})
-		  );
-		  return;
-		}
-	
-		updateEmployee({
-		  id: parseInt(employeeId, 10),
-		  employeeModel: data
-		})
-		  .unwrap()
-		  .then((data) => {
-			dispatch(showMessage({ message: 'An employee updated successfully.' }));
-		  })
-		  .catch((error) => {
-			console.error('Error updating employee:', error);
-			dispatch(showMessage({ message: 'Error updating employee', variant: 'error' }));
-		  });
-	  }
-	
-	  function handleCreateEmployee() {
-		const data = getValues() as EmployeeModel;
-	
-		if (_.isEmpty(dirtyFields) || !isValid) {
-		  dispatch(
-			showMessage({
-			  message: 'Required fields must be filled out',
-			  variant: 'warning'
-			})
-		  );
-		  return;
-		}
-	
-		createEmployee({ employeeModel: data })
-		  .unwrap()
-		  .then((data) => {
 			dispatch(
-			  showMessage({
-				message: 'An employee created successfully and a welcome email sent to employee.'
-			  })
+				showMessage({
+					message: 'Required fields must be filled out',
+					variant: 'warning'
+				})
 			);
-			navigate(`/apps/employees/employeesSearch`);
-		  })
-		  .catch((error) => {
-			console.error('Error creating employee:', error);
-			dispatch(showMessage({ message: 'Error creating employee', variant: 'error' }));
-		  });
-	  }
-	
-	
-	  function handleDeleteEmployee() {
-		deleteEmployee({
-		  id: parseInt(employeeId, 10)
+			return;
+		}
+
+		updateEmployee({
+			id: parseInt(employeeId, 10),
+			employeeModel: data
 		})
-		  .unwrap()
-		  .then((data) => {
-			dispatch(showMessage({ message: 'An employee deleted successfully.' }));
-			navigate('/apps/employees/employeesSearch');
-		  });
-	  }
+			.unwrap()
+			.then((data) => {
+				dispatch(showMessage({ message: 'An employee updated successfully.' }));
+			})
+			.catch((error) => {
+				console.error('Error updating employee:', error);
+				dispatch(showMessage({ message: 'Error updating employee', variant: 'error' }));
+			});
+	}
+
+	function handleCreateEmployee() {
+		const data = getValues() as EmployeeModel;
+		console.log('employeeData: ', data);
+
+		if (_.isEmpty(dirtyFields) || !isValid) {
+			dispatch(
+				showMessage({
+					message: 'Required fields must be filled out',
+					variant: 'warning'
+				})
+			);
+			return;
+		}
+
+		createEmployee({ employeeModel: data })
+			.unwrap()
+			.then((data) => {
+				dispatch(
+					showMessage({
+						message: 'An employee created successfully and a welcome email sent to employee.'
+					})
+				);
+				navigate(`/apps/employees/employeesSearch`);
+			})
+			.catch((error) => {
+				console.error('Error creating employee:', error);
+				dispatch(showMessage({ message: 'Error creating employee', variant: 'error' }));
+			});
+	}
+
+	function handleDeleteEmployee() {
+		deleteEmployee({
+			id: parseInt(employeeId, 10)
+		})
+			.unwrap()
+			.then((data) => {
+				dispatch(showMessage({ message: 'An employee deleted successfully.' }));
+				navigate('/apps/employees/employeesSearch');
+			});
+	}
+
+	if (isCreating || isUpdating || isDeleting) {
+		return(
+			<div className="flex  justify-center h-screen w-screen">
+ 	 		<FuseLoading />
+		</div>
+		)
+	}
 
 	return (
 		<div className="flex flex-col sm:flex-row flex-1 w-full items-center justify-between space-y-8 sm:space-y-0 py-24 sm:py-32">

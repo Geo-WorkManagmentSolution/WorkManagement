@@ -20,15 +20,16 @@ function HolidayForm() {
 		reset,
 		formState: { errors, touchedFields },
 		setError,
-		clearErrors
+		clearErrors,
+		setValue
 	} = useForm<EmployeeHoliday>();
 	const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
 	const [holidays, setHolidays] = useState<EmployeeHoliday[]>([]);
+	const [editingHoliday, setEditingHoliday] = useState<EmployeeHoliday | null>(null);
+	const [isUpdate, setIsUpdate] = useState(false);
 	const dispatch = useDispatch();
-
 	const { data: holidaysData, refetch } = useGetApiLeavesHolidaysByYearQuery({ year: selectedYear });
 	const [addHolidays] = usePostApiLeavesHolidaysMutation();
-
 	useEffect(() => {
 		if (holidaysData) {
 			setHolidays(holidaysData);
@@ -36,26 +37,26 @@ function HolidayForm() {
 			setHolidays([]);
 		}
 	}, [holidaysData]);
-
 	const adjustDateForTimezone = (date: Date): Date => {
-		return new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+		const userTimezoneOffset = date.getTimezoneOffset() * 60000;
+		return new Date(date.getTime() - userTimezoneOffset);
 	};
-
 	const handleYearChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setSelectedYear(Number(event.target.value));
+		reset();
+		setIsUpdate(false);
 	};
-
 	const handleAddHoliday = (data: EmployeeHoliday) => {
 		const startDate = adjustDateForTimezone(new Date(data.startDate));
 		const endDate = adjustDateForTimezone(new Date(data.endDate));
-
-		// Check if a holiday already exists on the same day
+		
 		const holidayExists = holidays.some(
 			(holiday) =>
-				new Date(holiday.startDate).toDateString() === startDate.toDateString() ||
-				new Date(holiday.endDate).toDateString() === endDate.toDateString() ||
-				(startDate >= new Date(holiday.startDate) && startDate <= new Date(holiday.endDate)) ||
-				(endDate >= new Date(holiday.startDate) && endDate <= new Date(holiday.endDate))
+				holiday.id !== editingHoliday?.id && // Exclude the currently editing holiday
+				(new Date(holiday.startDate).toDateString() === startDate.toDateString() ||
+					new Date(holiday.endDate).toDateString() === endDate.toDateString() ||
+					(startDate >= new Date(holiday.startDate) && startDate <= new Date(holiday.endDate)) ||
+					(endDate >= new Date(holiday.startDate) && endDate <= new Date(holiday.endDate)))
 		);
 
 		if (holidayExists) {
@@ -65,27 +66,40 @@ function HolidayForm() {
 				showMessage({
 					message: 'Holiday already exists on this date range',
 					autoHideDuration: 6000,
-					anchorOrigin: {
-						vertical: 'top',
-						horizontal: 'center'
-					},
+					anchorOrigin: { vertical: 'top', horizontal: 'center' },
 					variant: 'error'
 				})
 			);
-
 			return;
 		}
 
-		const holidayToAdd: EmployeeHoliday = {
-			...data,
-			startDate: startDate.toISOString(),
-			endDate: endDate.toISOString()
-		};
-		setHolidays([...holidays, holidayToAdd]);
+		if (isUpdate && editingHoliday) {
+			setHolidays(
+				holidays.map((holiday) =>
+					holiday.id === editingHoliday.id
+						? {
+								...holiday,
+								name: data.name,
+								startDate: startDate.toISOString(),
+								endDate: endDate.toISOString()
+							}
+						: holiday
+				)
+			);
+			setEditingHoliday(null);
+			setIsUpdate(false);
+		} else {
+			const holidayToAdd: EmployeeHoliday = {
+				...data,
+				startDate: startDate.toISOString(),
+				endDate: endDate.toISOString()
+			};
+			setHolidays([...holidays, holidayToAdd]);
+		}
+
 		reset();
 		clearErrors();
 	};
-
 	const handleSaveHolidays = async () => {
 		const modifiedHolidays = holidays.map(({ id, ...rest }) => ({ ...rest }));
 		try {
@@ -118,6 +132,18 @@ function HolidayForm() {
 		}
 	};
 
+	const updateHoliday = (holidayId: number) => {
+		const holidayToEdit = holidays.find((holiday) => holiday.id === holidayId);
+
+		if (holidayToEdit) {
+			setEditingHoliday(holidayToEdit);
+			setValue('name', holidayToEdit.name);
+			setValue('startDate', new Date(holidayToEdit.startDate.toString()));
+			setValue('endDate', new Date(holidayToEdit.endDate.toString()));
+			setIsUpdate(true);
+		}
+	};
+
 	const removeHoliday = (holidayId: number) => {
 		setHolidays(holidays.filter((holiday) => holiday.id !== holidayId));
 	};
@@ -146,19 +172,19 @@ function HolidayForm() {
 	return (
 		<Paper className="p-24 max-w-5xl mx-auto">
 			<div className="flex items-center border-b-1 space-x-8 m-10">
-					<FuseSvgIcon
-						color="action"
-						size={24}
-					>
-						heroicons-outline:adjustments-horizontal
-					</FuseSvgIcon>
-					<Typography
-						className="text-2xl mb-3"
-						color="text.secondary"
-					>
-						Holiday Form
-					</Typography>
-				</div>
+				<FuseSvgIcon
+					color="action"
+					size={24}
+				>
+					heroicons-outline:adjustments-horizontal
+				</FuseSvgIcon>
+				<Typography
+					className="text-2xl mb-3"
+					color="text.secondary"
+				>
+					Holiday Form
+				</Typography>
+			</div>
 			<form onSubmit={handleSubmit(handleAddHoliday)}>
 				<div className="flex flex-col gap-16 mb-24">
 					<div className="flex justify-start gap-16">
@@ -187,6 +213,8 @@ function HolidayForm() {
 							render={({ field }) => (
 								<TextField
 									{...field}
+									variant="outlined"
+									value={field.value || ''}
 									label="Holiday Name"
 									error={touchedFields.name && !!errors.name}
 									helperText={touchedFields.name && errors.name?.message}
@@ -233,38 +261,65 @@ function HolidayForm() {
 								/>
 							)}
 						/>
-						<Button
-							variant="contained"
-							type="submit"
-							startIcon={<FuseSvgIcon>heroicons-outline:plus</FuseSvgIcon>}
-							color="info"
-						>
-							Add
-						</Button>
+						{!isUpdate ? (
+							<Button
+								variant="contained"
+								type="submit"
+								startIcon={<FuseSvgIcon>heroicons-outline:plus</FuseSvgIcon>}
+								color="info"
+							>
+								Add
+							</Button>
+						) : (
+							<Button
+								variant="contained"
+								type="submit"
+								startIcon={<FuseSvgIcon>heroicons-outline:arrow-path</FuseSvgIcon>}
+								color="info"
+							>
+								Update
+							</Button>
+						)}
 					</div>
 				</div>
 			</form>
 			<DataTable
 				// enableColumnOrdering={true}
-				// enableRowSelection={false}
+				enableRowSelection={false}
 				data={holidays}
 				columns={columns}
 				renderRowActionMenuItems={({ closeMenu, row, table }) => [
-					<MenuItem
-						key={`remove-${row.original.id}`}
-						onClick={() => {
-							removeHoliday(row.original.id);
-							closeMenu();
-							table.resetRowSelection();
-						}}
-					>
-						<ListItemIcon>
-							<FuseSvgIcon>heroicons-outline:trash</FuseSvgIcon>
-						</ListItemIcon>
-						Remove
-					</MenuItem>
+					<>
+						<MenuItem
+							key={`remove-${row.original.id}`}
+							onClick={() => {
+								removeHoliday(row.original.id);
+								closeMenu();
+								table.resetRowSelection();
+							}}
+						>
+							<ListItemIcon>
+								<FuseSvgIcon>heroicons-outline:trash</FuseSvgIcon>
+							</ListItemIcon>
+							Remove
+						</MenuItem>
+						<MenuItem
+							key={`remove-${row.original.id}`}
+							onClick={() => {
+								updateHoliday(row.original.id);
+								closeMenu();
+								table.resetRowSelection();
+							}}
+						>
+							<ListItemIcon>
+								<FuseSvgIcon>heroicons-outline:arrow-path</FuseSvgIcon>
+							</ListItemIcon>
+							Update
+						</MenuItem>
+					</>
 				]}
 			/>
+			{}
 			<Button
 				variant="contained"
 				onClick={handleSaveHolidays}
@@ -278,3 +333,4 @@ function HolidayForm() {
 }
 
 export default HolidayForm;
+

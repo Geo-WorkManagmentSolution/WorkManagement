@@ -22,7 +22,7 @@ import DataTable from 'app/shared-components/data-table/DataTable';
 import { useGetApiEmployeesTeamMembersListQuery } from '../../EmployeeApi';
 import { Link } from 'react-router-dom';
 
-function TeamTab() {
+function TeamTab({UserRole}) {
   const routeParams = useParams();
   const { employeeId } = routeParams;
   const dispatch = useDispatch();

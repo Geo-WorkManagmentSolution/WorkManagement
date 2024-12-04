@@ -23,7 +23,7 @@ function LeaveSummary({ openDialoge, onSave, onDelete, refetchEvents, eventColor
 	const [pastOptions, setPastOptions] = useState('Past Leaves');
 	const pastOptionsArray = ['Past Leaves', 'Past Holidays', 'Past Leave and Holidays'];
 	const upcomingOptionsArray = ['Upcoming Leaves', 'Upcoming Holidays', 'Upcoming Leave and Holidays'];
-	
+
 	const [upcomingRequestBody, setUpcomingRequestBody] = useState({
 		getLeaveData: true,
 		getHolidayData: false,
@@ -97,7 +97,7 @@ function LeaveSummary({ openDialoge, onSave, onDelete, refetchEvents, eventColor
 			{
 				accessorKey: 'reason',
 				header: 'Reason',
-				Cell: ({ row }) => (row.original.name.startsWith("Holiday") ? 'N/A' : row.original.reason)
+				Cell: ({ row }) => (row.original.name.startsWith('Holiday') ? 'N/A' : row.original.reason)
 			},
 			{
 				accessorKey: 'description',
@@ -107,7 +107,7 @@ function LeaveSummary({ openDialoge, onSave, onDelete, refetchEvents, eventColor
 				accessorKey: 'status',
 				header: 'Status',
 				Cell: ({ row }) => {
-					if (row.original.name.startsWith("Holiday")) {
+					if (row.original.name.startsWith('Holiday')) {
 						return <Typography variant="body1">N/A</Typography>;
 					}
 
@@ -168,75 +168,72 @@ function LeaveSummary({ openDialoge, onSave, onDelete, refetchEvents, eventColor
 		await fetchPastEvents();
 	};
 
-	
 	return (
 		<>
-			<Paper
-				elevation={3}
-				className="w-full p-5 mb-10"
-			>
-				<div className="m-10">
-					<FormControl>
-						<Select
-							id="upcoming-select"
-							value={upcomingOptions}
-							onChange={handleFutureOptionChange}
-						>
-							{upcomingOptionsArray.map((eachOption) => (
-								<MenuItem
-									value={eachOption}
-									key={eachOption}
-								>
-									{eachOption}
-								</MenuItem>
-							))}
-						</Select>
-					</FormControl>
-				</div>
-				<div className="w-full h-auto bg-grey-200 m-12 rounded-2xl p-6">
-					<DataTable
-						enableRowSelection={false}
-						enableMultiRemove={false}
-						data={upcomingEvents}
-						columns={columns}
-						renderRowActionMenuItems={({ row, closeMenu }) => {
-							if (row.original.name === 'Holiday') {
-								return (
-									<MenuItem
-										key="na"
-										onClick={closeMenu}
-									>
-										<span className="ml-2">N/A</span>
-									</MenuItem>
-								);
-							}
-
+		<Paper
+			elevation={3}
+			className="w-full p-5 mb-10"
+		>
+			<div className="m-10">
+				<FormControl>
+					<Select
+						id="upcoming-select"
+						value={upcomingOptions}
+						onChange={handleFutureOptionChange}
+					>
+						{upcomingOptionsArray.map((eachOption) => (
+							<MenuItem
+								value={eachOption}
+								key={eachOption}
+							>
+								{eachOption}
+							</MenuItem>
+						))}
+					</Select>
+				</FormControl>
+			</div>
+			<div className="w-full h-auto bg-grey-200 m-12 rounded-2xl p-6">
+				<DataTable
+					enableRowSelection={false}
+					enableMultiRemove={false}
+					data={upcomingEvents}
+					columns={columns}
+					renderRowActionMenuItems={({ row, closeMenu }) => {
+						if (row.original.name.includes('Holiday')) {
 							return (
-								<>
-									<MenuItem
-										key="edit"
-										onClick={() => {
-											openDialoge(row.original);
-											closeMenu();
-										}}
-									>
-										<FuseSvgIcon size={20}>heroicons-outline:pencil-square</FuseSvgIcon>
-										<span className="ml-2">Update</span>
-									</MenuItem>
-									<MenuItem
-										key="delete"
-										onClick={() => {
-											handleDelete(row.original.employeeLeaveId);
-											closeMenu();
-										}}
-									>
-										<FuseSvgIcon size={20}>heroicons-outline:trash</FuseSvgIcon>
-										<span className="ml-2">Cancel Leave</span>
-									</MenuItem>
-								</>
+								<MenuItem
+									key="na"
+									onClick={closeMenu}
+								>
+									<span className="ml-2">N/A</span>
+								</MenuItem>
 							);
-						}}
-					/>
+						}
+
+						return [
+							<MenuItem
+								key="edit"
+								onClick={() => {
+									openDialoge(row.original);
+									closeMenu();
+								}}
+							>
+								<FuseSvgIcon size={20}>heroicons-outline:pencil-square</FuseSvgIcon>
+								<span className="ml-2">Update</span>
+							</MenuItem>,
+							<MenuItem
+								key="delete"
+								onClick={() => {
+									handleDelete(row.original.employeeLeaveId);
+									closeMenu();
+								}}
+							>
+								<FuseSvgIcon size={20}>heroicons-outline:trash</FuseSvgIcon>
+								<span className="ml-2">Cancel Leave</span>
+							</MenuItem>
+						];
+					}}
+				/>
 				</div>
 			</Paper>
 			<Paper
@@ -262,39 +259,39 @@ function LeaveSummary({ openDialoge, onSave, onDelete, refetchEvents, eventColor
 					</FormControl>
 				</div>
 				<div className="w-full h-auto bg-grey-200 m-12 rounded-2xl p-6">
-					<DataTable
-						enableRowSelection={false}
-						enableMultiRemove={false}
-						data={pastEvents}
-						columns={columns}
-						renderRowActionMenuItems={({ row, closeMenu }) => {
-							if (row.original.name === 'Holiday') {
-								return (
-									<MenuItem
-										key="na"
-										onClick={closeMenu}
-									>
-										<span className="ml-2">N/A</span>
-									</MenuItem>
-								);
-							}
-
+				<DataTable
+					enableRowSelection={false}
+					enableMultiRemove={false}
+					data={pastEvents}
+					columns={columns}
+					renderRowActionMenuItems={({ row, closeMenu }) => {
+						if (row.original.name.includes('Holiday')) {
 							return (
 								<MenuItem
-									key={0}
-									onClick={() => {
-										openDialoge(row.original);
-										closeMenu();
-									}}
+									key="na"
+									onClick={closeMenu}
 								>
-									<FuseSvgIcon size={20}>heroicons-outline:eye</FuseSvgIcon>
-									<span className="ml-2">View</span>
+									<span className="ml-2">N/A</span>
 								</MenuItem>
 							);
-						}}
-					/>
-				</div>
-			</Paper>
+						}
+
+						return [
+							<MenuItem
+								key={0}
+								onClick={() => {
+									openDialoge(row.original);
+									closeMenu();
+								}}
+							>
+								<FuseSvgIcon size={20}>heroicons-outline:eye</FuseSvgIcon>
+								<span className="ml-2">View</span>
+							</MenuItem>
+						];
+					}}
+				/>
+			</div>
+		</Paper>
 		</>
 	);
 }
