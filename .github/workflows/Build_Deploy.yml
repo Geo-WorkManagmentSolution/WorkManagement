@@ -35,7 +35,7 @@ jobs:
             ${{ runner.os }}-nuget-
 
       - name: Build with dotnet
-        run: dotnet build Backend/WorkManagementSolution.sln --configuration Release
+        run: dotnet build Backend/WorkManagementSolution.sln --self-contained true --configuration Release
 
       - name: dotnet publish
         run: dotnet publish Backend/WorkManagementSolution.sln --self-contained true -c Release -o ${{env.DOTNET_ROOT}}/myapp
