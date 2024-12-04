@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.IO;
 using System.Security.Claims;
 using WorkManagement.Domain.Contracts;
 using WorkManagement.Domain.Entity;
@@ -43,7 +44,7 @@ namespace WorkManagement.API.Controllers
         }
 
         // GET: api/employees
-        [Authorize(Roles = "Employee")]
+       
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EmployeeDashboardDataModel>>> GetEmployees()
         {
@@ -288,12 +289,42 @@ namespace WorkManagement.API.Controllers
                 var employeeFilePath = await employeeService.GetEmployeeDocumentFileName(id, file.FileName);
 
                 var filePath = Path.Combine(_storagePath, employeeFilePath);
+                var fileTypeStr = "";
+                var fileType = FileType.Other;
+                if (!string.IsNullOrEmpty(file.ContentType))
+                {
+                    var types = GetMimeTypes();
+                    var ext = file.ContentType.ToLower();
+                    fileTypeStr = types.ContainsValue(ext) ? types.FirstOrDefault(s=>s.Value == ext).Key : "";
+                    fileTypeStr = fileTypeStr.Replace(".", "");
+
+                    switch (fileTypeStr)
+                    {
+                        case "txt":
+                            fileType = FileType.TXT; 
+                            break;
+                        case "pdf":
+                            fileType = FileType.PDF;
+                            break;
+                        case "doc":
+                        case "docx":
+                            fileType = FileType.DOCX;
+                            break;
+                        case "xls":
+                        case "xlsx":
+                            fileType = FileType.XLSX;
+                            break;
+                        case "csv":
+                            fileType = FileType.CSV;
+                            break;
+                    }
+                }
 
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     await file.CopyToAsync(stream);
 
-                    await employeeService.UpdateEmployeeDocumentData(id, file.FileName, filePath);
+                    await employeeService.UpdateEmployeeDocumentData(id, file.FileName,fileType, file.Length, filePath);
                 }
 
 

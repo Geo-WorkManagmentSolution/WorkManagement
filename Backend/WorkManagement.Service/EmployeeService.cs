@@ -757,15 +757,17 @@ namespace WorkManagement.Service
                             newEmployee.EmployeeLeaves.AddRange(leaves.ToList());
 
                         }
-                        else {
-                            var employeeLeave = new EmployeeLeaveSummary();
+                        else { 
 
-                            employeeLeave.EmployeeLeaveTypeId = defaultLeaves[0].Id;
-                            employeeLeave.RemainingLeaves = defaultLeaves[0].RemainingLeaves;
-                            employeeLeave.TotalLeaves = defaultLeaves[0].TotalLeaves;
+                            foreach(var leave in defaultLeaves)
+                            {
+                                var employeeLeave = new EmployeeLeaveSummary();
+                                employeeLeave.EmployeeLeaveTypeId = leave.Id;
+                                employeeLeave.RemainingLeaves = leave.RemainingLeaves;
+                                employeeLeave.TotalLeaves = leave.TotalLeaves;
 
-                            newEmployee.EmployeeLeaves.Add(employeeLeave);
-
+                                newEmployee.EmployeeLeaves.Add(employeeLeave);
+                            }
                         }
 
                     }
@@ -1073,7 +1075,7 @@ namespace WorkManagement.Service
             return retunrFilePath;
         }
 
-        public async Task<string> UpdateEmployeeDocumentData(int id, string fileName, string filePath)
+        public async Task<string> UpdateEmployeeDocumentData(int id, string fileName,FileType fileType,long fileSize, string filePath)
         {
             var employee = _dbContext.Employees.FirstOrDefault(s => s.Id == id && !s.IsDeleted);
             if (employee != null)
@@ -1085,6 +1087,8 @@ namespace WorkManagement.Service
                     employeeDocument.EmployeeId = employee.Id;
                     employeeDocument.FileName = fileName;
                     employeeDocument.FilePath = filePath;
+                    employeeDocument.FileSize = (int)fileSize;
+                    employeeDocument.FileType = fileType;
                     employeeDocument.IsDeleted = false;
                     
 
