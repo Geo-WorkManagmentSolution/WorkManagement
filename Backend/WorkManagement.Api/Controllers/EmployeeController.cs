@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.IO;
 using System.Security.Claims;
 using WorkManagement.Domain.Contracts;
 using WorkManagement.Domain.Entity;
@@ -43,10 +44,14 @@ namespace WorkManagement.API.Controllers
         }
 
         // GET: api/employees
+       
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EmployeeDashboardDataModel>>> GetEmployees()
         {
-            var employees = await employeeService.GetAllEmployeesAsync();
+            var userRole = this.User.FindFirst(ClaimTypes.Role).Value;
+            string loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var employees = await employeeService.GetAllEmployeesAsync(loggedUserId,userRole);
             return Ok(employees);
         }
 
@@ -122,6 +127,11 @@ namespace WorkManagement.API.Controllers
         [HttpPost]
         public async Task<ActionResult<EmployeeModel>> CreateEmployee([FromBody] EmployeeModel employeeModel)
         {
+            var userRole = this.User.FindFirst(ClaimTypes.Role).Value;
+            
+            if(userRole == "Employee") {
+                return BadRequest("Employee user can not add new employee");            
+            }
             var createdEmployee = await employeeService.CreateEmployeeAsync(employeeModel);
             return CreatedAtAction(nameof(GetEmployee), new { id = createdEmployee.Id }, createdEmployee);
         }
@@ -279,12 +289,42 @@ namespace WorkManagement.API.Controllers
                 var employeeFilePath = await employeeService.GetEmployeeDocumentFileName(id, file.FileName);
 
                 var filePath = Path.Combine(_storagePath, employeeFilePath);
+                var fileTypeStr = "";
+                var fileType = FileType.Other;
+                if (!string.IsNullOrEmpty(file.ContentType))
+                {
+                    var types = GetMimeTypes();
+                    var ext = file.ContentType.ToLower();
+                    fileTypeStr = types.ContainsValue(ext) ? types.FirstOrDefault(s=>s.Value == ext).Key : "";
+                    fileTypeStr = fileTypeStr.Replace(".", "");
+
+                    switch (fileTypeStr)
+                    {
+                        case "txt":
+                            fileType = FileType.TXT; 
+                            break;
+                        case "pdf":
+                            fileType = FileType.PDF;
+                            break;
+                        case "doc":
+                        case "docx":
+                            fileType = FileType.DOCX;
+                            break;
+                        case "xls":
+                        case "xlsx":
+                            fileType = FileType.XLSX;
+                            break;
+                        case "csv":
+                            fileType = FileType.CSV;
+                            break;
+                    }
+                }
 
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     await file.CopyToAsync(stream);
 
-                    await employeeService.UpdateEmployeeDocumentData(id, file.FileName, filePath);
+                    await employeeService.UpdateEmployeeDocumentData(id, file.FileName,fileType, file.Length, filePath);
                 }
 
 

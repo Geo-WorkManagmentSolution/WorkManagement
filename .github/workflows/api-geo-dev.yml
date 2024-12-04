@@ -6,11 +6,29 @@ on:
 env:
   AZURE_WEBAPP_NAME: api-geo-dev
   AZURE_WEBAPP_PACKAGE_PATH: Backend/WorkManagement.Api/publish
+  AZURE_WEBAPP_FRONTEND_PACKAGE_PATH: Frontend/publish
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 8.0.x
   WORKING_DIRECTORY: Backend/WorkManagement.Api
 jobs:
-  build:
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup Node.js environment
+      uses: actions/setup-node@v4.1.0
+    - name: Install dependencies
+      run: npm install
+    - name: Generate OpenAPI Layer
+      run: npm run genAPIClient
+    - name: Build React app
+      run: npm run build
+    - name: Publish Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: frontend
+        path: ${{ env.AZURE_WEBAPP_FRONTEND_PACKAGE_PATH }}
+  build-backend:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -29,9 +47,9 @@ jobs:
       with:
         name: webapp
         path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-  deploy:
+  deploy-backend:
     runs-on: ubuntu-latest
-    needs: build
+    needs: build-backend
     steps:
     - name: Download artifact from build job
       uses: actions/download-artifact@v3
