@@ -43,6 +43,9 @@ namespace WorkManagmentSolution.EFCore
         public virtual DbSet<EmployeeLeave> EmployeeLeaves { get; set; }
         public virtual DbSet<EmployeeHoliday> EmployeeHolidays { get; set; }
 
+        public virtual DbSet<JobLevelLeave> JobLevelLeave { get; set; }
+
+
         public IHttpContextAccessor HttpContextAccessor { get; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -73,6 +76,14 @@ namespace WorkManagmentSolution.EFCore
                 .HasDefaultValueSql("NEXT VALUE FOR EmployeeNumber");
 
 
+            modelBuilder.Entity<JobLevelLeave>().HasData(
+                new JobLevelLeave { Id = 1, JobLevel = "Junior level" },
+                new JobLevelLeave { Id = 2, JobLevel = "Middle level" },
+                new JobLevelLeave { Id = 3, JobLevel = "Senior level" }
+                );
+
+
+
 
             modelBuilder.Entity<EmployeeCategory>().HasData(
                      new EmployeeCategory { Id = 1, Name = "Full-Time" },
@@ -94,6 +105,7 @@ namespace WorkManagmentSolution.EFCore
                 new EmployeeDesignation { Id = 5, Name = "HR Head" },
                 new EmployeeDesignation { Id = 6, Name = "Engineer" }
             );
+
 
             modelBuilder.Entity<EmployeeLeaveType>().HasData(
             new EmployeeLeaveType { Id = 1, Name = "Privilege Leave", IsPaid = true },

@@ -167,6 +167,7 @@ export type EmployeeModel = {
   alternateEmail?: string | null;
   phoneNumber?: number | null;
   alternateNumber?: number | null;
+  jobLevelLeaveType?: number | null;
   isDeleted?: boolean | null;
   userId?: string | null;
   roleId?: string;

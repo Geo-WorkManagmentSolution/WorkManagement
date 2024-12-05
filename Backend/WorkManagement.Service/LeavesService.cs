@@ -103,43 +103,64 @@ namespace WorkManagement.Service
             return returnData;
         }
 
-        public async Task<List<EmployeeDefaultLeaveSummary>> GetDefaultLeaveSummaries()
-{
-    var EmployeeDefaultLeaveSummary = await _dbContext.EmployeeDefaultLeave
-        .Include(x => x.EmployeeLeaveTypes)
-        .ToListAsync();
+        public async Task<List<JobLevelLeave>> GetJobLevels()
+        {
+            var levels= await _dbContext.JobLevelLeave.ToListAsync();
+            return levels;
+        }
 
-    return EmployeeDefaultLeaveSummary;
-}
-        public async Task<bool> UpdateDefaultLeave(List<EmployeeDefaultLeaveSummary> defaultLeaves)
+
+        public async Task<List<EmployeeDefaultLeaveSummary>> GetDefaultLeaveSummaries(int jobLevelId)
+        {
+            var employeeDefaultLeaveSummary = await _dbContext.EmployeeDefaultLeave
+                .Include(x => x.EmployeeLeaveTypes)
+                .Include(x => x.JobLevelLeaves)
+                .Where(x => x.JobLevelLeaveId == jobLevelId)
+                .ToListAsync();
+
+            return employeeDefaultLeaveSummary;
+        }
+
+        public async Task<bool> UpdateDefaultLeave(List<DefaultLeaveModel> defaultLeaves)
         {
             try
             {
-                // Remove existing default leaves
-                var existingLeaves = await _dbContext.EmployeeDefaultLeave.ToListAsync();
-                _dbContext.EmployeeDefaultLeave.RemoveRange(existingLeaves);
+                // Group the leaves by JobLevelLeaveTypeId
+                var leavesByJobLevel = defaultLeaves.GroupBy(l => l.JobLevelLeaveTypeId);
 
-                // Add new default leaves
-                foreach (var leave in defaultLeaves)
+                foreach (var jobLevelGroup in leavesByJobLevel)
                 {
-                    var leaveType = await _dbContext.EmployeeLeaveType.FirstOrDefaultAsync(lt => lt.Name == leave.EmployeeLeaveTypes.Name);
-                    if (leaveType == null)
-                    {
-                        leaveType = new EmployeeLeaveType
-                        {
-                            Name = leave.EmployeeLeaveTypes.Name,
-                            IsPaid = true
-                        };
-                        _dbContext.EmployeeLeaveType.Add(leaveType);
-                        await _dbContext.SaveChangesAsync();
-                    }
+                    int jobLevelLeaveTypeId = jobLevelGroup.Key;
 
-                    var newDefaultLeave = new EmployeeDefaultLeaveSummary
+                    // Remove existing default leaves for this job level
+                    var existingLeaves = await _dbContext.EmployeeDefaultLeave
+                        .Where(l => l.JobLevelLeaveId == jobLevelLeaveTypeId)
+                        .ToListAsync();
+                    _dbContext.EmployeeDefaultLeave.RemoveRange(existingLeaves);
+
+                    // Add new default leaves for this job level
+                    foreach (var leave in jobLevelGroup)
                     {
-                        EmployeeLeaveTypeId = leaveType.Id,
-                        TotalLeaves = leave.TotalLeaves
-                    };
-                    _dbContext.EmployeeDefaultLeave.Add(newDefaultLeave);
+                        var leaveType = await _dbContext.EmployeeLeaveType.FirstOrDefaultAsync(lt => lt.Name == leave.Name);
+                        if (leaveType == null)
+                        {
+                            leaveType = new EmployeeLeaveType
+                            {
+                                Name = leave.Name,
+                                IsPaid = true
+                            };
+                            _dbContext.EmployeeLeaveType.Add(leaveType);
+                            await _dbContext.SaveChangesAsync();
+                        }
+
+                        var newDefaultLeave = new EmployeeDefaultLeaveSummary
+                        {
+                            EmployeeLeaveTypeId = leaveType.Id,
+                            JobLevelLeaveId = jobLevelLeaveTypeId,
+                            TotalLeaves = leave.TotalLeaves
+                        };
+                        _dbContext.EmployeeDefaultLeave.Add(newDefaultLeave);
+                    }
                 }
 
                 await _dbContext.SaveChangesAsync();

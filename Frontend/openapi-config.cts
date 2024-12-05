@@ -16,7 +16,10 @@ const config: ConfigFile = {
 		},
 		'./src/app/main/employee/leave-management/LeavesApi.ts': {
 			filterEndpoints: [/Leaves/i],
-		}
+		},
+		'./src/app/main/settings/SettingsApi.ts': {
+            filterEndpoints: [/Settings/i],
+        }
 	},
 	useEnumType:true,
 	hooks: { queries: true, lazyQueries: true, mutations: true }

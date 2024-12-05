@@ -30,7 +30,7 @@ namespace WorkManagementSolution.Employee
         public string AlternateEmail { get; set; }
         public long? PhoneNumber { get; set; }
         public long? AlternateNumber { get; set; }
-        public int? JobLevelLeaveType { get; set; }
+        //public int? JobLevelLeaveType { get; set; }
 
         #region Foreign Keys
 

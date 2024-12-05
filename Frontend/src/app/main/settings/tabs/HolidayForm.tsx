@@ -8,10 +8,9 @@ import { useForm, Controller } from 'react-hook-form';
 import { showMessage } from '@fuse/core/FuseMessage/fuseMessageSlice';
 import { useDispatch } from 'react-redux';
 import {
-	EmployeeHoliday,
-	useGetApiLeavesHolidaysByYearQuery,
-	usePostApiLeavesHolidaysMutation
+	EmployeeHoliday
 } from '../../employee/leave-management/LeavesApi';
+import { useGetApiLeavesSettingsHolidaysByYearQuery, usePostApiLeavesSettingsHolidaysMutation } from '../SettingsApi';
 
 function HolidayForm() {
 	const {
@@ -28,8 +27,8 @@ function HolidayForm() {
 	const [editingHoliday, setEditingHoliday] = useState<EmployeeHoliday | null>(null);
 	const [isUpdate, setIsUpdate] = useState(false);
 	const dispatch = useDispatch();
-	const { data: holidaysData, refetch } = useGetApiLeavesHolidaysByYearQuery({ year: selectedYear });
-	const [addHolidays] = usePostApiLeavesHolidaysMutation();
+	const { data: holidaysData, refetch } = useGetApiLeavesSettingsHolidaysByYearQuery({ year: selectedYear });
+	const [addHolidays] = usePostApiLeavesSettingsHolidaysMutation();
 	useEffect(() => {
 		if (holidaysData) {
 			setHolidays(holidaysData);
@@ -49,7 +48,14 @@ function HolidayForm() {
 	const handleAddHoliday = (data: EmployeeHoliday) => {
 		const startDate = adjustDateForTimezone(new Date(data.startDate));
 		const endDate = adjustDateForTimezone(new Date(data.endDate));
-		
+
+		// Date validation
+		if (startDate > endDate) {
+			setError('startDate', { type: 'manual', message: 'Start date cannot be after end date' });
+			setError('endDate', { type: 'manual', message: 'End date cannot be before start date' });
+			return;
+		}
+
 		const holidayExists = holidays.some(
 			(holiday) =>
 				holiday.id !== editingHoliday?.id && // Exclude the currently editing holiday
@@ -73,6 +79,7 @@ function HolidayForm() {
 			return;
 		}
 
+		// If there are no errors, proceed with adding or updating the holiday
 		if (isUpdate && editingHoliday) {
 			setHolidays(
 				holidays.map((holiday) =>
@@ -224,7 +231,12 @@ function HolidayForm() {
 						<Controller
 							name="startDate"
 							control={control}
-							rules={{ required: 'Start date is required' }}
+							rules={{
+								required: 'Start date is required',
+								validate: (value) =>
+									!value || !control._formValues.endDate || value <= control._formValues.endDate ||
+									'Start date cannot be after end date'
+							}}
 							render={({ field }) => (
 								<DatePicker
 									{...field}
@@ -234,8 +246,16 @@ function HolidayForm() {
 									maxDate={new Date(selectedYear, 11, 31)}
 									slotProps={{
 										textField: {
-											error: touchedFields.startDate && !!errors.startDate,
-											helperText: touchedFields.startDate && errors.startDate?.message
+											error: !!errors.startDate,
+											helperText: errors.startDate?.message
+										}
+									}}
+									onChange={(date) => {
+										field.onChange(date);
+										if (control._formValues.endDate && date > control._formValues.endDate) {
+											setError('endDate', { type: 'manual', message: 'End date cannot be before start date' });
+										} else {
+											clearErrors('endDate');
 										}
 									}}
 								/>
@@ -244,7 +264,12 @@ function HolidayForm() {
 						<Controller
 							name="endDate"
 							control={control}
-							rules={{ required: 'End date is required' }}
+							rules={{
+								required: 'End date is required',
+								validate: (value) =>
+									!value || !control._formValues.startDate || value >= control._formValues.startDate ||
+									'End date cannot be before start date'
+							}}
 							render={({ field }) => (
 								<DatePicker
 									{...field}
@@ -254,8 +279,16 @@ function HolidayForm() {
 									maxDate={new Date(selectedYear, 11, 31)}
 									slotProps={{
 										textField: {
-											error: touchedFields.endDate && !!errors.endDate,
-											helperText: touchedFields.endDate && errors.endDate?.message
+											error: !!errors.endDate,
+											helperText: errors.endDate?.message
+										}
+									}}
+									onChange={(date) => {
+										field.onChange(date);
+										if (control._formValues.startDate && date < control._formValues.startDate) {
+											setError('startDate', { type: 'manual', message: 'Start date cannot be after end date' });
+										} else {
+											clearErrors('startDate');
 										}
 									}}
 								/>
@@ -304,7 +337,7 @@ function HolidayForm() {
 							Remove
 						</MenuItem>
 						<MenuItem
-							key={`remove-${row.original.id}`}
+							key={`update-${row.original.id}`}
 							onClick={() => {
 								updateHoliday(row.original.id);
 								closeMenu();
@@ -333,4 +366,8 @@ function HolidayForm() {
 }
 
 export default HolidayForm;
+
+
+
+
 

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using WorkManagement.Domain.Contracts;
 using WorkManagement.Domain.Entity;
 using WorkManagement.Domain.Entity.EmployeeLeaveTables;
+using WorkManagement.Domain.Models.Dropdown;
 using WorkManagement.Domain.Models.Email;
 using WorkManagement.Domain.Models.Employee;
 using WorkManagement.Domain.Utility;
@@ -737,7 +738,7 @@ namespace WorkManagement.Service
 
                     employee.JobLevelLeaveType = employee.JobLevelLeaveType.HasValue ? employee.JobLevelLeaveType.Value : 1;
 
-                    var defaultLeaves = (from ed in _dbContext.EmployeeDefaultLeave.Where(s=>s.JobLevelLeaveType == employee.JobLevelLeaveType)
+                    var defaultLeaves = (from ed in _dbContext.EmployeeDefaultLeave.Where(s=>s.JobLevelLeaveId == employee.JobLevelLeaveType)
                                          select new EmployeeLeaveSummaryModel
                                          {
                                              Id = ed.EmployeeLeaveTypeId.HasValue ? ed.EmployeeLeaveTypeId.Value : 0,
@@ -1714,9 +1715,88 @@ namespace WorkManagement.Service
 
         #endregion
 
+        #region Settings Tab 
+
+        public async Task<DropdownModel> AddDropdownItem(DropdownModel model)
+        {
+            if (model.Category.Equals("Designation", StringComparison.OrdinalIgnoreCase))
+            {
+                var newDesignation = new EmployeeDesignation { Name = model.Name };
+                _dbContext.EmployeeDesignations.Add(newDesignation);
+                await _dbContext.SaveChangesAsync();
+                model.Id = newDesignation.Id;
+            }
+            else if (model.Category.Equals("Department", StringComparison.OrdinalIgnoreCase))
+            {
+                var newDepartment = new EmployeeDepartment { Name = model.Name };
+                _dbContext.EmployeeDepartments.Add(newDepartment);
+                await _dbContext.SaveChangesAsync();
+                model.Id = newDepartment.Id;
+            }
+            else
+            {
+                throw new ArgumentException("Invalid category");
+            }
+
+            return model;
+        }
+
+        public async Task DeleteDropdownItem(int id)
+        {
+            var designation = await _dbContext.EmployeeDesignations.FindAsync(id);
+            if (designation != null)
+            {
+                _dbContext.EmployeeDesignations.Remove(designation);
+                await _dbContext.SaveChangesAsync();
+                return;
+            }
+
+            var department = await _dbContext.EmployeeDepartments.FindAsync(id);
+            if (department != null)
+            {
+                _dbContext.EmployeeDepartments.Remove(department);
+                await _dbContext.SaveChangesAsync();
+                return;
+            }
+
+            throw new ArgumentException("Item not found");
+        }
+
+        public async Task<DropdownModel> UpdateDropdownItem(DropdownModel model)
+        {
+            if (model.Category.Equals("Designation", StringComparison.OrdinalIgnoreCase))
+            {
+                var designation = await _dbContext.EmployeeDesignations.FindAsync(model.Id);
+                if (designation == null)
+                    throw new ArgumentException("Designation not found");
+
+                designation.Name = model.Name;
+                await _dbContext.SaveChangesAsync();
+            }
+            else if (model.Category.Equals("Department", StringComparison.OrdinalIgnoreCase))
+            {
+                var department = await _dbContext.EmployeeDepartments.FindAsync(model.Id);
+                if (department == null)
+                    throw new ArgumentException("Department not found");
+
+                department.Name = model.Name;
+                await _dbContext.SaveChangesAsync();
+            }
+            else
+            {
+                throw new ArgumentException("Invalid category");
+            }
+
+            return model;
+        }
+    
 
 
-        public async Task<(bool isValid, string errorMessage)> ValidateLeaveRequest(DateTime startDate, DateTime endDate, int employeeId)
+
+
+    #endregion
+
+    public async Task<(bool isValid, string errorMessage)> ValidateLeaveRequest(DateTime startDate, DateTime endDate, int employeeId)
         {
             // Check for existing leaves
             var existingLeaves = await _dbContext.EmployeeLeaves
