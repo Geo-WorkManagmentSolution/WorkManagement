@@ -522,7 +522,7 @@ function WorkInfoTab({ UserRole }) {
 						name="employeeWorkInformation.hireDate"
 						render={({ field: { value, onChange } }) => (
 							<DatePicker
-								value={new Date(value)}
+							value={value ? new Date(value) : new Date()}
 								onChange={(val) => {
 									onChange(val?.toISOString());
 								}}
