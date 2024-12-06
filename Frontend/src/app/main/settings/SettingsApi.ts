@@ -11,15 +11,16 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.dropdownModel,
       }),
     }),
-    deleteApiEmployeesSettingsDeleteDropdownItemById: build.mutation<
-      DeleteApiEmployeesSettingsDeleteDropdownItemByIdApiResponse,
-      DeleteApiEmployeesSettingsDeleteDropdownItemByIdApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/Employees/settings/deleteDropdownItem/${queryArg.id}`,
-        method: "DELETE",
+    deleteApiEmployeesSettingsDeleteDropdownItemByIdAndDropdownName:
+      build.mutation<
+        DeleteApiEmployeesSettingsDeleteDropdownItemByIdAndDropdownNameApiResponse,
+        DeleteApiEmployeesSettingsDeleteDropdownItemByIdAndDropdownNameApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/Employees/settings/deleteDropdownItem/${queryArg.id}/${queryArg.dropdownName}`,
+          method: "DELETE",
+        }),
       }),
-    }),
     putApiEmployeesSettingsUpdateDropdownItem: build.mutation<
       PutApiEmployeesSettingsUpdateDropdownItemApiResponse,
       PutApiEmployeesSettingsUpdateDropdownItemApiArg
@@ -75,11 +76,13 @@ export type PostApiEmployeesSettingsAddDropdownItemApiResponse = unknown;
 export type PostApiEmployeesSettingsAddDropdownItemApiArg = {
   dropdownModel: DropdownModel;
 };
-export type DeleteApiEmployeesSettingsDeleteDropdownItemByIdApiResponse =
+export type DeleteApiEmployeesSettingsDeleteDropdownItemByIdAndDropdownNameApiResponse =
   unknown;
-export type DeleteApiEmployeesSettingsDeleteDropdownItemByIdApiArg = {
-  id: number;
-};
+export type DeleteApiEmployeesSettingsDeleteDropdownItemByIdAndDropdownNameApiArg =
+  {
+    id: number;
+    dropdownName: string;
+  };
 export type PutApiEmployeesSettingsUpdateDropdownItemApiResponse = unknown;
 export type PutApiEmployeesSettingsUpdateDropdownItemApiArg = {
   dropdownModel: DropdownModel;
@@ -124,7 +127,7 @@ export type DefaultLeaveModel = {
 };
 export const {
   usePostApiEmployeesSettingsAddDropdownItemMutation,
-  useDeleteApiEmployeesSettingsDeleteDropdownItemByIdMutation,
+  useDeleteApiEmployeesSettingsDeleteDropdownItemByIdAndDropdownNameMutation,
   usePutApiEmployeesSettingsUpdateDropdownItemMutation,
   usePostApiLeavesSettingsHolidaysMutation,
   usePutApiLeavesSettingsDefaultLeavesMutation,

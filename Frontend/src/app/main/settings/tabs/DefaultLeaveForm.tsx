@@ -6,22 +6,12 @@ import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import FuseLoading from '@fuse/core/FuseLoading';
 import { showMessage } from '@fuse/core/FuseMessage/fuseMessageSlice';
 import { useDispatch } from 'react-redux';
+import { DefaultLeaveModel, useDeleteApiLeavesSettingsDefaultLeavesByIdMutation } from '../SettingsApi';
 import {
 	useGetApiLeavesJoblevelsQuery,
-	useLazyGetApiLeavesDefaultLeavesByJobLevelIdQuery
-} from '../../employee/leave-management/LeavesApi';
-import {
-	DefaultLeaveModel,
-	useDeleteApiLeavesSettingsDefaultLeavesByIdMutation,
+	useLazyGetApiLeavesDefaultLeavesByJobLevelIdQuery,
 	usePutApiLeavesSettingsDefaultLeavesMutation
-} from '../SettingsApi';
-
-// interface DefaultLeaveModel {
-//     id: number;
-//     name: string;
-//     jobLevelLeaveTypeId: number;
-//     totalLeaves: number;
-// }
+} from '../../employee/leave-management/LeavesApi';
 
 function DefaultLeaveForm() {
 	const [selectedJobLevel, setSelectedJobLevel] = useState<number | null>(null);
@@ -37,7 +27,15 @@ function DefaultLeaveForm() {
 	const [deleteDefaultLeave, { isLoading: isDeleting }] = useDeleteApiLeavesSettingsDefaultLeavesByIdMutation();
 
 	useEffect(() => {
-		if (selectedJobLevel) {
+		if (jobLevels && jobLevels.length > 0 && !selectedJobLevel) {
+			const firstJobLevel = jobLevels[0].id;
+			setSelectedJobLevel(firstJobLevel);
+			fetchDefaultLeaves(firstJobLevel);
+		}
+	}, [jobLevels]);
+
+	useEffect(() => {
+		if (selectedJobLevel && !leaveTypes.length) {
 			fetchDefaultLeaves(selectedJobLevel);
 		}
 	}, [selectedJobLevel]);
@@ -45,16 +43,12 @@ function DefaultLeaveForm() {
 	const fetchDefaultLeaves = async (jobLevelId: number) => {
 		try {
 			const result = await getDefaultLeaves({ jobLevelId }).unwrap();
-			console.log("result of default leave",result);
-			
 			const formattedLeaveTypes = result.map((leave) => ({
 				id: leave.id,
 				name: leave.employeeLeaveTypes?.name || '',
 				jobLevelLeaveTypeId: leave.jobLevelLeaveId || 0,
 				totalLeaves: leave.totalLeaves
 			}));
-			console.log("formatted leave types",formattedLeaveTypes);
-			
 			setLeaveTypes(formattedLeaveTypes);
 			setOriginalLeaveTypes(formattedLeaveTypes);
 		} catch (error) {
@@ -85,6 +79,7 @@ function DefaultLeaveForm() {
 
 		const jobLevelId = event.target.value as number;
 		setSelectedJobLevel(jobLevelId);
+		setLeaveTypes([]); // Clear existing leave types
 		setHasUnsavedChanges(false);
 	};
 
@@ -97,11 +92,8 @@ function DefaultLeaveForm() {
 
 	const handleRemoveField = async (index: number) => {
 		const leaveToRemove = leaveTypes[index];
-		console.log("Id oof leave to remove",leaveToRemove.id);
-		
 		try {
 			await deleteDefaultLeave({ id: leaveToRemove.id }).unwrap();
-
 			const updatedLeaveTypes = leaveTypes.filter((_, i) => i !== index);
 			setLeaveTypes(updatedLeaveTypes);
 			setOriginalLeaveTypes(updatedLeaveTypes);
@@ -193,7 +185,7 @@ function DefaultLeaveForm() {
 	return (
 		<div>
 			<Paper
-				className="flex flex-col flex-auto shadow-1 rounded-2xl overflow-hidden rounded-xl w-full h-full p-10"
+				className="flex flex-col flex-auto shadow-1 overflow-hidden rounded-xl w-full h-full p-10"
 				elevation={0}
 			>
 				<div className="flex items-center border-b-1 space-x-8 m-10">

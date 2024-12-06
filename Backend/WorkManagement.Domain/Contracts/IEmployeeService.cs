@@ -63,7 +63,7 @@ namespace WorkManagement.Domain.Contracts
         #region settings
 
         Task<DropdownModel> AddDropdownItem(DropdownModel model);
-        Task DeleteDropdownItem(int id);
+        public Task DeleteDropdownItem(int id, string dropdownName);
         Task<DropdownModel> UpdateDropdownItem(DropdownModel model);
 
         #endregion

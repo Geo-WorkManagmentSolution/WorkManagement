@@ -1732,7 +1732,14 @@ namespace WorkManagement.Service
                 _dbContext.EmployeeDepartments.Add(newDepartment);
                 await _dbContext.SaveChangesAsync();
                 model.Id = newDepartment.Id;
+            } else if (model.Category.Equals("JobLevel",StringComparison.OrdinalIgnoreCase)) 
+            {
+                var newJobLevel = new JobLevelLeave { JobLevel = model.Name };
+                _dbContext.JobLevelLeave.Add(newJobLevel);
+                await _dbContext.SaveChangesAsync();
+                model.Id = newJobLevel.Id;
             }
+
             else
             {
                 throw new ArgumentException("Invalid category");
@@ -1741,26 +1748,41 @@ namespace WorkManagement.Service
             return model;
         }
 
-        public async Task DeleteDropdownItem(int id)
+        public async Task DeleteDropdownItem(int id, string dropdownName)
+{
+    if (dropdownName.Equals("Designation", StringComparison.OrdinalIgnoreCase))
+    {
+        var designation = await _dbContext.EmployeeDesignations.FindAsync(id);
+        if (designation != null)
         {
-            var designation = await _dbContext.EmployeeDesignations.FindAsync(id);
-            if (designation != null)
-            {
-                _dbContext.EmployeeDesignations.Remove(designation);
-                await _dbContext.SaveChangesAsync();
-                return;
-            }
-
-            var department = await _dbContext.EmployeeDepartments.FindAsync(id);
-            if (department != null)
-            {
-                _dbContext.EmployeeDepartments.Remove(department);
-                await _dbContext.SaveChangesAsync();
-                return;
-            }
-
-            throw new ArgumentException("Item not found");
+            _dbContext.EmployeeDesignations.Remove(designation);
+            await _dbContext.SaveChangesAsync();
+            return;
         }
+    }
+    else if (dropdownName.Equals("Department", StringComparison.OrdinalIgnoreCase))
+    {
+        var department = await _dbContext.EmployeeDepartments.FindAsync(id);
+        if (department != null)
+        {
+            _dbContext.EmployeeDepartments.Remove(department);
+            await _dbContext.SaveChangesAsync();
+            return;
+        }
+    }
+    else if (dropdownName.Equals("JobLevel", StringComparison.OrdinalIgnoreCase))
+    {
+        var jobLevel = await _dbContext.JobLevelLeave.FindAsync(id);
+        if (jobLevel != null)
+        {
+            _dbContext.JobLevelLeave.Remove(jobLevel);
+            await _dbContext.SaveChangesAsync();
+            return;
+        }
+    }
+
+    throw new ArgumentException("Item not found");
+}
 
         public async Task<DropdownModel> UpdateDropdownItem(DropdownModel model)
         {
@@ -1780,6 +1802,13 @@ namespace WorkManagement.Service
                     throw new ArgumentException("Department not found");
 
                 department.Name = model.Name;
+                await _dbContext.SaveChangesAsync();
+            }
+            else if (model.Category.Equals("JobLevel", StringComparison.OrdinalIgnoreCase))
+            {
+                var jobLevel = await _dbContext.JobLevelLeave.FindAsync(model.Id);
+                if (jobLevel == null) throw new ArgumentException("Job Level not Found");
+                jobLevel.JobLevel = model.Name;
                 await _dbContext.SaveChangesAsync();
             }
             else

@@ -9,8 +9,7 @@ import {
 	FormControl,
 	InputLabel,
 	Typography,
-	ListItemIcon,
-	Snackbar
+	ListItemIcon
 } from '@mui/material';
 import { MRT_ColumnDef } from 'material-react-table';
 import DataTable from 'app/shared-components/data-table/DataTable';
@@ -23,7 +22,12 @@ import {
 	useGetApiEmployeesDepartmentsQuery,
 	DropdownModel
 } from '../../employee/EmployeeApi';
-import { useDeleteApiEmployeesSettingsDeleteDropdownItemByIdMutation, usePostApiEmployeesSettingsAddDropdownItemMutation, usePutApiEmployeesSettingsUpdateDropdownItemMutation } from '../SettingsApi';
+import {
+	useDeleteApiEmployeesSettingsDeleteDropdownItemByIdAndDropdownNameMutation,
+	usePostApiEmployeesSettingsAddDropdownItemMutation,
+	usePutApiEmployeesSettingsUpdateDropdownItemMutation
+} from '../SettingsApi';
+import { useGetApiLeavesJoblevelsQuery } from '../../employee/leave-management/LeavesApi';
 
 interface DropdownItem {
 	id: number;
@@ -46,6 +50,11 @@ const initialCategories: DropdownCategory[] = [
 		id: 'department',
 		name: 'Department',
 		items: []
+	},
+	{
+		id: 'joblevel',
+		name: 'Job Level',
+		items: []
 	}
 ];
 
@@ -67,12 +76,18 @@ function DropDownForm() {
 		isLoading: isLoadingDepartments,
 		refetch: refetchDepartments
 	} = useGetApiEmployeesDepartmentsQuery();
+	const {
+		data: jobLevels,
+		isLoading: isLoadingJobLevels,
+		refetch: refetchJobLevels
+	} = useGetApiLeavesJoblevelsQuery();
+
 	const [addDropdownItem] = usePostApiEmployeesSettingsAddDropdownItemMutation();
-	const [deleteDropdownItem] = useDeleteApiEmployeesSettingsDeleteDropdownItemByIdMutation();
+	const [deleteDropdownItem] = useDeleteApiEmployeesSettingsDeleteDropdownItemByIdAndDropdownNameMutation();
 	const [updateDropdownItem] = usePutApiEmployeesSettingsUpdateDropdownItemMutation();
 
 	useEffect(() => {
-		if (designations && departments) {
+		if (designations && departments && jobLevels) {
 			setCategories([
 				{
 					id: 'designation',
@@ -83,10 +98,15 @@ function DropDownForm() {
 					id: 'department',
 					name: 'Department',
 					items: departments.map((d) => ({ id: d.id, name: d.name }))
+				},
+				{
+					id: 'joblevel',
+					name: 'Job Level For Default Leaves',
+					items: jobLevels.map((d) => ({ id: d.id, name: d.jobLevel }))
 				}
 			]);
 		}
-	}, [designations, departments]);
+	}, [designations, departments,jobLevels]);
 
 	const handleAddItem = async () => {
 		if (selectedCategory && itemName.trim()) {
@@ -119,9 +139,9 @@ function DropDownForm() {
 		}
 	};
 
-	const handleDeleteItem = async (itemId: number) => {
+	const handleDeleteItem = async (itemId: number,dropdownType: string) => {
 		try {
-			await deleteDropdownItem({ id: itemId }).unwrap();
+			await deleteDropdownItem({ id: itemId,dropdownName:dropdownType }).unwrap();
 			dispatch(
 				showMessage({
 					message: 'Record has been deleted successfully',
@@ -154,6 +174,8 @@ function DropDownForm() {
 					category: selectedCategory,
 					name: itemName
 				};
+				console.log("updating data", updatedItem);
+			
 				await updateDropdownItem({ dropdownModel: updatedItem }).unwrap();
 				dispatch(
 					showMessage({
@@ -182,6 +204,8 @@ function DropDownForm() {
 			refetchDesignations();
 		} else if (selectedCategory === 'department') {
 			refetchDepartments();
+		} else if (selectedCategory === 'joblevel') {
+			refetchJobLevels();
 		}
 	};
 
@@ -195,7 +219,7 @@ function DropDownForm() {
 		[]
 	);
 
-	if (isLoadingDesignations || isLoadingDepartments) {
+	if (isLoadingDesignations || isLoadingDepartments || isLoadingJobLevels) {
 		return <div>Loading...</div>;
 	}
 
@@ -263,7 +287,7 @@ function DropDownForm() {
 						<MenuItem
 							key={`remove-${row.original.id}`}
 							onClick={() => {
-								handleDeleteItem(row.original.id);
+								handleDeleteItem(row.original.id, selectedCategory);
 								closeMenu();
 								table.resetRowSelection();
 							}}
@@ -289,7 +313,6 @@ function DropDownForm() {
 					]}
 				/>
 			)}
-			
 		</Paper>
 	);
 }

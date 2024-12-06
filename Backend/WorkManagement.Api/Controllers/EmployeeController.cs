@@ -381,12 +381,12 @@ namespace WorkManagement.API.Controllers
             }
         }
 
-        [HttpDelete("settings/deleteDropdownItem/{id}")]
-        public async Task<IActionResult> DeleteDropdownItem(int id)
+        [HttpDelete("settings/deleteDropdownItem/{id}/{dropdownName}")]
+        public async Task<IActionResult> DeleteDropdownItem(int id,string dropdownName)
         {
             try
             {
-                await employeeService.DeleteDropdownItem(id);
+                await employeeService.DeleteDropdownItem(id,dropdownName);
                 return Ok();
             }
             catch (Exception ex)
