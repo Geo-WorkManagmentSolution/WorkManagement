@@ -1,217 +1,297 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
-  Paper,
-  Box,
-  TextField,
-  Button,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Typography,
-  ListItemIcon,
+	Paper,
+	Box,
+	TextField,
+	Button,
+	Select,
+	MenuItem,
+	FormControl,
+	InputLabel,
+	Typography,
+	ListItemIcon,
+	Snackbar
 } from '@mui/material';
 import { MRT_ColumnDef } from 'material-react-table';
 import DataTable from 'app/shared-components/data-table/DataTable';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import AddIcon from '@mui/icons-material/Add';
+import { useDispatch } from 'react-redux';
+import { showMessage } from '@fuse/core/FuseMessage/fuseMessageSlice';
+import {
+	useGetApiEmployeesDesignationsQuery,
+	useGetApiEmployeesDepartmentsQuery,
+	DropdownModel
+} from '../../employee/EmployeeApi';
+import { useDeleteApiEmployeesSettingsDeleteDropdownItemByIdMutation, usePostApiEmployeesSettingsAddDropdownItemMutation, usePutApiEmployeesSettingsUpdateDropdownItemMutation } from '../SettingsApi';
 
 interface DropdownItem {
-  name: string;
+	id: number;
+	name: string;
 }
 
 interface DropdownCategory {
-  id: string;
-  name: string;
-  items: DropdownItem[];
+	id: string;
+	name: string;
+	items: DropdownItem[];
 }
 
 const initialCategories: DropdownCategory[] = [
-  {
-    id: 'designation',
-    name: 'Designation',
-    items: [
-      { name: 'Junior Developer' },
-      { name: 'Senior Developer' },
-      { name: 'Manager' },
-    ],
-  },
-  {
-    id: 'department',
-    name: 'Department',
-    items: [
-      { name: 'IT' },
-      { name: 'HR' },
-      { name: 'Finance' },
-    ],
-  },
+	{
+		id: 'designation',
+		name: 'Designation',
+		items: []
+	},
+	{
+		id: 'department',
+		name: 'Department',
+		items: []
+	}
 ];
 
 function DropDownForm() {
-  const [categories, setCategories] = useState<DropdownCategory[]>(initialCategories);
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const [itemName, setItemName] = useState<string>('');
-  const [isUpdating, setIsUpdating] = useState<boolean>(false);
-  const [updatingItemName, setUpdatingItemName] = useState<string | null>(null);
+	const [categories, setCategories] = useState<DropdownCategory[]>(initialCategories);
+	const [selectedCategory, setSelectedCategory] = useState<string>('designation');
+	const [itemName, setItemName] = useState<string>('');
+	const [isUpdating, setIsUpdating] = useState<boolean>(false);
+	const [updatingItemId, setUpdatingItemId] = useState<number | null>(null);
+	const dispatch = useDispatch();
 
-  const handleAddItem = () => {
-    if (selectedCategory && itemName.trim()) {
-      setCategories(prevCategories =>
-        prevCategories.map(category => {
-          if (category.id === selectedCategory) {
-            if (isUpdating) {
-              return {
-                ...category,
-                items: category.items.map(item =>
-                  item.name === updatingItemName ? { name: itemName } : item
-                ),
-              };
-            } else {
-              return {
-                ...category,
-                items: [...category.items, { name: itemName }],
-              };
-            }
-          }
-          return category;
-        })
-      );
-      setItemName('');
-      setIsUpdating(false);
-      setUpdatingItemName(null);
-    }
-  };
+	const {
+		data: designations,
+		isLoading: isLoadingDesignations,
+		refetch: refetchDesignations
+	} = useGetApiEmployeesDesignationsQuery();
+	const {
+		data: departments,
+		isLoading: isLoadingDepartments,
+		refetch: refetchDepartments
+	} = useGetApiEmployeesDepartmentsQuery();
+	const [addDropdownItem] = usePostApiEmployeesSettingsAddDropdownItemMutation();
+	const [deleteDropdownItem] = useDeleteApiEmployeesSettingsDeleteDropdownItemByIdMutation();
+	const [updateDropdownItem] = usePutApiEmployeesSettingsUpdateDropdownItemMutation();
 
-  const handleDeleteItem = (itemName: string) => {
-    if (selectedCategory) {
-      setCategories(prevCategories =>
-        prevCategories.map(category => {
-          if (category.id === selectedCategory) {
-            return {
-              ...category,
-              items: category.items.filter(item => item.name !== itemName),
-            };
-          }
-          return category;
-        })
-      );
-    }
-  };
+	useEffect(() => {
+		if (designations && departments) {
+			setCategories([
+				{
+					id: 'designation',
+					name: 'Designation',
+					items: designations.map((d) => ({ id: d.id, name: d.name }))
+				},
+				{
+					id: 'department',
+					name: 'Department',
+					items: departments.map((d) => ({ id: d.id, name: d.name }))
+				}
+			]);
+		}
+	}, [designations, departments]);
 
-  const handleUpdateItem = (item: DropdownItem) => {
-    setItemName(item.name);
-    setIsUpdating(true);
-    setUpdatingItemName(item.name);
-  };
+	const handleAddItem = async () => {
+		if (selectedCategory && itemName.trim()) {
+			try {
+				const newItem: DropdownModel = {
+					category: selectedCategory,
+					id: 0,
+					name: itemName
+				};
+				console.log('saving new data', newItem);
 
-  const handleSaveChanges = () => {
-    const dataToSend = categories.map(category => ({
-      category: category.name,
-      items: category.items.map(item => item.name)
-    }));
-    console.log('Data to be sent to backend:', dataToSend);
-    // Here you would typically make an API call to save the data
-  };
+				await addDropdownItem({ dropdownModel: newItem }).unwrap();
+				dispatch(
+					showMessage({
+						message: 'Record has been added successfully',
+						variant: 'success'
+					})
+				);
+				setItemName('');
+				refetchData();
+			} catch (error) {
+				console.error('Error adding Record:', error);
+				dispatch(
+					showMessage({
+						message: 'error adding Record',
+						variant: 'error'
+					})
+				);
+			}
+		}
+	};
 
-  const columns = useMemo<MRT_ColumnDef<DropdownItem>[]>(
-    () => [
-      {
-        accessorKey: 'name',
-        header: 'Name',
-      },
-    ],
-    []
-  );
+	const handleDeleteItem = async (itemId: number) => {
+		try {
+			await deleteDropdownItem({ id: itemId }).unwrap();
+			dispatch(
+				showMessage({
+					message: 'Record has been deleted successfully',
+					variant: 'success'
+				})
+			);
+			refetchData();
+		} catch (error) {
+			console.error('Error deleting Record:', error);
+			dispatch(
+				showMessage({
+					message: 'Cannot delete record',
+					variant: 'error'
+				})
+			);
+		}
+	};
 
-  return (
-    <Paper className="p-24 max-w-5xl mx-auto">
-      <div className="flex items-center border-b-1 space-x-8 m-10">
-        <FuseSvgIcon color="action" size={24}>
-          heroicons-outline:adjustments-horizontal
-        </FuseSvgIcon>
-        <Typography className="text-2xl mb-3" color="text.secondary">
-          Dropdown Form
-        </Typography>
-      </div>
-      <Box sx={{ mb: 3 }}>
-        <FormControl fullWidth sx={{ mb: 2 }}>
-        <InputLabel id="demo-simple-select-filled-label">Catagory</InputLabel>
-          <Select
-          label="Catagory"
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value as string)}
-          >
-            {categories.map((category) => (
-              <MenuItem key={category.id} value={category.id}>
-                {category.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <TextField
-            fullWidth
-            label={isUpdating ? 'Update Name' : 'Add Name'}
-            value={itemName}
-            onChange={(e) => setItemName(e.target.value)}
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleAddItem}
-            startIcon={<AddIcon />}
-          >
-            {isUpdating ? 'Update' : 'Add'}
-          </Button>
-        </Box>
-      </Box>
-      {selectedCategory && (
-        <DataTable
-        enableTopToolbar={false}
-          enableRowSelection={false}
-          data={categories.find((c) => c.id === selectedCategory)?.items || []}
-          columns={columns}
-          renderRowActionMenuItems={({ closeMenu, row, table }) => [
-            <MenuItem
-              key={`remove-${row.original.name}`}
-              onClick={() => {
-                handleDeleteItem(row.original.name);
-                closeMenu();
-                table.resetRowSelection();
-              }}
-            >
-              <ListItemIcon>
-                <FuseSvgIcon>heroicons-outline:trash</FuseSvgIcon>
-              </ListItemIcon>
-              Remove
-            </MenuItem>,
-            <MenuItem
-              key={`update-${row.original.name}`}
-              onClick={() => {
-                handleUpdateItem(row.original);
-                closeMenu();
-                table.resetRowSelection();
-              }}
-            >
-              <ListItemIcon>
-                <FuseSvgIcon>heroicons-outline:arrow-path</FuseSvgIcon>
-              </ListItemIcon>
-              Update
-            </MenuItem>,
-          ]}
-        />
-      )}
-      <Button
-        variant="contained"
-        onClick={handleSaveChanges}
-        className="mt-24"
-        style={{ backgroundColor: '#1976d2', color: 'white' }}
-      >
-        Save
-      </Button>
-    </Paper>
-  );
+	const handleUpdateItem = async (item: DropdownItem) => {
+		setItemName(item.name);
+		setIsUpdating(true);
+		setUpdatingItemId(item.id);
+	};
+
+	const handleSaveUpdate = async () => {
+		if (updatingItemId !== null && itemName.trim()) {
+			try {
+				const updatedItem: DropdownModel = {
+					id: updatingItemId,
+					category: selectedCategory,
+					name: itemName
+				};
+				await updateDropdownItem({ dropdownModel: updatedItem }).unwrap();
+				dispatch(
+					showMessage({
+						message: 'Record has been Updated successfully',
+						variant: 'success'
+					})
+				);
+				setItemName('');
+				setIsUpdating(false);
+				setUpdatingItemId(null);
+				refetchData();
+			} catch (error) {
+				console.error('Error updating item:', error);
+				dispatch(
+					showMessage({
+						message: 'Error updating record',
+						variant: 'error'
+					})
+				);
+			}
+		}
+	};
+
+	const refetchData = () => {
+		if (selectedCategory === 'designation') {
+			refetchDesignations();
+		} else if (selectedCategory === 'department') {
+			refetchDepartments();
+		}
+	};
+
+	const columns = useMemo<MRT_ColumnDef<DropdownItem>[]>(
+		() => [
+			{
+				accessorKey: 'name',
+				header: 'Name'
+			}
+		],
+		[]
+	);
+
+	if (isLoadingDesignations || isLoadingDepartments) {
+		return <div>Loading...</div>;
+	}
+
+	return (
+		<Paper className="p-24 max-w-5xl mx-auto">
+			<div className="flex items-center border-b-1 space-x-8 m-10">
+				<FuseSvgIcon
+					color="action"
+					size={24}
+				>
+					heroicons-outline:adjustments-horizontal
+				</FuseSvgIcon>
+				<Typography
+					className="text-2xl mb-3"
+					color="text.secondary"
+				>
+					Dropdown Form
+				</Typography>
+			</div>
+			<Box sx={{ mb: 3 }}>
+				<FormControl
+					fullWidth
+					sx={{ mb: 2 }}
+				>
+					<InputLabel id="demo-simple-select-filled-label">Category</InputLabel>
+					<Select
+						label="Category"
+						value={selectedCategory}
+						onChange={(e) => setSelectedCategory(e.target.value)}
+					>
+						{categories.map((category) => (
+							<MenuItem
+								key={category.id}
+								value={category.id}
+							>
+								{category.name}
+							</MenuItem>
+						))}
+					</Select>
+				</FormControl>
+				<Box sx={{ display: 'flex', gap: 2 }}>
+					<TextField
+						fullWidth
+						label={isUpdating ? 'Update Name' : 'Add Name'}
+						value={itemName}
+						onChange={(e) => setItemName(e.target.value)}
+					/>
+					<Button
+						variant="contained"
+						color="primary"
+						onClick={isUpdating ? handleSaveUpdate : handleAddItem}
+						startIcon={isUpdating ? <FuseSvgIcon>heroicons-outline:arrow-path</FuseSvgIcon> : <AddIcon />}
+					>
+						{isUpdating ? 'Update' : 'Add'}
+					</Button>
+				</Box>
+			</Box>
+			{selectedCategory && (
+				<DataTable
+					enableTopToolbar={false}
+					enableRowSelection={false}
+					data={categories.find((c) => c.id === selectedCategory)?.items || []}
+					columns={columns}
+					renderRowActionMenuItems={({ closeMenu, row, table }) => [
+						<MenuItem
+							key={`remove-${row.original.id}`}
+							onClick={() => {
+								handleDeleteItem(row.original.id);
+								closeMenu();
+								table.resetRowSelection();
+							}}
+						>
+							<ListItemIcon>
+								<FuseSvgIcon>heroicons-outline:trash</FuseSvgIcon>
+							</ListItemIcon>
+							Remove
+						</MenuItem>,
+						<MenuItem
+							key={`update-${row.original.id}`}
+							onClick={() => {
+								handleUpdateItem(row.original);
+								closeMenu();
+								table.resetRowSelection();
+							}}
+						>
+							<ListItemIcon>
+								<FuseSvgIcon>heroicons-outline:arrow-path</FuseSvgIcon>
+							</ListItemIcon>
+							Update
+						</MenuItem>
+					]}
+				/>
+			)}
+			
+		</Paper>
+	);
 }
 
 export default DropDownForm;
-

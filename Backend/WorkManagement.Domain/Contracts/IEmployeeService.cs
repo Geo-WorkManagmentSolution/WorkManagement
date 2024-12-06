@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WorkManagement.Domain.Entity;
 using WorkManagement.Domain.Entity.EmployeeLeaveTables;
+using WorkManagement.Domain.Models.Dropdown;
 using WorkManagement.Domain.Models.Employee;
 using WorkManagementSolution.Employee;
 
@@ -54,9 +55,19 @@ namespace WorkManagement.Domain.Contracts
         public Task CancelLeave(int employeeLeaveId, string value);
         public Task<EmployeeLeave> ApproveLeave(int leaveId);
         public Task<EmployeeLeave> RejectLeave(int leaveId);
-      
+
 
         #endregion
+
+
+        #region settings
+
+        Task<DropdownModel> AddDropdownItem(DropdownModel model);
+        Task DeleteDropdownItem(int id);
+        Task<DropdownModel> UpdateDropdownItem(DropdownModel model);
+
+        #endregion
+
 
         public Task<bool> CheckEmailExists(string email);
 

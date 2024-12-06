@@ -15,8 +15,11 @@ namespace WorkManagement.Domain.Contracts
         public Task<List<EmployeeHoliday>> GetHolidays();
         public Task<List<EmployeeLeaveModel>> GetAssignedEmployeeLeaves(string LoggedInUserId);
         public Task<List<EmployeeLeaveHistoryDTO>> GetEmployeeLeaveHistory(EmployeeLeaveHistoryDataModel data, string loggedUserId);
-        public Task<List<EmployeeDefaultLeaveSummary>> GetDefaultLeaveSummaries();
-        public Task<bool> UpdateDefaultLeave(List<EmployeeDefaultLeaveSummary> defaultLeaves);
+        public Task<List<EmployeeDefaultLeaveSummary>> GetDefaultLeaveSummaries(int jobLevelId);
+        public Task<List<JobLevelLeave>> GetJobLevels();
+        public Task<bool> UpdateDefaultLeave(List<DefaultLeaveModel> defaultLeaves);
+
+
         Task<bool> AddHoliday(List<EmployeeHoliday> holidays);
         Task<List<EmployeeHoliday>> GetHolidaysByYear(int year);
     }

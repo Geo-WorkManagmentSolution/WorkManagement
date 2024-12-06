@@ -53,24 +53,15 @@ namespace WorkManagement.API.Controllers
             return Ok(leaves);
         }
 
-        [HttpGet("default-leaves")]
-        public async Task<ActionResult<List<EmployeeDefaultLeaveSummary>>> GetDefaultLeave() 
+        [HttpGet("default-leaves/{jobLevelId}")]
+        public async Task<ActionResult<List<EmployeeDefaultLeaveSummary>>> GetDefaultLeave(int jobLevelId)
         {
-            var result = await leavesService.GetDefaultLeaveSummaries(); 
-            return Ok(result); 
+            var result = await leavesService.GetDefaultLeaveSummaries(jobLevelId);
+            return Ok(result);
         }
 
-        [HttpPut("default-leaves")]
-        public async Task<ActionResult<bool>> UpdateDefaultLeave([FromBody] List<EmployeeDefaultLeaveSummary> defaultLeaves)
-        {
-            var result = await leavesService.UpdateDefaultLeave(defaultLeaves);
-            if (result)
-            {
-                return Ok(true);
-            }
-            return BadRequest("Failed to update default leaves");
-        }
-        [HttpPost("holidays")]
+
+        [HttpPost("settings/holidays")]
         public async Task<ActionResult<bool>> AddHolidays([FromBody] List<EmployeeHoliday> holidays)
         {
             var result = await leavesService.AddHoliday(holidays);
@@ -81,7 +72,23 @@ namespace WorkManagement.API.Controllers
             return BadRequest("Failed to add holidays");
         }
 
-        [HttpGet("holidays/{year}")]
+        [HttpPut("settings/default-leaves")]
+        public async Task<ActionResult<bool>> UpdateDefaultLeave([FromBody] List<DefaultLeaveModel> defaultLeaves)
+        {
+            var result = await leavesService.UpdateDefaultLeave(defaultLeaves);
+            if (result)
+            {
+                return Ok(true);
+            }
+            return BadRequest("Failed to update default leaves");
+        }
+
+        [HttpGet("joblevels")]
+        public async Task<ActionResult<List<JobLevelLeave>>> GetjobLevels() { 
+            var jobLevels = await leavesService.GetJobLevels();
+            return Ok(jobLevels);
+        }
+        [HttpGet("settings/holidays/{year}")]
         public async Task<ActionResult<List<EmployeeHoliday>>> GetHolidaysByYear(int year)
         {
             var holidays = await leavesService.GetHolidaysByYear(year);

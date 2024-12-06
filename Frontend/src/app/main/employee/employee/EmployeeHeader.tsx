@@ -2,7 +2,7 @@
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { motion } from 'framer-motion';
-import { useFormContext } from 'react-hook-form';
+import { useForm, useFormContext } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import _ from '@lodash';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
@@ -32,23 +32,27 @@ function EmployeeHeader() {
 	const methods = useFormContext();
 	const { formState, watch, getValues } = methods;
 	const { errors, dirtyFields, isValid } = formState;
-
+	const { trigger } = useForm();
 	const navigate = useNavigate();
 
 	const { photoURL, firstName, lastName } = watch() as EmployeeModel;
 
-	function handleUpdateProduct() {
+	const handleUpdateProduct = async () => {
 		const data = getValues() as EmployeeModel;
 		console.log(data);
 
-		if (_.isEmpty(dirtyFields) || !isValid) {
-			dispatch(
-				showMessage({
-					message: 'Required fields must be filled out',
-					variant: 'warning'
-				})
-			);
-			return;
+		if (!isValid) {
+			await trigger(); // Trigger validation to ensure all errors are shown
+
+			if (Object.keys(errors).length > 0) {
+				dispatch(
+					showMessage({
+						message: 'Required fields must be filled out',
+						variant: 'warning'
+					})
+				);
+				return;
+			}
 		}
 
 		updateEmployee({
@@ -63,10 +67,11 @@ function EmployeeHeader() {
 				console.error('Error updating employee:', error);
 				dispatch(showMessage({ message: 'Error updating employee', variant: 'error' }));
 			});
-	}
+	};
 
 	function handleCreateEmployee() {
 		const data = getValues() as EmployeeModel;
+		
 		console.log('employeeData: ', data);
 
 		if (_.isEmpty(dirtyFields) || !isValid) {
@@ -107,11 +112,11 @@ function EmployeeHeader() {
 	}
 
 	if (isCreating || isUpdating || isDeleting) {
-		return(
+		return (
 			<div className="flex  justify-center h-screen w-screen">
- 	 		<FuseLoading />
-		</div>
-		)
+				<FuseLoading />
+			</div>
+		);
 	}
 
 	return (

@@ -27,15 +27,16 @@ import {
 	usePostApiEmployeesAddNewDesignationMutation,
 	usePostApiEmployeesAddNewSiteMutation,
 	useGetApiEmployeesReportToEmployeeListQuery
+	// useGetApiLeavesJoblevelsQuery,
+	// useLazyGetApiLeavesDefaultLeavesByJobLevelIdQuery
 } from '../../EmployeeApi';
+
 import EnhancedAutocomplete from '../EnhancedAutocomplete';
 import { SalaryType } from '../../models/EmployeeDropdownModels';
-import { getJobLevels, getLeaveTypes, JobLevel } from '../../../settings/dummyApi';
-
-// Added imports
-// Assuming getJobLevels and getLeaveTypes are defined elsewhere
-// const getJobLevels = () => Promise.resolve([{id:1, name: 'Level 1'}, {id:2, name: 'Level 2'}]); // Replace with actual API call
-// const getLeaveTypes = (jobLevelId) => Promise.resolve([{id:1, employeeLeaveType: 'Sick Leave', totalLeaves: 10}, {id:2, employeeLeaveType: 'Casual Leave', totalLeaves: 5}]); // Replace with actual API call
+import {
+	useGetApiLeavesJoblevelsQuery,
+	useLazyGetApiLeavesDefaultLeavesByJobLevelIdQuery
+} from '../../leave-management/LeavesApi';
 
 function WorkInfoTab({ UserRole }) {
 	const methods = useFormContext();
@@ -46,62 +47,20 @@ function WorkInfoTab({ UserRole }) {
 	const departmentId = watch('employeeDepartmentId');
 	const salaryType = watch('employeeWorkInformation.salaryType');
 	const [useDefaultLeaves, setUseDefaultLeaves] = useState(true);
-	const [jobLevels, setJobLevels] = useState<JobLevel[]>([]);
 	const [selectedJobLevel, setSelectedJobLevel] = useState(null);
-	const [defaultLeaveTypes, setDefaultLeaveTypes] = useState([]);
 
 	const { data: employeesDepartmentsOptions = [], isLoading: departmentLoading } =
 		useGetApiEmployeesDepartmentsQuery();
 	const { data: employeesSiteOptions = [], isLoading: siteLoading } = useGetApiEmployeesSitesQuery();
-	// const { data: employeeLeaveTypes = [] } = useGetApiEmployeesLeavesCurrentQuery({ employeeId: null });
 	const { data: employeesDesignationsOptions = [], isLoading: designationLoading } =
 		useGetApiEmployeesDesignationsQuery();
+	const { data: jobLevels = [], isLoading: jobLevelsLoading } = useGetApiLeavesJoblevelsQuery();
+	const [getDefaultLeaves, { isLoading: defaultLeavesLoading }] = useLazyGetApiLeavesDefaultLeavesByJobLevelIdQuery();
 
 	const { fields, append, remove } = useFieldArray({
 		control,
 		name: 'employeeLeaves'
 	});
-
-	useEffect(() => {
-		const loadJobLevels = async () => {
-			const levels: JobLevel[] = await getJobLevels();
-			setJobLevels(levels);
-		};
-		loadJobLevels();
-	}, []);
-
-	useEffect(() => {
-		if (selectedJobLevel) {
-			const loadLeaveTypes = async () => {
-				const leaveTypes = await getLeaveTypes(selectedJobLevel.id);
-				setDefaultLeaveTypes(leaveTypes);
-
-				if (useDefaultLeaves) {
-					setValue(
-						'employeeLeaves',
-						leaveTypes.map((lt) => ({
-							employeeLeaveTypeId: lt.id,
-							employeeLeaveType: lt.employeeLeaveType,
-							totalLeaves: lt.totalLeaves
-						}))
-					);
-				}
-			};
-			loadLeaveTypes();
-		}
-	}, [selectedJobLevel, useDefaultLeaves, setValue]);
-
-	// useEffect(() => {
-	// 	if (employeeLeaveTypes) {
-	// 		setValue(
-	// 			'employeeLeaves',
-	// 			employeeLeaveTypes.map((x) => ({
-	// 				employeeLeaveType: x.employeeLeaveType,
-	// 				totalLeaves: x.totalLeaves
-	// 			}))
-	// 		);
-	// 	}
-	// }, [employeeLeaveTypes, setValue]);
 
 	const { data: employeesReportToOptions = [] } = useGetApiEmployeesReportToEmployeeListQuery(
 		{
@@ -115,6 +74,31 @@ function WorkInfoTab({ UserRole }) {
 
 	const [AddSite] = usePostApiEmployeesAddNewSiteMutation();
 	const [AddDesignation] = usePostApiEmployeesAddNewDesignationMutation();
+
+	useEffect(() => {
+		if (selectedJobLevel) {
+			fetchDefaultLeaves(selectedJobLevel);
+		}
+	}, [selectedJobLevel]);
+
+	const fetchDefaultLeaves = async (jobLevelId) => {
+		try {
+			const result = await getDefaultLeaves({ jobLevelId }).unwrap();
+
+			if (useDefaultLeaves) {
+				setValue(
+					'employeeLeaves',
+					result.map((lt) => ({
+						employeeLeaveTypeId: lt.employeeLeaveTypeId,
+						employeeLeaveType: lt.employeeLeaveTypes.name,
+						totalLeaves: lt.totalLeaves
+					}))
+				);
+			}
+		} catch (error) {
+			console.error('Error fetching default leaves:', error);
+		}
+	};
 
 	const handleOptionAdd = async (newOption: Omit<Option, 'id'>) => {
 		try {
@@ -138,9 +122,9 @@ function WorkInfoTab({ UserRole }) {
 		}
 	};
 
-	if (designationLoading || siteLoading || departmentLoading) {
+	if (designationLoading || siteLoading || departmentLoading || jobLevelsLoading || defaultLeavesLoading) {
 		return (
-			<div className="flex  justify-center h-screen w-screen">
+			<div className="flex justify-center h-screen w-screen">
 				<FuseLoading />
 			</div>
 		);
@@ -148,6 +132,7 @@ function WorkInfoTab({ UserRole }) {
 
 	return (
 		<div className="space-y-48">
+			{/* Job profile section */}
 			<div className="space-y-16">
 				<div className="flex items-center border-b-1 space-x-8 pb-8">
 					<FuseSvgIcon
@@ -294,6 +279,7 @@ function WorkInfoTab({ UserRole }) {
 				/>
 			</div>
 
+			{/* Salary Information section */}
 			<div className="space-y-16">
 				<div className="flex items-center border-b-1 space-x-8 pb-8">
 					<FuseSvgIcon
@@ -513,6 +499,7 @@ function WorkInfoTab({ UserRole }) {
 				</div>
 			</div>
 
+			{/* Hiring Information section */}
 			<div className="space-y-16">
 				<div className="flex items-center border-b-1 space-x-8 pb-8">
 					<FuseSvgIcon
@@ -535,7 +522,7 @@ function WorkInfoTab({ UserRole }) {
 						name="employeeWorkInformation.hireDate"
 						render={({ field: { value, onChange } }) => (
 							<DatePicker
-								value={new Date(value)}
+							value={value ? new Date(value) : new Date()}
 								onChange={(val) => {
 									onChange(val?.toISOString());
 								}}
@@ -612,6 +599,7 @@ function WorkInfoTab({ UserRole }) {
 					/>
 				</div>
 			</div>
+			{/* Leave Information section */}
 			<div className="space-y-16">
 				<div className="flex items-center border-b-1 space-x-8 pb-8">
 					<FuseSvgIcon
@@ -657,10 +645,10 @@ function WorkInfoTab({ UserRole }) {
 								{...field}
 								labelId="job-level-select-label"
 								label="Job Level"
-								value={field.value || jobLevels[1]?.id}
+								value={field.value || ''}
 								onChange={(e) => {
 									field.onChange(e.target.value);
-									setSelectedJobLevel(jobLevels.find((jl) => jl.id === parseInt(e.target.value, 10)));
+									setSelectedJobLevel(e.target.value);
 								}}
 							>
 								{jobLevels.map((jobLevel) => (
@@ -668,7 +656,7 @@ function WorkInfoTab({ UserRole }) {
 										key={jobLevel.id}
 										value={jobLevel.id}
 									>
-										{jobLevel.name}
+										{jobLevel.jobLevel}
 									</MenuItem>
 								))}
 							</Select>
@@ -721,7 +709,6 @@ function WorkInfoTab({ UserRole }) {
 									type="button"
 									onClick={() => remove(index)}
 								>
-									{' '}
 									<DeleteIcon />
 								</IconButton>
 							)}

@@ -11,6 +11,7 @@ using WorkManagement.Domain.Contracts;
 using WorkManagement.Domain.Entity;
 using WorkManagement.Domain.Entity.EmployeeLeaveTables;
 using WorkManagement.Domain.Models;
+using WorkManagement.Domain.Models.Dropdown;
 using WorkManagement.Domain.Models.Employee;
 using WorkManagement.Service;
 using WorkManagementSolution.Employee;
@@ -366,7 +367,47 @@ namespace WorkManagement.API.Controllers
             return File(memory, GetContentType(filePath), fileName);
         }
 
+        [HttpPost("settings/addDropdownItem")]
+        public async Task<IActionResult> AddDropdownItem([FromBody] DropdownModel model)
+        {
+            try
+            {
+                var newItem = await employeeService.AddDropdownItem(model);
+                return Ok(newItem);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
 
+        [HttpDelete("settings/deleteDropdownItem/{id}")]
+        public async Task<IActionResult> DeleteDropdownItem(int id)
+        {
+            try
+            {
+                await employeeService.DeleteDropdownItem(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpPut("settings/ updateDropdownItem")]
+        public async Task<IActionResult> UpdateDropdownItem([FromBody] DropdownModel model)
+        {
+            try
+            {
+                var updatedItem = await employeeService.UpdateDropdownItem(model);
+                return Ok(updatedItem);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
 
         private string GetContentType(string path)
         {

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WorkManagmentSolution.EFCore;
 
@@ -11,9 +12,11 @@ using WorkManagmentSolution.EFCore;
 namespace WorkManagement.EFCore.Migrations
 {
     [DbContext(typeof(WorkManagementDbContext))]
-    partial class WorkManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241205093851_addijobLlevalInDefaultLeave")]
+    partial class addijobLlevalInDefaultLeave
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -280,7 +283,7 @@ namespace WorkManagement.EFCore.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("JobLevelLeaveId")
+                    b.Property<int?>("JobLevelLeaveType")
                         .HasColumnType("int");
 
                     b.Property<int>("TotalLeaves")
@@ -289,8 +292,6 @@ namespace WorkManagement.EFCore.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("EmployeeLeaveTypeId");
-
-                    b.HasIndex("JobLevelLeaveId");
 
                     b.ToTable("EmployeeDefaultLeave");
 
@@ -574,26 +575,6 @@ namespace WorkManagement.EFCore.Migrations
                             IsPaid = true,
                             Name = "Compensatory Leave"
                         });
-                });
-
-            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.JobLevelLeave", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("JobLevel")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("JobLevelLeave");
                 });
 
             modelBuilder.Entity("WorkManagement.Domain.Entity.Project", b =>
@@ -1343,13 +1324,7 @@ namespace WorkManagement.EFCore.Migrations
                         .WithMany()
                         .HasForeignKey("EmployeeLeaveTypeId");
 
-                    b.HasOne("WorkManagement.Domain.Entity.EmployeeLeaveTables.JobLevelLeave", "JobLevelLeaves")
-                        .WithMany()
-                        .HasForeignKey("JobLevelLeaveId");
-
                     b.Navigation("EmployeeLeaveTypes");
-
-                    b.Navigation("JobLevelLeaves");
                 });
 
             modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeave", b =>
