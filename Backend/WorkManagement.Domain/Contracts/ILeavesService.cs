@@ -18,6 +18,7 @@ namespace WorkManagement.Domain.Contracts
         public Task<List<EmployeeDefaultLeaveSummary>> GetDefaultLeaveSummaries(int jobLevelId);
         public Task<List<JobLevelLeave>> GetJobLevels();
         public Task<bool> UpdateDefaultLeave(List<DefaultLeaveModel> defaultLeaves);
+        public Task<bool> DeleteDefaultLeaveAsync(int defaultLeaveSummaryId);
 
 
         Task<bool> AddHoliday(List<EmployeeHoliday> holidays);

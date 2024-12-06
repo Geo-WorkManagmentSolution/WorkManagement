@@ -2,7 +2,6 @@ import { lazy } from 'react';
 // import { Navigate } from 'react-router-dom';
 import { FuseRouteItemType } from '@fuse/utils/FuseUtils';
 import DropDownForm from './tabs/DropDownForm';
-import settingsConfig from 'app/configs/settingsConfig';
 
 const SettingsApp = lazy(() => import('./SettingsApp'));
 const DefaultLeaveForm = lazy(() => import('./tabs/DefaultLeaveForm'));
@@ -17,9 +16,8 @@ const SettingsAppRoute: FuseRouteItemType = {
 	children: [
 		{
 			path: 'dropdown',
-			element:<DropDownForm/>
-		}
-	,
+			element: <DropDownForm />
+		},
 		{
 			path: 'default-leave',
 			element: <DefaultLeaveForm />

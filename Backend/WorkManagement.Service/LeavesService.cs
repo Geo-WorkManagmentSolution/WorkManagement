@@ -172,6 +172,22 @@ namespace WorkManagement.Service
                 return false;
             }
         }
+
+        public async Task<bool> DeleteDefaultLeaveAsync(int defaultLeaveSummaryId)
+        {
+            var defaultLeave = await _dbContext.EmployeeDefaultLeave
+                .FirstOrDefaultAsync(dl => dl.Id == defaultLeaveSummaryId);
+
+            if (defaultLeave == null)
+            {
+                return false;
+            }
+
+            _dbContext.EmployeeDefaultLeave.Remove(defaultLeave);
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<bool> AddHoliday(List<EmployeeHoliday> holidays)
         {
             try

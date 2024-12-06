@@ -7,16 +7,21 @@ import FuseLoading from '@fuse/core/FuseLoading';
 import { showMessage } from '@fuse/core/FuseMessage/fuseMessageSlice';
 import { useDispatch } from 'react-redux';
 import {
-	usePutApiLeavesSettingsDefaultLeavesMutation,
 	useGetApiLeavesJoblevelsQuery,
 	useLazyGetApiLeavesDefaultLeavesByJobLevelIdQuery
 } from '../../employee/leave-management/LeavesApi';
+import {
+	DefaultLeaveModel,
+	useDeleteApiLeavesSettingsDefaultLeavesByIdMutation,
+	usePutApiLeavesSettingsDefaultLeavesMutation
+} from '../SettingsApi';
 
-interface DefaultLeaveModel {
-	name: string;
-	jobLevelLeaveTypeId: number;
-	totalLeaves: number;
-}
+// interface DefaultLeaveModel {
+//     id: number;
+//     name: string;
+//     jobLevelLeaveTypeId: number;
+//     totalLeaves: number;
+// }
 
 function DefaultLeaveForm() {
 	const [selectedJobLevel, setSelectedJobLevel] = useState<number | null>(null);
@@ -29,9 +34,10 @@ function DefaultLeaveForm() {
 	const [updateDefaultLeaves, { isLoading: isUpdating }] = usePutApiLeavesSettingsDefaultLeavesMutation();
 	const [getDefaultLeaves, { isLoading: isLoadingDefaultLeaves }] =
 		useLazyGetApiLeavesDefaultLeavesByJobLevelIdQuery();
+	const [deleteDefaultLeave, { isLoading: isDeleting }] = useDeleteApiLeavesSettingsDefaultLeavesByIdMutation();
 
 	useEffect(() => {
-		if (selectedJobLevel !== null) {
+		if (selectedJobLevel) {
 			fetchDefaultLeaves(selectedJobLevel);
 		}
 	}, [selectedJobLevel]);
@@ -39,11 +45,16 @@ function DefaultLeaveForm() {
 	const fetchDefaultLeaves = async (jobLevelId: number) => {
 		try {
 			const result = await getDefaultLeaves({ jobLevelId }).unwrap();
+			console.log("result of default leave",result);
+			
 			const formattedLeaveTypes = result.map((leave) => ({
+				id: leave.id,
 				name: leave.employeeLeaveTypes?.name || '',
 				jobLevelLeaveTypeId: leave.jobLevelLeaveId || 0,
 				totalLeaves: leave.totalLeaves
 			}));
+			console.log("formatted leave types",formattedLeaveTypes);
+			
 			setLeaveTypes(formattedLeaveTypes);
 			setOriginalLeaveTypes(formattedLeaveTypes);
 		} catch (error) {
@@ -84,9 +95,35 @@ function DefaultLeaveForm() {
 		setHasUnsavedChanges(true);
 	};
 
-	const handleRemoveField = (index: number) => {
-		setLeaveTypes(leaveTypes.filter((_, i) => i !== index));
-		setHasUnsavedChanges(true);
+	const handleRemoveField = async (index: number) => {
+		const leaveToRemove = leaveTypes[index];
+		console.log("Id oof leave to remove",leaveToRemove.id);
+		
+		try {
+			await deleteDefaultLeave({ id: leaveToRemove.id }).unwrap();
+
+			const updatedLeaveTypes = leaveTypes.filter((_, i) => i !== index);
+			setLeaveTypes(updatedLeaveTypes);
+			setOriginalLeaveTypes(updatedLeaveTypes);
+			dispatch(
+				showMessage({
+					message: 'Default leave removed successfully',
+					autoHideDuration: 6000,
+					anchorOrigin: { vertical: 'top', horizontal: 'center' },
+					variant: 'success'
+				})
+			);
+		} catch (error) {
+			console.error('Error removing default leave:', error);
+			dispatch(
+				showMessage({
+					message: 'Failed to remove default leave',
+					autoHideDuration: 6000,
+					anchorOrigin: { vertical: 'top', horizontal: 'center' },
+					variant: 'error'
+				})
+			);
+		}
 	};
 
 	const handleAddField = () => {
@@ -94,6 +131,7 @@ function DefaultLeaveForm() {
 			setLeaveTypes([
 				...leaveTypes,
 				{
+					id: 0, // This will be assigned by the backend
 					name: '',
 					jobLevelLeaveTypeId: selectedJobLevel,
 					totalLeaves: 0
@@ -150,7 +188,7 @@ function DefaultLeaveForm() {
 		setHasUnsavedChanges(false);
 	};
 
-	if (isLoadingJobLevels || isUpdating || isLoadingDefaultLeaves) return <FuseLoading />;
+	if (isLoadingJobLevels || isUpdating || isLoadingDefaultLeaves || isDeleting) return <FuseLoading />;
 
 	return (
 		<div>
@@ -181,7 +219,7 @@ function DefaultLeaveForm() {
 						<Select
 							labelId="job-level-select-label"
 							id="job-level-select"
-							value={selectedJobLevel || jobLevels[0]?.id}
+							value={selectedJobLevel || ''}
 							label="Job Level"
 							onChange={handleJobLevelChange}
 						>
@@ -260,4 +298,3 @@ function DefaultLeaveForm() {
 }
 
 export default DefaultLeaveForm;
-

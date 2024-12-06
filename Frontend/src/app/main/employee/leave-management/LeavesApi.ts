@@ -90,6 +90,15 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.body,
       }),
     }),
+    deleteApiLeavesSettingsDefaultLeavesById: build.mutation<
+      DeleteApiLeavesSettingsDefaultLeavesByIdApiResponse,
+      DeleteApiLeavesSettingsDefaultLeavesByIdApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Leaves/settings/default-leaves/${queryArg.id}`,
+        method: "DELETE",
+      }),
+    }),
     getApiLeavesJoblevels: build.query<
       GetApiLeavesJoblevelsApiResponse,
       GetApiLeavesJoblevelsApiArg
@@ -153,6 +162,10 @@ export type PutApiLeavesSettingsDefaultLeavesApiResponse =
   /** status 200 OK */ boolean;
 export type PutApiLeavesSettingsDefaultLeavesApiArg = {
   body: DefaultLeaveModel[];
+};
+export type DeleteApiLeavesSettingsDefaultLeavesByIdApiResponse = unknown;
+export type DeleteApiLeavesSettingsDefaultLeavesByIdApiArg = {
+  id: number;
 };
 export type GetApiLeavesJoblevelsApiResponse =
   /** status 200 OK */ JobLevelLeave[];
@@ -229,6 +242,7 @@ export type EmployeeDefaultLeaveSummary = {
   totalLeaves?: number;
 };
 export type DefaultLeaveModel = {
+  id?: number | null;
   name?: string | null;
   jobLevelLeaveTypeId?: number;
   totalLeaves?: number;
@@ -253,6 +267,7 @@ export const {
   useLazyGetApiLeavesDefaultLeavesByJobLevelIdQuery,
   usePostApiLeavesSettingsHolidaysMutation,
   usePutApiLeavesSettingsDefaultLeavesMutation,
+  useDeleteApiLeavesSettingsDefaultLeavesByIdMutation,
   useGetApiLeavesJoblevelsQuery,
   useLazyGetApiLeavesJoblevelsQuery,
   useGetApiLeavesSettingsHolidaysByYearQuery,

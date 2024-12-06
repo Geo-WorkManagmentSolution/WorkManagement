@@ -83,6 +83,18 @@ namespace WorkManagement.API.Controllers
             return BadRequest("Failed to update default leaves");
         }
 
+        [HttpDelete("settings/default-leaves/{id}")]
+        public async Task<IActionResult> DeleteDefaultLeave(int id)
+        {
+            var result = await leavesService.DeleteDefaultLeaveAsync(id);
+            if (result)
+            {
+                return Ok();
+            }
+            return NotFound();
+        }
+
+
         [HttpGet("joblevels")]
         public async Task<ActionResult<List<JobLevelLeave>>> GetjobLevels() { 
             var jobLevels = await leavesService.GetJobLevels();

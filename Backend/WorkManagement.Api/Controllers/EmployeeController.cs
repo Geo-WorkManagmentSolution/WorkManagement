@@ -409,6 +409,7 @@ namespace WorkManagement.API.Controllers
             }
         }
 
+
         private string GetContentType(string path)
         {
             var types = GetMimeTypes();
