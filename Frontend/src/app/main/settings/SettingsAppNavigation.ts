@@ -11,9 +11,9 @@ const SettingsAppNavigation: FuseNavItemType = {
 			id: 'apps.settings.dropdown',
 			icon: 'heroicons-outline:arrow-turn-left-down',
 			title: 'Dropdown Setting',
-			subtitle:"Add or Remove Dropdown Items this will reflect in the dropdown menu",
-			type:'item',
-			url:"/apps/settings/dropdown",
+			subtitle: 'Add , Remove or Update Dropdown Options.',
+			type: 'item',
+			url: '/apps/settings/dropdown'
 		},
 		{
 			id: 'apps.settings.leave-management',
@@ -21,24 +21,24 @@ const SettingsAppNavigation: FuseNavItemType = {
 			title: 'Leave Management',
 			type: 'collapse',
 			// url: '/apps/settings/account',
-			subtitle: 'Add or Remove Default Leave and Holidays',
+			subtitle: 'Add , Remove or Update Default Leaves and Holidays',
 			children: [
 				{
 					id: 'apps.settings.leave-management.default-leave',
-                    title: 'Default Leave',
-                    type: 'item',
-                    url: '/apps/settings/default-leave',
-                    end: true
+					title: 'Default Leave',
+					type: 'item',
+					url: '/apps/settings/default-leave',
+					end: true
 				},
 				{
 					id: 'apps.settings.leave-management.holidays',
 					title: 'Holidays',
-                    type: 'item',
-                    url: '/apps/settings/holidays',
-                    end: true
-				}]
-		},
-		
+					type: 'item',
+					url: '/apps/settings/holidays',
+					end: true
+				}
+			]
+		}
 	]
 };
 

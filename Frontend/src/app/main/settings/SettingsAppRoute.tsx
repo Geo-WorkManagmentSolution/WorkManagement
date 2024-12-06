@@ -1,6 +1,7 @@
 import { lazy } from 'react';
 // import { Navigate } from 'react-router-dom';
 import { FuseRouteItemType } from '@fuse/utils/FuseUtils';
+import { Navigate } from 'react-router';
 import DropDownForm from './tabs/DropDownForm';
 
 const SettingsApp = lazy(() => import('./SettingsApp'));
@@ -25,6 +26,10 @@ const SettingsAppRoute: FuseRouteItemType = {
 		{
 			path: 'holidays',
 			element: <HolidayForm />
+		},
+		{
+			path: '',
+			element: <Navigate to="dropdown" />
 		}
 	]
 };

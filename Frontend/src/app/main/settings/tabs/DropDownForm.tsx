@@ -266,6 +266,8 @@ function DropDownForm() {
 						label={isUpdating ? 'Update Name' : 'Add Name'}
 						value={itemName}
 						onChange={(e) => setItemName(e.target.value)}
+						error={isUpdating &&!itemName.trim()}
+						helperText = {isUpdating && !itemName.trim() ? 'Name is required': ""}
 					/>
 					<Button
 						variant="contained"
