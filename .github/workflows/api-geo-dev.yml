@@ -22,9 +22,6 @@ jobs:
     - name: Install dependencies
       run: npm install
       working-directory: ${{ env.FRONTEND_WORKING_DIRECTORY }}
-    - name: Generate OpenAPI Layer
-      run: npm run genAPIClient
-      working-directory: ${{ env.FRONTEND_WORKING_DIRECTORY }}
     - name: Build React app
       run: npm run build
       working-directory: ${{ env.FRONTEND_WORKING_DIRECTORY }}
