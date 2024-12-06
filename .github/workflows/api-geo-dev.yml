@@ -37,7 +37,7 @@ jobs:
     - name: Download artifact from build job
       uses: actions/download-artifact@v3
       with:
-        name: webapp
+        name: frontend
         path: ${{ env.AZURE_WEBAPP_FRONTEND_PACKAGE_PATH }}
     - name: Deploy to Azure WebApp
       uses: azure/webapps-deploy@v2
@@ -62,7 +62,7 @@ jobs:
     - name: Publish Artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: frontend
+        name: webapp
         path: ${{ env.AZURE_WEBAPP_API_PACKAGE_PATH }}
   deploy-backend:
     runs-on: ubuntu-latest
@@ -72,7 +72,7 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: webapp
-        path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+        path: ${{ env.AZURE_WEBAPP_API_PACKAGE_PATH }}
     - name: Deploy to Azure WebApp
       uses: azure/webapps-deploy@v2
       with:
