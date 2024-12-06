@@ -5,7 +5,7 @@ on:
     - main
 env:
   AZURE_API_WEBAPP_NAME: api-geo-dev
-  AZURE_UI_WEBAPP_NAME: ui-gro-dev
+  AZURE_UI_WEBAPP_NAME: ui-geo-dev
   AZURE_WEBAPP_API_PACKAGE_PATH: Backend/WorkManagement.Api/publish
   AZURE_WEBAPP_FRONTEND_PACKAGE_PATH: Frontend/build
   CONFIGURATION: Release
