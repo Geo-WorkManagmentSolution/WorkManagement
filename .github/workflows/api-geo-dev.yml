@@ -5,6 +5,7 @@ on:
     - main
 env:
   AZURE_API_WEBAPP_NAME: api-geo-dev
+  AZURE_UI_WEBAPP_NAME: ui-gro-dev
   AZURE_WEBAPP_API_PACKAGE_PATH: Backend/WorkManagement.Api/publish
   AZURE_WEBAPP_FRONTEND_PACKAGE_PATH: Frontend/publish
   CONFIGURATION: Release
@@ -44,9 +45,9 @@ jobs:
     - name: Deploy to Azure WebApp
       uses: azure/webapps-deploy@v2
       with:
-        app-name: ${{ env.AZURE_WEBAPP_FRONTEND_PACKAGE_PATH }}
+        app-name: ${{ env.AZURE_UI_WEBAPP_NAME }}
         publish-profile: ${{ secrets.AZURE_WEBAPP_UI_PUBLISH_PROFILE }}
-        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+        package: ${{ env.AZURE_WEBAPP_FRONTEND_PACKAGE_PATH }}
   build-backend:
     runs-on: ubuntu-latest
     steps:
