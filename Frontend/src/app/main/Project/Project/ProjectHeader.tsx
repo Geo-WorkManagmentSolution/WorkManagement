@@ -8,6 +8,10 @@ import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import PageBreadcrumb from 'app/shared-components/PageBreadcrumb';
 import { showMessage } from '@fuse/core/FuseMessage/fuseMessageSlice';
 import { useAppDispatch } from 'app/store/hooks';
+import { closeDialog, openDialog } from '@fuse/core/FuseDialog/fuseDialogSlice';
+import React from 'react';
+import { DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import FuseLoading from '@fuse/core/FuseLoading';
 import {
 	ProjectModel,
 	usePostApiProjectMutation,
@@ -23,9 +27,9 @@ function EmployeeHeader() {
 	const { projectId } = routeParams;
 	const dispatch = useAppDispatch();
 
-	const [createProject] = usePostApiProjectMutation();
-	const [updateProject] = usePutApiProjectByIdMutation();
-	const [deleteProject] = useDeleteApiProjectByIdMutation();
+	const [createProject, { isLoading: isCreating }] = usePostApiProjectMutation();
+	const [updateProject, { isLoading: isUpdating }] = usePutApiProjectByIdMutation();
+	const [deleteProject, { isLoading: isDeleting }] = useDeleteApiProjectByIdMutation();
 
 	const methods = useFormContext();
 	const { formState, watch, getValues } = methods;
@@ -35,36 +39,76 @@ function EmployeeHeader() {
 
 	const { projectName } = watch() as ProjectModel;
 
-
 	function handleUpdateProject() {
 		updateProject({
 			id: parseInt(projectId, 10),
 			projectModel: getValues() as ProjectModel
 		})
-		.unwrap()
-		.then((data) => {
-			dispatch(showMessage({ message: "A project updated successfully." }));
-		});
+			.unwrap()
+			.then((data) => {
+				dispatch(showMessage({ message: 'A project updated successfully.' }));
+			});
 	}
-
-	
 
 	function handleCreateProject() {
 		createProject({ projectModel: getValues() as ProjectModel })
 			.unwrap()
 			.then((data) => {
-				dispatch(showMessage({ message: "A project created successfully." }));
+				dispatch(showMessage({ message: 'A project created successfully.' }));
 				navigate(`/apps/projects/projectSearch`);
 			});
 	}
 
-	function handleDeleteProject() {
-		deleteProject({
-			id: parseInt(projectId, 10)
-		});
-		dispatch(showMessage({ message: "A project deleted successfully." }));
-		navigate(`/apps/projects/projectSearch`);
+	const projectDetails = getValues() as ProjectModel;
 
+	function handleDeleteProject() {
+		dispatch(
+			openDialog({
+				children: (
+					<>
+						<DialogTitle id="alert-dialog-title">Are you sure you want to delete this project?</DialogTitle>
+						<DialogContent>
+							<DialogContentText id="alert-dialog-description">
+								<strong>Project number</strong> : {projectDetails.projectNumber} <br />
+								<strong>Project Name </strong>: {projectDetails.projectName}
+							</DialogContentText>
+						</DialogContent>
+						<DialogActions>
+							<Button
+								onClick={() => {
+									dispatch(closeDialog());
+								}}
+								color="primary"
+							>
+								Disagree
+							</Button>
+							<Button
+								onClick={() => {
+									dispatch(closeDialog());
+									deleteProject({
+										id: parseInt(projectId, 10)
+									});
+									dispatch(showMessage({ message: 'A project deleted successfully.' }));
+									navigate(`/apps/projects/projectSearch`);
+								}}
+								color="primary"
+								autoFocus
+							>
+								Agree
+							</Button>
+						</DialogActions>
+					</>
+				)
+			})
+		);
+	}
+
+	if (isCreating || isUpdating || isDeleting) {
+		return (
+			<div className="flex  justify-center h-screen w-screen">
+				<FuseLoading />
+			</div>
+		);
 	}
 
 	return (
@@ -91,7 +135,7 @@ function EmployeeHeader() {
 						animate={{ x: 0, transition: { delay: 0.3 } }}
 					>
 						<Typography className="text-15 sm:text-2xl truncate font-semibold">
-							{ projectName || 'New Project'}
+							{projectName || 'New Project'}
 						</Typography>
 						{/* <Typography
 							variant="caption"
@@ -128,15 +172,15 @@ function EmployeeHeader() {
 						</Button>
 					</>
 				) : (
-						<Button
-							className="whitespace-nowrap mx-4"
-							variant="contained"
-							color="secondary"
-							disabled={_.isEmpty(dirtyFields) || !isValid}
-							onClick={handleCreateProject}
-						>
-							Add
-						</Button>
+					<Button
+						className="whitespace-nowrap mx-4"
+						variant="contained"
+						color="secondary"
+						disabled={_.isEmpty(dirtyFields) || !isValid}
+						onClick={handleCreateProject}
+					>
+						Add
+					</Button>
 				)}
 			</motion.div>
 		</div>

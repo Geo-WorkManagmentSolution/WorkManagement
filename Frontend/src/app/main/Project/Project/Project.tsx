@@ -17,14 +17,16 @@ import * as yup from 'yup';
 import EmployeeHeader from './ProjectHeader';
 import BasicProjectInfoTab from './tabs/BasicProjectInfoTab';
 import { useGetApiProjectByIdQuery } from '../ProjectApi';
-
+import WorkOrderDocuments from './tabs/WorkOrderDocuments';
 
 const projectSchema = yup.object({
 	projectName: yup.string().min(1, 'Project name is required').required(),
 	projectNumber: yup.string().nullable(),
 	projectDescription: yup.string().nullable(),
-	startDate: yup.date().required('Start of birth is required'),
-	endDate: yup.date().nullable()
+	startDate: yup.date().required('Start Date is required'),
+	endDate: yup .date().nullable()
+	.when('startDate', (startDate, schema) => { return startDate && schema.min(startDate, 'End Date must be later than Start Date'); }),
+	// workOrderNumber:yup.string().min(1, 'Work Order Number is required').required(),
 });
 
 // The product page.
@@ -123,7 +125,7 @@ function Project() {
 			<FusePageCarded
 				header={<EmployeeHeader />}
 				content={
-					<div className="p-16 sm:p-24 max-w-3xl space-y-24">
+					<div className="p-16 sm:p-24 space-y-24">
 						<FuseTabs
 							value={tabValue}
 							onChange={handleTabChange}
@@ -132,10 +134,17 @@ function Project() {
 								value="basic-project-info"
 								label="Project Info"
 							/>
+							<FuseTab
+								value="work-order-documents"
+								label="Work Order Documents"
+							/>
 						</FuseTabs>
 						<div className="">
 							<div className={tabValue !== 'basic-project-info' ? 'hidden' : ''}>
 								<BasicProjectInfoTab />
+							</div>
+							<div className={tabValue !== 'work-order-documents' ? 'hidden': ''}>
+								<WorkOrderDocuments />
 							</div>
 						</div>
 					</div>

@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.IO;
 using WorkManagement.Domain.Contracts;
 using WorkManagement.Domain.Entity;
 using WorkManagement.Domain.Models;
+
 using WorkManagement.Domain.Models.Employee;
 using WorkManagement.Domain.Models.Project;
 using WorkManagement.Service;
@@ -88,5 +90,43 @@ namespace WorkManagement.API.Controllers
             }
             return NoContent();
         }
+
+        [HttpPost("upload/{projectId}")]
+        public async Task<ActionResult<ProjectWorkOrders>> CreateWorkOrderDocument(int projectId, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("File is required");
+            }
+
+            var document = await _projectService.CreateWorkOrderDocumentAsync(projectId, file);
+            return CreatedAtAction(nameof(DownloadWorkOrderDocument), new { documentId = document.Id }, document);
+        }
+
+        [HttpDelete("remove/{documentId}")]
+        public async Task<IActionResult> DeleteWorkOrderDocument(int documentId)
+        {
+            var result = await _projectService.DeleteWorkOrderDocumentAsync(documentId);
+            if (!result)
+            {
+                return NotFound();
+            }
+            return NoContent();
+        }
+
+        [HttpGet("download/{documentId}")]
+        public async Task<IActionResult> DownloadWorkOrderDocument(int documentId)
+        {
+            var fileResult = await _projectService.DownloadWorkOrderDocumentAsync(documentId);
+            return File(fileResult.FileStream, fileResult.ContentType, fileResult.FileName);
+        }
+
+        [HttpGet("project/{projectId}")]
+        public async Task<ActionResult<IEnumerable<ProjectWorkOrders>>> GetWorkOrderDocuments(int projectId)
+        {
+            var documents = await _projectService.GetWorkOrderDocumentsAsync(projectId);
+            return Ok(documents);
+        }
+
     }
 }

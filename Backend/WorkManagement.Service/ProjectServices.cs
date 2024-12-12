@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+
 using WorkManagement.Domain.Entity;
 using WorkManagement.Domain.Models.Project;
 using WorkManagementSolution.Employee;
@@ -32,7 +34,16 @@ namespace WorkManagement.Service
                                     ProjectNumber = string.IsNullOrEmpty(p.ProjectNumber) ? "" : p.ProjectNumber.Trim(),
                                     ProjectDescription = string.IsNullOrEmpty(p.ProjectDescription) ? "" : p.ProjectDescription.Trim(),
                                     StartDate = p.StartDate,
-                                    EndDate = p.EndDate
+                                    EndDate = p.EndDate,
+                                    WorkOrderName=p.WorkOrderName,
+                                    WorkOrderNumber = p.WorkOrderNumber,
+                                    WorkOrderDate = p.WorkOrderDate,
+                                    PeriodOfWorkInMonths=p.PeriodOfWorkInMonths,
+                                    Status=p.Status,
+                                    WorkOrderAmount=p.WorkOrderAmount,
+                                    
+                                    
+
                                 }).ToList();
 
                 return projects;
@@ -57,7 +68,14 @@ namespace WorkManagement.Service
                                     ProjectNumber = string.IsNullOrEmpty(p.ProjectNumber) ? "" : p.ProjectNumber.Trim(),
                                     ProjectDescription = string.IsNullOrEmpty(p.ProjectDescription) ? "" : p.ProjectDescription.Trim(),
                                     StartDate = p.StartDate,
-                                    EndDate = p.EndDate
+                                    EndDate = p.EndDate,
+                                    WorkOrderName = p.WorkOrderName,
+                                    WorkOrderNumber = p.WorkOrderNumber,
+                                    WorkOrderDate = p.WorkOrderDate,
+                                    PeriodOfWorkInMonths = p.PeriodOfWorkInMonths,
+                                    Status = p.Status,
+                                    WorkOrderAmount = p.WorkOrderAmount,
+
 
                                 }).FirstOrDefault();
 
@@ -83,11 +101,20 @@ namespace WorkManagement.Service
                 project.ProjectDescription = projectData.ProjectDescription;
                 project.StartDate = projectData.StartDate;
                 project.EndDate = projectData.EndDate;
+                project.WorkOrderName = projectData.WorkOrderNumber;
+                project.WorkOrderNumber = projectData.WorkOrderNumber;
+                project.WorkOrderDate = projectData.WorkOrderDate;
+                project.PeriodOfWorkInMonths = projectData.PeriodOfWorkInMonths;
+                project.Status = projectData.Status;
+                project.WorkOrderAmount = projectData.WorkOrderAmount;
+                
                 project.CreatedBy = user.Id;
                 project.CreatedOn = DateTime.Now;
                 project.LastModifiedBy = user.Id;
                 project.LastModifiedOn = DateTime.Now;
 
+                
+                
                 _dbContext.Projects.Add(project);
 
                 _dbContext.SaveChanges();
@@ -116,6 +143,12 @@ namespace WorkManagement.Service
                 existingProject.ProjectDescription = projectData.ProjectDescription;
                 existingProject.StartDate = projectData.StartDate;
                 existingProject.EndDate = projectData.EndDate;
+                existingProject.WorkOrderName = projectData.WorkOrderNumber;
+                existingProject.WorkOrderNumber = projectData.WorkOrderNumber;
+                existingProject.WorkOrderDate = projectData.WorkOrderDate;
+                existingProject.PeriodOfWorkInMonths = projectData.PeriodOfWorkInMonths;
+                existingProject.Status = projectData.Status;
+                existingProject.WorkOrderAmount = projectData.WorkOrderAmount;
                 existingProject.LastModifiedBy = user.Id;
                 existingProject.LastModifiedOn = DateTime.Now;
 
@@ -167,6 +200,98 @@ namespace WorkManagement.Service
 
         }
 
+        public async Task<ProjectWorkOrders> CreateWorkOrderDocumentAsync(int projectId, IFormFile file)
+        {
+            var project = await _dbContext.Projects.FindAsync(projectId);
+            if (project == null)
+            {
+                throw new Exception("Project not found");
+            }
+
+            var fileName = $"{Guid.NewGuid()}_{file.FileName}";
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles");
+
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            var filePath = Path.Combine(uploadsFolder, fileName);
+            byte[] fileContent;
+            using (var memoryStream = new MemoryStream()) { await file.CopyToAsync(memoryStream); fileContent = memoryStream.ToArray(); }
+
+            var workOrderDocument = new ProjectWorkOrders
+            {
+                FileName = file.FileName,
+                FilePath = filePath,
+                FileSize = (int)file.Length,
+                FileContent = fileContent,
+                FileType = GetFileType(file.ContentType),
+                ProjectId = projectId
+            };
+
+
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+                
+            }
+
+            _dbContext.WorkOrderDocuments.Add(workOrderDocument);
+            await _dbContext.SaveChangesAsync();
+
+            return workOrderDocument;
+        }
+
+        public async Task<bool> DeleteWorkOrderDocumentAsync(int documentId)
+        {
+            var document = await _dbContext.WorkOrderDocuments.FindAsync(documentId);
+            if (document == null)
+            {
+                return false;
+            }
+
+            var uploadsFolder = EnsureUploadsFolderExists();
+            var filePath = Path.Combine(uploadsFolder, Path.GetFileName(document.FilePath));
+
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
+
+            _dbContext.WorkOrderDocuments.Remove(document);
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<(FileStream FileStream, string ContentType, string FileName)> DownloadWorkOrderDocumentAsync(int documentId)
+        {
+            var document = await _dbContext.WorkOrderDocuments.FindAsync(documentId);
+            if (document == null)
+            {
+                throw new Exception("Document not found");
+            }
+
+            var uploadsFolder = EnsureUploadsFolderExists();
+            var filePath = Path.Combine(uploadsFolder, Path.GetFileName(document.FilePath));
+
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException("File not found on the server");
+            }
+
+            var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            return (fileStream, GetContentType(document.FileType), document.FileName);
+        }
+
+        public async Task<List<ProjectWorkOrders>> GetWorkOrderDocumentsAsync(int projectId)
+        {
+            return await _dbContext.WorkOrderDocuments
+                .Where(d => d.ProjectId == projectId)
+                .ToListAsync();
+        }
+
         #region Private Methods
 
         private ProjectModel GetProjectByName(string projectName)
@@ -185,6 +310,38 @@ namespace WorkManagement.Service
             return projects;
         }
 
+        
+        private FileType GetFileType(string contentType)
+        {
+            // Will add other types
+            if (contentType.StartsWith("image/"))
+                return FileType.Other;
+            if (contentType == "application/pdf")
+                return FileType.PDF;
+            return FileType.Other;
+        }
+
+        private string GetContentType(FileType? fileType)
+        {
+            switch (fileType)
+            {
+                case FileType.Other:
+                    return "image/jpeg";
+                case FileType.PDF:
+                    return "application/pdf";
+                default:
+                    return "application/octet-stream";
+            }
+        }
+        private string EnsureUploadsFolderExists()
+        {
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles");
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+            return uploadsFolder;
+        }
         #endregion
     }
 }

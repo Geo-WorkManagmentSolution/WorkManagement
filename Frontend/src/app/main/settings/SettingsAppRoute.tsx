@@ -2,6 +2,7 @@ import { lazy } from 'react';
 // import { Navigate } from 'react-router-dom';
 import { FuseRouteItemType } from '@fuse/utils/FuseUtils';
 import { Navigate } from 'react-router';
+import { authRoles } from 'src/app/auth';
 import DropDownForm from './tabs/DropDownForm';
 
 const SettingsApp = lazy(() => import('./SettingsApp'));
@@ -14,6 +15,7 @@ const HolidayForm = lazy(() => import('./tabs/HolidayForm'));
 const SettingsAppRoute: FuseRouteItemType = {
 	path: 'apps/settings',
 	element: <SettingsApp />,
+	auth: authRoles.admin,
 	children: [
 		{
 			path: 'dropdown',

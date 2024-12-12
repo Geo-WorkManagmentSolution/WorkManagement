@@ -13,7 +13,7 @@ using WorkManagmentSolution.EFCore;
 
 namespace WorkManagement.Service
 {
-    public class EmployeeService : IEmployeeService
+    public class EmployeeService :  IEmployeeService
     {
         private readonly WorkManagementDbContext _dbContext;
         private readonly IMapper mapper;
@@ -1094,7 +1094,7 @@ namespace WorkManagement.Service
             return retunrFilePath;
         }
 
-        public async Task<string> UpdateEmployeeDocumentData(int id, string fileName,FileType fileType,long fileSize, string filePath)
+        public async Task<string> UpdateEmployeeDocumentData(int id, string fileName,FileType fileType,long fileSize, string filePath, byte[] fileContent)
         {
             var employee = _dbContext.Employees.FirstOrDefault(s => s.Id == id && !s.IsDeleted);
             if (employee != null)
@@ -1108,6 +1108,7 @@ namespace WorkManagement.Service
                     employeeDocument.FilePath = filePath;
                     employeeDocument.FileSize = (int)fileSize;
                     employeeDocument.FileType = fileType;
+                    employeeDocument.FileContent = fileContent;
                     employeeDocument.IsDeleted = false;
                     
 

@@ -40,7 +40,7 @@ namespace WorkManagement.Domain.Contracts
         public Task<EmployeeModel> UpdateEmployeeAsync(int id, EmployeeModel employee);
         public Task<bool> DeleteEmployeeAsync(int id);
         public Task<string> GetEmployeeDocumentFileName(int id, string fileName);
-        public Task<string> UpdateEmployeeDocumentData(int id, string fileName, FileType fileType, long fileSize, string filePath);
+        public Task<string> UpdateEmployeeDocumentData(int id, string fileName, FileType fileType, long fileSize, string filePath, byte[] fileContent);
         public string GetEmployeeFilePath(int id, string fileName);
         public Task<bool> DeleteEmployeeFile(int employeeId, string fileName);
         #endregion        

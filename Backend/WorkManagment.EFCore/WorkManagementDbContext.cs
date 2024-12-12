@@ -37,6 +37,8 @@ namespace WorkManagmentSolution.EFCore
         public virtual DbSet<Project> Projects { get; set; }
         public virtual DbSet<ProjectEmployee> ProjectEmployees { get; set; }
 
+        public virtual DbSet<ProjectWorkOrders> WorkOrderDocuments { get; set; }
+
         public virtual DbSet<EmployeeLeaveSummary> EmployeeLeaveSummary { get; set; }
         public virtual DbSet<EmployeeDefaultLeaveSummary> EmployeeDefaultLeave { get; set; }
         public virtual DbSet<EmployeeLeaveType> EmployeeLeaveType { get; set; }
@@ -44,6 +46,7 @@ namespace WorkManagmentSolution.EFCore
         public virtual DbSet<EmployeeHoliday> EmployeeHolidays { get; set; }
 
         public virtual DbSet<JobLevelLeave> JobLevelLeave { get; set; }
+
 
 
         public IHttpContextAccessor HttpContextAccessor { get; }

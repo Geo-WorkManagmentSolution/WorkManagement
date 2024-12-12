@@ -39,6 +39,41 @@ const injectedRtkApi = api.injectEndpoints({
         method: "DELETE",
       }),
     }),
+    postApiProjectUploadByProjectId: build.mutation<
+      PostApiProjectUploadByProjectIdApiResponse,
+      PostApiProjectUploadByProjectIdApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Project/upload/${queryArg.projectId}`,
+        method: "POST",
+        body: queryArg.body,
+      }),
+    }),
+    deleteApiProjectRemoveByDocumentId: build.mutation<
+      DeleteApiProjectRemoveByDocumentIdApiResponse,
+      DeleteApiProjectRemoveByDocumentIdApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Project/remove/${queryArg.documentId}`,
+        method: "DELETE",
+      }),
+    }),
+    getApiProjectDownloadByDocumentId: build.query<
+      GetApiProjectDownloadByDocumentIdApiResponse,
+      GetApiProjectDownloadByDocumentIdApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Project/download/${queryArg.documentId}`,
+      }),
+    }),
+    getApiProjectProjectByProjectId: build.query<
+      GetApiProjectProjectByProjectIdApiResponse,
+      GetApiProjectProjectByProjectIdApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Project/project/${queryArg.projectId}`,
+      }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -62,6 +97,27 @@ export type DeleteApiProjectByIdApiResponse = unknown;
 export type DeleteApiProjectByIdApiArg = {
   id: number;
 };
+export type PostApiProjectUploadByProjectIdApiResponse =
+  /** status 200 OK */ ProjectWorkOrders;
+export type PostApiProjectUploadByProjectIdApiArg = {
+  projectId: number;
+  body: {
+    file?: Blob;
+  };
+};
+export type DeleteApiProjectRemoveByDocumentIdApiResponse = unknown;
+export type DeleteApiProjectRemoveByDocumentIdApiArg = {
+  documentId: number;
+};
+export type GetApiProjectDownloadByDocumentIdApiResponse = unknown;
+export type GetApiProjectDownloadByDocumentIdApiArg = {
+  documentId: number;
+};
+export type GetApiProjectProjectByProjectIdApiResponse =
+  /** status 200 OK */ ProjectWorkOrders[];
+export type GetApiProjectProjectByProjectIdApiArg = {
+  projectId: number;
+};
 export type ProjectModel = {
   id?: number;
   projectName?: string | null;
@@ -69,6 +125,12 @@ export type ProjectModel = {
   projectDescription?: string | null;
   startDate?: string;
   endDate?: string | null;
+  workOrderNumber?: string | null;
+  workOrderName?: string | null;
+  workOrderAmount?: number | null;
+  periodOfWorkInMonths?: number | null;
+  status?: ProjectStatus;
+  workOrderDate?: string | null;
 };
 export type EmployeePersonalDetailsModel = {
   dateOfBirth?: string | null;
@@ -185,6 +247,43 @@ export type EmployeeModel = {
   employeeDocuments?: EmployeeDocumentsModel[] | null;
   employeeLeaves?: EmployeeLeaveSummaryModel[] | null;
 };
+export type Project = {
+  id?: number;
+  createdBy?: string;
+  createdOn?: string;
+  lastModifiedBy?: string | null;
+  lastModifiedOn?: string;
+  isDeleted?: boolean;
+  projectName: string;
+  projectNumber?: string | null;
+  projectDescription?: string | null;
+  workOrderNumber?: string | null;
+  workOrderName?: string | null;
+  workOrderAmount?: number | null;
+  periodOfWorkInMonths?: number | null;
+  status?: ProjectStatus;
+  startDate: string;
+  endDate?: string | null;
+  workOrderDate?: string | null;
+};
+export type ProjectWorkOrders = {
+  id?: number;
+  isDeleted?: boolean;
+  fileName?: string | null;
+  filePath?: string | null;
+  fileSize?: number | null;
+  fileContent?: string | null;
+  fileType?: FileType;
+  projectId?: number | null;
+  project?: Project;
+};
+export enum ProjectStatus {
+  Upcoming = "Upcoming",
+  Ongoing = "Ongoing",
+  Completed = "Completed",
+  OnHold = "OnHold",
+  Closed = "Closed",
+}
 export enum MaritalStatus {
   Unknown = "Unknown",
   Single = "Single",
@@ -238,4 +337,10 @@ export const {
   useLazyGetApiProjectByIdQuery,
   usePutApiProjectByIdMutation,
   useDeleteApiProjectByIdMutation,
+  usePostApiProjectUploadByProjectIdMutation,
+  useDeleteApiProjectRemoveByDocumentIdMutation,
+  useGetApiProjectDownloadByDocumentIdQuery,
+  useLazyGetApiProjectDownloadByDocumentIdQuery,
+  useGetApiProjectProjectByProjectIdQuery,
+  useLazyGetApiProjectProjectByProjectIdQuery,
 } = injectedRtkApi;

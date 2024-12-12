@@ -4,12 +4,13 @@ import Typography from '@mui/material/Typography';
 import { motion } from 'framer-motion';
 import { useForm, useFormContext } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
-import _ from '@lodash';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import PageBreadcrumb from 'app/shared-components/PageBreadcrumb';
 import { showMessage } from '@fuse/core/FuseMessage/fuseMessageSlice';
 import { useAppDispatch } from 'app/store/hooks';
 import FuseLoading from '@fuse/core/FuseLoading';
+import { closeDialog, openDialog } from '@fuse/core/FuseDialog/fuseDialogSlice';
+import { DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import {
 	EmployeeModel,
 	usePostApiEmployeesMutation,
@@ -69,19 +70,23 @@ function EmployeeHeader() {
 			});
 	};
 
-	function handleCreateEmployee() {
+	const handleCreateEmployee = async () => {
 		const data = getValues() as EmployeeModel;
-		
+
 		console.log('employeeData: ', data);
 
-		if (_.isEmpty(dirtyFields) || !isValid) {
-			dispatch(
-				showMessage({
-					message: 'Required fields must be filled out',
-					variant: 'warning'
-				})
-			);
-			return;
+		if (!isValid) {
+			await trigger(); // Trigger validation to ensure all errors are shown
+
+			if (Object.keys(errors).length > 0) {
+				dispatch(
+					showMessage({
+						message: 'Required fields must be filled out',
+						variant: 'warning'
+					})
+				);
+				return;
+			}
 		}
 
 		createEmployee({ employeeModel: data })
@@ -98,17 +103,54 @@ function EmployeeHeader() {
 				console.error('Error creating employee:', error);
 				dispatch(showMessage({ message: 'Error creating employee', variant: 'error' }));
 			});
-	}
+	};
 
 	function handleDeleteEmployee() {
-		deleteEmployee({
-			id: parseInt(employeeId, 10)
-		})
-			.unwrap()
-			.then((data) => {
-				dispatch(showMessage({ message: 'An employee deleted successfully.' }));
-				navigate('/apps/employees/employeesSearch');
-			});
+		const employeeData=getValues() as EmployeeModel;
+		dispatch(
+			openDialog({
+				children: (
+					<>
+						<DialogTitle id="alert-dialog-title">Are you sure you want to delete this Employee ?</DialogTitle>
+						<DialogContent>
+							<DialogContentText id="alert-dialog-description">
+								<strong>Employee Number</strong> : {employeeData.employeeNumber} <br />
+								<strong>Employee Name </strong>: {employeeData.firstName} {employeeData.lastName} <br />
+								<strong>Employee Email</strong> : {employeeData.email}
+
+							</DialogContentText>
+						</DialogContent>
+						<DialogActions>
+							<Button
+								onClick={() => {
+									dispatch(closeDialog());
+								}}
+								color="primary"
+							>
+								Cancel
+							</Button>
+							<Button
+								onClick={() => {
+									dispatch(closeDialog());
+									deleteEmployee({
+										id: parseInt(employeeId, 10)
+									})
+										.unwrap()
+										.then((data) => {
+											dispatch(showMessage({ message: 'An employee deleted successfully.' }));
+											navigate('/apps/employees/employeesSearch');
+										});
+								}}
+								color="primary"
+								autoFocus
+							>
+								Yes
+							</Button>
+						</DialogActions>
+					</>
+				)
+			})
+		);
 	}
 
 	if (isCreating || isUpdating || isDeleting) {

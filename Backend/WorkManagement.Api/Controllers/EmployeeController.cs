@@ -320,12 +320,14 @@ namespace WorkManagement.API.Controllers
                             break;
                     }
                 }
+                byte[] fileContent;
+                using (var memoryStream = new MemoryStream()) { await file.CopyToAsync(memoryStream); fileContent = memoryStream.ToArray(); }
 
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     await file.CopyToAsync(stream);
 
-                    await employeeService.UpdateEmployeeDocumentData(id, file.FileName,fileType, file.Length, filePath);
+                    await employeeService.UpdateEmployeeDocumentData(id, file.FileName,fileType, file.Length, filePath,fileContent);
                 }
 
 

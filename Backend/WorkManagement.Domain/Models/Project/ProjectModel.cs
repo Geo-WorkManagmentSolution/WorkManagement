@@ -12,6 +12,13 @@ namespace WorkManagement.Domain.Models.Project
         public string ProjectDescription { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime? EndDate { get; set; }
+        public string? WorkOrderNumber { get; set; }
+        public string? WorkOrderName { get; set; }
+        public double? WorkOrderAmount { get; set; }
+        public int? PeriodOfWorkInMonths { get; set; }
+        public ProjectStatus? Status { get; set; }
+        public DateTime? WorkOrderDate { get; set; }
+
 
 
     }

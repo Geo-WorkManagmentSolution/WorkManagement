@@ -23,7 +23,7 @@ namespace WorkManagement.Domain.Entity
        // public List<ProjectWorkOrders> ProjectWorkOrderDocuments { get; set; }
     }
 
-    public class ProjectWorkOrders:BaseEntity
+    public class ProjectWorkOrders  :BaseEntity
     {
         public string? FileName { get; set; }
         public string? FilePath { get; set; }

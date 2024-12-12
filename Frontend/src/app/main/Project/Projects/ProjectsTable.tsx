@@ -15,6 +15,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { useAppDispatch } from 'app/store/hooks';
 import { closeDialog, openDialog } from '@fuse/core/FuseDialog/fuseDialogSlice';
 import { ProjectModel, useDeleteApiProjectByIdMutation, useGetApiProjectQuery } from '../ProjectApi';
+import { ProjectStatusComponent } from './Projectstatus';
 
 
 function ProjectsTable() {
@@ -52,12 +53,44 @@ function ProjectsTable() {
 			{
 				accessorKey: 'StartDate',
 				header: 'Start Date',
-				accessorFn: (row) => `${row.startDate}`
+				accessorFn: (row) => new Date(row.startDate || '').toLocaleDateString()
 			},
 			{
 				accessorKey: 'EndDate',
 				header: 'End Date',
-				accessorFn: (row) => `${row.endDate}`
+				accessorFn: (row) => new Date(row.endDate || '').toLocaleDateString()
+			},
+			{
+				accessorKey: 'workOrderName',
+                header: 'Work Order Name',
+				accessorFn: (row) => `${row.workOrderName}`
+			},
+			{
+				accessorKey:'workOrderNumber',
+				header: 'Work Order Number',
+                accessorFn: (row) => `${row.workOrderNumber}`
+			},
+			{
+				accessorKey:"PeriodOfWorkInMonths",
+				header: 'Period of Work (in Months)',
+                accessorFn: (row) => `${row.periodOfWorkInMonths}`
+			},
+			{
+				accessorKey: 'status',
+                header: 'Project Status',
+                Cell: ({ row }) => (
+                    <ProjectStatusComponent status={row.original.status} />
+                  )
+			},
+			{
+				accessorKey: 'workOrderAmount',
+                header: 'Work Order Amount',
+                accessorFn: (row) => `$  ${row.workOrderAmount}`
+			},
+			{
+				accessorKey: 'workOrderDate',
+				header: 'Work Order Date',
+                accessorFn: (row) => new Date(row.workOrderDate || '').toLocaleDateString()
 			}
 		],
 		[]
