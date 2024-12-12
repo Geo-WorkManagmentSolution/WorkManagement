@@ -199,98 +199,105 @@ namespace WorkManagement.Service
             }
 
         }
-
-        public async Task<ProjectWorkOrders> CreateWorkOrderDocumentAsync(int projectId, IFormFile file)
+        public string GetProjectFilePath(int id, string fileName)
         {
-            var project = await _dbContext.Projects.FindAsync(projectId);
-            if (project == null)
+            var retunrFilePath = "";
+            var Project = _dbContext.Projects.FirstOrDefault(s => s.Id == id && !s.IsDeleted);
+            if (Project != null)
             {
-                throw new Exception("Project not found");
+                var projectDocument = _dbContext.WorkOrderDocuments.FirstOrDefault(s => s.FileName == fileName && s.ProjectId == id && !s.IsDeleted);
+                if (projectDocument != null)
+                {
+                    retunrFilePath = projectDocument.FilePath;
+                }
             }
 
-            var fileName = $"{Guid.NewGuid()}_{file.FileName}";
-            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles");
-
-            if (!Directory.Exists(uploadsFolder))
-            {
-                Directory.CreateDirectory(uploadsFolder);
-            }
-
-            var filePath = Path.Combine(uploadsFolder, fileName);
-            byte[] fileContent;
-            using (var memoryStream = new MemoryStream()) { await file.CopyToAsync(memoryStream); fileContent = memoryStream.ToArray(); }
-
-            var workOrderDocument = new ProjectWorkOrders
-            {
-                FileName = file.FileName,
-                FilePath = filePath,
-                FileSize = (int)file.Length,
-                FileContent = fileContent,
-                FileType = GetFileType(file.ContentType),
-                ProjectId = projectId
-            };
-
-
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-                
-            }
-
-            _dbContext.WorkOrderDocuments.Add(workOrderDocument);
-            await _dbContext.SaveChangesAsync();
-
-            return workOrderDocument;
+            return retunrFilePath;
         }
 
-        public async Task<bool> DeleteWorkOrderDocumentAsync(int documentId)
+        public async Task<string> UpdateProjectDocumentData(int id, string fileName, FileType fileType, long fileSize, string filePath, byte[] fileContent)
         {
-            var document = await _dbContext.WorkOrderDocuments.FindAsync(documentId);
-            if (document == null)
+            var project = _dbContext.Projects.FirstOrDefault(s => s.Id == id && !s.IsDeleted);
+            if (project != null)
             {
-                return false;
+                var availableProjectDocument = _dbContext.WorkOrderDocuments.FirstOrDefault(s => s.ProjectId == id && s.FileName == fileName);
+                if (availableProjectDocument == null)
+                {
+                    var workOrderDocument = new ProjectWorkOrders();
+                    workOrderDocument.ProjectId = project.Id;
+                    workOrderDocument.FileName = fileName;
+                    workOrderDocument.FilePath = filePath;
+                    workOrderDocument.FileSize = (int)fileSize;
+                    workOrderDocument.FileType = fileType;
+                    workOrderDocument.FileContent = fileContent;
+                    workOrderDocument.IsDeleted = false;
+
+
+
+                    _dbContext.WorkOrderDocuments.Add(workOrderDocument);
+                }
+                else
+                {
+                    availableProjectDocument.ProjectId = project.Id;
+                    availableProjectDocument.FileName = fileName;
+                    availableProjectDocument.FilePath = filePath;
+                    availableProjectDocument.IsDeleted = false;
+
+
+                    _dbContext.WorkOrderDocuments.Update(availableProjectDocument);
+                }
+
+                _dbContext.SaveChanges();
             }
 
-            var uploadsFolder = EnsureUploadsFolderExists();
-            var filePath = Path.Combine(uploadsFolder, Path.GetFileName(document.FilePath));
-
-            if (File.Exists(filePath))
-            {
-                File.Delete(filePath);
-            }
-
-            _dbContext.WorkOrderDocuments.Remove(document);
-            await _dbContext.SaveChangesAsync();
-            return true;
+            return fileName;
         }
-
-        public async Task<(FileStream FileStream, string ContentType, string FileName)> DownloadWorkOrderDocumentAsync(int documentId)
-        {
-            var document = await _dbContext.WorkOrderDocuments.FindAsync(documentId);
-            if (document == null)
-            {
-                throw new Exception("Document not found");
-            }
-
-            var uploadsFolder = EnsureUploadsFolderExists();
-            var filePath = Path.Combine(uploadsFolder, Path.GetFileName(document.FilePath));
-
-            if (!File.Exists(filePath))
-            {
-                throw new FileNotFoundException("File not found on the server");
-            }
-
-            var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-            return (fileStream, GetContentType(document.FileType), document.FileName);
-        }
-
-        public async Task<List<ProjectWorkOrders>> GetWorkOrderDocumentsAsync(int projectId)
+        public async Task<List<ProjectWorkOrders>> GetProjectDocumentsAsync(int projectId)
         {
             return await _dbContext.WorkOrderDocuments
                 .Where(d => d.ProjectId == projectId)
                 .ToListAsync();
         }
+
+        public async Task<bool> DeleteProjectFile(int projectId, string fileName)
+        {
+            var filePath = GetProjectFilePath(projectId, fileName);
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+
+                // Remove the file entry from the database
+                var projectDocument = await _dbContext.WorkOrderDocuments
+                    .FirstOrDefaultAsync(d => d.ProjectId == projectId && d.FileName == fileName);
+
+                if (projectDocument != null)
+                {
+                    _dbContext.WorkOrderDocuments.Remove(projectDocument);
+                    await _dbContext.SaveChangesAsync();
+                }
+
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<string> GetProjectDocumentFileName(int id, string fileName)
+        {
+            var returnFilePath = fileName;
+            var project = _dbContext.Projects.FirstOrDefault(s => s.Id == id && !s.IsDeleted);
+            if (project != null)
+            {
+                returnFilePath = project.ProjectName + "_" + project.ProjectNumber + "_" + fileName;
+            }
+
+            return returnFilePath;
+        }
+
+
+
+
+
+
 
         #region Private Methods
 
@@ -311,37 +318,10 @@ namespace WorkManagement.Service
         }
 
         
-        private FileType GetFileType(string contentType)
-        {
-            // Will add other types
-            if (contentType.StartsWith("image/"))
-                return FileType.Other;
-            if (contentType == "application/pdf")
-                return FileType.PDF;
-            return FileType.Other;
-        }
+       
 
-        private string GetContentType(FileType? fileType)
-        {
-            switch (fileType)
-            {
-                case FileType.Other:
-                    return "image/jpeg";
-                case FileType.PDF:
-                    return "application/pdf";
-                default:
-                    return "application/octet-stream";
-            }
-        }
-        private string EnsureUploadsFolderExists()
-        {
-            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles");
-            if (!Directory.Exists(uploadsFolder))
-            {
-                Directory.CreateDirectory(uploadsFolder);
-            }
-            return uploadsFolder;
-        }
+        
+       
         #endregion
     }
 }

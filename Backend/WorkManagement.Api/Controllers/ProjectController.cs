@@ -24,7 +24,7 @@ namespace WorkManagement.API.Controllers
         private IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper mapper;
         private readonly UserManager<ApplicationUser> _userManager;
-
+        private readonly string _storagePath = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles");
         public ProjectController(IProjectService projectService, IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> userManager, IMapper mapper)
         {
             this._projectService = projectService;
@@ -57,7 +57,7 @@ namespace WorkManagement.API.Controllers
         [HttpPost]
         public async Task<ActionResult<EmployeeModel>> CreateProject([FromBody] ProjectModel projectModel)
         {
-            var createdProject = await _projectService.CreateProjectAsync(projectModel);
+                    var createdProject = await _projectService.CreateProjectAsync(projectModel);
             return Ok(createdProject);
 
         }
@@ -90,43 +90,133 @@ namespace WorkManagement.API.Controllers
             }
             return NoContent();
         }
-
-        [HttpPost("upload/{projectId}")]
-        public async Task<ActionResult<ProjectWorkOrders>> CreateWorkOrderDocument(int projectId, IFormFile file)
-        {
-            if (file == null || file.Length == 0)
-            {
-                return BadRequest("File is required");
-            }
-
-            var document = await _projectService.CreateWorkOrderDocumentAsync(projectId, file);
-            return CreatedAtAction(nameof(DownloadWorkOrderDocument), new { documentId = document.Id }, document);
-        }
-
-        [HttpDelete("remove/{documentId}")]
-        public async Task<IActionResult> DeleteWorkOrderDocument(int documentId)
-        {
-            var result = await _projectService.DeleteWorkOrderDocumentAsync(documentId);
-            if (!result)
-            {
-                return NotFound();
-            }
-            return NoContent();
-        }
-
-        [HttpGet("download/{documentId}")]
-        public async Task<IActionResult> DownloadWorkOrderDocument(int documentId)
-        {
-            var fileResult = await _projectService.DownloadWorkOrderDocumentAsync(documentId);
-            return File(fileResult.FileStream, fileResult.ContentType, fileResult.FileName);
-        }
-
-        [HttpGet("project/{projectId}")]
+        [HttpGet("documents/{projectId}")]
         public async Task<ActionResult<IEnumerable<ProjectWorkOrders>>> GetWorkOrderDocuments(int projectId)
         {
-            var documents = await _projectService.GetWorkOrderDocumentsAsync(projectId);
+            var documents = await _projectService.GetProjectDocumentsAsync(projectId);
             return Ok(documents);
         }
+
+
+
+        [HttpPost("documnet/upload")]
+        public async Task<ActionResult<string>> Upload(int id, IFormFile file)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                    return BadRequest("No file uploaded.");
+
+                var employeeFilePath = await _projectService.GetProjectDocumentFileName(id, file.FileName);
+
+                var filePath = Path.Combine(_storagePath, employeeFilePath);
+                var fileTypeStr = "";
+                var fileType = FileType.Other;
+                if (!string.IsNullOrEmpty(file.ContentType))
+                {
+                    var types = GetMimeTypes();
+                    var ext = file.ContentType.ToLower();
+                    fileTypeStr = types.ContainsValue(ext) ? types.FirstOrDefault(s => s.Value == ext).Key : "";
+                    fileTypeStr = fileTypeStr.Replace(".", "");
+
+                    switch (fileTypeStr)
+                    {
+                        case "txt":
+                            fileType = FileType.TXT;
+                            break;
+                        case "pdf":
+                            fileType = FileType.PDF;
+                            break;
+                        case "doc":
+                        case "docx":
+                            fileType = FileType.DOCX;
+                            break;
+                        case "xls":
+                        case "xlsx":
+                            fileType = FileType.XLSX;
+                            break;
+                        case "csv":
+                            fileType = FileType.CSV;
+                            break;
+                    }
+                }
+                byte[] fileContent;
+                using (var memoryStream = new MemoryStream()) { await file.CopyToAsync(memoryStream); fileContent = memoryStream.ToArray(); }
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+
+                    await _projectService.UpdateProjectDocumentData(id, file.FileName, fileType, file.Length, filePath, fileContent);
+                }
+
+
+                return Ok(filePath);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
+
+        }
+
+        [HttpDelete("document/{fileName}")]
+        public async Task<IActionResult> DeleteDocument(int id, string fileName)
+        {
+            var result = await _projectService.DeleteProjectFile(id, fileName);
+            if (result)
+            {
+                return Ok(new { message = "File deleted successfully" });
+            }
+            return NotFound(new { message = "File not found" });
+        }
+
+        [HttpGet("download/{fileName}")]
+        public IActionResult Download(int id, string fileName)
+        {
+            var filePath = _projectService.GetProjectFilePath(id, fileName);
+
+            if (!System.IO.File.Exists(filePath))
+                return NotFound();
+
+            var memory = new MemoryStream();
+            using (var stream = new FileStream(filePath, FileMode.Open))
+            {
+                stream.CopyTo(memory);
+            }
+            memory.Position = 0;
+
+            return File(memory, GetContentType(filePath), fileName);
+        }
+
+        private string GetContentType(string path)
+        {
+            var types = GetMimeTypes();
+            var ext = Path.GetExtension(path).ToLowerInvariant();
+            return types.ContainsKey(ext) ? types[ext] : "application/octet-stream";
+        }
+        private Dictionary<string, string> GetMimeTypes()
+        {
+            return new Dictionary<string, string>
+            {
+                { ".txt", "text/plain" },
+                { ".pdf", "application/pdf" },
+                { ".doc", "application/vnd.ms-word" },
+                { ".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
+                { ".xls", "application/vnd.ms-excel" },
+                { ".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
+                { ".png", "image/png" },
+                { ".jpg", "image/jpeg" },
+                { ".jpeg", "image/jpeg" },
+                { ".gif", "image/gif" },
+                { ".csv", "text/csv" }
+            };
+        }
+
+
+
+
+
 
     }
 }

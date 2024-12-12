@@ -39,39 +39,42 @@ const injectedRtkApi = api.injectEndpoints({
         method: "DELETE",
       }),
     }),
-    postApiProjectUploadByProjectId: build.mutation<
-      PostApiProjectUploadByProjectIdApiResponse,
-      PostApiProjectUploadByProjectIdApiArg
+    getApiProjectDocumentsByProjectId: build.query<
+      GetApiProjectDocumentsByProjectIdApiResponse,
+      GetApiProjectDocumentsByProjectIdApiArg
     >({
       query: (queryArg) => ({
-        url: `/api/Project/upload/${queryArg.projectId}`,
+        url: `/api/Project/documents/${queryArg.projectId}`,
+      }),
+    }),
+    postApiProjectDocumnetUpload: build.mutation<
+      PostApiProjectDocumnetUploadApiResponse,
+      PostApiProjectDocumnetUploadApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Project/documnet/upload`,
         method: "POST",
         body: queryArg.body,
+        params: { id: queryArg.id },
       }),
     }),
-    deleteApiProjectRemoveByDocumentId: build.mutation<
-      DeleteApiProjectRemoveByDocumentIdApiResponse,
-      DeleteApiProjectRemoveByDocumentIdApiArg
+    deleteApiProjectDocumentByFileName: build.mutation<
+      DeleteApiProjectDocumentByFileNameApiResponse,
+      DeleteApiProjectDocumentByFileNameApiArg
     >({
       query: (queryArg) => ({
-        url: `/api/Project/remove/${queryArg.documentId}`,
+        url: `/api/Project/document/${queryArg.fileName}`,
         method: "DELETE",
+        params: { id: queryArg.id },
       }),
     }),
-    getApiProjectDownloadByDocumentId: build.query<
-      GetApiProjectDownloadByDocumentIdApiResponse,
-      GetApiProjectDownloadByDocumentIdApiArg
+    getApiProjectDownloadByFileName: build.query<
+      GetApiProjectDownloadByFileNameApiResponse,
+      GetApiProjectDownloadByFileNameApiArg
     >({
       query: (queryArg) => ({
-        url: `/api/Project/download/${queryArg.documentId}`,
-      }),
-    }),
-    getApiProjectProjectByProjectId: build.query<
-      GetApiProjectProjectByProjectIdApiResponse,
-      GetApiProjectProjectByProjectIdApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/Project/project/${queryArg.projectId}`,
+        url: `/api/Project/download/${queryArg.fileName}`,
+        params: { id: queryArg.id },
       }),
     }),
   }),
@@ -97,26 +100,28 @@ export type DeleteApiProjectByIdApiResponse = unknown;
 export type DeleteApiProjectByIdApiArg = {
   id: number;
 };
-export type PostApiProjectUploadByProjectIdApiResponse =
-  /** status 200 OK */ ProjectWorkOrders;
-export type PostApiProjectUploadByProjectIdApiArg = {
+export type GetApiProjectDocumentsByProjectIdApiResponse =
+  /** status 200 OK */ ProjectWorkOrders[];
+export type GetApiProjectDocumentsByProjectIdApiArg = {
   projectId: number;
+};
+export type PostApiProjectDocumnetUploadApiResponse =
+  /** status 200 OK */ string;
+export type PostApiProjectDocumnetUploadApiArg = {
+  id?: number;
   body: {
     file?: Blob;
   };
 };
-export type DeleteApiProjectRemoveByDocumentIdApiResponse = unknown;
-export type DeleteApiProjectRemoveByDocumentIdApiArg = {
-  documentId: number;
+export type DeleteApiProjectDocumentByFileNameApiResponse = unknown;
+export type DeleteApiProjectDocumentByFileNameApiArg = {
+  id?: number;
+  fileName: string;
 };
-export type GetApiProjectDownloadByDocumentIdApiResponse = unknown;
-export type GetApiProjectDownloadByDocumentIdApiArg = {
-  documentId: number;
-};
-export type GetApiProjectProjectByProjectIdApiResponse =
-  /** status 200 OK */ ProjectWorkOrders[];
-export type GetApiProjectProjectByProjectIdApiArg = {
-  projectId: number;
+export type GetApiProjectDownloadByFileNameApiResponse = unknown;
+export type GetApiProjectDownloadByFileNameApiArg = {
+  id?: number;
+  fileName: string;
 };
 export type ProjectModel = {
   id?: number;
@@ -337,10 +342,10 @@ export const {
   useLazyGetApiProjectByIdQuery,
   usePutApiProjectByIdMutation,
   useDeleteApiProjectByIdMutation,
-  usePostApiProjectUploadByProjectIdMutation,
-  useDeleteApiProjectRemoveByDocumentIdMutation,
-  useGetApiProjectDownloadByDocumentIdQuery,
-  useLazyGetApiProjectDownloadByDocumentIdQuery,
-  useGetApiProjectProjectByProjectIdQuery,
-  useLazyGetApiProjectProjectByProjectIdQuery,
+  useGetApiProjectDocumentsByProjectIdQuery,
+  useLazyGetApiProjectDocumentsByProjectIdQuery,
+  usePostApiProjectDocumnetUploadMutation,
+  useDeleteApiProjectDocumentByFileNameMutation,
+  useGetApiProjectDownloadByFileNameQuery,
+  useLazyGetApiProjectDownloadByFileNameQuery,
 } = injectedRtkApi;

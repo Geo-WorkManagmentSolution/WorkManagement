@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web.Mvc;
 using WorkManagement.Domain.Entity;
 using WorkManagement.Domain.Models;
 using WorkManagement.Domain.Models.Employee;
@@ -23,10 +21,12 @@ namespace WorkManagement.Service
                                                                    
         public Task<ProjectModel> UpdateProjectAsync(ProjectModel project);
         public Task<bool> DeleteProjectAsync(int id);
-        Task<ProjectWorkOrders> CreateWorkOrderDocumentAsync(int projectId, IFormFile file);
-        Task<bool> DeleteWorkOrderDocumentAsync(int documentId);
-        Task<(FileStream FileStream, string ContentType, string FileName)> DownloadWorkOrderDocumentAsync(int documentId);
-        Task<List<ProjectWorkOrders>> GetWorkOrderDocumentsAsync(int projectId);
+        Task<List<ProjectWorkOrders>> GetProjectDocumentsAsync(int projectId);
+
+        public Task<string> GetProjectDocumentFileName(int id, string fileName);
+        public Task<string> UpdateProjectDocumentData(int id, string fileName, FileType fileType, long fileSize, string filePath, byte[] fileContent);
+        public string GetProjectFilePath(int id, string fileName);
+        public Task<bool> DeleteProjectFile(int employeeId, string fileName);
 
 
     }

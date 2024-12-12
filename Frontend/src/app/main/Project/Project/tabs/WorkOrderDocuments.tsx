@@ -12,9 +12,9 @@ import { useDispatch } from 'react-redux';
 import { showMessage } from '@fuse/core/FuseMessage/fuseMessageSlice';
 
 import {
-	usePostApiProjectUploadByProjectIdMutation,
-	useGetApiProjectProjectByProjectIdQuery,
-	useDeleteApiProjectRemoveByDocumentIdMutation,
+	usePostApiProjectDocumnetUploadMutation,
+	useGetApiProjectDocumentsByProjectIdQuery,
+	useDeleteApiProjectDocumentByFileNameMutation,
 	ProjectWorkOrders
 } from '../../ProjectApi';
 import ItemIcon from './ItemIcon';
@@ -104,19 +104,19 @@ export default function WorkOrderDocuments() {
 	const storedToken = localStorage.getItem(jwtAuthConfig.tokenStorageKey);
 	const { projectId } = useParams<{ projectId: string }>();
 	const [files, setFiles] = useState<FileInfo[]>([]);
-	const [uploadFile, { isLoading: isUploading }] = usePostApiProjectUploadByProjectIdMutation();
+	const [uploadFile, { isLoading: isUploading }] = usePostApiProjectDocumnetUploadMutation();
 
 	const {
 		data: documents,
 		isLoading: isLoadingDocuments,
 		refetch
-	} = useGetApiProjectProjectByProjectIdQuery(
+	} = useGetApiProjectDocumentsByProjectIdQuery(
 		{ projectId: Number(projectId) },
 		{
 			skip: !projectId || projectId === 'new'
 		}
 	);
-	const [deleteDocument] = useDeleteApiProjectRemoveByDocumentIdMutation();
+	const [deleteDocument] = useDeleteApiProjectDocumentByFileNameMutation();
 	const [deletingFiles, setDeletingFiles] = useState<{ [key: string]: boolean }>({});
 	const [downloadingFiles, setDownloadingFiles] = useState<{ [key: string]: boolean }>({});
 	const [downloadError, setDownloadError] = useState<string | null>(null);
@@ -153,7 +153,7 @@ export default function WorkOrderDocuments() {
 				formData.append('file', selectedFile);
 	
 				try {
-					await uploadFile({ projectId: Number(projectId), body: formData }).unwrap();
+					await uploadFile({ id: Number(projectId), body: formData }).unwrap();
 					refetch();
 					dispatch(showMessage({ message: 'File uploaded successfully', variant: 'success' }));
 				} catch (error) {
@@ -168,17 +168,17 @@ export default function WorkOrderDocuments() {
 	
 
 	const handleRemoveFile = useCallback(
-		async (documentId: number) => {
-			setDeletingFiles((prev) => ({ ...prev, [documentId]: true }));
+		async (fileName: string) => {
+			setDeletingFiles((prev) => ({ ...prev, [fileName]: true }));
 			try {
-				await deleteDocument({ documentId }).unwrap();
+				await deleteDocument({ id:projectId ,fileName }).unwrap();
 				refetch();
 				dispatch(showMessage({ message: 'File deleted successfully', variant: 'success' }));
 			} catch (error) {
 				console.error('Error deleting file:', error);
 				dispatch(showMessage({ message: 'Error deleting file', variant: 'error' }));
 			} finally {
-				setDeletingFiles((prev) => ({ ...prev, [documentId]: false }));
+				setDeletingFiles((prev) => ({ ...prev, [fileName]: false }));
 			}
 		},
 		[deleteDocument, refetch, dispatch]
@@ -189,7 +189,7 @@ export default function WorkOrderDocuments() {
 			setDownloadingFiles((prev) => ({ ...prev, [documentId]: true }));
 			setDownloadError(null);
 			try {
-				const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/Project/download/${documentId}`, {
+				const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/Project/download/${fileName}?id=${projectId}`, {
 					method: 'GET',
 					headers: {
 						'Content-Type': 'application/json',
@@ -280,14 +280,7 @@ export default function WorkOrderDocuments() {
 				</Typography>
 				</div>
 
-			{downloadError && (
-				<Alert
-					severity="error"
-					sx={{ mt: 2, mb: 2 }}
-				>
-					{downloadError}
-				</Alert>
-			)}
+			
 			{isLoadingDocuments ? (
 				<Alert
 					severity="info"
@@ -307,7 +300,7 @@ export default function WorkOrderDocuments() {
 						<FileCard
 							key={file.id}
 							file={file}
-							onRemove={() => file.id && handleRemoveFile(file.id)}
+							onRemove={() => file.id && handleRemoveFile(file.fileName)}
 							onDownload={() => file.id && file.fileName && handleDownloadFile(file.id, file.fileName)}
 							isDeleting={deletingFiles[file.id] || false}
 							isDownloading={downloadingFiles[file.id] || false}

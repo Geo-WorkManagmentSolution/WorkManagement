@@ -317,14 +317,7 @@ export default function FileUpload({ UserRole }) {
 				)}
 			/>
 
-			{/* {downloadError && (
-				<Alert
-					severity="error"
-					sx={{ mt: 2, mb: 2 }}
-				>
-					{downloadError}
-				</Alert>
-			)} */}
+		
 
 			{files.length > 0 ? (
 				<>
@@ -332,7 +325,7 @@ export default function FileUpload({ UserRole }) {
 						variant="h6"
 						gutterBottom
 					>
-						Uploaded Files
+						Uploaded Documents
 					</Typography>
 					{files.map((file) => (
 						<FileCard
@@ -351,15 +344,6 @@ export default function FileUpload({ UserRole }) {
 					sx={{ mt: 2 }}
 				>
 					No documents uploaded
-				</Alert>
-			)}
-
-			{isDownloading && (
-				<Alert
-					severity="info"
-					sx={{ mt: 2 }}
-				>
-					Downloading file...
 				</Alert>
 			)}
 		</Box>
