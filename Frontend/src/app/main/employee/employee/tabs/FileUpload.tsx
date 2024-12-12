@@ -165,19 +165,36 @@ export default function FileUpload({ UserRole }) {
 	const handleFileChange = useCallback(
 		async (event: React.ChangeEvent<HTMLInputElement>) => {
 			const { files: uploadedFiles } = event.target;
-
+	
 			if (uploadedFiles && uploadedFiles.length > 0) {
+				const selectedFile = uploadedFiles[0];
+				const fileName = selectedFile.name;
+				const fileSizeLimit = 50 * 1024 * 1024; // 50 MB in bytes
+	
+				// Check if file with the same name exists
+				const fileExists = files.some(file => file.fileName === fileName);
+				if (fileExists) {
+					dispatch(showMessage({ message: 'File already exists', variant: 'error' }));
+					return;
+				}
+	
+				// Check if file size exceeds the limit
+				if (selectedFile.size > fileSizeLimit) {
+					dispatch(showMessage({ message: 'File size should not be more than 50 MB', variant: 'error' }));
+					return;
+				}
+	
 				setIsUploading(true);
 				const formData = new FormData();
-				formData.append('file', uploadedFiles[0]);
-
+				formData.append('file', selectedFile);
+	
 				try {
 					const response = await uploadFile({ id: parseInt(employeeId), body: formData }).unwrap();
 					console.log('File upload response:', response);
 					const newFile: FileInfo = {
-						fileName: uploadedFiles[0].name,
-						fileSize: uploadedFiles[0].size,
-						fileType: getFileType(uploadedFiles[0].type)
+						fileName: selectedFile.name,
+						fileSize: selectedFile.size,
+						fileType: getFileType(selectedFile.type)
 					};
 					setFiles((prevFiles) => [...prevFiles, newFile]);
 					setValue('employeeDocuments', (prevDocs) => [...prevDocs, newFile]);
@@ -190,8 +207,9 @@ export default function FileUpload({ UserRole }) {
 				}
 			}
 		},
-		[employeeId, uploadFile, setValue, dispatch]
+		[employeeId, uploadFile, setValue, dispatch, files]
 	);
+	
 
 	const handleRemoveFile = useCallback(
 		async (fileName: string) => {
