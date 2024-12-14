@@ -269,6 +269,40 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.dropdownModel,
       }),
     }),
+    getApiEmployeesProjectByEmployeeId: build.query<
+      GetApiEmployeesProjectByEmployeeIdApiResponse,
+      GetApiEmployeesProjectByEmployeeIdApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/project/${queryArg.employeeId}`,
+      }),
+    }),
+    getApiProjectByProjectIdEmployees: build.query<
+      GetApiProjectByProjectIdEmployeesApiResponse,
+      GetApiProjectByProjectIdEmployeesApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Project/${queryArg.projectId}/employees`,
+      }),
+    }),
+    deleteApiProjectByProjectIdEmployeesAndEmployeeId: build.mutation<
+      DeleteApiProjectByProjectIdEmployeesAndEmployeeIdApiResponse,
+      DeleteApiProjectByProjectIdEmployeesAndEmployeeIdApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Project/${queryArg.projectId}/employees/${queryArg.employeeId}`,
+        method: "DELETE",
+      }),
+    }),
+    getApiProjectDepartmentEmployeesByDepartmentId: build.query<
+      GetApiProjectDepartmentEmployeesByDepartmentIdApiResponse,
+      GetApiProjectDepartmentEmployeesByDepartmentIdApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Project/department-employees/${queryArg.departmentId}`,
+        params: { projectId: queryArg.projectId },
+      }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -405,6 +439,28 @@ export type DeleteApiEmployeesSettingsDeleteDropdownItemByIdAndDropdownNameApiAr
 export type PutApiEmployeesSettingsUpdateDropdownItemApiResponse = unknown;
 export type PutApiEmployeesSettingsUpdateDropdownItemApiArg = {
   dropdownModel: DropdownModel;
+};
+export type GetApiEmployeesProjectByEmployeeIdApiResponse =
+  /** status 200 OK */ ProjectModel[];
+export type GetApiEmployeesProjectByEmployeeIdApiArg = {
+  employeeId: number;
+};
+export type GetApiProjectByProjectIdEmployeesApiResponse =
+  /** status 200 OK */ EmployeeTeamMemberList[];
+export type GetApiProjectByProjectIdEmployeesApiArg = {
+  projectId: number;
+};
+export type DeleteApiProjectByProjectIdEmployeesAndEmployeeIdApiResponse =
+  unknown;
+export type DeleteApiProjectByProjectIdEmployeesAndEmployeeIdApiArg = {
+  projectId: number;
+  employeeId: number;
+};
+export type GetApiProjectDepartmentEmployeesByDepartmentIdApiResponse =
+  /** status 200 OK */ EmployeeModel[];
+export type GetApiProjectDepartmentEmployeesByDepartmentIdApiArg = {
+  projectId?: number;
+  departmentId: number;
 };
 export type EmployeeDashboardDataModel = {
   id?: number;
@@ -606,6 +662,20 @@ export type DropdownModel = {
   id?: number;
   name?: string | null;
 };
+export type ProjectModel = {
+  id?: number;
+  projectName?: string | null;
+  projectNumber?: string | null;
+  projectDescription?: string | null;
+  startDate?: string;
+  endDate?: string | null;
+  workOrderNumber?: string | null;
+  workOrderName?: string | null;
+  workOrderAmount?: number | null;
+  periodOfWorkInMonths?: number | null;
+  status?: ProjectStatus;
+  workOrderDate?: string | null;
+};
 export enum MaritalStatus {
   Unknown = "Unknown",
   Single = "Single",
@@ -656,6 +726,13 @@ export enum LeaveStatus {
   Pending = "Pending",
   Rejected = "Rejected",
 }
+export enum ProjectStatus {
+  Upcoming = "Upcoming",
+  Ongoing = "Ongoing",
+  Completed = "Completed",
+  OnHold = "OnHold",
+  Closed = "Closed",
+}
 export const {
   useGetApiEmployeesQuery,
   useLazyGetApiEmployeesQuery,
@@ -698,4 +775,11 @@ export const {
   usePostApiEmployeesSettingsAddDropdownItemMutation,
   useDeleteApiEmployeesSettingsDeleteDropdownItemByIdAndDropdownNameMutation,
   usePutApiEmployeesSettingsUpdateDropdownItemMutation,
+  useGetApiEmployeesProjectByEmployeeIdQuery,
+  useLazyGetApiEmployeesProjectByEmployeeIdQuery,
+  useGetApiProjectByProjectIdEmployeesQuery,
+  useLazyGetApiProjectByProjectIdEmployeesQuery,
+  useDeleteApiProjectByProjectIdEmployeesAndEmployeeIdMutation,
+  useGetApiProjectDepartmentEmployeesByDepartmentIdQuery,
+  useLazyGetApiProjectDepartmentEmployeesByDepartmentIdQuery,
 } = injectedRtkApi;

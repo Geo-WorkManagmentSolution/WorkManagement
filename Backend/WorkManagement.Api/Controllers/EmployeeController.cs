@@ -13,6 +13,7 @@ using WorkManagement.Domain.Entity.EmployeeLeaveTables;
 using WorkManagement.Domain.Models;
 using WorkManagement.Domain.Models.Dropdown;
 using WorkManagement.Domain.Models.Employee;
+using WorkManagement.Domain.Models.Project;
 using WorkManagement.Service;
 using WorkManagementSolution.Employee;
 
@@ -408,6 +409,24 @@ namespace WorkManagement.API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpGet("project/{employeeId}")]
+        public async Task<ActionResult<IEnumerable<ProjectModel>>> GetProjectsByEmployeeId(int employeeId)
+        {
+            try
+            {
+                var projects = await employeeService.GetProjectsByEmployeeIdAsync(employeeId);
+                if (projects == null )
+                {
+                    return NotFound(new { message = "No projects found for this employee." });
+                }
+                return Ok(projects);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while processing your request." });
             }
         }
 

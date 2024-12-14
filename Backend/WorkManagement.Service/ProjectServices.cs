@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 using WorkManagement.Domain.Entity;
+using WorkManagement.Domain.Models.Employee;
 using WorkManagement.Domain.Models.Project;
 using WorkManagementSolution.Employee;
 using WorkManagmentSolution.EFCore;
@@ -295,8 +296,108 @@ namespace WorkManagement.Service
 
 
 
+        public async Task<bool> AssignProjectToEmployee(int projectId, int employeeId)
+        {
+            var user = _dbContext.Users.FirstOrDefault(s => s.UserName == "admin1@admin.com");
+            try
+            {
+                var project = await _dbContext.Projects.FindAsync(projectId);
+                var employee = await _dbContext.Employees.FindAsync(employeeId);
+
+                if (project == null || employee == null)
+                {
+                    return false;
+                }
+
+                var existingAssignment = await _dbContext.ProjectEmployees
+                    .FirstOrDefaultAsync(pe => pe.ProjectId == projectId && pe.EmployeeId == employeeId);
+
+                if (existingAssignment != null)
+                {
+                    return true; // Assignment already exists
+                }
+
+                var projectEmployee = new ProjectEmployee
+                {
+                    ProjectId = projectId,
+                    EmployeeId = employeeId,
+                  CreatedBy = user.Id,
+                    CreatedOn = DateTime.Now,
+                   LastModifiedBy = user.Id,
+                    LastModifiedOn = DateTime.Now,
+                };
+
+                _dbContext.ProjectEmployees.Add(projectEmployee);
+                await _dbContext.SaveChangesAsync();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return false;
+            }
+        }
+
+        public async Task<List<EmployeeTeamMemberList>> GetEmployeesByProjectIdAsync(int projectId)
+        {
+
+            try
+            {
+                var data = await (from e in _dbContext.ProjectEmployees
+                                  where !e.IsDeleted && e.ProjectId == projectId
+                                  select new EmployeeTeamMemberList
+                                  {
+                                      Name = e.Employee.FirstName + " " + e.Employee.LastName,
+                                      Email = e.Employee.Email,
+                                      Avatar = "",
+                                      Designation = e.Employee.EmployeeDesignationId != null ? e.Employee.EmployeeDesignation.Name : "",
+                                      EmployeeId = e.Employee.Id,
+                                      EmployeeNumber = e.Employee.EmployeeNumber
+                                  }).ToListAsync();
+                if (data.Count > 0)
+                {
+                    return data;
+                }
+                else {
+                    return new List<EmployeeTeamMemberList>();
+                }
 
 
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                throw new Exception("Somthing wrong happened!");
+                }
+            }
+
+        public async Task<bool> RemoveEmployeeFromProjectAsync(int projectId, int employeeId)
+        {
+            var user = _dbContext.Users.FirstOrDefault(s => s.UserName == "admin1@admin.com");
+            try
+            {
+                var projectEmployee = await _dbContext.ProjectEmployees
+                    .FirstOrDefaultAsync(pe => pe.ProjectId == projectId && pe.EmployeeId == employeeId && !pe.IsDeleted);
+
+                if (projectEmployee == null)
+                {
+                    return false;
+                }
+
+                projectEmployee.IsDeleted = true;
+                projectEmployee.LastModifiedBy = user.Id; 
+                projectEmployee.LastModifiedOn = DateTime.Now;
+
+                await _dbContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return false;
+            }
+        }
 
 
         #region Private Methods
@@ -317,11 +418,36 @@ namespace WorkManagement.Service
             return projects;
         }
 
-        
-       
+        public async Task<List<EmployeeModel>> GetEmployeesNotAssignedToProjectByDepartment(int projectId, int departmentId)
+        {
+            var employeesInProject = await _dbContext.ProjectEmployees
+                .Where(pe => pe.ProjectId == projectId)
+                .Select(pe => pe.EmployeeId)
+                .ToListAsync();
 
-        
-       
+            var employees = await _dbContext.Employees
+                .Where(e => !e.IsDeleted
+                            && e.EmployeeDepartmentId == departmentId
+                            && !employeesInProject.Contains(e.Id) )
+                .Select(e => new EmployeeModel
+                {
+                    Id = e.Id,
+                    EmployeeNumber = e.EmployeeNumber,
+                    FirstName = e.FirstName,
+                    LastName = e.LastName,
+                    Email = e.Email,
+                    // Add other employee properties as needed
+                })
+                .ToListAsync();
+
+            return employees;
+        }
+
+
+
+
+
+
         #endregion
     }
 }

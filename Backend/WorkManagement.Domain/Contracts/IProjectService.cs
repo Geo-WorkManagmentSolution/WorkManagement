@@ -21,12 +21,17 @@ namespace WorkManagement.Service
                                                                    
         public Task<ProjectModel> UpdateProjectAsync(ProjectModel project);
         public Task<bool> DeleteProjectAsync(int id);
-        Task<List<ProjectWorkOrders>> GetProjectDocumentsAsync(int projectId);
+        public Task<List<ProjectWorkOrders>> GetProjectDocumentsAsync(int projectId);
+
 
         public Task<string> GetProjectDocumentFileName(int id, string fileName);
         public Task<string> UpdateProjectDocumentData(int id, string fileName, FileType fileType, long fileSize, string filePath, byte[] fileContent);
         public string GetProjectFilePath(int id, string fileName);
         public Task<bool> DeleteProjectFile(int employeeId, string fileName);
+        public Task<bool> AssignProjectToEmployee(int projectId, int employeeId);
+        public  Task<bool> RemoveEmployeeFromProjectAsync(int projectId, int employeeId);
+        public  Task<List<EmployeeTeamMemberList>> GetEmployeesByProjectIdAsync(int projectId);
+        public Task<List<EmployeeModel>> GetEmployeesNotAssignedToProjectByDepartment(int projectId, int departmentId);
 
 
     }

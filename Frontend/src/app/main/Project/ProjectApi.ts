@@ -1,6 +1,14 @@
 import { apiService as api } from "app/store/apiService";
 const injectedRtkApi = api.injectEndpoints({
   endpoints: (build) => ({
+    getApiEmployeesProjectByEmployeeId: build.query<
+      GetApiEmployeesProjectByEmployeeIdApiResponse,
+      GetApiEmployeesProjectByEmployeeIdApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/project/${queryArg.employeeId}`,
+      }),
+    }),
     getApiProject: build.query<GetApiProjectApiResponse, GetApiProjectApiArg>({
       query: () => ({ url: `/api/Project` }),
     }),
@@ -77,10 +85,54 @@ const injectedRtkApi = api.injectEndpoints({
         params: { id: queryArg.id },
       }),
     }),
+    postApiProjectAssign: build.mutation<
+      PostApiProjectAssignApiResponse,
+      PostApiProjectAssignApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Project/assign`,
+        method: "POST",
+        params: {
+          projectId: queryArg.projectId,
+          employeeId: queryArg.employeeId,
+        },
+      }),
+    }),
+    getApiProjectByProjectIdEmployees: build.query<
+      GetApiProjectByProjectIdEmployeesApiResponse,
+      GetApiProjectByProjectIdEmployeesApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Project/${queryArg.projectId}/employees`,
+      }),
+    }),
+    deleteApiProjectByProjectIdEmployeesAndEmployeeId: build.mutation<
+      DeleteApiProjectByProjectIdEmployeesAndEmployeeIdApiResponse,
+      DeleteApiProjectByProjectIdEmployeesAndEmployeeIdApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Project/${queryArg.projectId}/employees/${queryArg.employeeId}`,
+        method: "DELETE",
+      }),
+    }),
+    getApiProjectDepartmentEmployeesByDepartmentId: build.query<
+      GetApiProjectDepartmentEmployeesByDepartmentIdApiResponse,
+      GetApiProjectDepartmentEmployeesByDepartmentIdApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Project/department-employees/${queryArg.departmentId}`,
+        params: { projectId: queryArg.projectId },
+      }),
+    }),
   }),
   overrideExisting: false,
 });
 export { injectedRtkApi as enhancedApi };
+export type GetApiEmployeesProjectByEmployeeIdApiResponse =
+  /** status 200 OK */ ProjectModel[];
+export type GetApiEmployeesProjectByEmployeeIdApiArg = {
+  employeeId: number;
+};
 export type GetApiProjectApiResponse = /** status 200 OK */ ProjectModel[];
 export type GetApiProjectApiArg = void;
 export type PostApiProjectApiResponse = /** status 200 OK */ EmployeeModel;
@@ -122,6 +174,28 @@ export type GetApiProjectDownloadByFileNameApiResponse = unknown;
 export type GetApiProjectDownloadByFileNameApiArg = {
   id?: number;
   fileName: string;
+};
+export type PostApiProjectAssignApiResponse = unknown;
+export type PostApiProjectAssignApiArg = {
+  projectId?: number;
+  employeeId?: number;
+};
+export type GetApiProjectByProjectIdEmployeesApiResponse =
+  /** status 200 OK */ EmployeeTeamMemberList[];
+export type GetApiProjectByProjectIdEmployeesApiArg = {
+  projectId: number;
+};
+export type DeleteApiProjectByProjectIdEmployeesAndEmployeeIdApiResponse =
+  unknown;
+export type DeleteApiProjectByProjectIdEmployeesAndEmployeeIdApiArg = {
+  projectId: number;
+  employeeId: number;
+};
+export type GetApiProjectDepartmentEmployeesByDepartmentIdApiResponse =
+  /** status 200 OK */ EmployeeModel[];
+export type GetApiProjectDepartmentEmployeesByDepartmentIdApiArg = {
+  projectId?: number;
+  departmentId: number;
 };
 export type ProjectModel = {
   id?: number;
@@ -282,6 +356,14 @@ export type ProjectWorkOrders = {
   projectId?: number | null;
   project?: Project;
 };
+export type EmployeeTeamMemberList = {
+  name?: string | null;
+  email?: string | null;
+  avatar?: string | null;
+  employeeNumber?: number;
+  designation?: string | null;
+  employeeId?: number;
+};
 export enum ProjectStatus {
   Upcoming = "Upcoming",
   Ongoing = "Ongoing",
@@ -335,6 +417,8 @@ export enum FileType {
   Other = "Other",
 }
 export const {
+  useGetApiEmployeesProjectByEmployeeIdQuery,
+  useLazyGetApiEmployeesProjectByEmployeeIdQuery,
   useGetApiProjectQuery,
   useLazyGetApiProjectQuery,
   usePostApiProjectMutation,
@@ -348,4 +432,10 @@ export const {
   useDeleteApiProjectDocumentByFileNameMutation,
   useGetApiProjectDownloadByFileNameQuery,
   useLazyGetApiProjectDownloadByFileNameQuery,
+  usePostApiProjectAssignMutation,
+  useGetApiProjectByProjectIdEmployeesQuery,
+  useLazyGetApiProjectByProjectIdEmployeesQuery,
+  useDeleteApiProjectByProjectIdEmployeesAndEmployeeIdMutation,
+  useGetApiProjectDepartmentEmployeesByDepartmentIdQuery,
+  useLazyGetApiProjectDepartmentEmployeesByDepartmentIdQuery,
 } = injectedRtkApi;

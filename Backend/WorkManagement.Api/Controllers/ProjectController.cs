@@ -188,6 +188,74 @@ namespace WorkManagement.API.Controllers
 
             return File(memory, GetContentType(filePath), fileName);
         }
+        [HttpPost("assign")]
+        public async Task<IActionResult> AssignProjectToEmployee(int projectId, int employeeId)
+        {
+            try
+            {
+                var result = await _projectService.AssignProjectToEmployee(projectId, employeeId);
+                if (result)
+                {
+                    return Ok(new { message = "Project assigned to employee successfully" });
+                }
+                else
+                {
+                    return BadRequest(new { message = "Failed to assign project to employee" });
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return StatusCode(500, new { message = "An error occurred while processing your request" });
+            }
+        }
+        [HttpGet("{projectId}/employees")]
+        public async Task<ActionResult<IEnumerable<EmployeeTeamMemberList>>> GetEmployeesByProjectId(int projectId)
+        {
+            try
+            {
+                var employees = await _projectService.GetEmployeesByProjectIdAsync(projectId);
+                if (employees == null)
+                {
+                    return NotFound("No employees found for this project.");
+                }
+                return Ok(employees);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
+        }
+
+        [HttpDelete("{projectId}/employees/{employeeId}")]
+        public async Task<IActionResult> RemoveEmployeeFromProject(int projectId, int employeeId)
+        {
+            try
+            {
+                var result = await _projectService.RemoveEmployeeFromProjectAsync(projectId, employeeId);
+                if (result)
+                {
+                    return Ok("Employee removed from project successfully.");
+                }
+                else
+                {
+                    return NotFound("Employee not found in the project or already removed.");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
+        }
+        [HttpGet("department-employees/{departmentId}")]
+        public async Task<IEnumerable<EmployeeModel>> GetEmployeeByDepartment(int projectId ,int departmentId)
+        {
+            return await _projectService.GetEmployeesNotAssignedToProjectByDepartment(projectId, departmentId);
+        }
+
+
 
         private string GetContentType(string path)
         {

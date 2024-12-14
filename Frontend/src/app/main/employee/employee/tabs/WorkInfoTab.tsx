@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
 	TextField,
 	MenuItem,
@@ -20,15 +20,17 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { DatePicker } from '@mui/x-date-pickers';
 import FuseLoading from '@fuse/core/FuseLoading';
+import { MRT_ColumnDef } from 'material-react-table';
+import DataTable from 'app/shared-components/data-table/DataTable';
 import {
 	useGetApiEmployeesDepartmentsQuery,
 	useGetApiEmployeesDesignationsQuery,
 	useGetApiEmployeesSitesQuery,
 	usePostApiEmployeesAddNewDesignationMutation,
 	usePostApiEmployeesAddNewSiteMutation,
-	useGetApiEmployeesReportToEmployeeListQuery
-	// useGetApiLeavesJoblevelsQuery,
-	// useLazyGetApiLeavesDefaultLeavesByJobLevelIdQuery
+	useGetApiEmployeesReportToEmployeeListQuery,
+	ProjectModel,
+	useGetApiEmployeesProjectByEmployeeIdQuery
 } from '../../EmployeeApi';
 
 import EnhancedAutocomplete from '../EnhancedAutocomplete';
@@ -37,6 +39,8 @@ import {
 	useGetApiLeavesJoblevelsQuery,
 	useLazyGetApiLeavesDefaultLeavesByJobLevelIdQuery
 } from '../../leave-management/LeavesApi';
+import { log } from 'node:console';
+import { ProjectStatusComponent } from 'src/app/main/Project/Projects/Projectstatus';
 
 function WorkInfoTab({ UserRole }) {
 	const methods = useFormContext();
@@ -56,7 +60,11 @@ function WorkInfoTab({ UserRole }) {
 		useGetApiEmployeesDesignationsQuery();
 	const { data: jobLevels = [], isLoading: jobLevelsLoading } = useGetApiLeavesJoblevelsQuery();
 	const [getDefaultLeaves, { isLoading: defaultLeavesLoading }] = useLazyGetApiLeavesDefaultLeavesByJobLevelIdQuery();
-
+	const { data: projects, isLoading: projectsLoading } = useGetApiEmployeesProjectByEmployeeIdQuery({
+		employeeId: parsedEmployeeId
+	});
+	console.log("projects", projects);
+	
 	const { fields, append, remove } = useFieldArray({
 		control,
 		name: 'employeeLeaves'
@@ -121,6 +129,34 @@ function WorkInfoTab({ UserRole }) {
 			throw error;
 		}
 	};
+
+	const columns = useMemo<MRT_ColumnDef<ProjectModel>[]>(
+		() => [
+			{
+				accessorKey: 'projectNumber',
+				header: 'Project Number',
+				accessorFn: (row) => `${row.projectNumber}`
+			},
+			{
+				accessorKey: 'projectName',
+				header: 'Project Name',
+				accessorFn: (row) => row.projectName
+			},
+			{
+				accessorKey: 'projectDiscription',
+				header: 'Project Description',
+				accessorFn: (row) => `${row.projectDescription}`
+			},
+			{
+							accessorKey: 'status',
+							header: 'Project Status',
+							Cell: ({ row }) => (
+								<ProjectStatusComponent status={row.original.status} />
+							  )
+						}
+		],
+		[]
+	);
 
 	if (designationLoading || siteLoading || departmentLoading || jobLevelsLoading || defaultLeavesLoading) {
 		return (
@@ -522,7 +558,7 @@ function WorkInfoTab({ UserRole }) {
 						name="employeeWorkInformation.hireDate"
 						render={({ field: { value, onChange } }) => (
 							<DatePicker
-							value={value ? new Date(value) : new Date()}
+								value={value ? new Date(value) : new Date()}
 								onChange={(val) => {
 									onChange(val?.toISOString());
 								}}
@@ -599,6 +635,32 @@ function WorkInfoTab({ UserRole }) {
 					/>
 				</div>
 			</div>
+
+			<div className="space-y-16">
+				<div className="flex items-center border-b-1 space-x-8 pb-8">
+					<FuseSvgIcon
+						color="action"
+						size={24}
+					>
+						heroicons-outline:presentation-chart-bar
+					</FuseSvgIcon>
+					<Typography
+						className="text-2xl"
+						color="text.secondary"
+					>
+						Assiegned Projects
+					</Typography>
+				</div>
+
+				<DataTable
+					enableTopToolbar={false}
+					enableRowActions={false}
+					enableRowSelection={false}
+					data={projects}
+					columns={columns}
+				/>
+			</div>
+
 			{/* Leave Information section */}
 			<div className="space-y-16">
 				<div className="flex items-center border-b-1 space-x-8 pb-8">

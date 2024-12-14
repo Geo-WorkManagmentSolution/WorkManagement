@@ -7,6 +7,7 @@ using WorkManagement.Domain.Entity;
 using WorkManagement.Domain.Entity.EmployeeLeaveTables;
 using WorkManagement.Domain.Models.Dropdown;
 using WorkManagement.Domain.Models.Employee;
+using WorkManagement.Domain.Models.Project;
 using WorkManagementSolution.Employee;
 
 namespace WorkManagement.Domain.Contracts
@@ -17,6 +18,7 @@ namespace WorkManagement.Domain.Contracts
 
         public Task<List<EmployeeCategory>> GetEmployeeCategories();
         public Task<List<EmployeeDepartment>> GetEmployeeDepartments();
+
         public Task<List<EmployeeDesignation>> GetEmployeeDesignations();
         public Task<List<Site>> GetSites();
         public Task<List<EmployeeReportToModel>> GetReportToEmployeeList(int? departmentId, int? employeeId);
@@ -43,7 +45,8 @@ namespace WorkManagement.Domain.Contracts
         public Task<string> UpdateEmployeeDocumentData(int id, string fileName, FileType fileType, long fileSize, string filePath, byte[] fileContent);
         public string GetEmployeeFilePath(int id, string fileName);
         public Task<bool> DeleteEmployeeFile(int employeeId, string fileName);
-        #endregion        
+        public Task<List<ProjectModel>> GetProjectsByEmployeeIdAsync(int employeeId);
+        #endregion
 
         #region Employee Leave
 

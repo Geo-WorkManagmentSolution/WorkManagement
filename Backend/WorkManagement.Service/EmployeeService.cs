@@ -7,6 +7,7 @@ using WorkManagement.Domain.Entity.EmployeeLeaveTables;
 using WorkManagement.Domain.Models.Dropdown;
 using WorkManagement.Domain.Models.Email;
 using WorkManagement.Domain.Models.Employee;
+using WorkManagement.Domain.Models.Project;
 using WorkManagement.Domain.Utility;
 using WorkManagementSolution.Employee;
 using WorkManagmentSolution.EFCore;
@@ -1819,14 +1820,46 @@ namespace WorkManagement.Service
 
             return model;
         }
-    
+
+        public async Task<List<ProjectModel>> GetProjectsByEmployeeIdAsync(int employeeId)
+        {
+            try
+            {
+                var projects = await _dbContext.ProjectEmployees
+                    .Where(pe => pe.EmployeeId == employeeId && !pe.IsDeleted)
+                    .Select(pe => new ProjectModel
+                    {
+                        Id = pe.Project.Id,
+                        ProjectName = string.IsNullOrEmpty(pe.Project.ProjectName) ? "" : pe.Project.ProjectName.Trim(),
+                        ProjectNumber = string.IsNullOrEmpty(pe.Project.ProjectNumber) ? "" : pe.Project.ProjectNumber.Trim(),
+                        ProjectDescription = string.IsNullOrEmpty(pe.Project.ProjectDescription) ? "" : pe.Project.ProjectDescription.Trim(),
+                        StartDate = pe.Project.StartDate,
+                        EndDate = pe.Project.EndDate,
+                        WorkOrderName = pe.Project.WorkOrderName,
+                        WorkOrderNumber = pe.Project.WorkOrderNumber,
+                        WorkOrderDate = pe.Project.WorkOrderDate,
+                        PeriodOfWorkInMonths = pe.Project.PeriodOfWorkInMonths,
+                        Status = pe.Project.Status,
+                        WorkOrderAmount = pe.Project.WorkOrderAmount
+                    })
+                    .ToListAsync();
+
+                return projects;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                // In a production environment, use a proper logging mechanism
+                Console.WriteLine($"Error retrieving projects for employee: {ex.Message}");
+                return new List<ProjectModel>();
+            }
+        }
 
 
 
+        #endregion
 
-    #endregion
-
-    public async Task<(bool isValid, string errorMessage)> ValidateLeaveRequest(DateTime startDate, DateTime endDate, int employeeId)
+        public async Task<(bool isValid, string errorMessage)> ValidateLeaveRequest(DateTime startDate, DateTime endDate, int employeeId)
         {
             // Check for existing leaves
             var existingLeaves = await _dbContext.EmployeeLeaves
@@ -1856,6 +1889,6 @@ namespace WorkManagement.Service
             return (true, string.Empty);
         }
 
-       
+        
     }
 }

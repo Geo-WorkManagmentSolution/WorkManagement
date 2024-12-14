@@ -18,14 +18,19 @@ import EmployeeHeader from './ProjectHeader';
 import BasicProjectInfoTab from './tabs/BasicProjectInfoTab';
 import { useGetApiProjectByIdQuery } from '../ProjectApi';
 import WorkOrderDocuments from './tabs/WorkOrderDocuments';
+import EmployeeProject from './tabs/EmployeeProject';
 
 const projectSchema = yup.object({
 	projectName: yup.string().min(1, 'Project name is required').required(),
 	projectNumber: yup.string().nullable(),
 	projectDescription: yup.string().nullable(),
 	startDate: yup.date().required('Start Date is required'),
-	endDate: yup .date().nullable()
-	.when('startDate', (startDate, schema) => { return startDate && schema.min(startDate, 'End Date must be later than Start Date'); }),
+	endDate: yup
+		.date()
+		.nullable()
+		.when('startDate', (startDate, schema) => {
+			return startDate && schema.min(startDate, 'End Date must be later than Start Date');
+		})
 	// workOrderNumber:yup.string().min(1, 'Work Order Number is required').required(),
 });
 
@@ -138,13 +143,20 @@ function Project() {
 								value="work-order-documents"
 								label="Work Order Documents"
 							/>
+							<FuseTab
+								value="Project-Allocations"
+								label="Project Allocations"
+							/>
 						</FuseTabs>
 						<div className="">
 							<div className={tabValue !== 'basic-project-info' ? 'hidden' : ''}>
 								<BasicProjectInfoTab />
 							</div>
-							<div className={tabValue !== 'work-order-documents' ? 'hidden': ''}>
+							<div className={tabValue !== 'work-order-documents' ? 'hidden' : ''}>
 								<WorkOrderDocuments />
+							</div>
+							<div className={tabValue !== 'Project-Allocations' ? 'hidden' : ''}>
+								<EmployeeProject />
 							</div>
 						</div>
 					</div>

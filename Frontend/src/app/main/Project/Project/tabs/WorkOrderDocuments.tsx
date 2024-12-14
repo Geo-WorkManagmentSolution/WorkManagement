@@ -18,6 +18,7 @@ import {
 	ProjectWorkOrders
 } from '../../ProjectApi';
 import ItemIcon from './ItemIcon';
+import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 
 interface FileInfo extends ProjectWorkOrders {
 	isExisting?: boolean;
@@ -54,6 +55,9 @@ const FileCard: React.FC<{
 			className="p-10 my-20"
 			elevation={3}
 		>
+
+
+
 			<Grid
 				container
 				alignItems="center"
@@ -230,6 +234,21 @@ export default function WorkOrderDocuments() {
 
 	return (
 		<Box sx={{ margin: 'auto', padding: 2 }}>
+			<div className="flex items-center border-b-1 space-x-8 pb-8 mb-16">
+					<FuseSvgIcon
+						color="action"
+						size={24}
+					>
+						heroicons-outline:document
+					</FuseSvgIcon>
+					<Typography
+						className="text-2xl"
+						color="text.secondary"
+					>
+						Work Order Documents
+					</Typography>
+				</div>
+
 			<div
     className="border-2 border-dashed border-gray-300 rounded p-16 text-center mb-2 cursor-pointer hover:bg-gray-200"
     onDrop={(e) => {
@@ -245,7 +264,6 @@ export default function WorkOrderDocuments() {
     onDragOver={(e) => e.preventDefault()}
 >
    
-
 
 				<input
 					type="file"
@@ -279,7 +297,7 @@ export default function WorkOrderDocuments() {
 					Only PDF, DOC, DOCX, TXT, JPG, JPEG, PNG, GIF, ZIP, XLSX, and CSV files are allowed
 				</Typography>
 				</div>
-
+			
 			
 			{isLoadingDocuments ? (
 				<Alert
