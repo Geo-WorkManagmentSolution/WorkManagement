@@ -1,11 +1,15 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Generic;
 using System.Security.Claims;
 using WorkManagement.Domain.Entity;
 using WorkManagement.Domain.Entity.EmployeeLeaveTables;
 using WorkManagement.Domain.Models;
 using WorkManagementSolution.Employee;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace WorkManagmentSolution.EFCore
 {
@@ -18,7 +22,7 @@ namespace WorkManagmentSolution.EFCore
 
         public WorkManagementDbContext(DbContextOptions<WorkManagementDbContext> options) : base(options)
         {
-}
+        }
 
 
         public virtual DbSet<Employee> Employees { get; set; }
@@ -45,6 +49,9 @@ namespace WorkManagmentSolution.EFCore
 
         public virtual DbSet<JobLevelLeave> JobLevelLeave { get; set; }
 
+        public virtual DbSet<RolePermission> RolePermissions { get; set; }
+        public virtual DbSet<PermissionAction> PermissionActions { get; set; }
+        public virtual DbSet<PermissionCategory> PermissionCategories { get; set; }
 
         public IHttpContextAccessor HttpContextAccessor { get; }
 
@@ -67,6 +74,38 @@ namespace WorkManagmentSolution.EFCore
             //        mutableEntityType.SetQueryFilter(lambdaExpression);
             //    }
             //}
+
+            modelBuilder.Entity<ApplicationRole>().HasData(new ApplicationRole { Id = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210"), Name = "admin", NormalizedName = "admin".ToUpper() });
+            modelBuilder.Entity<ApplicationRole>().HasData(new ApplicationRole { Id = new Guid("2800e45a-293d-4c8e-8b91-2f57cce4b963"), Name = "Manager", NormalizedName = "Manager".ToUpper() });
+            modelBuilder.Entity<ApplicationRole>().HasData(new ApplicationRole { Id = new Guid("611c6e4c-c1fc-49a4-847e-fb9608f460c0"), Name = "SuperUser", NormalizedName = "SuperUser".ToUpper() });
+            modelBuilder.Entity<ApplicationRole>().HasData(new ApplicationRole { Id = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7"), Name = "HR Admin", NormalizedName = "HR Admin".ToUpper() });
+            modelBuilder.Entity<ApplicationRole>().HasData(new ApplicationRole { Id = new Guid("f794ec58-bf79-4ca0-a897-021e0657ca42"), Name = "HR", NormalizedName = "HR".ToUpper() });
+            modelBuilder.Entity<ApplicationRole>().HasData(new ApplicationRole { Id = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f"), Name = "Employee", NormalizedName = "Employee".ToUpper() });
+
+
+            var hasher = new PasswordHasher<ApplicationUser>();
+
+            //Seeding the User to AspNetUsers table
+            modelBuilder.Entity<ApplicationUser>().HasData(
+                new ApplicationUser
+                {
+                    Id = new Guid("8e445865-a24d-4543-a6c6-9443d048cdb9"), // primary key
+                    UserName = "admin1@admin.com",
+                    NormalizedUserName = "admin",
+                    Email = "admin1@admin.com",
+                    PasswordHash = hasher.HashPassword(null, "admin@admin.com")
+                }
+            );
+
+            modelBuilder.Entity<IdentityUserRole<Guid>>().HasData(
+                new IdentityUserRole<Guid>
+                {
+                    RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210"),
+                    UserId = new Guid("8e445865-a24d-4543-a6c6-9443d048cdb9")
+                }
+            );
+
+
             modelBuilder.HasSequence<int>("EmployeeNumber")
             .StartsAt(1000)
             .IncrementsBy(1);
@@ -81,9 +120,6 @@ namespace WorkManagmentSolution.EFCore
                 new JobLevelLeave { Id = 2, JobLevel = "Middle level" },
                 new JobLevelLeave { Id = 3, JobLevel = "Senior level" }
                 );
-
-
-
 
             modelBuilder.Entity<EmployeeCategory>().HasData(
                      new EmployeeCategory { Id = 1, Name = "Full-Time" },

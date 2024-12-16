@@ -98,7 +98,6 @@ namespace WorkManagementSolution.Employee
         [ForeignKey("EmployeeId")]
         public Employee? Employee { get; set; }
 
-
     }
     public class EmployeeDepartment : BaseEntity
     {

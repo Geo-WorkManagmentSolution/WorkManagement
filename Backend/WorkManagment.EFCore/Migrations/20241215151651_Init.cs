@@ -36,7 +36,7 @@ namespace WorkManagement.EFCore.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Shortcuts = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Shortcuts = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -198,16 +198,51 @@ namespace WorkManagement.EFCore.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "JobLevelLeave",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    JobLevel = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_JobLevelLeave", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PermissionCategories",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Value = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PermissionCategories", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Projects",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProjectName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ProjectNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ProjectDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProjectNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ProjectDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    WorkOrderNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    WorkOrderName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    WorkOrderAmount = table.Column<double>(type: "float", nullable: true),
+                    PeriodOfWorkInMonths = table.Column<int>(type: "int", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: true),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    WorkOrderDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedOn = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     LastModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -373,6 +408,7 @@ namespace WorkManagement.EFCore.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     EmployeeLeaveTypeId = table.Column<int>(type: "int", nullable: true),
+                    JobLevelLeaveId = table.Column<int>(type: "int", nullable: true),
                     TotalLeaves = table.Column<int>(type: "int", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
@@ -383,6 +419,32 @@ namespace WorkManagement.EFCore.Migrations
                         name: "FK_EmployeeDefaultLeave_EmployeeLeaveType_EmployeeLeaveTypeId",
                         column: x => x.EmployeeLeaveTypeId,
                         principalTable: "EmployeeLeaveType",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_EmployeeDefaultLeave_JobLevelLeave_JobLevelLeaveId",
+                        column: x => x.JobLevelLeaveId,
+                        principalTable: "JobLevelLeave",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PermissionActions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Value = table.Column<int>(type: "int", nullable: false),
+                    PermissionCategoryId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PermissionActions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PermissionActions_PermissionCategories_PermissionCategoryId",
+                        column: x => x.PermissionCategoryId,
+                        principalTable: "PermissionCategories",
                         principalColumn: "Id");
                 });
 
@@ -421,6 +483,33 @@ namespace WorkManagement.EFCore.Migrations
                         column: x => x.SiteId,
                         principalTable: "Sites",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RolePermissions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PermissionActionId = table.Column<int>(type: "int", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RolePermissions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RolePermissions_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_RolePermissions_PermissionActions_PermissionActionId",
+                        column: x => x.PermissionActionId,
+                        principalTable: "PermissionActions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -524,6 +613,7 @@ namespace WorkManagement.EFCore.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FileName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FilePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FileSize = table.Column<int>(type: "int", nullable: true),
                     FileContent = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     FileType = table.Column<int>(type: "int", nullable: true),
@@ -680,6 +770,24 @@ namespace WorkManagement.EFCore.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[,]
+                {
+                    { new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7"), null, "HR Admin", "HR ADMIN" },
+                    { new Guid("2800e45a-293d-4c8e-8b91-2f57cce4b963"), null, "Manager", "MANAGER" },
+                    { new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210"), null, "admin", "ADMIN" },
+                    { new Guid("611c6e4c-c1fc-49a4-847e-fb9608f460c0"), null, "SuperUser", "SUPERUSER" },
+                    { new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f"), null, "Employee", "EMPLOYEE" },
+                    { new Guid("f794ec58-bf79-4ca0-a897-021e0657ca42"), null, "HR", "HR" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUsers",
+                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "Shortcuts", "TwoFactorEnabled", "UserName" },
+                values: new object[] { new Guid("8e445865-a24d-4543-a6c6-9443d048cdb9"), 0, "e65c3fe0-ae07-471f-971f-84a816e1c104", "admin1@admin.com", false, false, null, null, "admin", "AQAAAAIAAYagAAAAEOk2Tc+MCUrABZay7NoCnEHAu9J8fHqlVopLDdyD+52ov65KN/buXJE+Q8t/KsvBtw==", null, false, null, null, false, "admin1@admin.com" });
+
+            migrationBuilder.InsertData(
                 table: "EmployeeCategories",
                 columns: new[] { "Id", "IsDeleted", "Name" },
                 values: new object[,]
@@ -740,16 +848,31 @@ namespace WorkManagement.EFCore.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "EmployeeDefaultLeave",
-                columns: new[] { "Id", "EmployeeLeaveTypeId", "IsDeleted", "TotalLeaves" },
+                table: "JobLevelLeave",
+                columns: new[] { "Id", "IsDeleted", "JobLevel" },
                 values: new object[,]
                 {
-                    { 1, 1, false, 5 },
-                    { 2, 2, false, 5 },
-                    { 3, 3, false, 5 },
-                    { 4, 4, false, 5 },
-                    { 5, 5, false, 5 },
-                    { 6, 6, false, 5 }
+                    { 1, false, "Junior level" },
+                    { 2, false, "Middle level" },
+                    { 3, false, "Senior level" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUserRoles",
+                columns: new[] { "RoleId", "UserId" },
+                values: new object[] { new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210"), new Guid("8e445865-a24d-4543-a6c6-9443d048cdb9") });
+
+            migrationBuilder.InsertData(
+                table: "EmployeeDefaultLeave",
+                columns: new[] { "Id", "EmployeeLeaveTypeId", "IsDeleted", "JobLevelLeaveId", "TotalLeaves" },
+                values: new object[,]
+                {
+                    { 1, 1, false, null, 5 },
+                    { 2, 2, false, null, 5 },
+                    { 3, 3, false, null, 5 },
+                    { 4, 4, false, null, 5 },
+                    { 5, 5, false, null, 5 },
+                    { 6, 6, false, null, 5 }
                 });
 
             migrationBuilder.CreateIndex(
@@ -795,6 +918,11 @@ namespace WorkManagement.EFCore.Migrations
                 name: "IX_EmployeeDefaultLeave_EmployeeLeaveTypeId",
                 table: "EmployeeDefaultLeave",
                 column: "EmployeeLeaveTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmployeeDefaultLeave_JobLevelLeaveId",
+                table: "EmployeeDefaultLeave",
+                column: "JobLevelLeaveId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_EmployeeDocuments_EmployeeId",
@@ -897,6 +1025,11 @@ namespace WorkManagement.EFCore.Migrations
                 column: "SiteId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PermissionActions_PermissionCategoryId",
+                table: "PermissionActions",
+                column: "PermissionCategoryId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ProjectEmployees_EmployeeId",
                 table: "ProjectEmployees",
                 column: "EmployeeId");
@@ -905,6 +1038,16 @@ namespace WorkManagement.EFCore.Migrations
                 name: "IX_ProjectEmployees_ProjectId",
                 table: "ProjectEmployees",
                 column: "ProjectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RolePermissions_PermissionActionId",
+                table: "RolePermissions",
+                column: "PermissionActionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RolePermissions_RoleId",
+                table: "RolePermissions",
+                column: "RoleId");
         }
 
         /// <inheritdoc />
@@ -950,6 +1093,12 @@ namespace WorkManagement.EFCore.Migrations
                 name: "ProjectEmployees");
 
             migrationBuilder.DropTable(
+                name: "RolePermissions");
+
+            migrationBuilder.DropTable(
+                name: "JobLevelLeave");
+
+            migrationBuilder.DropTable(
                 name: "EmployeeLeaveType");
 
             migrationBuilder.DropTable(
@@ -957,6 +1106,9 @@ namespace WorkManagement.EFCore.Migrations
 
             migrationBuilder.DropTable(
                 name: "Projects");
+
+            migrationBuilder.DropTable(
+                name: "PermissionActions");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -984,6 +1136,9 @@ namespace WorkManagement.EFCore.Migrations
 
             migrationBuilder.DropTable(
                 name: "EmployeeWorkInformations");
+
+            migrationBuilder.DropTable(
+                name: "PermissionCategories");
 
             migrationBuilder.DropTable(
                 name: "EmployeeDesignations");

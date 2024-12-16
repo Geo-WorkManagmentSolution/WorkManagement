@@ -12,8 +12,8 @@ using WorkManagmentSolution.EFCore;
 namespace WorkManagement.EFCore.Migrations
 {
     [DbContext(typeof(WorkManagementDbContext))]
-    [Migration("20241127114220_AddFilePathToEmployeeDocuments")]
-    partial class AddFilePathToEmployeeDocuments
+    [Migration("20241215151651_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -110,6 +110,13 @@ namespace WorkManagement.EFCore.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = new Guid("8e445865-a24d-4543-a6c6-9443d048cdb9"),
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
@@ -157,6 +164,44 @@ namespace WorkManagement.EFCore.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210"),
+                            Name = "admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = new Guid("2800e45a-293d-4c8e-8b91-2f57cce4b963"),
+                            Name = "Manager",
+                            NormalizedName = "MANAGER"
+                        },
+                        new
+                        {
+                            Id = new Guid("611c6e4c-c1fc-49a4-847e-fb9608f460c0"),
+                            Name = "SuperUser",
+                            NormalizedName = "SUPERUSER"
+                        },
+                        new
+                        {
+                            Id = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7"),
+                            Name = "HR Admin",
+                            NormalizedName = "HR ADMIN"
+                        },
+                        new
+                        {
+                            Id = new Guid("f794ec58-bf79-4ca0-a897-021e0657ca42"),
+                            Name = "HR",
+                            NormalizedName = "HR"
+                        },
+                        new
+                        {
+                            Id = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f"),
+                            Name = "Employee",
+                            NormalizedName = "EMPLOYEE"
+                        });
                 });
 
             modelBuilder.Entity("WorkManagement.Domain.Entity.ApplicationUser", b =>
@@ -206,7 +251,6 @@ namespace WorkManagement.EFCore.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Shortcuts")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("TwoFactorEnabled")
@@ -227,6 +271,22 @@ namespace WorkManagement.EFCore.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("8e445865-a24d-4543-a6c6-9443d048cdb9"),
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "e65c3fe0-ae07-471f-971f-84a816e1c104",
+                            Email = "admin1@admin.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            NormalizedUserName = "admin",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOk2Tc+MCUrABZay7NoCnEHAu9J8fHqlVopLDdyD+52ov65KN/buXJE+Q8t/KsvBtw==",
+                            PhoneNumberConfirmed = false,
+                            TwoFactorEnabled = false,
+                            UserName = "admin1@admin.com"
+                        });
                 });
 
             modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeCategory", b =>
@@ -283,12 +343,17 @@ namespace WorkManagement.EFCore.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("JobLevelLeaveId")
+                        .HasColumnType("int");
+
                     b.Property<int>("TotalLeaves")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("EmployeeLeaveTypeId");
+
+                    b.HasIndex("JobLevelLeaveId");
 
                     b.ToTable("EmployeeDefaultLeave");
 
@@ -574,6 +639,99 @@ namespace WorkManagement.EFCore.Migrations
                         });
                 });
 
+            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.JobLevelLeave", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("JobLevel")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("JobLevelLeave");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            IsDeleted = false,
+                            JobLevel = "Junior level"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            IsDeleted = false,
+                            JobLevel = "Middle level"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            IsDeleted = false,
+                            JobLevel = "Senior level"
+                        });
+                });
+
+            modelBuilder.Entity("WorkManagement.Domain.Entity.PermissionAction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("PermissionCategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Value")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PermissionCategoryId");
+
+                    b.ToTable("PermissionActions");
+                });
+
+            modelBuilder.Entity("WorkManagement.Domain.Entity.PermissionCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Value")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PermissionCategories");
+                });
+
             modelBuilder.Entity("WorkManagement.Domain.Entity.Project", b =>
                 {
                     b.Property<int>("Id")
@@ -600,8 +758,10 @@ namespace WorkManagement.EFCore.Migrations
                     b.Property<DateTimeOffset>("LastModifiedOn")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<int?>("PeriodOfWorkInMonths")
+                        .HasColumnType("int");
+
                     b.Property<string>("ProjectDescription")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProjectName")
@@ -609,11 +769,25 @@ namespace WorkManagement.EFCore.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProjectNumber")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<int?>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<double?>("WorkOrderAmount")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime?>("WorkOrderDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("WorkOrderName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WorkOrderNumber")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -656,6 +830,32 @@ namespace WorkManagement.EFCore.Migrations
                     b.HasIndex("ProjectId");
 
                     b.ToTable("ProjectEmployees");
+                });
+
+            modelBuilder.Entity("WorkManagement.Domain.Entity.RolePermission", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("PermissionActionId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PermissionActionId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("RolePermissions");
                 });
 
             modelBuilder.Entity("WorkManagementSolution.Employee.Employee", b =>
@@ -1305,7 +1505,13 @@ namespace WorkManagement.EFCore.Migrations
                         .WithMany()
                         .HasForeignKey("EmployeeLeaveTypeId");
 
+                    b.HasOne("WorkManagement.Domain.Entity.EmployeeLeaveTables.JobLevelLeave", "JobLevelLeaves")
+                        .WithMany()
+                        .HasForeignKey("JobLevelLeaveId");
+
                     b.Navigation("EmployeeLeaveTypes");
+
+                    b.Navigation("JobLevelLeaves");
                 });
 
             modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeave", b =>
@@ -1344,6 +1550,15 @@ namespace WorkManagement.EFCore.Migrations
                     b.Navigation("EmployeeLeaveTypes");
                 });
 
+            modelBuilder.Entity("WorkManagement.Domain.Entity.PermissionAction", b =>
+                {
+                    b.HasOne("WorkManagement.Domain.Entity.PermissionCategory", "PermissionCategory")
+                        .WithMany("PermissionActions")
+                        .HasForeignKey("PermissionCategoryId");
+
+                    b.Navigation("PermissionCategory");
+                });
+
             modelBuilder.Entity("WorkManagement.Domain.Entity.ProjectEmployee", b =>
                 {
                     b.HasOne("WorkManagementSolution.Employee.Employee", "Employee")
@@ -1361,6 +1576,25 @@ namespace WorkManagement.EFCore.Migrations
                     b.Navigation("Employee");
 
                     b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("WorkManagement.Domain.Entity.RolePermission", b =>
+                {
+                    b.HasOne("WorkManagement.Domain.Entity.PermissionAction", "PermissionAction")
+                        .WithMany("RolePermissions")
+                        .HasForeignKey("PermissionActionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WorkManagement.Domain.Entity.ApplicationRole", "Role")
+                        .WithMany("RolePermissions")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PermissionAction");
+
+                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("WorkManagementSolution.Employee.Employee", b =>
@@ -1479,6 +1713,21 @@ namespace WorkManagement.EFCore.Migrations
                         .HasForeignKey("SiteId");
 
                     b.Navigation("Site");
+                });
+
+            modelBuilder.Entity("WorkManagement.Domain.Entity.ApplicationRole", b =>
+                {
+                    b.Navigation("RolePermissions");
+                });
+
+            modelBuilder.Entity("WorkManagement.Domain.Entity.PermissionAction", b =>
+                {
+                    b.Navigation("RolePermissions");
+                });
+
+            modelBuilder.Entity("WorkManagement.Domain.Entity.PermissionCategory", b =>
+                {
+                    b.Navigation("PermissionActions");
                 });
 
             modelBuilder.Entity("WorkManagementSolution.Employee.Employee", b =>

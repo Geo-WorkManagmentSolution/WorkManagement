@@ -18,6 +18,7 @@ using WorkManagmentSolution.EFCore;
 using WorkManagement.Domain.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using WorkManagementSolution.Employee;
+using Newtonsoft.Json;
 
 namespace WorkManagement.API.Controllers
 {
@@ -70,6 +71,7 @@ namespace WorkManagement.API.Controllers
                         ApplicationUser? user = await workManagementDbContext.Users.FirstOrDefaultAsync(s => s.UserName == userloginModel.Email);
                         var role = await userManager.GetRolesAsync(user);
                         var token = _authService.GenerateJwtToken(userloginModel.Email, role.FirstOrDefault(), user.Id.ToString());
+
                         var User = mapper.Map<UserModel>(user);
                         User.Role = role.FirstOrDefault();
 

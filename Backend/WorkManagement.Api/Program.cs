@@ -18,6 +18,10 @@ using WorkManagement.Domain.Models.Email;
 using System.Text.Json.Serialization;
 using WorkManagement.Domain;
 using Newtonsoft.Json.Converters;
+using WorkManagement.API.Controllers;
+using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Authorization;
+using WorkManagement.Domain.Attribute;
 
 
 
@@ -74,6 +78,8 @@ try
     builder.Services.AddScoped<IProjectService, ProjectServices>();
     builder.Services.AddScoped<IEmailService, EmailService>();
     builder.Services.AddScoped<ILeavesService, LeavesService>();
+    builder.Services.AddScoped<IPermissionService, PermissionService>();
+
     builder.Services.AddCors();
     builder.Services.AddSwaggerGen(option =>
     {
@@ -107,12 +113,27 @@ try
     builder.Services.AddTransient<ProjectServices>();
     builder.Services.AddTransient<EmailService>();
     builder.Services.AddTransient<LeavesService>();
+    builder.Services.AddTransient<PermissionService>();
 
     builder.Services.AddAutoMapper(typeof(WorkManagement.Domain.AutoMapper.Profiles.EmployeeProfile).Assembly);
+    builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionAuthPolicyProvider>();
 
     builder.AddJWTAuthetication();
+    builder.Services.AddAuthorization();
+    //builder.Services.AddAuthorization(options =>
+    //{
+    //    options.DefaultPolicy = 
+    //    options.DefaultPolicy("UserPolicy", policyBuilder =>
+    //    {
+    //        policyBuilder.RequireAuthenticatedUser();
+    //    }
+
+    //        //options.AddPolicy("PermissionPolicy", policy =>
+    //        //policy.Requirements.Add(new PermissionRequirement()));
+    //});
     builder.Services.AddControllers()
-    .AddJsonOptions(options => {
+    .AddJsonOptions(options =>
+    {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         //options.SerializerSettings.Converters.Add(new JsonNullableStringEnumConverter());
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
@@ -120,47 +141,23 @@ try
     });
     var app = builder.Build();
 
-   
+
 
     // Run pending migrations in DB
     using (var scope = app.Services.CreateScope()) // this will use `IServiceScopeFactory` internally
     {
-        try
-        {
-            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
 
-            var roles = new[] { "admin", "Manager", "SuperUser", "HR Admin", "HR", "Employee" };
-
-            foreach(var role in roles)
-            {
-                if(!await roleManager.RoleExistsAsync(role))
-                {
-                    var newRole = new ApplicationRole { Name = role };
-                    await roleManager.CreateAsync(newRole);
-                }
-            }
-
-
-            var db = scope.ServiceProvider.GetService<WorkManagementDbContext>();
-            await db.Database.MigrateAsync();
-
-        }
-        catch (Exception e)
-        {
-
-        }
+        var db = scope.ServiceProvider.GetService<WorkManagementDbContext>();
+        await db.Database.MigrateAsync();
     }
 
     //should be changed in future
 
-    if (app.Environment.IsDevelopment())
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
     {
-        app.UseSwagger();
-        app.UseSwaggerUI(c =>
-        {
-            c.SwaggerEndpoint("/swagger/v1/swagger.json", "Work Management API v1");
-        });
-    }
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Work Management API v1");
+    });
 
 
     // Configure the HTTP request pipeline.
@@ -176,7 +173,7 @@ try
     app.MapControllers();
 
     app.UseMiddleware<ErrorHandlingMiddleware>();
-    app.Map("/",async context =>
+    app.Map("/", async context =>
     {
         await context.Response.WriteAsync("Api is Up & running!");
     });
@@ -187,6 +184,7 @@ try
 catch (Exception ex)
 {
     Log.Error(ex, "An error occurred in web starting");
+    throw;
 }
 finally
 {
