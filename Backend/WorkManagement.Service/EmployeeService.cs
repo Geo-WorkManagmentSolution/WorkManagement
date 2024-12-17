@@ -1073,12 +1073,24 @@ namespace WorkManagement.Service
             var employee = _dbContext.Employees.FirstOrDefault(s=>s.Id == id && !s.IsDeleted);
             if(employee != null)
             {
-                returnFilePath = employee.FirstName + "_" + employee.LastName + "_" + fileName;
+                returnFilePath = fileName;
             }
 
             return returnFilePath;
         }
-        
+
+        public async Task<string> GetEmployeeFolderPath(int id)
+        {
+            var returnFolderPath = "";
+            var employee = _dbContext.Employees.FirstOrDefault(s => s.Id == id && !s.IsDeleted);
+            if (employee != null)
+            {
+                returnFolderPath = employee.FirstName + "_" + employee.LastName;
+            }
+
+            return returnFolderPath;
+        }
+
         public string GetEmployeeFilePath(int id, string fileName)
         {
             var retunrFilePath = "";
