@@ -8,6 +8,14 @@ const SettingsAppNavigation: FuseNavItemType = {
 	url: '/apps/settings',
 	children: [
 		{
+			id: 'apps.settings.permission-manager',
+			icon: 'heroicons-outline:shield-check',
+			title: 'Permission Manager',
+			subtitle: 'Manage user permissions and access controls',
+			type: 'item',
+			url: '/apps/settings/permission-manager'
+		},
+		{
 			id: 'apps.settings.dropdown',
 			icon: 'heroicons-outline:arrow-turn-left-down',
 			title: 'Dropdown Setting',

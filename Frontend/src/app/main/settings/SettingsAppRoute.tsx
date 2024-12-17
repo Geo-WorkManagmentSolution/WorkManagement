@@ -4,6 +4,7 @@ import { FuseRouteItemType } from '@fuse/utils/FuseUtils';
 import { Navigate } from 'react-router';
 import { authRoles } from 'src/app/auth';
 import DropDownForm from './tabs/DropDownForm';
+import PermissionManager from './tabs/PermissionManager';
 
 const SettingsApp = lazy(() => import('./SettingsApp'));
 const DefaultLeaveForm = lazy(() => import('./tabs/DefaultLeaveForm'));
@@ -17,6 +18,10 @@ const SettingsAppRoute: FuseRouteItemType = {
 	element: <SettingsApp />,
 	auth: authRoles.admin,
 	children: [
+		{
+			path: 'permission-manager',
+            element: <PermissionManager />
+		},
 		{
 			path: 'dropdown',
 			element: <DropDownForm />
