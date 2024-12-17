@@ -22,26 +22,26 @@ namespace WorkManagement.Service
             this.mapper = mapper;
         }
 
-        public async Task<List<ProjectModel>> GetAllProjectsAsync()
+        public async Task<List<ProjectDashboardModel>> GetAllProjectsAsync()
         {
 
             try
             {
                 var projects = (from p in _dbContext.Projects.Where(s=>!s.IsDeleted)
-                                select new ProjectModel
+                                select new ProjectDashboardModel
                                 {
                                     Id = p.Id,
                                     ProjectName = string.IsNullOrEmpty(p.ProjectName) ? "" : p.ProjectName.Trim(),
                                     ProjectNumber = string.IsNullOrEmpty(p.ProjectNumber) ? "" : p.ProjectNumber.Trim(),
                                     ProjectDescription = string.IsNullOrEmpty(p.ProjectDescription) ? "" : p.ProjectDescription.Trim(),
-                                    StartDate = p.StartDate,
-                                    EndDate = p.EndDate,
-                                    WorkOrderName=p.WorkOrderName,
-                                    WorkOrderNumber = p.WorkOrderNumber,
-                                    WorkOrderDate = p.WorkOrderDate,
-                                    PeriodOfWorkInMonths=p.PeriodOfWorkInMonths,
+                                    StartDate = p.StartDate.ToString("yyyy-MM-dd"),
+                                    EndDate = p.EndDate.HasValue ?  p.EndDate.Value.ToString("yyyy-MM-dd") : "",
+                                    WorkOrderName= string.IsNullOrEmpty(p.WorkOrderName) ? "" : p.WorkOrderName,
+                                    WorkOrderNumber = string.IsNullOrEmpty(p.WorkOrderNumber) ? "" : p.WorkOrderNumber,
+                                    WorkOrderDate = p.WorkOrderDate.HasValue ? p.WorkOrderDate.Value.ToString("yyyy-MM-dd") : "",
+                                    PeriodOfWorkInMonths=p.PeriodOfWorkInMonths.HasValue ? p.PeriodOfWorkInMonths.Value : 0,
                                     Status=p.Status,
-                                    WorkOrderAmount=p.WorkOrderAmount,
+                                    WorkOrderAmount=p.WorkOrderAmount.HasValue ? p.WorkOrderAmount.Value : 0,
                                     
                                     
 
@@ -255,9 +255,17 @@ namespace WorkManagement.Service
         }
         public async Task<List<ProjectWorkOrders>> GetProjectDocumentsAsync(int projectId)
         {
-            return await _dbContext.WorkOrderDocuments
-                .Where(d => d.ProjectId == projectId)
-                .ToListAsync();
+            var returnDocumentList = new List<ProjectWorkOrders>();
+
+            var projectDocs = _dbContext.WorkOrderDocuments.Where(s => s.ProjectId == projectId).ToList();
+            if(projectDocs == null)
+            {
+                return returnDocumentList;
+            }
+            else
+            {
+                return projectDocs;
+            }
         }
 
         public async Task<bool> DeleteProjectFile(int projectId, string fileName)
@@ -280,6 +288,18 @@ namespace WorkManagement.Service
                 return true;
             }
             return false;
+        }
+
+        public async Task<string> GetProjectFolderPath(int id)
+        {
+            var returnFolderPath = "";
+            var project = _dbContext.Projects.FirstOrDefault(s => s.Id == id && !s.IsDeleted);
+            if (project != null)
+            {
+                returnFolderPath = project.ProjectName;
+            }
+
+            return returnFolderPath;
         }
 
         public async Task<string> GetProjectDocumentFileName(int id, string fileName)

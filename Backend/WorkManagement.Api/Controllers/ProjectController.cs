@@ -24,7 +24,7 @@ namespace WorkManagement.API.Controllers
         private IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper mapper;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly string _storagePath = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles");
+        private readonly string _storagePath = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles\\ProjectDocuments");
         public ProjectController(IProjectService projectService, IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> userManager, IMapper mapper)
         {
             this._projectService = projectService;
@@ -35,7 +35,7 @@ namespace WorkManagement.API.Controllers
 
         // GET: api/projects
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProjectModel>>> GetProjects()
+        public async Task<ActionResult<IEnumerable<ProjectDashboardModel>>> GetProjects()
         {
             var projects = await _projectService.GetAllProjectsAsync();
             return Ok(projects);
@@ -57,7 +57,7 @@ namespace WorkManagement.API.Controllers
         [HttpPost]
         public async Task<ActionResult<EmployeeModel>> CreateProject([FromBody] ProjectModel projectModel)
         {
-                    var createdProject = await _projectService.CreateProjectAsync(projectModel);
+            var createdProject = await _projectService.CreateProjectAsync(projectModel);
             return Ok(createdProject);
 
         }
@@ -107,9 +107,18 @@ namespace WorkManagement.API.Controllers
                 if (file == null || file.Length == 0)
                     return BadRequest("No file uploaded.");
 
-                var employeeFilePath = await _projectService.GetProjectDocumentFileName(id, file.FileName);
+                var projectFilePath = await _projectService.GetProjectDocumentFileName(id, file.FileName);
 
-                var filePath = Path.Combine(_storagePath, employeeFilePath);
+                var projectFolderPath = await _projectService.GetProjectFolderPath(id);
+
+                var folderPath = Path.Combine(_storagePath, projectFolderPath);
+
+                if (!Directory.Exists(folderPath))
+                {
+                    Directory.CreateDirectory(folderPath);
+                }
+
+                var filePath = Path.Combine(folderPath, projectFilePath);
                 var fileTypeStr = "";
                 var fileType = FileType.Other;
                 if (!string.IsNullOrEmpty(file.ContentType))

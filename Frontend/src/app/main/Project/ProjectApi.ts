@@ -133,7 +133,8 @@ export type GetApiEmployeesProjectByEmployeeIdApiResponse =
 export type GetApiEmployeesProjectByEmployeeIdApiArg = {
   employeeId: number;
 };
-export type GetApiProjectApiResponse = /** status 200 OK */ ProjectModel[];
+export type GetApiProjectApiResponse =
+  /** status 200 OK */ ProjectDashboardModel[];
 export type GetApiProjectApiArg = void;
 export type PostApiProjectApiResponse = /** status 200 OK */ EmployeeModel;
 export type PostApiProjectApiArg = {
@@ -210,6 +211,21 @@ export type ProjectModel = {
   periodOfWorkInMonths?: number | null;
   status?: ProjectStatus;
   workOrderDate?: string | null;
+};
+export type ProjectDashboardModel = {
+  id?: number;
+  projectName?: string | null;
+  projectNumber?: string | null;
+  projectDescription?: string | null;
+  workOrderNumber?: string | null;
+  workOrderName?: string | null;
+  workOrderAmount?: number | null;
+  departmentName?: string | null;
+  status?: ProjectStatus;
+  startDate?: string | null;
+  endDate?: string | null;
+  workOrderDate?: string | null;
+  periodOfWorkInMonths?: number;
 };
 export type EmployeePersonalDetailsModel = {
   dateOfBirth?: string | null;

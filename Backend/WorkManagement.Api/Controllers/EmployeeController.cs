@@ -29,7 +29,7 @@ namespace WorkManagement.API.Controllers
         private readonly AdvanceSearchService advanceSearchService;
         private IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper mapper;
-        private readonly string _storagePath = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles");
+        private readonly string _storagePath = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles\\EmployeeDocuments");
 
         public EmployeesController(IEmployeeService employeeService, AdvanceSearchService AdvanceSearchService, IHttpContextAccessor httpContextAccessor, IMapper mapper, IEmailService emailService)
         {
@@ -290,7 +290,17 @@ namespace WorkManagement.API.Controllers
 
                 var employeeFilePath = await employeeService.GetEmployeeDocumentFileName(id, file.FileName);
 
-                var filePath = Path.Combine(_storagePath, employeeFilePath);
+                var employeeFolderPath = await employeeService.GetEmployeeFolderPath(id);
+
+                var folderPath = Path.Combine(_storagePath, employeeFolderPath);
+
+                if (!Directory.Exists(folderPath))
+                {
+                    Directory.CreateDirectory(folderPath);
+                }
+
+                var filePath = Path.Combine(folderPath, employeeFilePath);
+
                 var fileTypeStr = "";
                 var fileType = FileType.Other;
                 if (!string.IsNullOrEmpty(file.ContentType))
