@@ -3,17 +3,73 @@ import { useMemo } from 'react';
 import { type MRT_ColumnDef } from 'material-react-table';
 import DataTable from 'app/shared-components/data-table/DataTable';
 import FuseLoading from '@fuse/core/FuseLoading';
-import {ListItemIcon, MenuItem, Paper } from '@mui/material';
+import { Button, DialogActions, DialogContent, DialogContentText, DialogTitle, ListItemIcon, MenuItem, Paper } from '@mui/material';
 import * as React from 'react';
-import _ from '@lodash';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { Link } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
+import { useAppDispatch } from 'app/store/hooks';
+import { closeDialog, openDialog } from '@fuse/core/FuseDialog/fuseDialogSlice';
+
 import { EmployeeDashboardDataModel, useDeleteApiEmployeesByIdMutation, useGetApiEmployeesQuery } from '../EmployeeApi';
 
 function EmployeesTable() {
-	const { data: employees, isLoading,} = useGetApiEmployeesQuery();
+	const dispatch = useAppDispatch();
+	const {
+		data: employees,
+		isLoading,
+		refetch
+	} = useGetApiEmployeesQuery(undefined, {
+		refetchOnMountOrArgChange: true
+	});
 	const [removeEmployees] = useDeleteApiEmployeesByIdMutation();
+	React.useEffect(() => {
+		refetch();
+	}, [refetch]);
+
+	const handleRemoveEmployee =  (id: number) => {
+		dispatch(
+			openDialog({
+				children: (
+					<>
+						<DialogTitle id="alert-dialog-title">
+							Are you sure you want to delete this Employee ?
+						</DialogTitle>
+						<DialogContent>
+						<DialogContentText id="alert-dialog-description">
+													You are going to remove selected Employee. Are you sure you want to
+													continue?
+												</DialogContentText>
+						</DialogContent>
+						<DialogActions className='p-16'>
+							<Button
+								onClick={() => {
+									dispatch(closeDialog());
+								}}
+								
+								
+								color="warning"
+							>
+								Cancel
+							</Button>
+							<Button
+								onClick={ async() => {
+									dispatch(closeDialog());
+
+									await removeEmployees({ id });
+									refetch(); // Refetch data after deletion
+								}}
+								color="primary"
+								autoFocus
+							>
+								Yes
+							</Button>
+						</DialogActions>
+					</>
+				)
+			})
+		);
+	};
 
 	const columns = useMemo<MRT_ColumnDef<EmployeeDashboardDataModel>[]>(
 		() => [
@@ -51,7 +107,7 @@ function EmployeesTable() {
 				accessorKey: 'gender',
 				header: 'Gender',
 				accessorFn: (row) => `${row?.gender}`
-			},			
+			},
 			{
 				accessorKey: 'departmentName',
 				header: 'Department',
@@ -76,7 +132,7 @@ function EmployeesTable() {
 				accessorKey: 'hireDate',
 				header: 'Hire Date',
 				accessorFn: (row) => `${row?.hireDate}`
-			}			
+			}
 		],
 		[]
 	);
@@ -91,14 +147,14 @@ function EmployeesTable() {
 			elevation={0}
 		>
 			<DataTable
-				enableMultiRemove= {false}
+				enableMultiRemove={false}
 				data={employees}
 				columns={columns}
 				renderRowActionMenuItems={({ closeMenu, row, table }) => [
 					<MenuItem
 						key={0}
 						onClick={() => {
-							removeEmployees({id:row.original.id});
+							handleRemoveEmployee(row.original.id);
 							closeMenu();
 							table.resetRowSelection();
 						}}

@@ -76,6 +76,7 @@ function BasicProjectInfoTab() {
                   onChange(val?.toISOString());
                 }}
                 className="mx-4"
+                required
                 slotProps={{
                   textField: {
                     id: "startDate",
@@ -101,9 +102,9 @@ function BasicProjectInfoTab() {
             name="endDate"
             render={({ field: { value, onChange } }) => (
               <DatePicker
-                value={new Date(value)}
+                value={value ? new Date(value) : null}
                 onChange={(val) => {
-                  onChange(val?.toISOString());
+                  onChange(val ? val.toISOString() : null);
                 }}
                 className="mx-4"
                 slotProps={{
@@ -205,10 +206,17 @@ function BasicProjectInfoTab() {
                   startAdornment: (
                     <InputAdornment position="start">₹</InputAdornment>
                   ),
+                  inputProps: { min: 0 },
                 }}
                 type="number"
                 variant="outlined"
                 fullWidth
+                error={!!errors.workOrderAmount}
+                helperText={errors?.workOrderAmount?.message as string}
+                onChange={(e) => {
+                  const value = parseFloat(e.target.value);
+                  field.onChange(value);
+                }}
               />
             )}
           />
@@ -218,9 +226,9 @@ function BasicProjectInfoTab() {
             name="workOrderDate"
             render={({ field: { value, onChange } }) => (
               <DatePicker
-                value={new Date(value)}
+                value={value ? new Date(value) : null}
                 onChange={(val) => {
-                  onChange(val?.toISOString());
+                  onChange(val ? val.toISOString() : null);
                 }}
                 className="mx-4"
                 slotProps={{
@@ -233,7 +241,6 @@ function BasicProjectInfoTab() {
                     fullWidth: true,
                     variant: "outlined",
                     error: !!errors.workOrderDate,
-
                     helperText: errors?.workOrderDate?.message,
                   },
                   actionBar: {
@@ -258,11 +265,17 @@ function BasicProjectInfoTab() {
                   endAdornment: (
                     <InputAdornment position="end">Months</InputAdornment>
                   ),
+                  inputProps: { min: 0 },
                 }}
                 type="number"
                 variant="outlined"
-                autoFocus
                 fullWidth
+                error={!!errors.periodOfWorkInMonths}
+                helperText={errors?.periodOfWorkInMonths?.message as string}
+                onChange={(e) => {
+                  const value = parseFloat(e.target.value);
+                  field.onChange(value);
+                }}
               />
             )}
           />
@@ -303,3 +316,4 @@ function BasicProjectInfoTab() {
 }
 
 export default BasicProjectInfoTab;
+

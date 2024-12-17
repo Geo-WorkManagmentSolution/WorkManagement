@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -71,7 +71,6 @@ type EmployeeFormValues = yup.InferType<typeof schema>;
 function Employee() {
 	const user = useAppSelector((state) => state.user);
 	const UserRole = user.role;
-	console.log("Currunt User's Role is: ", UserRole);
 
 	const { employeeId } = useParams();
 	const [tabValue, setTabValue] = useState('basic-info');
@@ -79,7 +78,8 @@ function Employee() {
 	const {
 		data: Employee,
 		isLoading,
-		isError
+		isError,
+		refetch
 	} = useGetApiEmployeesByIdQuery({ id: employeeId }, { skip: !employeeId || employeeId === 'new' });
 
 	const methods = useForm({
@@ -97,6 +97,11 @@ function Employee() {
 	const handleTabChange = useCallback((event, newValue: string) => {
 		setTabValue(newValue);
 	}, []);
+	useEffect(() => {
+		if (employeeId && employeeId !== 'new') {
+		  refetch();
+		}
+	  }, [employeeId, refetch]);
 
 	React.useEffect(() => {
 		if (Employee) {
