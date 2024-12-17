@@ -93,7 +93,8 @@ namespace WorkManagmentSolution.EFCore
                     UserName = "admin1@admin.com",
                     NormalizedUserName = "admin",
                     Email = "admin1@admin.com",
-                    PasswordHash = hasher.HashPassword(null, "admin@admin.com")
+                    PasswordHash = hasher.HashPassword(null, "admin@admin.com"),
+                    Shortcuts = new List<string>()
                 }
             );
 
