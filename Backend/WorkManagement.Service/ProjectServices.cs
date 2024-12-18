@@ -595,6 +595,69 @@ namespace WorkManagement.Service
             }
         }
 
+        public async Task<TaskModel> GetProjectTaskByIdAsync(int id)
+        {
+            try
+            {
+                var returnProjectTask = new TaskModel();
+                var projectTasks = (from p in _dbContext.ProjectTasks.Where(p => p.Id == id && !p.IsDeleted)
+                                select new TaskModel
+                                {
+                                    Id = p.Id,
+                                    Title = string.IsNullOrEmpty(p.Title) ? "" : p.Title.Trim(),
+                                    Description = string.IsNullOrEmpty(p.Description) ? "" : p.Description.Trim(),
+                                    Notes = string.IsNullOrEmpty(p.Notes) ? "" : p.Notes.Trim(),
+                                    Status = p.Status,
+                                    Priority = p.Priority,
+                                    StartDate = p.StartDate.HasValue ? p.StartDate.Value.ToString("yyyy-MM-dd") : "",
+                                    EndDate = p.EndDate.HasValue ? p.EndDate.Value.ToString("yyyy-MM-dd") : "",
+                                    EstimatedHours = p.EstimatedHours,
+                                    RemainingHours = p.RemainingHours,
+                                    CompletedHours = p.CompletedHours,
+                                    AssignedEmployees = p.AssignedEmployees,
+                                    ProjectId = p.ProjectId,
+
+
+                                }).FirstOrDefault();
+
+
+                return projectTasks;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public async Task<List<TaskDashboardModel>> GetAllProjectTasksAsync(int projectId)
+        {
+
+            try
+            {
+                var projectTasks = (from p in _dbContext.ProjectTasks.Where(s => !s.IsDeleted && s.ProjectId == projectId)
+                                select new TaskDashboardModel
+                                {
+                                    Id = p.Id,
+                                    Title = string.IsNullOrEmpty(p.Title) ? "" : p.Title.Trim(),
+                                    Description = string.IsNullOrEmpty(p.Description) ? "" : p.Description.Trim(),
+                                    Status = p.Status,
+                                    Priority = p.Priority,
+                                    RemainingHours = p.RemainingHours.HasValue ? p.RemainingHours.Value : 0,
+                                    EstimatedHours = p.EstimatedHours.HasValue ? p.EstimatedHours.Value : 0,
+                                    CompletedHours = p.CompletedHours.HasValue ? p.CompletedHours.Value : 0,
+                                    StartDate = p.StartDate.HasValue ? p.StartDate.Value.ToString("yyyy-MM-dd") : "",
+                                    EndDate = p.EndDate.HasValue ? p.EndDate.Value.ToString("yyyy-MM-dd") : "",
+                                }).ToList();
+
+                return projectTasks;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+
+        }
+
         public async Task<bool> DeleteProjectTaskAsync(int taskId,int projectId)
         {
             try

@@ -36,7 +36,7 @@ namespace WorkManagement.Service
         public  Task<bool> RemoveEmployeeFromProjectAsync(int projectId, int employeeId);
         public  Task<List<EmployeeTeamMemberList>> GetEmployeesByProjectIdAsync(int projectId);
         public Task<List<EmployeeModel>> GetEmployeesNotAssignedToProjectByDepartment(int projectId, int departmentId);
-
-
+        public Task<TaskModel> GetProjectTaskByIdAsync(int id);
+        public Task<List<TaskDashboardModel>> GetAllProjectTasksAsync(int projectId);
     }
 }
