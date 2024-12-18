@@ -419,6 +419,210 @@ namespace WorkManagement.Service
             }
         }
 
+        #region Task Region
+
+        public async Task<TaskModel> CreateTaskToProjectAsync(string loggedUserId, TaskModel task)
+        {
+            try
+            {
+                if(task == null)
+                {
+                    return null;
+                    throw new Exception("task data is empty");
+                }
+
+                if(task.ProjectId == null)
+                {
+                    return null;
+                    throw new Exception("Project Id can not be null");
+                }
+
+                if (!Guid.TryParse(loggedUserId, out Guid userGuid))
+                {
+                    return null;
+                    throw new Exception("Invalid User ID");
+
+                }
+
+                ProjectTask projectTask = new ProjectTask();
+
+                projectTask.Title = task.Title;
+                projectTask.Description = task.Description;
+                projectTask.Notes = task.Notes;
+                projectTask.Status = ProjectTaskStatus.New;
+                projectTask.Priority = task.Priority;
+                projectTask.EstimatedHours = task.EstimatedHours;
+                projectTask.RemainingHours = task.RemainingHours;
+                projectTask.CompletedHours = task.CompletedHours;
+                projectTask.ProjectId = task.ProjectId;
+
+                projectTask.CreatedBy = userGuid;
+                projectTask.CreatedOn = DateTime.Now;
+                projectTask.LastModifiedBy = userGuid;
+                projectTask.LastModifiedOn = DateTime.Now;
+
+                if (!string.IsNullOrEmpty(task.StartDate))
+                {
+                    var taskStartDate = DateTime.Parse(task.StartDate);
+                    projectTask.StartDate = taskStartDate;
+                }
+
+                if (!string.IsNullOrEmpty(task.EndDate))
+                {
+                    var taskEndDate = DateTime.Parse(task.EndDate);
+                    projectTask.EndDate = taskEndDate;
+                }
+
+                var assignedEmployeeList = new List<int>();
+                if(task.AssignedEmployees != null)
+                {
+                    if(task.AssignedEmployees.Count > 0)
+                    {
+                        foreach(var employeeId in  task.AssignedEmployees)
+                        {
+                            var employee = _dbContext.Employees.FirstOrDefault(s=>s.IsDeleted == false && s.Id == employeeId);
+                            if(employee != null)
+                            {
+                                assignedEmployeeList.Add(employeeId);
+                            }
+                        }
+
+                        projectTask.AssignedEmployees = assignedEmployeeList;
+                    }
+                }
+
+                _dbContext.ProjectTasks.Add(projectTask);
+
+                _dbContext.SaveChanges();
+
+                
+
+                return task;
+
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public async Task<TaskModel> UpdateTaskToProjectAsync(string loggedUserId, TaskModel task)
+        {
+            try
+            {
+                if (task == null)
+                {
+                    return null;
+                    throw new Exception("task data is empty");
+                }
+
+                if (task.ProjectId == null)
+                {
+                    return null;
+                    throw new Exception("Project Id can not be null");
+                }
+
+
+                if (!Guid.TryParse(loggedUserId, out Guid userGuid))
+                {
+                    return null;
+                    throw new Exception("Invalid User ID");
+
+                }
+
+                ProjectTask projectTask = _dbContext.ProjectTasks.FirstOrDefault(x => x.Id == task.Id);
+                
+                if(projectTask == null)
+                {
+                    return null;
+                    throw new Exception("Can not update data. There is no task available");
+                }
+
+                projectTask.Title = task.Title;
+                projectTask.Description = task.Description;
+                projectTask.Notes = task.Notes;
+                projectTask.Status = task.Status;
+                projectTask.Priority = task.Priority;
+                projectTask.EstimatedHours = task.EstimatedHours.HasValue ? task.EstimatedHours.Value : 0;
+                projectTask.RemainingHours = task.RemainingHours.HasValue ? task.RemainingHours.Value : 0;
+                projectTask.CompletedHours = task.CompletedHours.HasValue ? task.CompletedHours.Value : 0;
+                
+
+                projectTask.LastModifiedBy = userGuid;
+                projectTask.LastModifiedOn = DateTime.Now;
+
+                if (!string.IsNullOrEmpty(task.StartDate))
+                {
+                    var taskStartDate = DateTime.Parse(task.StartDate);
+                    projectTask.StartDate = taskStartDate;
+                }
+
+                if (!string.IsNullOrEmpty(task.EndDate))
+                {
+                    var taskEndDate = DateTime.Parse(task.EndDate);
+                    projectTask.EndDate = taskEndDate;
+                }
+
+                var assignedEmployeeList = new List<int>();
+                if (task.AssignedEmployees != null)
+                {
+                    if (task.AssignedEmployees.Count > 0)
+                    {
+                        foreach (var employeeId in task.AssignedEmployees)
+                        {
+                            var employee = _dbContext.Employees.FirstOrDefault(s => s.IsDeleted == false && s.Id == employeeId);
+                            if (employee != null)
+                            {
+                                assignedEmployeeList.Add(employeeId);
+                            }
+                        }
+
+                        projectTask.AssignedEmployees = assignedEmployeeList;
+                    }
+                }
+
+                _dbContext.ProjectTasks.Update(projectTask);
+
+                _dbContext.SaveChanges();
+
+
+                return task;
+
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public async Task<bool> DeleteProjectTaskAsync(int taskId,int projectId)
+        {
+            try
+            {
+                var projectTask = await _dbContext.ProjectTasks.FindAsync(taskId);
+                if (projectTask == null)
+                    return false;
+
+                if(projectTask.ProjectId != projectId)
+                {
+                    return false;
+                }
+
+                _dbContext.ProjectTasks.Remove(projectTask);
+                await _dbContext.SaveChangesAsync();
+
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+
+        }
+
+        #endregion
+
 
         #region Private Methods
 
@@ -462,10 +666,6 @@ namespace WorkManagement.Service
 
             return employees;
         }
-
-
-
-
 
 
         #endregion

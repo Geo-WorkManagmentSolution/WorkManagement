@@ -38,6 +38,7 @@ namespace WorkManagmentSolution.EFCore
         public virtual DbSet<ProjectEmployee> ProjectEmployees { get; set; }
 
         public virtual DbSet<ProjectWorkOrders> WorkOrderDocuments { get; set; }
+        public virtual DbSet<ProjectTask> ProjectTasks { get; set; }
 
         public virtual DbSet<EmployeeLeaveSummary> EmployeeLeaveSummary { get; set; }
         public virtual DbSet<EmployeeDefaultLeaveSummary> EmployeeDefaultLeave { get; set; }

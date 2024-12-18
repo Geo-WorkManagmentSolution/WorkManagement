@@ -24,6 +24,10 @@ namespace WorkManagement.Service
         public Task<List<ProjectWorkOrders>> GetProjectDocumentsAsync(int projectId);
         public Task<string> GetProjectFolderPath(int id);
 
+        public Task<TaskModel> CreateTaskToProjectAsync(string loggedUserId, TaskModel task);
+        public Task<TaskModel> UpdateTaskToProjectAsync(string loggedUserId, TaskModel task);
+
+        public Task<bool> DeleteProjectTaskAsync(int taskId, int projectId);
         public Task<string> GetProjectDocumentFileName(int id, string fileName);
         public Task<string> UpdateProjectDocumentData(int id, string fileName, FileType fileType, long fileSize, string filePath, byte[] fileContent);
         public string GetProjectFilePath(int id, string fileName);

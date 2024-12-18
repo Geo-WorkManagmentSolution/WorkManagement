@@ -160,17 +160,18 @@ function EmployeeProject() {
       {
         accessorKey: "employeeName",
         header: "Employee Name",
-        accessorFn: (row) => (
-          <Typography
-            component={Link}
-            to={`/apps/employees/employeesSearch/${row.employeeId}`}
-            className="underline"
-            color="secondary"
-            role="button"
-          >
-            {`${row.name}`}
-          </Typography>
-        ),
+        accessorFn: (row) => `${row.name}`,
+        // accessorFn: (row) => (
+        //   <Typography
+        //     component={Link}
+        //     to={`/apps/employees/employeesSearch/${row.employeeId}`}
+        //     className="underline"
+        //     color="secondary"
+        //     role="button"
+        //   >
+        //     {`${row.name}`}
+        //   </Typography>
+        // ),
       },
       {
         accessorKey: "email",

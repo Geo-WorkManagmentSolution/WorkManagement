@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.IO;
+using System.Security.Claims;
 using WorkManagement.Domain.Contracts;
 using WorkManagement.Domain.Entity;
 using WorkManagement.Domain.Models;
@@ -90,6 +91,48 @@ namespace WorkManagement.API.Controllers
             }
             return NoContent();
         }
+
+
+        // POST: api/project/projectTask
+        [HttpPost("projectTask")]
+        public async Task<ActionResult<EmployeeModel>> CreateProjectTask([FromBody] TaskModel taskModel)
+        {
+            string loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var createdProjectTask = await _projectService.CreateTaskToProjectAsync(loggedUserId,taskModel);
+            return Ok(createdProjectTask);
+
+        }
+
+
+        // PUT: api/project/projectTask/5
+        [HttpPut("projectTask/{id}")]
+        public async Task<IActionResult> UpdateProjectTask(int id, TaskModel taskModel)
+        {
+            if (id != taskModel.Id)
+            {
+                return BadRequest();
+            }
+
+            taskModel.Id = id;
+            string loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var updatedProjectTask = await _projectService.UpdateTaskToProjectAsync(loggedUserId, taskModel);
+            return Ok(updatedProjectTask);
+        }
+
+
+        // DELETE: api/project/projectTask/5
+        [HttpDelete("projectTask/{id}")]
+        public async Task<IActionResult> DeleteProjectTask(int taskId,int projectId)
+        {
+            var deleted = await _projectService.DeleteProjectTaskAsync(taskId,projectId);
+            if (!deleted)
+            {
+                return NotFound();
+            }
+            return NoContent();
+        }
+
+
         [HttpGet("documents/{projectId}")]
         public async Task<ActionResult<IEnumerable<ProjectWorkOrders>>> GetWorkOrderDocuments(int projectId)
         {
