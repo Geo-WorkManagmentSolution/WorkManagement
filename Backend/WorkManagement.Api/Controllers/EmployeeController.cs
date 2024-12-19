@@ -48,6 +48,7 @@ namespace WorkManagement.API.Controllers
         // GET: api/employees
        
         [HttpGet]
+        [Authorize]
         [PermissionAuth(PermissionActionEnum.EmployeeModule_View)]
         public async Task<ActionResult<IEnumerable<EmployeeDashboardDataModel>>> GetEmployees()
         {

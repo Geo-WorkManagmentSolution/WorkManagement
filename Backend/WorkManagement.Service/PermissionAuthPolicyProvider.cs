@@ -1,36 +1,37 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.CodeAnalysis;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace WorkManagement.Service
 {
-
-
     public class PermissionAuthPolicyProvider : IAuthorizationPolicyProvider
     {
         const string POLICY_PREFIX = "Permission_";
         bool AllowsCachingPolicies => true;
-
-        public Task<AuthorizationPolicy> GetDefaultPolicyAsync()
+        public DefaultAuthorizationPolicyProvider FallbackPolicyProvider { get; }
+        public PermissionAuthPolicyProvider(IOptions<AuthorizationOptions> options)
         {
-            throw new NotImplementedException();
+            FallbackPolicyProvider = new DefaultAuthorizationPolicyProvider(options);
         }
 
-        public Task<AuthorizationPolicy?> GetFallbackPolicyAsync()
-        {
-            throw new NotImplementedException();
-        }
+        public Task<AuthorizationPolicy> GetDefaultPolicyAsync() =>
+                        FallbackPolicyProvider.GetDefaultPolicyAsync();
+        public Task<AuthorizationPolicy?> GetFallbackPolicyAsync() =>
+                                FallbackPolicyProvider.GetFallbackPolicyAsync();
 
-        // Policies are looked up by string name, so expect 'parameters' (like age)
-        // to be embedded in the policy names. This is abstracted away from developers
-        // by the more strongly-typed attributes derived from AuthorizeAttribute
-        // (like [MinimumAgeAuthorize()] in this sample)
+
         public Task<AuthorizationPolicy> GetPolicyAsync(string policyName)
         {
-            var permissionAction = policyName.Substring(POLICY_PREFIX.Length, policyName.Length);
+            var permissionAction = policyName.Substring(POLICY_PREFIX.Length);
             if (policyName.StartsWith(POLICY_PREFIX, StringComparison.OrdinalIgnoreCase))
             {
                 var policy = new AuthorizationPolicyBuilder();

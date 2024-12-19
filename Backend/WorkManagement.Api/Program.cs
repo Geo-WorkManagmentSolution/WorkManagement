@@ -114,12 +114,17 @@ try
     builder.Services.AddTransient<EmailService>();
     builder.Services.AddTransient<LeavesService>();
     builder.Services.AddTransient<PermissionService>();
+    builder.Services.AddTransient<CustomJwtBearerHandler>();
 
     builder.Services.AddAutoMapper(typeof(WorkManagement.Domain.AutoMapper.Profiles.EmployeeProfile).Assembly);
     builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionAuthPolicyProvider>();
+    builder.Services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
     builder.AddJWTAuthetication();
-    builder.Services.AddAuthorization();
+    builder.Services.AddAuthorization(opt => {
+        //opt.AddPolicy("ActiveAdminPolicy", policy =>
+        //policy.Requirements.Add(new PermissionRequirement()));
+    });
     //builder.Services.AddAuthorization(options =>
     //{
     //    options.DefaultPolicy = 

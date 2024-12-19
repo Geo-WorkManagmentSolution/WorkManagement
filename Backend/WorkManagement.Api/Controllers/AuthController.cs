@@ -19,6 +19,7 @@ using WorkManagement.Domain.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using WorkManagementSolution.Employee;
 using Newtonsoft.Json;
+using FluentEmail.Core;
 
 namespace WorkManagement.API.Controllers
 {
@@ -32,12 +33,14 @@ namespace WorkManagement.API.Controllers
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly WorkManagementDbContext workManagementDbContext;
         private readonly IMapper mapper;
+        private readonly IPermissionService permissionService;
 
         public AuthController(SignInManager<ApplicationUser> signInManager,
             IAuthService authService,
             UserManager<ApplicationUser> userManager,
             RoleManager<ApplicationRole> roleManager,
             WorkManagementDbContext workManagementDbContext,
+            IPermissionService permissionService,
             IMapper mapper
             )
         {
@@ -47,6 +50,7 @@ namespace WorkManagement.API.Controllers
             this.roleManager = roleManager;
             this.workManagementDbContext = workManagementDbContext;
             this.mapper = mapper;
+            this.permissionService = permissionService;
         }
         public class UserloginModel
         {
@@ -70,12 +74,32 @@ namespace WorkManagement.API.Controllers
                     {
                         ApplicationUser? user = await workManagementDbContext.Users.FirstOrDefaultAsync(s => s.UserName == userloginModel.Email);
                         var role = await userManager.GetRolesAsync(user);
-                        var token = _authService.GenerateJwtToken(userloginModel.Email, role.FirstOrDefault(), user.Id.ToString());
+
+
+                        var claimList = new List<Claim>
+                        {
+                          new Claim(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Email,userloginModel.Email),
+                          new Claim(JwtRegisteredClaimNames.Name,userloginModel.Email),
+                          new Claim(JwtRegisteredClaimNames.NameId,user.Id.ToString()),
+                          new Claim(ClaimTypes.Role,role.FirstOrDefault())
+                        };
+
+                        var permissionsClaim = await permissionService.GetPermissionClaimsByUserAsync(user.Id);
+
+                        // Serialize the hierarchical permissions into a JSON string
+                        string permissionsJson = JsonConvert.SerializeObject(permissionsClaim);
+
+                        //Adding permissions to the claims
+                        claimList.Add(new Claim("Permissions", permissionsJson));
+
+                        var token = _authService.GenerateJwtToken(claimList);
+                        ClaimsIdentity claimsIdentity = new ClaimsIdentity(claimList, "auth");
+                        ClaimsPrincipal claims = new ClaimsPrincipal(claimsIdentity);
+                        await HttpContext.SignInAsync(claims);
 
                         var User = mapper.Map<UserModel>(user);
                         User.Role = role.FirstOrDefault();
 
-                        //await SignInUser(token);
                         LoggedInUserId = User.Uid;
                         return Ok(new { User = User, AccessToken = token });
                     }
@@ -153,7 +177,7 @@ namespace WorkManagement.API.Controllers
                             var userdata = await workManagementDbContext.Users.FirstOrDefaultAsync(s => s.Email == model.Email);
                             var User = mapper.Map<UserModel>(userdata);
                             User.Role = role;
-                            var token = _authService.GenerateJwtToken(User.Data.Email, role,User.Uid);
+                            var token = _authService.GenerateJwtToken(User.Data.Email, role, User.Uid);
 
                             return Ok(new { User = User, AccessToken = token });
                         }
