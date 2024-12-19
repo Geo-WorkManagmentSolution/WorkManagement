@@ -12,8 +12,8 @@ using WorkManagmentSolution.EFCore;
 namespace WorkManagement.EFCore.Migrations
 {
     [DbContext(typeof(WorkManagementDbContext))]
-    [Migration("20241127114220_AddFilePathToEmployeeDocuments")]
-    partial class AddFilePathToEmployeeDocuments
+    [Migration("20241218140915_fix")]
+    partial class fix
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -283,12 +283,17 @@ namespace WorkManagement.EFCore.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("JobLevelLeaveId")
+                        .HasColumnType("int");
+
                     b.Property<int>("TotalLeaves")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("EmployeeLeaveTypeId");
+
+                    b.HasIndex("JobLevelLeaveId");
 
                     b.ToTable("EmployeeDefaultLeave");
 
@@ -574,6 +579,46 @@ namespace WorkManagement.EFCore.Migrations
                         });
                 });
 
+            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.JobLevelLeave", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("JobLevel")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("JobLevelLeave");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            IsDeleted = false,
+                            JobLevel = "Junior level"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            IsDeleted = false,
+                            JobLevel = "Middle level"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            IsDeleted = false,
+                            JobLevel = "Senior level"
+                        });
+                });
+
             modelBuilder.Entity("WorkManagement.Domain.Entity.Project", b =>
                 {
                     b.Property<int>("Id")
@@ -600,8 +645,10 @@ namespace WorkManagement.EFCore.Migrations
                     b.Property<DateTimeOffset>("LastModifiedOn")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<int?>("PeriodOfWorkInMonths")
+                        .HasColumnType("int");
+
                     b.Property<string>("ProjectDescription")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProjectName")
@@ -609,11 +656,25 @@ namespace WorkManagement.EFCore.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProjectNumber")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<int?>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<double?>("WorkOrderAmount")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime?>("WorkOrderDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("WorkOrderName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WorkOrderNumber")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -656,6 +717,109 @@ namespace WorkManagement.EFCore.Migrations
                     b.HasIndex("ProjectId");
 
                     b.ToTable("ProjectEmployees");
+                });
+
+            modelBuilder.Entity("WorkManagement.Domain.Entity.ProjectTask", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AssignedEmployees")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double?>("CompletedHours")
+                        .HasColumnType("float");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double?>("EstimatedHours")
+                        .HasColumnType("float");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("LastModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("LastModifiedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Priority")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<double?>("RemainingHours")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("ProjectTasks");
+                });
+
+            modelBuilder.Entity("WorkManagement.Domain.Entity.ProjectWorkOrders", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<byte[]>("FileContent")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("FileName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FilePath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("FileSize")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("FileType")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("WorkOrderDocuments");
                 });
 
             modelBuilder.Entity("WorkManagementSolution.Employee.Employee", b =>
@@ -1305,7 +1469,13 @@ namespace WorkManagement.EFCore.Migrations
                         .WithMany()
                         .HasForeignKey("EmployeeLeaveTypeId");
 
+                    b.HasOne("WorkManagement.Domain.Entity.EmployeeLeaveTables.JobLevelLeave", "JobLevelLeaves")
+                        .WithMany()
+                        .HasForeignKey("JobLevelLeaveId");
+
                     b.Navigation("EmployeeLeaveTypes");
+
+                    b.Navigation("JobLevelLeaves");
                 });
 
             modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeave", b =>
@@ -1359,6 +1529,24 @@ namespace WorkManagement.EFCore.Migrations
                         .IsRequired();
 
                     b.Navigation("Employee");
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("WorkManagement.Domain.Entity.ProjectTask", b =>
+                {
+                    b.HasOne("WorkManagement.Domain.Entity.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId");
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("WorkManagement.Domain.Entity.ProjectWorkOrders", b =>
+                {
+                    b.HasOne("WorkManagement.Domain.Entity.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId");
 
                     b.Navigation("Project");
                 });

@@ -9,7 +9,7 @@ import { useParams } from 'react-router-dom';
 import jwtAuthConfig from 'src/app/auth/services/jwt/jwtAuthConfig';
 import { useDispatch } from 'react-redux';
 import { showMessage } from '@fuse/core/FuseMessage/fuseMessageSlice';
-import ItemIcon from 'src/app/main/Project/Project/tabs/ItemIcon';
+import ItemIcon from 'src/app/main/Project/Project/tabs/helperComponents/ItemIcon';
 import {
 	FileType,
 	usePostApiEmployeesDocumnetUploadMutation,

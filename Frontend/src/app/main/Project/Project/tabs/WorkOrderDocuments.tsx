@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import React, { useState, useCallback, useEffect } from 'react';
-import { Box, Typography, IconButton, Grid, Alert, CircularProgress ,Paper} from '@mui/material';
+import { Box, Typography, IconButton, Grid, Alert, CircularProgress, Paper } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -11,14 +11,14 @@ import { useDispatch } from 'react-redux';
 
 import { showMessage } from '@fuse/core/FuseMessage/fuseMessageSlice';
 
+import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import {
 	usePostApiProjectDocumnetUploadMutation,
 	useGetApiProjectDocumentsByProjectIdQuery,
 	useDeleteApiProjectDocumentByFileNameMutation,
 	ProjectWorkOrders
 } from '../../ProjectApi';
-import ItemIcon from './ItemIcon';
-import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
+import ItemIcon from './helperComponents/ItemIcon';
 
 interface FileInfo extends ProjectWorkOrders {
 	isExisting?: boolean;
@@ -43,7 +43,7 @@ const FileCard: React.FC<{
 			case 'JPG':
 			case 'JPEG':
 			case 'PNG':
-				case 'ZIP':
+			case 'ZIP':
 				return extension;
 			default:
 				return 'OTHER';
@@ -55,9 +55,6 @@ const FileCard: React.FC<{
 			className="p-10 my-20"
 			elevation={3}
 		>
-
-
-
 			<Grid
 				container
 				alignItems="center"
@@ -134,28 +131,29 @@ export default function WorkOrderDocuments() {
 	const handleFileChange = useCallback(
 		async (event: React.ChangeEvent<HTMLInputElement>) => {
 			const { files: uploadedFiles } = event.target;
-	
+
 			if (uploadedFiles && uploadedFiles.length > 0 && projectId) {
 				const selectedFile = uploadedFiles[0];
 				const fileName = selectedFile.name;
 				const fileSizeLimit = 50 * 1024 * 1024; // 50 MB in bytes
-	
+
 				// Check if file with the same name exists
-				const fileExists = files.some(file => file.fileName === fileName);
+				const fileExists = files.some((file) => file.fileName === fileName);
+
 				if (fileExists) {
 					dispatch(showMessage({ message: 'File already exists', variant: 'error' }));
 					return;
 				}
-	
+
 				// Check if file size exceeds the limit
 				if (selectedFile.size > fileSizeLimit) {
 					dispatch(showMessage({ message: 'File size should not be more than 50 MB', variant: 'error' }));
 					return;
 				}
-	
+
 				const formData = new FormData();
 				formData.append('file', selectedFile);
-	
+
 				try {
 					await uploadFile({ id: Number(projectId), body: formData }).unwrap();
 					refetch();
@@ -168,14 +166,12 @@ export default function WorkOrderDocuments() {
 		},
 		[projectId, uploadFile, refetch, dispatch, files]
 	);
-	
-	
 
 	const handleRemoveFile = useCallback(
 		async (fileName: string) => {
 			setDeletingFiles((prev) => ({ ...prev, [fileName]: true }));
 			try {
-				await deleteDocument({ id:projectId ,fileName }).unwrap();
+				await deleteDocument({ id: projectId, fileName }).unwrap();
 				refetch();
 				dispatch(showMessage({ message: 'File deleted successfully', variant: 'success' }));
 			} catch (error) {
@@ -193,13 +189,16 @@ export default function WorkOrderDocuments() {
 			setDownloadingFiles((prev) => ({ ...prev, [documentId]: true }));
 			setDownloadError(null);
 			try {
-				const response = await fetch(`${import.meta.env.VITE_BASE_URL}api/Project/download/${fileName}?id=${projectId}`, {
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json',
-						authorization: `Bearer ${storedToken}`
+				const response = await fetch(
+					`${import.meta.env.VITE_BASE_URL}api/Project/download/${fileName}?id=${projectId}`,
+					{
+						method: 'GET',
+						headers: {
+							'Content-Type': 'application/json',
+							authorization: `Bearer ${storedToken}`
+						}
 					}
-				});
+				);
 
 				if (!response.ok) {
 					throw new Error(`HTTP error! status: ${response.status}`);
@@ -235,36 +234,34 @@ export default function WorkOrderDocuments() {
 	return (
 		<Box sx={{ margin: 'auto', padding: 2 }}>
 			<div className="flex items-center border-b-1 space-x-8 pb-8 mb-16">
-					<FuseSvgIcon
-						color="action"
-						size={24}
-					>
-						heroicons-outline:document
-					</FuseSvgIcon>
-					<Typography
-						className="text-2xl"
-						color="text.secondary"
-					>
-						Work Order Documents
-					</Typography>
-				</div>
+				<FuseSvgIcon
+					color="action"
+					size={24}
+				>
+					heroicons-outline:document
+				</FuseSvgIcon>
+				<Typography
+					className="text-2xl"
+					color="text.secondary"
+				>
+					Work Order Documents
+				</Typography>
+			</div>
 
 			<div
-    className="border-2 border-dashed border-gray-300 rounded p-16 text-center mb-2 cursor-pointer hover:bg-gray-200"
-    onDrop={(e) => {
-        e.preventDefault();
-        const droppedFiles = e.dataTransfer.files;
+				className="border-2 border-dashed border-gray-300 rounded p-16 text-center mb-2 cursor-pointer hover:bg-gray-200"
+				onDrop={(e) => {
+					e.preventDefault();
+					const droppedFiles = e.dataTransfer.files;
 
-        if (droppedFiles.length > 0) {
-            handleFileChange({
-                target: { files: droppedFiles }
-            } as React.ChangeEvent<HTMLInputElement>);
-        }
-    }}
-    onDragOver={(e) => e.preventDefault()}
->
-   
-
+					if (droppedFiles.length > 0) {
+						handleFileChange({
+							target: { files: droppedFiles }
+						} as React.ChangeEvent<HTMLInputElement>);
+					}
+				}}
+				onDragOver={(e) => e.preventDefault()}
+			>
 				<input
 					type="file"
 					onChange={handleFileChange}
@@ -296,9 +293,8 @@ export default function WorkOrderDocuments() {
 				>
 					Only PDF, DOC, DOCX, TXT, JPG, JPEG, PNG, GIF, ZIP, XLSX, and CSV files are allowed
 				</Typography>
-				</div>
-			
-			
+			</div>
+
 			{isLoadingDocuments ? (
 				<Alert
 					severity="info"

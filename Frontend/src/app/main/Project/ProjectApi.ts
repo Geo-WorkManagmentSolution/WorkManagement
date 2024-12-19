@@ -47,6 +47,49 @@ const injectedRtkApi = api.injectEndpoints({
         method: "DELETE",
       }),
     }),
+    getApiProjectProjectTaskById: build.query<
+      GetApiProjectProjectTaskByIdApiResponse,
+      GetApiProjectProjectTaskByIdApiArg
+    >({
+      query: (queryArg) => ({ url: `/api/Project/projectTask/${queryArg.id}` }),
+    }),
+    putApiProjectProjectTaskById: build.mutation<
+      PutApiProjectProjectTaskByIdApiResponse,
+      PutApiProjectProjectTaskByIdApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Project/projectTask/${queryArg.id}`,
+        method: "PUT",
+        body: queryArg.taskModel,
+      }),
+    }),
+    getApiProjectProjectTasksByProjectId: build.query<
+      GetApiProjectProjectTasksByProjectIdApiResponse,
+      GetApiProjectProjectTasksByProjectIdApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Project/projectTasks/${queryArg.projectId}`,
+      }),
+    }),
+    postApiProjectProjectTask: build.mutation<
+      PostApiProjectProjectTaskApiResponse,
+      PostApiProjectProjectTaskApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Project/projectTask`,
+        method: "POST",
+        body: queryArg.taskModel,
+      }),
+    }),
+    deleteApiProjectTaskByTaskIdAndProjectId: build.mutation<
+      DeleteApiProjectTaskByTaskIdAndProjectIdApiResponse,
+      DeleteApiProjectTaskByTaskIdAndProjectIdApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Project/Task/${queryArg.taskId}/${queryArg.projectId}`,
+        method: "DELETE",
+      }),
+    }),
     getApiProjectDocumentsByProjectId: build.query<
       GetApiProjectDocumentsByProjectIdApiResponse,
       GetApiProjectDocumentsByProjectIdApiArg
@@ -152,6 +195,31 @@ export type PutApiProjectByIdApiArg = {
 export type DeleteApiProjectByIdApiResponse = unknown;
 export type DeleteApiProjectByIdApiArg = {
   id: number;
+};
+export type GetApiProjectProjectTaskByIdApiResponse =
+  /** status 200 OK */ TaskModel;
+export type GetApiProjectProjectTaskByIdApiArg = {
+  id: number;
+};
+export type PutApiProjectProjectTaskByIdApiResponse = unknown;
+export type PutApiProjectProjectTaskByIdApiArg = {
+  id: number;
+  taskModel: TaskModel;
+};
+export type GetApiProjectProjectTasksByProjectIdApiResponse =
+  /** status 200 OK */ TaskDashboardModel[];
+export type GetApiProjectProjectTasksByProjectIdApiArg = {
+  projectId: number;
+};
+export type PostApiProjectProjectTaskApiResponse =
+  /** status 200 OK */ EmployeeModel;
+export type PostApiProjectProjectTaskApiArg = {
+  taskModel: TaskModel;
+};
+export type DeleteApiProjectTaskByTaskIdAndProjectIdApiResponse = unknown;
+export type DeleteApiProjectTaskByTaskIdAndProjectIdApiArg = {
+  taskId: number;
+  projectId: number;
 };
 export type GetApiProjectDocumentsByProjectIdApiResponse =
   /** status 200 OK */ ProjectWorkOrders[];
@@ -342,6 +410,34 @@ export type EmployeeModel = {
   employeeDocuments?: EmployeeDocumentsModel[] | null;
   employeeLeaves?: EmployeeLeaveSummaryModel[] | null;
 };
+export type TaskModel = {
+  id?: number;
+  isDeleted?: boolean;
+  title?: string | null;
+  description?: string | null;
+  notes?: string | null;
+  status?: ProjectTaskStatus;
+  priority?: ProjectTaskPriorityStatus;
+  startDate?: string | null;
+  endDate?: string | null;
+  estimatedHours?: number | null;
+  remainingHours?: number | null;
+  completedHours?: number | null;
+  assignedEmployees?: number[] | null;
+  projectId?: number | null;
+};
+export type TaskDashboardModel = {
+  id?: number;
+  title?: string | null;
+  description?: string | null;
+  status?: ProjectTaskStatus;
+  priority?: ProjectTaskPriorityStatus;
+  startDate?: string | null;
+  endDate?: string | null;
+  estimatedHours?: number | null;
+  remainingHours?: number | null;
+  completedHours?: number | null;
+};
 export type Project = {
   id?: number;
   createdBy?: string;
@@ -432,6 +528,17 @@ export enum FileType {
   Csv = "CSV",
   Other = "Other",
 }
+export enum ProjectTaskStatus {
+  New = "New",
+  Active = "Active",
+  Completed = "Completed",
+  Removed = "Removed",
+}
+export enum ProjectTaskPriorityStatus {
+  High = "High",
+  Medium = "Medium",
+  Low = "Low",
+}
 export const {
   useGetApiEmployeesProjectByEmployeeIdQuery,
   useLazyGetApiEmployeesProjectByEmployeeIdQuery,
@@ -442,6 +549,13 @@ export const {
   useLazyGetApiProjectByIdQuery,
   usePutApiProjectByIdMutation,
   useDeleteApiProjectByIdMutation,
+  useGetApiProjectProjectTaskByIdQuery,
+  useLazyGetApiProjectProjectTaskByIdQuery,
+  usePutApiProjectProjectTaskByIdMutation,
+  useGetApiProjectProjectTasksByProjectIdQuery,
+  useLazyGetApiProjectProjectTasksByProjectIdQuery,
+  usePostApiProjectProjectTaskMutation,
+  useDeleteApiProjectTaskByTaskIdAndProjectIdMutation,
   useGetApiProjectDocumentsByProjectIdQuery,
   useLazyGetApiProjectDocumentsByProjectIdQuery,
   usePostApiProjectDocumnetUploadMutation,

@@ -67,7 +67,7 @@ namespace WorkManagement.API.Controllers
         }
 
         // GET: api/projects/projectTask
-        [HttpGet("projectTask/{projectId}")]
+        [HttpGet("projectTasks/{projectId}")]
         public async Task<ActionResult<IEnumerable<TaskDashboardModel>>> GetProjectTasks(int projectId)
         {
             var projectTasks = await _projectService.GetAllProjectTasksAsync(projectId);
@@ -141,7 +141,7 @@ namespace WorkManagement.API.Controllers
 
 
         // DELETE: api/project/projectTask/5
-        [HttpDelete("projectTask/{id}")]
+        [HttpDelete("Task/{taskId}/{projectId}")]
         public async Task<IActionResult> DeleteProjectTask(int taskId,int projectId)
         {
             var deleted = await _projectService.DeleteProjectTaskAsync(taskId,projectId);
