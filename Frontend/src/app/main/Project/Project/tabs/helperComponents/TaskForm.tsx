@@ -308,83 +308,7 @@ function TaskForm({ projectId, taskId, open, onClose, taskData }: TaskFormProps)
 							)}
 						/>
 					</div>
-					<div className='flex space-x-8'>
-					<Controller
-						name="estimatedHours"
-						control={control}
-						rules={{ required: 'Estimated hours is required' }}
-						render={({ field }) => (
-							<TextField
-								{...field}
-								label="Estimated Hours"
-								type="number"
-								value={field.value || 0}
-								fullWidth
-								margin="normal"
-								error={!!errors.estimatedHours}
-								helperText={errors.estimatedHours?.message}
-								onChange={(e) => field.onChange(parseFloat(e.target.value))}
-							/>
-						)}
-					/>
-					<Controller
-						name="remainingHours"
-						control={control}
-						render={({ field }) => (
-							<TextField
-								{...field}
-								label="Remaining Hours"
-								type="number"
-								value={field.value || 0}
-								fullWidth
-								margin="normal"
-								error={!!errors.remainingHours}
-								helperText={errors.remainingHours?.message}
-								onChange={(e) => field.onChange(parseFloat(e.target.value))}
-							/>
-						)}
-					/>
-					<Controller
-						name="completedHours"
-						control={control}
-						render={({ field }) => (
-							<TextField
-								{...field}
-								label="Completed Hours"
-								type="number"
-								value={field.value || 0}
-								fullWidth
-								margin="normal"
-								error={!!errors.completedHours}
-								helperText={errors.completedHours?.message}
-								onChange={(e) => field.onChange(parseFloat(e.target.value))}
-							/>
-						)}
-					/>
-					</div>
-					{taskId && (
-						<Controller
-							name="status"
-							control={control}
-							render={({ field }) => (
-								<FormControl fullWidth margin="normal" error={!!errors.status}>
-									<InputLabel id="status-label">Status</InputLabel>
-									<Select
-										{...field}
-										labelId="status-label"
-										label="Status"
-									>
-										{Object.values(ProjectTaskStatus).map((status) => (
-											<MenuItem key={status} value={status}>
-												{status}
-											</MenuItem>
-										))}
-									</Select>
-									{errors.status && <FormHelperText>{errors.status.message}</FormHelperText>}
-								</FormControl>
-							)}
-						/>
-					)}
+
 					<Controller
 						name="assignedEmployees"
 						control={control}
@@ -395,12 +319,13 @@ function TaskForm({ projectId, taskId, open, onClose, taskData }: TaskFormProps)
 									multiple
 									id="assignedEmployees"
 									options={employees || []}
+									className='mt-32'
 									disableCloseOnSelect
 									getOptionLabel={(option: EmployeeTeamMemberList) => option?.name || ''}
 									renderOption={(props, option: EmployeeTeamMemberList, { selected }) => {
 										const { key, ...propsWithoutKey } = props;
 										return (
-											<li {...propsWithoutKey}>
+											<li {...propsWithoutKey} key={option.employeeId}>
 												<Checkbox
 													style={{ marginRight: 8 }}
 													checked={selected}
@@ -424,6 +349,88 @@ function TaskForm({ projectId, taskId, open, onClose, taskData }: TaskFormProps)
 							);
 						}}
 					/>
+
+
+					<div className='flex space-x-8 mt-32'>
+					<Controller
+						name="estimatedHours"
+						control={control}
+						rules={{ required: 'Estimated hours is required' }}
+						render={({ field }) => (
+							<TextField
+								{...field}
+								label="Estimated Hours"
+								type="number"
+								value={field.value || 0}
+								fullWidth
+								// margin="normal"
+								error={!!errors.estimatedHours}
+								helperText={errors.estimatedHours?.message}
+								onChange={(e) => field.onChange(parseFloat(e.target.value))}
+							/>
+						)}
+					/>
+					<Controller
+						name="remainingHours"
+						control={control}
+						render={({ field }) => (
+							<TextField
+								{...field}
+								label="Remaining Hours"
+								type="number"
+								value={field.value || 0}
+								fullWidth
+								// margin="normal"
+								error={!!errors.remainingHours}
+								helperText={errors.remainingHours?.message}
+								onChange={(e) => field.onChange(parseFloat(e.target.value))}
+							/>
+						)}
+					/>
+					<Controller
+						name="completedHours"
+						control={control}
+						render={({ field }) => (
+							<TextField
+								{...field}
+								label="Completed Hours"
+								type="number"
+								value={field.value || 0}
+								fullWidth
+								// margin="normal"
+								error={!!errors.completedHours}
+								helperText={errors.completedHours?.message}
+								onChange={(e) => field.onChange(parseFloat(e.target.value))}
+							/>
+						)}
+					/>
+					</div>
+					{taskId && (
+						<Controller
+							name="status"
+							
+							control={control}
+							render={({ field }) => (
+								<FormControl fullWidth margin="normal" className='mt-32' error={!!errors.status}>
+									<InputLabel id="status-label">Status</InputLabel>
+									<Select
+									
+										{...field}
+										labelId="status-label"
+										label="Status"
+									>
+										{Object.values(ProjectTaskStatus).map((status) => (
+											<MenuItem key={status} value={status}>
+												{status}
+											</MenuItem>
+										))}
+									</Select>
+									{errors.status && <FormHelperText>{errors.status.message}</FormHelperText>}
+								</FormControl>
+							)}
+						/>
+					)}
+					
 					<Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
 						<Button
 							onClick={onClose}
