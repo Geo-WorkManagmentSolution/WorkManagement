@@ -121,6 +121,7 @@ try
     builder.Services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
     builder.AddJWTAuthetication();
+    builder.Services.AddHttpContextAccessor();
     builder.Services.AddAuthorization(opt => {
         //opt.AddPolicy("ActiveAdminPolicy", policy =>
         //policy.Requirements.Add(new PermissionRequirement()));
