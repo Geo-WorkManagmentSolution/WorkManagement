@@ -174,7 +174,7 @@ namespace WorkManagement.Service
                     targetEmployeeId = CheckValidEmployeeId(loggedUserId);
                     if (targetEmployeeId == -1)
                     {
-                        throw new Exception("Invalid User data");
+                        return new List<EmployeeTeamMemberList>();
                     }
                 }
 
@@ -190,7 +190,8 @@ namespace WorkManagement.Service
                                       EmployeeNumber=e.EmployeeNumber
                                   }).ToListAsync();
 
-                return data;
+                return data.Any() ? data : new List<EmployeeTeamMemberList>();
+
             }
             catch (Exception ex)
             {
@@ -1413,7 +1414,7 @@ namespace WorkManagement.Service
                 }
                 else
                 {
-                    throw new Exception(" leave data was not found.");
+                    return new List<EmployeeLeaveSummaryModel>();
                 }
             }
             catch (Exception ex)
@@ -1494,7 +1495,7 @@ namespace WorkManagement.Service
 
                 return employeeLeaveData;
             }
-            catch (Exception ex)
+             catch (Exception ex)
             {
                 // Log the exception (use your preferred logging framework)
                 Console.WriteLine(ex.ToString());
@@ -1674,7 +1675,27 @@ namespace WorkManagement.Service
             }
             return employeeLeave;
         }
+        public int CheckValidEmployeeId(string loggedUserId)
+        {
+            // Check if the loggedUserId can be parsed to a GUID
+            if (!Guid.TryParse(loggedUserId, out Guid userGuid))
+            {
+                return -1;
+                throw new Exception("Invalid User ID");
 
+            }
+
+            // Find Employee ID
+            var employee = _dbContext.Employees.FirstOrDefault(x => x.UserId == userGuid);
+            if (employee == null)
+            {
+                return -1;
+                throw new Exception("User was not found");
+
+            }
+
+            return employee.Id;
+        }
         #endregion
 
         #region Private methods
@@ -1704,27 +1725,7 @@ namespace WorkManagement.Service
             _emailService.SendLeaveEmail(emailModel);
         }
 
-        private int CheckValidEmployeeId(string loggedUserId)
-        {
-            // Check if the loggedUserId can be parsed to a GUID
-            if (!Guid.TryParse(loggedUserId, out Guid userGuid))
-            {
-                return -1;
-                throw new Exception("Invalid User ID");
-
-            }
-
-            // Find Employee ID
-            var employee = _dbContext.Employees.FirstOrDefault(x => x.UserId == userGuid);
-            if (employee == null)
-            {
-                return -1;
-                throw new Exception("User was not found");
-
-            }
-
-            return employee.Id;
-        }
+        
 
 
         #endregion

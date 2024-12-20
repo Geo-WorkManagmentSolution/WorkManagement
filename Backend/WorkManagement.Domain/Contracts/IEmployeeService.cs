@@ -74,6 +74,7 @@ namespace WorkManagement.Domain.Contracts
 
 
         public Task<bool> CheckEmailExists(string email);
+        public int CheckValidEmployeeId(string loggedUserId);
 
         public Task SendEmail();
        

@@ -687,7 +687,7 @@ function WorkInfoTab({ UserRole }) {
 				</div>
 
 				<Controller
-					name="useDefaultLeaves"
+					name="employeeWorkInformation.useDefaultLeaves"
 					control={control}
 					render={({ field }) => (
 						<FormControlLabel
@@ -708,7 +708,7 @@ function WorkInfoTab({ UserRole }) {
 				<FormControl fullWidth>
 					<InputLabel id="job-level-select-label">Job Level</InputLabel>
 					<Controller
-						name="jobLevelId"
+						name="jobLevelLeaveType"
 						control={control}
 						render={({ field }) => (
 							<Select

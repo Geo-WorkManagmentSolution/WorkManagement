@@ -69,40 +69,6 @@ function EmployeesLeaveHistories() {
 					enableRowSelection={false}
 					data={teamMember}
 					columns={columns}
-					// renderRowActionMenuItems={({ closeMenu, row, table }) => [
-					// 	<MenuItem
-					// 		disabled={row.original.status === LeaveStatus.Rejected}
-					// 		key={`approve-${row.original.id}`}
-					// 		onClick={() => {
-					// 			approveLeave(row.original.id);
-					// 			closeMenu();
-					// 			table.resetRowSelection();
-					// 		}}
-					// 	>
-					// 		{' '}
-					// 		<ListItemIcon>
-					// 			{' '}
-					// 			<FuseSvgIcon>heroicons-outline:check</FuseSvgIcon>{' '}
-					// 		</ListItemIcon>{' '}
-					// 		Approve{' '}
-					// 	</MenuItem>,
-					// 	<MenuItem
-					// 		key={`reject-${row.original.id}`}
-					// 		disabled={row.original.status === LeaveStatus.Rejected}
-					// 		onClick={() => {
-					// 			rejectLeave(row.original.id);
-					// 			closeMenu();
-					// 			table.resetRowSelection();
-					// 		}}
-					// 	>
-					// 		{' '}
-					// 		<ListItemIcon>
-					// 			{' '}
-					// 			<FuseSvgIcon>heroicons-outline:x-mark</FuseSvgIcon>{' '}
-					// 		</ListItemIcon>{' '}
-					// 		Reject{' '}
-					// 	</MenuItem>
-					// ]}
 				/>
 			</Paper>
 		</>

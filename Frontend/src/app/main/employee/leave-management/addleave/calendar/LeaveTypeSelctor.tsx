@@ -116,8 +116,8 @@ function LeaveTypeSelector({
 				horizontal: 'right'
 			}}
 			transformOrigin={{
-				vertical: 'top',
-				horizontal: 'right'
+				vertical: 'center',
+				horizontal: 'left'
 			}}
 		>
 			<div className="flex flex-col p-20 w-auto">
@@ -129,7 +129,7 @@ function LeaveTypeSelector({
 						Leave Details
 					</Typography>
 				</div>
-
+			{currentLeaves && currentLeaves.length === 0 && (<span>No Leave Assiegned.. Please Contact HR</span>)}
 				{currentLeaves?.map((eachType) => (
 					<FormLabel
 						htmlFor={`leave-type-${eachType.id}`}

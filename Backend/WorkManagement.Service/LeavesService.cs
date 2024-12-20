@@ -20,12 +20,14 @@ namespace WorkManagement.Service
         private readonly WorkManagementDbContext _dbContext;
         private readonly IMapper mapper;
         private readonly IEmailService _emailService;
+        private readonly IEmployeeService _employeeService;
 
-        public LeavesService(WorkManagementDbContext dbContext, IMapper mapper, IEmailService emailService)
+        public LeavesService(WorkManagementDbContext dbContext, IMapper mapper, IEmailService emailService ,IEmployeeService employeeService)
         {
             _dbContext = dbContext;
             this.mapper = mapper;
             _emailService = emailService;
+            _employeeService = employeeService; 
         }
 
         public async Task<List<EmployeeLeave>> GetAllEmployeeLeaves()
@@ -75,10 +77,14 @@ namespace WorkManagement.Service
         {
             var returnData = new List<EmployeeLeaveHistoryDTO>();
 
-            if (data == null) return returnData;
+            if (data == null) { return returnData; };
 
             var startDate = DateTime.Now;
-            var EmployeeId = _dbContext.Employees.First(x => x.UserId == Guid.Parse(loggedUserId)).Id;
+   
+
+            var EmployeeId = _employeeService.CheckValidEmployeeId(loggedUserId);
+            if (EmployeeId == -1) return returnData;
+
             data.EmployeeId = EmployeeId;
             var employeeId = data.EmployeeId;
             
