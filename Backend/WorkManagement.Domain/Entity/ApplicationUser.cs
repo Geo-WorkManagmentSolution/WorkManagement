@@ -11,6 +11,8 @@ namespace WorkManagement.Domain.Entity
 {
     public class ApplicationUser : IdentityUser<Guid>
     {
-        public List<string> Shortcuts { get; set; }
+        public ApplicationUser() : base() { }
+
+        public List<string>? Shortcuts { get; set; }
     }
 }

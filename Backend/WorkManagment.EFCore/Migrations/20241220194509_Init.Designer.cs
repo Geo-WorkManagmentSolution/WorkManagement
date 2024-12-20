@@ -12,8 +12,8 @@ using WorkManagmentSolution.EFCore;
 namespace WorkManagement.EFCore.Migrations
 {
     [DbContext(typeof(WorkManagementDbContext))]
-    [Migration("20241218140915_fix")]
-    partial class fix
+    [Migration("20241220194509_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -110,6 +110,13 @@ namespace WorkManagement.EFCore.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = new Guid("8e445865-a24d-4543-a6c6-9443d048cdb9"),
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
@@ -157,6 +164,44 @@ namespace WorkManagement.EFCore.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210"),
+                            Name = "admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = new Guid("2800e45a-293d-4c8e-8b91-2f57cce4b963"),
+                            Name = "Manager",
+                            NormalizedName = "MANAGER"
+                        },
+                        new
+                        {
+                            Id = new Guid("611c6e4c-c1fc-49a4-847e-fb9608f460c0"),
+                            Name = "SuperUser",
+                            NormalizedName = "SUPERUSER"
+                        },
+                        new
+                        {
+                            Id = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7"),
+                            Name = "HR Admin",
+                            NormalizedName = "HR ADMIN"
+                        },
+                        new
+                        {
+                            Id = new Guid("f794ec58-bf79-4ca0-a897-021e0657ca42"),
+                            Name = "HR",
+                            NormalizedName = "HR"
+                        },
+                        new
+                        {
+                            Id = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f"),
+                            Name = "Employee",
+                            NormalizedName = "EMPLOYEE"
+                        });
                 });
 
             modelBuilder.Entity("WorkManagement.Domain.Entity.ApplicationUser", b =>
@@ -206,7 +251,6 @@ namespace WorkManagement.EFCore.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Shortcuts")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("TwoFactorEnabled")
@@ -227,6 +271,23 @@ namespace WorkManagement.EFCore.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("8e445865-a24d-4543-a6c6-9443d048cdb9"),
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "78208e0f-0ff8-4aa1-8e1c-dc332b331119",
+                            Email = "admin1@admin.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            NormalizedUserName = "admin",
+                            PasswordHash = "AQAAAAIAAYagAAAAEBqIwYF4moK8/wMAkaJjjC21/7fwc3VFCbWVdGHVNZpF/yr0kADkXMbG5hueXwixZg==",
+                            PhoneNumberConfirmed = false,
+                            Shortcuts = "[]",
+                            TwoFactorEnabled = false,
+                            UserName = "admin1@admin.com"
+                        });
                 });
 
             modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeCategory", b =>
@@ -619,6 +680,148 @@ namespace WorkManagement.EFCore.Migrations
                         });
                 });
 
+            modelBuilder.Entity("WorkManagement.Domain.Entity.PermissionAction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("PermissionCategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Value")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PermissionCategoryId");
+
+                    b.ToTable("PermissionActions");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "Employee Module view",
+                            Name = "EmployeeModule_View",
+                            PermissionCategoryId = 2,
+                            Value = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "Employee Module Add",
+                            Name = "EmployeeModule_Add",
+                            PermissionCategoryId = 2,
+                            Value = 3
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "Employee Module Delete",
+                            Name = "EmployeeModule_Delete",
+                            PermissionCategoryId = 2,
+                            Value = 4
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Description = "Employee Module Edit",
+                            Name = "EmployeeModule_Edit",
+                            PermissionCategoryId = 2,
+                            Value = 2
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Description = "Project Module view",
+                            Name = "ProjectModule_View",
+                            PermissionCategoryId = 1,
+                            Value = 5
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Description = "Project Module Add",
+                            Name = "ProjectModule_Add",
+                            PermissionCategoryId = 1,
+                            Value = 7
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Description = "Project Module Delete",
+                            Name = "ProjectModule_Delete",
+                            PermissionCategoryId = 1,
+                            Value = 8
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Description = "Project Module Edit",
+                            Name = "ProjectModule_Edit",
+                            PermissionCategoryId = 1,
+                            Value = 6
+                        });
+                });
+
+            modelBuilder.Entity("WorkManagement.Domain.Entity.PermissionCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Value")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PermissionCategories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "Project Module",
+                            Name = "ProjectModule",
+                            Value = 2
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "Employee Module",
+                            Name = "EmployeeModule",
+                            Value = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "Integration Module",
+                            Name = "IntegrationModule",
+                            Value = 3
+                        });
+                });
+
             modelBuilder.Entity("WorkManagement.Domain.Entity.Project", b =>
                 {
                     b.Property<int>("Id")
@@ -820,6 +1023,32 @@ namespace WorkManagement.EFCore.Migrations
                     b.HasIndex("ProjectId");
 
                     b.ToTable("WorkOrderDocuments");
+                });
+
+            modelBuilder.Entity("WorkManagement.Domain.Entity.RolePermission", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("PermissionActionId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PermissionActionId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("RolePermissions");
                 });
 
             modelBuilder.Entity("WorkManagementSolution.Employee.Employee", b =>
@@ -1514,6 +1743,15 @@ namespace WorkManagement.EFCore.Migrations
                     b.Navigation("EmployeeLeaveTypes");
                 });
 
+            modelBuilder.Entity("WorkManagement.Domain.Entity.PermissionAction", b =>
+                {
+                    b.HasOne("WorkManagement.Domain.Entity.PermissionCategory", "PermissionCategory")
+                        .WithMany("PermissionActions")
+                        .HasForeignKey("PermissionCategoryId");
+
+                    b.Navigation("PermissionCategory");
+                });
+
             modelBuilder.Entity("WorkManagement.Domain.Entity.ProjectEmployee", b =>
                 {
                     b.HasOne("WorkManagementSolution.Employee.Employee", "Employee")
@@ -1549,6 +1787,25 @@ namespace WorkManagement.EFCore.Migrations
                         .HasForeignKey("ProjectId");
 
                     b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("WorkManagement.Domain.Entity.RolePermission", b =>
+                {
+                    b.HasOne("WorkManagement.Domain.Entity.PermissionAction", "PermissionAction")
+                        .WithMany("RolePermissions")
+                        .HasForeignKey("PermissionActionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WorkManagement.Domain.Entity.ApplicationRole", "Role")
+                        .WithMany("RolePermissions")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PermissionAction");
+
+                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("WorkManagementSolution.Employee.Employee", b =>
@@ -1667,6 +1924,21 @@ namespace WorkManagement.EFCore.Migrations
                         .HasForeignKey("SiteId");
 
                     b.Navigation("Site");
+                });
+
+            modelBuilder.Entity("WorkManagement.Domain.Entity.ApplicationRole", b =>
+                {
+                    b.Navigation("RolePermissions");
+                });
+
+            modelBuilder.Entity("WorkManagement.Domain.Entity.PermissionAction", b =>
+                {
+                    b.Navigation("RolePermissions");
+                });
+
+            modelBuilder.Entity("WorkManagement.Domain.Entity.PermissionCategory", b =>
+                {
+                    b.Navigation("PermissionActions");
                 });
 
             modelBuilder.Entity("WorkManagementSolution.Employee.Employee", b =>

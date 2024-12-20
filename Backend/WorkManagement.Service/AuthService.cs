@@ -3,10 +3,15 @@
 namespace WorkManagement.Service
 {
     using AutoMapper;
+    using FluentEmail.Core;
+    using Microsoft.AspNet.Identity;
     using Microsoft.Extensions.Configuration;
     using Microsoft.IdentityModel.Tokens;
+    using Newtonsoft.Json;
+    using System.Data;
     using System.IdentityModel.Tokens.Jwt;
     using System.Security.Claims;
+    using WorkManagement.API.Controllers;
     using WorkManagement.Domain.Contracts;
     using WorkManagement.Domain.Entity;
     using WorkManagement.Domain.Models;
@@ -16,56 +21,68 @@ namespace WorkManagement.Service
     {
         private readonly IConfiguration _configuration;
         private readonly Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> userManager;
-
-        public AuthService(IConfiguration configuration, Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> userManager)
+        private readonly IPermissionService permissionService;
+        public AuthService(IConfiguration configuration, Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> userManager, IPermissionService permissionService)
         {
             _configuration = configuration;
             this.userManager = userManager;
+            this.permissionService = permissionService;
         }
+        public string GenerateJwtToken(List<Claim> claims)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
 
+            var key = Encoding.ASCII.GetBytes(_configuration["ApiSettings:JwtOptions:Secret"]);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                IssuedAt = DateTime.UtcNow,
+                Issuer = _configuration["ApiSettings:JwtOptions:Issuer"],
+                Audience = _configuration["ApiSettings:JwtOptions:Audience"],
+                Expires = DateTime.UtcNow.AddMinutes(30),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+
+        }
 
         public string GenerateJwtToken(string email, string role, string userId)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
 
-            try
-            {
-                var key = Encoding.ASCII.GetBytes(_configuration["ApiSettings:JwtOptions:Secret"]);
+            var key = Encoding.ASCII.GetBytes(_configuration["ApiSettings:JwtOptions:Secret"]);
 
-                var claimList = new List<Claim>
+            List<Claim> claimList = GenerateClaims(email, role, userId);
+          
+            return GenerateJwtToken(claimList);
+        }
+
+        private List<Claim> GenerateClaims(string email, string role, string userId)
+        {
+            var claimList = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Email,email),
                 new Claim(JwtRegisteredClaimNames.Name,email),
                 new Claim(JwtRegisteredClaimNames.NameId,userId),
-                new Claim(ClaimTypes.Role,role)
-            };
-
-
-
-                var tokenDescriptor = new SecurityTokenDescriptor
-                {
-                    Subject = new ClaimsIdentity(claimList),
-                    IssuedAt = DateTime.UtcNow,
-                    Issuer = _configuration["ApiSettings:JwtOptions:Issuer"],
-                    Audience = _configuration["ApiSettings:JwtOptions:Audience"],
-                    Expires = DateTime.UtcNow.AddMinutes(30),
-                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
+                    new Claim(ClaimTypes.Role,role)
                 };
-                var token = tokenHandler.CreateToken(tokenDescriptor);
-                return tokenHandler.WriteToken(token);
-            }
-            catch (Exception ex)
-            {
-                return "";
-            }
 
+            var permissionsClaim = permissionService.GetPermissionClaimsByUserAsync(Guid.Parse(userId)).Result;
+
+            // Serialize the hierarchical permissions into a JSON string
+            string permissionsJson = JsonConvert.SerializeObject(permissionsClaim);
+
+            //Adding permissions to the claims
+            claimList.Add(new Claim("Permissions", permissionsJson));
+            return claimList;
         }
 
         public bool ValidateToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_configuration["JWT:SecretKey"]);
-
+            var key = Encoding.ASCII.GetBytes(_configuration["ApiSettings:JwtOptions:Secret"]);
             try
             {
                 tokenHandler.ValidateToken(token, new TokenValidationParameters

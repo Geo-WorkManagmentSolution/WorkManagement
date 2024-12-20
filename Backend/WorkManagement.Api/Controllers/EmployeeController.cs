@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.IO;
 using System.Security.Claims;
+using WorkManagement.Domain.Attribute;
 using WorkManagement.Domain.Contracts;
 using WorkManagement.Domain.Entity;
 using WorkManagement.Domain.Entity.EmployeeLeaveTables;
@@ -48,6 +49,7 @@ namespace WorkManagement.API.Controllers
         // GET: api/employees
        
         [HttpGet]
+        [PermissionAuth(PermissionActionEnum.EmployeeModule_View)]
         public async Task<ActionResult<IEnumerable<EmployeeDashboardDataModel>>> GetEmployees()
         {
             var userRole = this.User.FindFirst(ClaimTypes.Role).Value;
