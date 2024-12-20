@@ -17,6 +17,12 @@
                 return Task.CompletedTask;
             }
 
+            //Admin should allow all actions
+            if (user.Claims.Any(x=>x.Type == ClaimTypes.Role && x.Value == "admin")) {
+                context.Succeed(requirement);
+                return Task.CompletedTask;
+            }
+
             bool isAuthorized = CheckUserPermission(user, (PermissionActionEnum)Enum.Parse(typeof(PermissionActionEnum), requirement.Permission));
             if (isAuthorized)
             {
@@ -26,8 +32,8 @@
             {
                 context.Fail();
             }
-
             return Task.CompletedTask;
+
         }
 
         private bool CheckUserPermission(ClaimsPrincipal user, PermissionActionEnum permissionAction)
