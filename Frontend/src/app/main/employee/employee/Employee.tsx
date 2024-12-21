@@ -36,21 +36,15 @@ const schema = yup.object({
 	roleId: yup.string().required('Employee role is required'),
 	employeePersonalDetails: yup.object().shape({
 		gender: yup.string().required('Gender is required'),
-		dateOfBirth: yup
-			.date()
-			.max(new Date(), 'Birth date cannot be in the future')
-			.nullable()
-			.test('is-adult', 'You must be at least 16 years old', (value) => {
-				const today = new Date();
-				const eighteenYearsAgo = new Date(today);
-				eighteenYearsAgo.setFullYear(today.getFullYear() - 16);
-
-				if (value !== undefined) {
-					return value <= eighteenYearsAgo;
-				}
-
-				return true;
-			})
+		dateOfBirth: yup.date()
+		.max(new Date(), 'Birth date cannot be in the future')
+		.nullable()
+		.test('is-adult', 'You must be at least 16 years old', (value) => {
+		  if (!value) return true;
+		  const today = new Date();
+		  const minAge = new Date(today.getFullYear() - 16, today.getMonth(), today.getDate());
+		  return value <= minAge;
+		}),
 	}),
 	employeeWorkInformation: yup.object().shape({
 		salaryType: yup.string().required('Salary Type is required'),
@@ -82,8 +76,9 @@ function Employee() {
 		refetch
 	} = useGetApiEmployeesByIdQuery({ id: employeeId }, { skip: !employeeId || employeeId === 'new' });
 
-	const methods = useForm({
-		mode: 'onBlur',
+
+	const methods = useForm<EmployeeFormValues>({
+		mode: 'onChange',
 		resolver: yupResolver(schema),
 		defaultValues: useMemo(() => {
 			if (employeeId === 'new') {

@@ -1,26 +1,26 @@
 import _ from '@lodash';
 import { PartialDeep } from 'type-fest';
-import { BloodGroup, EmployeeModel, RelationWithEmployee, SalaryType } from '../EmployeeApi';
+import { BloodGroup, EmployeeModel, MaritalStatus, RelationWithEmployee, SalaryType } from '../EmployeeApi';
 
 /**
  * The product model.
  */
-const EmployeeModelClone = (data: PartialDeep<EmployeeModel>) =>
+const EmployeeModelClone = (data: PartialDeep<EmployeeModel>) =>	
 	_.defaults(data || {}, {
 		photoURL: '',
 		firstName: '',
 		lastName: '',
-		email: '',
-		phoneNumber: '',
+		email: null,
+		phoneNumber: undefined,
 		employeeCategoryId:null,
 		roleId: '',
 		employeePersonalDetails: {
 			isDeleted: false,
 			dateOfBirth: '',
 			gender: '',
-			maritalStatus: '',
+			maritalStatus: null as MaritalStatus,
 			bloodGroup: null as BloodGroup,
-			relationWithEmployee: null as RelationWithEmployee
+			relationWithEmployee: undefined as RelationWithEmployee
 		},
 		employeeWorkInformation: {
 			isDeleted: false,
@@ -70,7 +70,8 @@ const EmployeeModelClone = (data: PartialDeep<EmployeeModel>) =>
 			biometricCode: ''
 		},
 		employeeEducationDetail: [{ type: '', university: '', passingYear: '', grade: '' }],
-		employeeRelationshipDetails: [{ relationshipType: '', name: '', email: '', phoneNumber: ''}]
+		employeeRelationshipDetails: [{ relationshipType: undefined, name: "", email: "", phoneNumber: ""}],
+		employeeInsuranceDetails: {serialNumber:''}
 	});
 
 export default EmployeeModelClone;

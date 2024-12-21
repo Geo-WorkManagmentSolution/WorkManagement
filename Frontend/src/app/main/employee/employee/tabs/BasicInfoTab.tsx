@@ -451,6 +451,7 @@ function BasicInfoTab({UserRole}) {
 										<TextField
 											{...field}
 											select
+											value={field.value ?? Object.values(RelationshipType)[0]}
 											fullWidth
 											label="Relationship Type"
 											SelectProps={{
