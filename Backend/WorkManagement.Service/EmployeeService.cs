@@ -1358,14 +1358,14 @@ namespace WorkManagement.Service
 
                 if (employeeId.HasValue && employeeId.Value != -1)
                 {
-                    var defaultLeaves = (from ed in _dbContext.EmployeeDefaultLeave
-                                         select new EmployeeLeaveSummaryModel
-                                         {
-                                             Id = ed.EmployeeLeaveTypeId.HasValue ? ed.EmployeeLeaveTypeId.Value : 0,
-                                             EmployeeLeaveType = ed.EmployeeLeaveTypes.Name,
-                                             TotalLeaves = ed.TotalLeaves,
-                                             RemainingLeaves = ed.TotalLeaves
-                                         }).ToList();
+                    //var defaultLeaves = (from ed in _dbContext.EmployeeDefaultLeave
+                    //                     select new EmployeeLeaveSummaryModel
+                    //                     {
+                    //                         Id = ed.EmployeeLeaveTypeId.HasValue ? ed.EmployeeLeaveTypeId.Value : 0,
+                    //                         EmployeeLeaveType = ed.EmployeeLeaveTypes.Name,
+                    //                         TotalLeaves = ed.TotalLeaves,
+                    //                         RemainingLeaves = ed.TotalLeaves
+                    //                     }).ToList();
 
                     var employeeLeaveData = (from el in _dbContext.EmployeeLeaveSummary.Where(s => s.EmployeeId == employeeId.Value)
                                              select new EmployeeLeaveSummaryModel
@@ -1409,7 +1409,7 @@ namespace WorkManagement.Service
                     }
                     else
                     {
-                        return defaultLeaves;
+                        return new List<EmployeeLeaveSummaryModel>();
                     }
                 }
                 else

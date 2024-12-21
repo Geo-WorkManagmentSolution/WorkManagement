@@ -27,7 +27,7 @@ namespace WorkManagementSolution.Employee
         [EmailAddress]
         [Required]
         public string Email { get; set; }
-        public string AlternateEmail { get; set; }
+        public string? AlternateEmail { get; set; }
         public long? PhoneNumber { get; set; }
         public long? AlternateNumber { get; set; }
         //public int? JobLevelLeaveType { get; set; }
@@ -97,7 +97,6 @@ namespace WorkManagementSolution.Employee
         public int? EmployeeId { get; set; }
         [ForeignKey("EmployeeId")]
         public Employee? Employee { get; set; }
-
 
     }
     public class EmployeeDepartment : BaseEntity
@@ -222,9 +221,9 @@ namespace WorkManagementSolution.Employee
         public Employee? Employee { get; set; }
 
         public RelationshipType? RelationshipType { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public string PhoneNumber { get; set; }
+        public string? Name { get; set; }
+        public string? Email { get; set; }
+        public string? PhoneNumber { get; set; }
 
     }
 
