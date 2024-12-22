@@ -21,7 +21,8 @@ namespace WorkManagement.Domain.Contracts
         public Task<bool> DeleteDefaultLeaveAsync(int defaultLeaveSummaryId);
 
 
-        Task<bool> AddHoliday(List<EmployeeHoliday> holidays);
-        Task<List<EmployeeHoliday>> GetHolidaysByYear(int year);
+        public Task<bool> AddHoliday(List<EmployeeHoliday> holidays);
+        public Task<List<EmployeeHoliday>> GetHolidaysByYear(int year);
+        public Task<List<EmployeeLeaveType>> GetEmployeeLeaveTypes();
     }
 }

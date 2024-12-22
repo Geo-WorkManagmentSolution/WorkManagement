@@ -254,6 +254,11 @@ namespace WorkManagement.Service
                 .ToListAsync();
         }
 
+        public async Task<List<EmployeeLeaveType>> GetEmployeeLeaveTypes()
+        {
+            return await _dbContext.EmployeeLeaveType.ToListAsync();
+
+        }
 
         #region Private Methods
 

@@ -113,6 +113,12 @@ const injectedRtkApi = api.injectEndpoints({
         url: `/api/Leaves/settings/holidays/${queryArg.year}`,
       }),
     }),
+    getApiLeavesSettingsLeaveTypes: build.query<
+      GetApiLeavesSettingsLeaveTypesApiResponse,
+      GetApiLeavesSettingsLeaveTypesApiArg
+    >({
+      query: () => ({ url: `/api/Leaves/settings/leaveTypes` }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -175,6 +181,9 @@ export type GetApiLeavesSettingsHolidaysByYearApiResponse =
 export type GetApiLeavesSettingsHolidaysByYearApiArg = {
   year: number;
 };
+export type GetApiLeavesSettingsLeaveTypesApiResponse =
+  /** status 200 OK */ EmployeeLeaveType[];
+export type GetApiLeavesSettingsLeaveTypesApiArg = void;
 export type EmployeeLeaveSummaryModel = {
   employeeLeaveSummaryId?: number;
   id?: number;
@@ -272,4 +281,6 @@ export const {
   useLazyGetApiLeavesJoblevelsQuery,
   useGetApiLeavesSettingsHolidaysByYearQuery,
   useLazyGetApiLeavesSettingsHolidaysByYearQuery,
+  useGetApiLeavesSettingsLeaveTypesQuery,
+  useLazyGetApiLeavesSettingsLeaveTypesQuery,
 } = injectedRtkApi;

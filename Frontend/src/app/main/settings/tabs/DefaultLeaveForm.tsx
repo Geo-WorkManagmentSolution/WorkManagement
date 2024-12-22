@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Button, TextField, Paper, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { Typography, Button, TextField, Paper, Select, MenuItem, FormControl, InputLabel, FormHelperText } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import FuseLoading from '@fuse/core/FuseLoading';
 import { showMessage } from '@fuse/core/FuseMessage/fuseMessageSlice';
 import { useDispatch } from 'react-redux';
-import { DefaultLeaveModel, useDeleteApiLeavesSettingsDefaultLeavesByIdMutation } from '../SettingsApi';
+import { DefaultLeaveModel, useDeleteApiLeavesSettingsDefaultLeavesByIdMutation, useGetApiLeavesSettingsLeaveTypesQuery } from '../SettingsApi';
 import {
 	useGetApiLeavesJoblevelsQuery,
 	useLazyGetApiLeavesDefaultLeavesByJobLevelIdQuery,
@@ -25,6 +25,7 @@ function DefaultLeaveForm() {
 	const [getDefaultLeaves, { isLoading: isLoadingDefaultLeaves }] =
 		useLazyGetApiLeavesDefaultLeavesByJobLevelIdQuery();
 	const [deleteDefaultLeave, { isLoading: isDeleting }] = useDeleteApiLeavesSettingsDefaultLeavesByIdMutation();
+	const { data: availableLeaveTypes, isLoading: isLoadingLeaveTypes } = useGetApiLeavesSettingsLeaveTypesQuery();
 
 	useEffect(() => {
 		if (jobLevels && jobLevels.length > 0 && !selectedJobLevel) {
@@ -88,6 +89,10 @@ function DefaultLeaveForm() {
 		updatedLeaveTypes[index] = { ...updatedLeaveTypes[index], [field]: value };
 		setLeaveTypes(updatedLeaveTypes);
 		setHasUnsavedChanges(true);
+	};
+
+	const isDuplicateLeaveType = (name: string, currentIndex: number) => {
+		return leaveTypes.some((leaveType, index) => leaveType.name === name && index !== currentIndex);
 	};
 
 	const handleRemoveField = async (index: number) => {
@@ -180,7 +185,7 @@ function DefaultLeaveForm() {
 		setHasUnsavedChanges(false);
 	};
 
-	if (isLoadingJobLevels || isUpdating || isLoadingDefaultLeaves || isDeleting) return <FuseLoading />;
+	if (isLoadingJobLevels || isUpdating || isLoadingDefaultLeaves || isDeleting || isLoadingLeaveTypes) return <FuseLoading />;
 
 	return (
 		<div>
@@ -230,14 +235,26 @@ function DefaultLeaveForm() {
 							key={index}
 							style={{ display: 'flex', alignItems: 'center', marginBottom: '2rem', gap: '3rem' }}
 						>
-							<TextField
-								label="Leave Type"
-								value={leaveType.name}
-								onChange={(e) => handleInputChange(index, 'name', e.target.value)}
-								error={!leaveType.name}
-								helperText={!leaveType.name ? 'Leave Type is required' : ''}
-								style={{ marginRight: '1rem' }}
-							/>
+							<FormControl fullWidth error={!leaveType.name || isDuplicateLeaveType(leaveType.name, index)}>
+								<InputLabel id={`leave-type-select-label-${index}`}>Leave Type</InputLabel>
+								<Select
+									labelId={`leave-type-select-label-${index}`}
+									id={`leave-type-select-${index}`}
+									value={leaveType.name}
+									label="Leave Type"
+									onChange={(e) => handleInputChange(index, 'name', e.target.value)}
+								>
+									{availableLeaveTypes?.map((type) => (
+										<MenuItem key={type.id} value={type.name}>
+											{type.name}
+										</MenuItem>
+									))}
+								</Select>
+								{!leaveType.name && <FormHelperText>Leave Type is required</FormHelperText>}
+								{isDuplicateLeaveType(leaveType.name, index) && (
+									<FormHelperText>This leave type is already selected</FormHelperText>
+								)}
+							</FormControl>
 							<TextField
 								label="Total Leaves"
 								type="number"
@@ -279,7 +296,11 @@ function DefaultLeaveForm() {
 						variant="contained"
 						color="primary"
 						onClick={handleSave}
-						disabled={!selectedJobLevel || leaveTypes.some((lt) => !lt.name || lt.totalLeaves <= 0)}
+						disabled={
+							!selectedJobLevel || 
+							leaveTypes.some((lt) => !lt.name || lt.totalLeaves <= 0) ||
+							leaveTypes.some((lt, index) => isDuplicateLeaveType(lt.name, index))
+						}
 					>
 						Save
 					</Button>
@@ -290,3 +311,4 @@ function DefaultLeaveForm() {
 }
 
 export default DefaultLeaveForm;
+

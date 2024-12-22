@@ -27,7 +27,7 @@ import { useGetApiEmployeesByIdQuery } from '../EmployeeApi';
 import EmployeeModelClone from '../models/EmployeeModelClone';
 import './Employee.css';
 
-const schema = yup.object({
+const schema = yup.object().shape({
 	firstName: yup.string().required('First Name is required'),
 	middleName: yup.string().required('Middle Name is required'),
 	lastName: yup.string().required('Last Name is required'),
@@ -53,11 +53,44 @@ const schema = yup.object({
 			.number()
 			.required('Salary is required')
 			.typeError('Salary must be a number')
-			.positive('Salary must be greater than zero')
+			.positive('Salary must be greater than zero'),
+		useDefaultLeaves: yup.boolean().required(),
+		jobLevelLeaveType: yup.string().when('useDefaultLeaves', {
+			is: true,
+			then: (schema) => schema.required('Job Level must be selected when using default leaves'),
+			otherwise: (schema) => schema.notRequired(),
+		}),
+		employeeLeaves: yup.array().when('useDefaultLeaves', {
+			is: false,
+			then: (schema) => schema
+				.of(
+					yup.object().shape({
+						employeeLeaveType: yup.string().required('Leave type is required'),
+						totalLeaves: yup
+							.number()
+							.required('Total leaves is required')
+							.min(1, 'Total leaves must be at least 1'),
+					})
+				)
+				.min(1, 'At least one leave type must be selected')
+				.test('unique-leave-types', 'Duplicate leave types are not allowed', function (value) {
+					if (!value) return true;
+					const seenTypes = new Set();
+					return value.every((leave) => {
+						if (seenTypes.has(leave.employeeLeaveType)) {
+							return false;
+						}
+						seenTypes.add(leave.employeeLeaveType);
+						return true;
+					});
+				}),
+			otherwise: (schema) => schema.notRequired(),
+		}),
 	}),
 	employeeDepartmentId: yup.string().required('Department is required'),
 	employeeDesignationId: yup.string().required('Designation is required')
 });
+  
 
 // The Employee page.
 type EmployeeFormValues = yup.InferType<typeof schema>;
@@ -219,3 +252,4 @@ const TabContent = React.memo(({ tabValue, UserRole }) => {
 });
 
 export default Employee;
+

@@ -107,6 +107,10 @@ namespace WorkManagement.API.Controllers
             return Ok(holidays);
         }
 
+        [HttpGet("settings/leaveTypes")]
+        public async Task<ActionResult<List<EmployeeLeaveType>>> GetEmployeeLeaveTypes() {
+            return await leavesService.GetEmployeeLeaveTypes();
+        }
 
     }
 }
