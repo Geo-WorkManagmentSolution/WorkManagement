@@ -132,7 +132,7 @@ function PersonalInfoTab({UserRole}) {
 				name="employeePersonalDetails.dateOfBirth"
 				render={({ field: { value, onChange } }) => (
 					<DatePicker
-						// value={new Date(value)}
+						value={new Date(value) || null}
 						onChange={(val) => {
 							onChange(val?.toISOString());
 						}}
