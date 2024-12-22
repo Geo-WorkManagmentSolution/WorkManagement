@@ -145,7 +145,7 @@ function PersonalInfoTab({UserRole}) {
 								fullWidth: true,
 								variant: 'outlined',
 								error: !!errors.employeePersonalDetails?.dateOfBirth,
-								margin: 'normal',
+								// margin: 'normal',
 								helperText: errors?.employeePersonalDetails?.dateOfBirth.message,
 							},
 							actionBar: {

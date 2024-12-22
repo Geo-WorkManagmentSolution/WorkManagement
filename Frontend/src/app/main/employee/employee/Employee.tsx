@@ -37,15 +37,20 @@ const schema = yup.object().shape({
 	employeePersonalDetails: yup.object().shape({
 		gender: yup.string().required('Gender is required'),
 		dateOfBirth: yup.date()
+		.required('Date of Birth is required')
 		.max(new Date(), 'Birth date cannot be in the future')
 		.nullable()
 		.test('is-adult', 'You must be at least 16 years old', (value) => {
-		  if (!value) return true;
-		  const today = new Date();
-		  const minAge = new Date(today.getFullYear() - 16, today.getMonth(), today.getDate());
-		  return value <= minAge;
+			if (!value) return true;
+			const today = new Date();
+			const minAge = new Date(today.getFullYear() - 16, today.getMonth(), today.getDate());
+			return value <= minAge;
 		}),
-	}),
+}),jobLevelLeaveType: yup.string().when('employeeWorkInformation.useDefaultLeaves', {
+	is: true,
+	then: (schema) => schema.required('Job Level must be selected when using default leaves'),
+	otherwise: (schema) => schema.notRequired(),
+}),
 	employeeWorkInformation: yup.object().shape({
 		salaryType: yup.string().required('Salary Type is required'),
 		hireDate: yup.date().required('Hire Date is required'),
@@ -55,11 +60,11 @@ const schema = yup.object().shape({
 			.typeError('Salary must be a number')
 			.positive('Salary must be greater than zero'),
 		useDefaultLeaves: yup.boolean().required(),
-		jobLevelLeaveType: yup.string().when('useDefaultLeaves', {
-			is: true,
-			then: (schema) => schema.required('Job Level must be selected when using default leaves'),
-			otherwise: (schema) => schema.notRequired(),
-		}),
+		// jobLevelLeaveType: yup.string().when('useDefaultLeaves', {
+		// 	is: true,
+		// 	then: (schema) => schema.required('Job Level must be selected when using default leaves'),
+		// 	otherwise: (schema) => schema.notRequired(),
+		// }),
 		employeeLeaves: yup.array().when('useDefaultLeaves', {
 			is: false,
 			then: (schema) => schema

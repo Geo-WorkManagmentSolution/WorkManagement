@@ -9,5 +9,6 @@ namespace WorkManagement.API.Controllers
         Task<List<PermissionCategoryClaim>> GetPermissionClaimsByUserAsync(Guid userId);
         Task<List<RolePermission>> GetRolePermissionsByRoleAsync(Guid roleId);
         Task<List<RolePermission>> GetRolePermissionsByUserAsync(Guid userId);
+        Task<List<PermissionAction>> GetAllPermissionActions();
     }
 }
