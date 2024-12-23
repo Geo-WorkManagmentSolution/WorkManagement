@@ -68,6 +68,12 @@ const injectedRtkApi = api.injectEndpoints({
         url: `/api/Leaves/settings/holidays/${queryArg.year}`,
       }),
     }),
+    getApiLeavesSettingsLeaveTypes: build.query<
+      GetApiLeavesSettingsLeaveTypesApiResponse,
+      GetApiLeavesSettingsLeaveTypesApiArg
+    >({
+      query: () => ({ url: `/api/Leaves/settings/leaveTypes` }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -106,6 +112,9 @@ export type GetApiLeavesSettingsHolidaysByYearApiResponse =
 export type GetApiLeavesSettingsHolidaysByYearApiArg = {
   year: number;
 };
+export type GetApiLeavesSettingsLeaveTypesApiResponse =
+  /** status 200 OK */ EmployeeLeaveType[];
+export type GetApiLeavesSettingsLeaveTypesApiArg = void;
 export type DropdownModel = {
   category?: string | null;
   id?: number;
@@ -125,6 +134,12 @@ export type DefaultLeaveModel = {
   jobLevelLeaveTypeId?: number;
   totalLeaves?: number;
 };
+export type EmployeeLeaveType = {
+  id?: number;
+  isDeleted?: boolean;
+  name?: string | null;
+  isPaid?: boolean;
+};
 export const {
   usePostApiEmployeesSettingsAddDropdownItemMutation,
   useDeleteApiEmployeesSettingsDeleteDropdownItemByIdAndDropdownNameMutation,
@@ -134,4 +149,6 @@ export const {
   useDeleteApiLeavesSettingsDefaultLeavesByIdMutation,
   useGetApiLeavesSettingsHolidaysByYearQuery,
   useLazyGetApiLeavesSettingsHolidaysByYearQuery,
+  useGetApiLeavesSettingsLeaveTypesQuery,
+  useLazyGetApiLeavesSettingsLeaveTypesQuery,
 } = injectedRtkApi;

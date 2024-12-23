@@ -62,5 +62,12 @@ namespace WorkManagement.API.Controllers
             return await permissionService.GetRolePermissionsByUserAsync(userId);
 
         }
+
+        [HttpGet("PermissionActions")]
+        public async Task<List<PermissionAction>> GetPermissionActions()
+        {
+            return await permissionService.GetAllPermissionActions();
+
+        }
     }
 }

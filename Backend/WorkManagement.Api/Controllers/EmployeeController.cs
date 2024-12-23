@@ -49,7 +49,7 @@ namespace WorkManagement.API.Controllers
         // GET: api/employees
        
         [HttpGet]
-        [PermissionAuth(PermissionActionEnum.EmployeeModule_View)]
+        //[PermissionAuth(PermissionActionEnum.EmployeeModule_View)]
         public async Task<ActionResult<IEnumerable<EmployeeDashboardDataModel>>> GetEmployees()
         {
             var userRole = this.User.FindFirst(ClaimTypes.Role).Value;

@@ -86,5 +86,10 @@ namespace WorkManagement.API.Controllers
         {
             throw new NotImplementedException();
         }
+
+        public async Task<List<PermissionAction>> GetAllPermissionActions()
+        {
+            return await _dbContext.PermissionActions.ToListAsync();
+        }
     }
 }

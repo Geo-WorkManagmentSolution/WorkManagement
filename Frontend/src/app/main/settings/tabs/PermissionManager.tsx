@@ -13,117 +13,107 @@ import {
   Box,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { permissionApi } from '../permissionApi';
-import { Role } from '../permissionTypes';
+import { 
+  useGetApiPermissionsPermissionActionsQuery,
+  usePutApiPermissionsAssignRoleByRoleIdMutation,
+  useGetApiPermissionsRoleByRoleIdQuery,
+  PermissionCategoryEnum,
+  PermissionAction
+} from '../PermissionsApi';
+import { useGetApiAuthRolesQuery } from '../../../auth/services/AuthApi';
+import { useDispatch } from 'react-redux';
+import { showMessage } from '@fuse/core/FuseMessage/fuseMessageSlice';
 
 export default function PermissionManager() {
-  const [roles, setRoles] = useState<string[]>([]);
+  const dispatch = useDispatch();
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
-  const [permissions, setPermissions] = useState<Role | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: roles, isLoading: isLoadingRoles } = useGetApiAuthRolesQuery();
+  const { data: permissionActions, isLoading: isLoadingPermissionActions } = useGetApiPermissionsPermissionActionsQuery();
+  const { data: rolePermissions, isLoading: isLoadingRolePermissions } = useGetApiPermissionsRoleByRoleIdQuery(
+    { roleId: selectedRole || '' },
+    { skip: !selectedRole }
+  );
+  const [updatePermissions] = usePutApiPermissionsAssignRoleByRoleIdMutation();
 
-  const { control, handleSubmit, reset } = useForm<Role>();
-
-  useEffect(() => {
-    const fetchRoles = async () => {
-      try {
-        const fetchedRoles = await permissionApi.getRoles();
-        setRoles(fetchedRoles);
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Error fetching roles:', error);
-        setIsLoading(false);
-      }
-    };
-
-    fetchRoles();
-  }, []);
+  const { control, handleSubmit, reset } = useForm<Record<number, boolean>>();
 
   useEffect(() => {
-    const fetchPermissions = async () => {
-      if (selectedRole) {
-        try {
-          const data = await permissionApi.getRolePermissions(selectedRole);
-          setPermissions(data);
-          reset(data);
-        } catch (error) {
-          console.error('Error fetching permissions:', error);
-          setPermissions(null);
-        }
-      } else {
-        setPermissions(null);
+    if (permissionActions && rolePermissions) {
+      const initialFormState = permissionActions.reduce((acc, action) => {
+        acc[action.id!] = rolePermissions.some(rp => rp.permissionActionId === action.id);
+        return acc;
+      }, {} as Record<number, boolean>);
+      reset(initialFormState);
+    }
+  }, [permissionActions, rolePermissions, reset]);
+
+  const groupPermissionsByCategory = (permissions: PermissionAction[]) => {
+    return permissions.reduce((acc, permission) => {
+      const category = permission.value?.split('_')[0] as keyof typeof PermissionCategoryEnum;
+      if (!acc[category]) {
+        acc[category] = [];
       }
-    };
+      acc[category].push(permission);
+      return acc;
+    }, {} as Record<keyof typeof PermissionCategoryEnum, PermissionAction[]>);
+  };
 
-    fetchPermissions();
-  }, [selectedRole, reset]);
-
-  const onSubmit = async (data: Role) => {
+  const onSubmit = async (data: Record<number, boolean>) => {
     if (selectedRole) {
+      const enabledPermissionIds = Object.entries(data)
+        .filter(([_, isEnabled]) => isEnabled)
+        .map(([id, _]) => parseInt(id));
+
       try {
-        await permissionApi.updatePermissions(selectedRole, data);
-        setPermissions(data); // Update local state
-        alert('Permissions saved successfully!');
+        await updatePermissions({ roleId: selectedRole, body: enabledPermissionIds }).unwrap();
+        dispatch(showMessage({ message: 'Permissions saved successfully', variant:'success' }));
       } catch (error) {
         console.error('Error saving permissions:', error);
-        alert('Error saving permissions. Please try again.');
+        dispatch(showMessage({ message: 'Error saving permissions', variant:'error' }));
       }
     }
   };
 
-  const handleResetToInitialValues = async () => {
-    try {
-      await permissionApi.resetToInitialValues();
-      if (selectedRole) {
-        const data = await permissionApi.getRolePermissions(selectedRole);
-        setPermissions(data);
-        reset(data);
-      }
-      alert('Permissions reset to initial values successfully!');
-    } catch (error) {
-      console.error('Error resetting permissions:', error);
-      alert('Error resetting permissions. Please try again.');
-    }
-  };
-
-  if (isLoading) {
+  if (isLoadingRoles || isLoadingPermissionActions || (selectedRole && isLoadingRolePermissions)) {
     return <Typography>Loading...</Typography>;
   }
+
+  const groupedPermissions = permissionActions ? groupPermissionsByCategory(permissionActions) : {};
 
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ maxWidth: 600, margin: 'auto' }}>
       <Autocomplete
-        options={roles}
+        options={roles || []}
+        getOptionLabel={(option) => option.name}
         renderInput={(params) => <TextField {...params} label="Select Role" />}
-        onChange={(_, value) => setSelectedRole(value)}
+        onChange={(_, value) => setSelectedRole(value?.id || null)}
         sx={{ mb: 2 }}
       />
 
-      {permissions && (
+      {selectedRole && (
         <>
-          {Object.entries(permissions).map(([module, actions]) => (
-            <Accordion key={module}>
+          {Object.entries(groupedPermissions).map(([category, permissions]) => (
+            <Accordion key={category}>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>{module}</Typography>
+                <Typography>{PermissionCategoryEnum[category as keyof typeof PermissionCategoryEnum]}</Typography>
               </AccordionSummary>
               <AccordionDetails>
-                {Object.entries(actions).map(([action, value]) => (
+                {permissions.map((permission) => (
                   <Controller
-                    key={action}
-                    name={`${module}.${action}` as any}
+                    key={permission.id}
+                    name={`${permission.id}`}
                     control={control}
-                    defaultValue={value}
+                    defaultValue={false}
                     render={({ field }) => (
                       <FormControlLabel
-                      labelPlacement="start"
-                      label={action.charAt(0).toUpperCase() + action.slice(1)}
                         control={
                           <Switch
                             checked={field.value}
                             onChange={(e) => field.onChange(e.target.checked)}
                           />
                         }
-                        label={action}
+                        label={permission.name}
+                        labelPlacement="start"
                         sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', mb: 1 }}
                       />
                     )}
@@ -135,9 +125,6 @@ export default function PermissionManager() {
           <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
             <Button type="submit" variant="contained" color="primary">
               Save Permissions
-            </Button>
-            <Button onClick={handleResetToInitialValues} variant="outlined" color="secondary">
-              Reset to Initial Values
             </Button>
           </Box>
         </>

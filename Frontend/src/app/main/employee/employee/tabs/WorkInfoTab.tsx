@@ -11,7 +11,8 @@ import {
 	InputLabel,
 	Select,
 	IconButton,
-	Button
+	Button,
+	FormHelperText
 } from '@mui/material';
 import { Controller, useFormContext, useFieldArray } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
@@ -23,6 +24,8 @@ import FuseLoading from '@fuse/core/FuseLoading';
 import { MRT_ColumnDef } from 'material-react-table';
 import DataTable from 'app/shared-components/data-table/DataTable';
 import { ProjectStatusComponent } from 'src/app/main/Project/Projects/Projectstatus';
+import { useDispatch } from 'react-redux';
+import { showMessage } from '@fuse/core/FuseMessage/fuseMessageSlice';
 import {
 	useGetApiEmployeesDepartmentsQuery,
 	useGetApiEmployeesDesignationsQuery,
@@ -38,7 +41,8 @@ import EnhancedAutocomplete from '../EnhancedAutocomplete';
 import { SalaryType } from '../../models/EmployeeDropdownModels';
 import {
 	useGetApiLeavesJoblevelsQuery,
-	useLazyGetApiLeavesDefaultLeavesByJobLevelIdQuery
+	useLazyGetApiLeavesDefaultLeavesByJobLevelIdQuery,
+	useGetApiLeavesSettingsLeaveTypesQuery
 } from '../../leave-management/LeavesApi';
 
 function WorkInfoTab({ UserRole }) {
@@ -49,8 +53,9 @@ function WorkInfoTab({ UserRole }) {
 	const parsedEmployeeId = employeeId ? parseInt(employeeId, 10) : undefined;
 	const departmentId = watch('employeeDepartmentId');
 	const salaryType = watch('employeeWorkInformation.salaryType');
-	const [useDefaultLeaves, setUseDefaultLeaves] = useState(true);
+	const useDefaultLeaves = watch('employeeWorkInformation.useDefaultLeaves');
 	const [selectedJobLevel, setSelectedJobLevel] = useState(null);
+	const dispatch = useDispatch();
 
 	const { data: employeesDepartmentsOptions = [], isLoading: departmentLoading } =
 		useGetApiEmployeesDepartmentsQuery();
@@ -59,6 +64,7 @@ function WorkInfoTab({ UserRole }) {
 		useGetApiEmployeesDesignationsQuery();
 	const { data: jobLevels = [], isLoading: jobLevelsLoading } = useGetApiLeavesJoblevelsQuery();
 	const [getDefaultLeaves, { isLoading: defaultLeavesLoading }] = useLazyGetApiLeavesDefaultLeavesByJobLevelIdQuery();
+	const { data: leaveTypes = [], isLoading: leaveTypesLoading } = useGetApiLeavesSettingsLeaveTypesQuery();
 	const { data: projects, isLoading: projectsLoading } = useGetApiEmployeesProjectByEmployeeIdQuery(
 		{
 			employeeId: parsedEmployeeId
@@ -67,11 +73,11 @@ function WorkInfoTab({ UserRole }) {
 			skip: !parsedEmployeeId
 		}
 	);
-	// console.log('projects', projects);
 
 	const { fields, append, remove } = useFieldArray({
 		control,
-		name: 'employeeLeaves'
+		name: 'employeeLeaves',
+		keyName: 'key'
 	});
 
 	const { data: employeesReportToOptions = [] } = useGetApiEmployeesReportToEmployeeListQuery(
@@ -101,7 +107,7 @@ function WorkInfoTab({ UserRole }) {
 				setValue(
 					'employeeLeaves',
 					result.map((lt) => ({
-						employeeLeaveTypeId: lt.employeeLeaveTypeId,
+						id: lt.employeeLeaveTypeId,
 						employeeLeaveType: lt.employeeLeaveTypes.name,
 						totalLeaves: lt.totalLeaves
 					}))
@@ -160,7 +166,43 @@ function WorkInfoTab({ UserRole }) {
 		[]
 	);
 
-	if (designationLoading || siteLoading || departmentLoading || jobLevelsLoading || defaultLeavesLoading) {
+	const isDuplicateLeaveType = (leaveType: string, currentIndex: number) => {
+		const leaves = watch('employeeLeaves');
+		return leaves.some((leave, index) => index !== currentIndex && leave.employeeLeaveType === leaveType);
+	};
+
+	useEffect(() => {
+		if (!useDefaultLeaves) {
+			const leaves = watch('employeeLeaves');
+			const validLeaves = leaves.filter((leave) => leave.id && leave.totalLeaves && leave.totalLeaves > 0);
+
+			if (validLeaves.length === 0) {
+				dispatch(
+					showMessage({
+						message: 'At least one leave type must be filled completely',
+						autoHideDuration: 8000,
+						anchorOrigin: {
+							vertical: 'top',
+							horizontal: 'right'
+						},
+						variant: 'warning'
+					})
+				);
+			} else {
+				// Clear any existing error messages
+				dispatch(showMessage({ message: '', variant: 'success' }));
+			}
+		}
+	}, [watch('employeeLeaves'), useDefaultLeaves, dispatch]);
+
+	if (
+		designationLoading ||
+		siteLoading ||
+		departmentLoading ||
+		jobLevelsLoading ||
+		defaultLeavesLoading ||
+		leaveTypesLoading
+	) {
 		return (
 			<div className="flex justify-center h-screen w-screen">
 				<FuseLoading />
@@ -243,8 +285,8 @@ function WorkInfoTab({ UserRole }) {
 									InputLabelProps={{
 										shrink: true
 									}}
-									error={!!errors.employeeWorkInformation?.designation}
-									helperText={errors.employeeWorkInformation?.designation?.message as string}
+									error={!!errors.employeeDesignationId}
+									helperText={errors.employeeDesignationId?.message as string}
 								/>
 							)}
 							attachedLabel="A Designation will be added to the database"
@@ -252,6 +294,7 @@ function WorkInfoTab({ UserRole }) {
 						/>
 					)}
 				/>
+
 				<Controller
 					name="employeeReportToId"
 					control={control}
@@ -560,7 +603,7 @@ function WorkInfoTab({ UserRole }) {
 						name="employeeWorkInformation.hireDate"
 						render={({ field: { value, onChange } }) => (
 							<DatePicker
-								value={value ? new Date(value) : new Date()}
+								value={value ? new Date(value) : null}
 								onChange={(val) => {
 									onChange(val?.toISOString());
 								}}
@@ -696,8 +739,12 @@ function WorkInfoTab({ UserRole }) {
 									{...field}
 									checked={useDefaultLeaves}
 									onChange={(e) => {
-										setUseDefaultLeaves(e.target.checked);
 										field.onChange(e.target.checked);
+
+										if (!e.target.checked) {
+											setValue('jobLevelLeaveType', '');
+											setValue('employeeLeaves', []);
+										}
 									}}
 								/>
 							}
@@ -705,74 +752,164 @@ function WorkInfoTab({ UserRole }) {
 						/>
 					)}
 				/>
-				<FormControl fullWidth>
-					<InputLabel id="job-level-select-label">Job Level</InputLabel>
-					<Controller
-						name="jobLevelLeaveType"
-						control={control}
-						render={({ field }) => (
-							<Select
-								{...field}
-								labelId="job-level-select-label"
-								label="Job Level"
-								value={field.value || ''}
-								onChange={(e) => {
-									field.onChange(e.target.value);
-									setSelectedJobLevel(e.target.value);
-								}}
-							>
-								{jobLevels.map((jobLevel) => (
-									<MenuItem
-										key={jobLevel.id}
-										value={jobLevel.id}
-									>
-										{jobLevel.jobLevel}
-									</MenuItem>
-								))}
-							</Select>
+
+				{useDefaultLeaves && (
+					<FormControl
+						fullWidth
+						error={!!errors.jobLevelLeaveType}
+					>
+						<InputLabel id="job-level-select-label">Job Level</InputLabel>
+						<Controller
+							name="jobLevelLeaveType"
+							control={control}
+							rules={{ required: 'Please select a job level' }}
+							render={({ field }) => (
+								<Select
+									{...field}
+									labelId="job-level-select-label"
+									label="Job Level"
+									value={field.value || ''}
+									onChange={(e) => {
+										field.onChange(e.target.value);
+										setSelectedJobLevel(e.target.value);
+									}}
+									error={!!errors.jobLevelLeaveType}
+								>
+									{jobLevels.map((jobLevel) => (
+										<MenuItem
+											key={jobLevel.id}
+											value={jobLevel.id}
+										>
+											{jobLevel.jobLevel}
+										</MenuItem>
+									))}
+								</Select>
+							)}
+						/>
+						{errors.jobLevelLeaveType && (
+							<FormHelperText error>
+								{errors.jobLevelLeaveType?.message}
+							</FormHelperText>
 						)}
-					/>
-				</FormControl>
-				<div className="space-y-4">
-					{fields.map((field, index) => (
-						<div
-							key={field.id}
-							className="flex space-x-4 m-4"
-						>
-							<div className="flex-1 m-4">
-								<Controller
-									name={`employeeLeaves.${index}.employeeLeaveType`}
-									control={control}
-									render={({ field }) => (
-										<TextField
-											{...field}
-											label="Employee Leave Type"
-											fullWidth
-											InputProps={{
-												readOnly: useDefaultLeaves
-											}}
-										/>
-									)}
-								/>
+					</FormControl>
+				)}
+
+				{useDefaultLeaves && selectedJobLevel && (
+					<div className="space-y-4">
+						{fields.map((field, index) => (
+							<div
+								key={field.id}
+								className="flex space-x-4 m-4"
+							>
+								<div className="flex-1 m-4">
+									<TextField
+										label="Leave Type"
+										value={field.employeeLeaveType}
+										fullWidth
+										InputProps={{
+											readOnly: true
+										}}
+									/>
+								</div>
+								<div className="flex-1 m-4">
+									<TextField
+										label="Total Leaves"
+										value={field.totalLeaves}
+										fullWidth
+										InputProps={{
+											readOnly: true
+										}}
+									/>
+								</div>
 							</div>
-							<div className="flex-1 m-4">
-								<Controller
-									name={`employeeLeaves.${index}.totalLeaves`}
-									control={control}
-									render={({ field }) => (
-										<TextField
-											{...field}
-											label="Total Leaves"
-											type="number"
-											fullWidth
-											InputProps={{
-												readOnly: useDefaultLeaves
-											}}
-										/>
-									)}
-								/>
-							</div>
-							{!useDefaultLeaves && (
+						))}
+					</div>
+				)}
+
+				{!useDefaultLeaves && (
+					<div className="space-y-4">
+						{fields.map((field, index) => (
+							<div
+								key={field.key}
+								className="flex space-x-4 m-4"
+							>
+								<div className="flex-1 m-4">
+									<Controller
+										name={`employeeLeaves.${index}.id`}
+										control={control}
+										rules={{
+											validate: (value) => {
+												if (index === 0 || value) {
+													return (
+														!isDuplicateLeaveType(value, index) ||
+														'This leave type is already selected'
+													);
+												}
+
+												return true;
+											}
+										}}
+										render={({ field, fieldState: { error } }) => (
+											<FormControl
+												fullWidth
+												error={!!error}
+											>
+												<InputLabel id={`leave-type-label-${index}`}>Leave Type</InputLabel>
+												<Select
+													{...field}
+													labelId={`leave-type-label-${index}`}
+													label="Leave Type"
+													value={field.value || ''}
+													onChange={(e) => {
+														const selectedType = leaveTypes.find(
+															(type) => type.id === e.target.value
+														);
+														field.onChange(e.target.value);
+														setValue(
+															`employeeLeaves.${index}.employeeLeaveType`,
+															selectedType ? selectedType.name : ''
+														);
+													}}
+												>
+													{leaveTypes.map((type) => (
+														<MenuItem
+															key={type.id}
+															value={type.id}
+														>
+															{type.name}
+														</MenuItem>
+													))}
+												</Select>
+												{error && <FormHelperText>{error.message}</FormHelperText>}
+											</FormControl>
+										)}
+									/>
+								</div>
+								<div className="flex-1 m-4">
+									<Controller
+										name={`employeeLeaves.${index}.totalLeaves`}
+										control={control}
+										rules={{
+											validate: (value) => {
+												if (index === 0 || value) {
+													return value > 0 || 'Total leaves must be greater than 0';
+												}
+
+												return true;
+											}
+										}}
+										render={({ field, fieldState: { error } }) => (
+											<TextField
+												{...field}
+												label="Total Leaves"
+												type="number"
+												fullWidth
+												error={!!error}
+												helperText={error?.message}
+											/>
+										)}
+									/>
+								</div>
 								<IconButton
 									aria-label="delete"
 									color="error"
@@ -781,18 +918,16 @@ function WorkInfoTab({ UserRole }) {
 								>
 									<DeleteIcon />
 								</IconButton>
-							)}
-						</div>
-					))}
-				</div>
-				{!useDefaultLeaves && (
-					<Button
-						type="button"
-						startIcon={<AddIcon />}
-						onClick={() => append({ employeeLeaveType: '', totalLeaves: 0 })}
-					>
-						Add Leave Type
-					</Button>
+							</div>
+						))}
+						<Button
+							type="button"
+							startIcon={<AddIcon />}
+							onClick={() => append({ id: '', employeeLeaveType: '', totalLeaves: '' })}
+						>
+							Add Leave Type
+						</Button>
+					</div>
 				)}
 			</div>
 		</div>
@@ -800,4 +935,3 @@ function WorkInfoTab({ UserRole }) {
 }
 
 export default WorkInfoTab;
-

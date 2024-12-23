@@ -4,6 +4,7 @@ import Typography from '@mui/material/Typography';
 import { motion } from 'framer-motion';
 import { useForm, useFormContext } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
+import _ from "@lodash";
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import PageBreadcrumb from 'app/shared-components/PageBreadcrumb';
 import { showMessage } from '@fuse/core/FuseMessage/fuseMessageSlice';
@@ -71,38 +72,31 @@ function EmployeeHeader() {
 	};
 
 	const handleCreateEmployee = async () => {
-		const data = getValues() as EmployeeModel;
-
-		console.log('employeeData: ', data);
-
-		if (!isValid) {
-			await trigger(); // Trigger validation to ensure all errors are shown
-
-			if (Object.keys(errors).length > 0) {
-				dispatch(
-					showMessage({
-						message: 'Required fields must be filled out',
-						variant: 'warning'
-					})
-				);
-				return;
-			}
+		const result = await methods.trigger();
+		if (result) {
+			const data = methods.getValues() as EmployeeModel;
+			createEmployee({ employeeModel: data })
+				.unwrap()
+				.then((data) => {
+					dispatch(
+						showMessage({
+							message: 'An employee created successfully and a welcome email sent to employee.'
+						})
+					);
+					navigate(`/apps/employees/employeesSearch`);
+				})
+				.catch((error) => {
+					console.error('Error creating employee:', error);
+					dispatch(showMessage({ message: 'Error creating employee', variant: 'error' }));
+				});
+		} else {
+			dispatch(
+				showMessage({
+					message: 'Please fill all required fields',
+					variant: 'warning'
+				})
+			);
 		}
-
-		createEmployee({ employeeModel: data })
-			.unwrap()
-			.then((data) => {
-				dispatch(
-					showMessage({
-						message: 'An employee created successfully and a welcome email sent to employee.'
-					})
-				);
-				navigate(`/apps/employees/employeesSearch`);
-			})
-			.catch((error) => {
-				console.error('Error creating employee:', error);
-				dispatch(showMessage({ message: 'Error creating employee', variant: 'error' }));
-			});
 	};
 
 	function handleDeleteEmployee() {

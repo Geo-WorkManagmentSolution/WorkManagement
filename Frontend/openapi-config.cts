@@ -19,6 +19,9 @@ const config: ConfigFile = {
 		},
 		'./src/app/main/settings/SettingsApi.ts': {
             filterEndpoints: [/Settings/i],
+        },
+		'./src/app/main/settings/PermissionsApi.ts': {
+            filterEndpoints: [/permissions/i],
         }
 	},
 	useEnumType:true,
