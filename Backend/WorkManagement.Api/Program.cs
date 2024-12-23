@@ -179,13 +179,11 @@ try
     app.MapControllers();
 
     app.UseMiddleware<ErrorHandlingMiddleware>();
-    app.Map("/", async context =>
-    {
-        await context.Response.WriteAsync("Api is Up & running!");
-    });
+    //app.Map("/", async context =>
+    //{
+    //    await context.Response.WriteAsync("Api is Up & running!");
+    //});
     app.Run();
-
-
 }
 catch (Exception ex)
 {
