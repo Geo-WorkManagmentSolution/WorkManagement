@@ -49,7 +49,7 @@ namespace WorkManagement.API.Controllers
         // GET: api/employees
        
         [HttpGet]
-        //[PermissionAuth(PermissionActionEnum.EmployeeModule_View)]
+        [PermissionAuth(PermissionActionEnum.EmployeeModule_Dashboard)]
         public async Task<ActionResult<IEnumerable<EmployeeDashboardDataModel>>> GetEmployees()
         {
             var userRole = this.User.FindFirst(ClaimTypes.Role).Value;
@@ -90,7 +90,7 @@ namespace WorkManagement.API.Controllers
             return Ok(Sites);
         }
 
-        [HttpGet("ReportToEmployeeList")]
+        [HttpGet("ReportToE mployeeList")]
         public async Task<ActionResult<IEnumerable<EmployeeReportToModel>>> GetReportToEmployeeList(int? departmentId, int? employeeId)
         {
             var reportToEmployeeList = await employeeService.GetReportToEmployeeList(departmentId, employeeId);

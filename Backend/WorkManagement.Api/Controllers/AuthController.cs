@@ -101,7 +101,7 @@ namespace WorkManagement.API.Controllers
                         User.Role = role.FirstOrDefault();
 
                         LoggedInUserId = User.Uid;
-                        return Ok(new { User = User, AccessToken = token });
+                        return Ok(new { User = User, AccessToken = token, Permissions = permissionsClaim });
                     }
                     else
                     {

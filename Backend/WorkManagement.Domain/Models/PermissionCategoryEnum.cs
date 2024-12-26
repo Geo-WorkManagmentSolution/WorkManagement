@@ -4,7 +4,9 @@
     {
         EmployeeModule = 1,
         ProjectModule = 2,
-        IntegrationModule = 3
+        IntegrationModule = 3,
+        LeaveModule = 4,
+        SettingModule = 5,
     }
 
 }
