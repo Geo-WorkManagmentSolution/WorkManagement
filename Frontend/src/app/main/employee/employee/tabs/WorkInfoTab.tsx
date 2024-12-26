@@ -172,6 +172,7 @@ function WorkInfoTab({ UserRole }) {
 	};
 
 	useEffect(() => {
+		if(employeeId === 'new') {
 		if (!useDefaultLeaves) {
 			const leaves = watch('employeeLeaves');
 			const validLeaves = leaves.filter((leave) => leave.id && leave.totalLeaves && leave.totalLeaves > 0);
@@ -193,7 +194,37 @@ function WorkInfoTab({ UserRole }) {
 				dispatch(showMessage({ message: '', variant: 'success' }));
 			}
 		}
+	}
 	}, [watch('employeeLeaves'), useDefaultLeaves, dispatch]);
+
+	useEffect(() => {
+		if (salaryType === 'OnRoll') {
+			const calculateTotalSalary = () => {
+				const basic = parseFloat(watch('employeeWorkInformation.basic') || '0');
+				const pf = parseFloat(watch('employeeWorkInformation.pf') || '0');
+				const hrAllowances = parseFloat(watch('employeeWorkInformation.hrAllowances') || '0');
+				const gratuity = parseFloat(watch('employeeWorkInformation.gratuity') || '0');
+				const bonus = parseFloat(watch('employeeWorkInformation.bonus') || '0');
+				const esi = parseFloat(watch('employeeWorkInformation.esi') || '0');
+				const pt = parseFloat(watch('employeeWorkInformation.pt') || '0');
+
+				const totalSalary = basic + pf + hrAllowances + gratuity + bonus + esi + pt;
+				setValue('employeeWorkInformation.salary', totalSalary);
+			};
+
+			calculateTotalSalary();
+		}
+	}, [
+		salaryType,
+		watch('employeeWorkInformation.basic'),
+		watch('employeeWorkInformation.pf'),
+		watch('employeeWorkInformation.hrAllowances'),
+		watch('employeeWorkInformation.gratuity'),
+		watch('employeeWorkInformation.bonus'),
+		watch('employeeWorkInformation.esi'),
+		watch('employeeWorkInformation.pt'),
+		setValue
+	]);
 
 	if (
 		designationLoading ||
@@ -418,7 +449,8 @@ function WorkInfoTab({ UserRole }) {
 								required
 								InputProps={{
 									inputProps: {
-										min: 1
+										min: 1,
+										readOnly: salaryType === 'OnRoll'
 									},
 									startAdornment: <InputAdornment position="start">₹</InputAdornment>
 								}}
@@ -428,156 +460,167 @@ function WorkInfoTab({ UserRole }) {
 							/>
 						)}
 					/>
-					<Controller
-						name="employeeWorkInformation.basic"
-						control={control}
-						render={({ field }) => (
-							<TextField
-								{...field}
-								label="Basic"
-								type="number"
-								className={salaryType === 'OnRoll' ? 'mx-4' : 'mx-4 salaryHiddenClass'}
-								InputProps={{
-									inputProps: {
-										min: 1
-									},
-									startAdornment: <InputAdornment position="start">₹</InputAdornment>
-								}}
-								fullWidth
-								error={!!errors.employeeWorkInformation?.basic}
-								helperText={errors.employeeWorkInformation?.basic?.message as string}
+					{salaryType === 'OnRoll' && (
+						<>
+							<Controller
+								name="employeeWorkInformation.basic"
+								control={control}
+								render={({ field }) => (
+									<TextField
+										{...field}
+										label="Basic"
+										type="number"
+										className="mx-4"
+										InputProps={{
+											inputProps: {
+												min: 0
+											},
+											startAdornment: <InputAdornment position="start">₹</InputAdornment>
+										}}
+										fullWidth
+										required
+										error={!!errors.employeeWorkInformation?.basic}
+										helperText={errors.employeeWorkInformation?.basic?.message as string}
+									/>
+								)}
 							/>
-						)}
-					/>
-					<Controller
-						name="employeeWorkInformation.hrAllowances"
-						control={control}
-						render={({ field }) => (
-							<TextField
-								{...field}
-								label="HR Allowances"
-								type="number"
-								className={salaryType === 'OnRoll' ? 'mx-4' : 'mx-4 salaryHiddenClass'}
-								InputProps={{
-									inputProps: {
-										min: 1
-									},
-									startAdornment: <InputAdornment position="start">₹</InputAdornment>
-								}}
-								fullWidth
-								error={!!errors.employeeWorkInformation?.hrAllowances}
-								helperText={errors.employeeWorkInformation?.hrAllowances?.message as string}
+							<Controller
+								name="employeeWorkInformation.hrAllowances"
+								control={control}
+								render={({ field }) => (
+									<TextField
+										{...field}
+										label="HR Allowances"
+										type="number"
+										className="mx-4"
+										InputProps={{
+											inputProps: {
+												min: 0
+											},
+											startAdornment: <InputAdornment position="start">₹</InputAdornment>
+										}}
+										fullWidth
+										required
+										error={!!errors.employeeWorkInformation?.hrAllowances}
+										helperText={errors.employeeWorkInformation?.hrAllowances?.message as string}
+									/>
+								)}
 							/>
-						)}
-					/>
-					<Controller
-						name="employeeWorkInformation.bonus"
-						control={control}
-						render={({ field }) => (
-							<TextField
-								{...field}
-								label="Bonus"
-								type="number"
-								className={salaryType === 'OnRoll' ? 'mx-4' : 'mx-4 salaryHiddenClass'}
-								InputProps={{
-									inputProps: {
-										min: 1
-									},
-									startAdornment: <InputAdornment position="start">₹</InputAdornment>
-								}}
-								fullWidth
-								error={!!errors.employeeWorkInformation?.bonus}
-								helperText={errors.employeeWorkInformation?.bonus?.message as string}
+							<Controller
+								name="employeeWorkInformation.bonus"
+								control={control}
+								render={({ field }) => (
+									<TextField
+										{...field}
+										label="Bonus"
+										value={field.value?? 0}
+										type="number"
+										className="mx-4"
+										InputProps={{
+											inputProps: {
+												min: 0
+											},
+											startAdornment: <InputAdornment position="start">₹</InputAdornment>
+										}}
+										fullWidth
+										error={!!errors.employeeWorkInformation?.bonus}
+										helperText={errors.employeeWorkInformation?.bonus?.message as string}
+									/>
+								)}
 							/>
-						)}
-					/>
+						</>
+					)}
 				</div>
-				<div className="flex -mx-4">
-					<Controller
-						name="employeeWorkInformation.gratuity"
-						control={control}
-						render={({ field }) => (
-							<TextField
-								{...field}
-								label="Gratuity"
-								type="number"
-								className={salaryType === 'OnRoll' ? 'mx-4' : 'mx-4 salaryHiddenClass'}
-								InputProps={{
-									inputProps: {
-										min: 1
-									},
-									startAdornment: <InputAdornment position="start">₹</InputAdornment>
-								}}
-								fullWidth
-								error={!!errors.employeeWorkInformation?.gratuity}
-								helperText={errors.employeeWorkInformation?.gratuity?.message as string}
-							/>
-						)}
-					/>
-					<Controller
-						name="employeeWorkInformation.pf"
-						control={control}
-						render={({ field }) => (
-							<TextField
-								{...field}
-								label="PF"
-								type="number"
-								className={salaryType === 'OnRoll' ? 'mx-4' : 'mx-4 salaryHiddenClass'}
-								InputProps={{
-									inputProps: {
-										min: 1
-									},
-									startAdornment: <InputAdornment position="start">₹</InputAdornment>
-								}}
-								fullWidth
-								error={!!errors.employeeWorkInformation?.pf}
-								helperText={errors.employeeWorkInformation?.pf?.message as string}
-							/>
-						)}
-					/>
-					<Controller
-						name="employeeWorkInformation.esi"
-						control={control}
-						render={({ field }) => (
-							<TextField
-								{...field}
-								label="ESI"
-								type="number"
-								className={salaryType === 'OnRoll' ? 'mx-4' : 'mx-4 salaryHiddenClass'}
-								InputProps={{
-									inputProps: {
-										min: 1
-									},
-									startAdornment: <InputAdornment position="start">₹</InputAdornment>
-								}}
-								fullWidth
-								error={!!errors.employeeWorkInformation?.esi}
-								helperText={errors.employeeWorkInformation?.esi?.message as string}
-							/>
-						)}
-					/>
-					<Controller
-						name="employeeWorkInformation.pt"
-						control={control}
-						render={({ field }) => (
-							<TextField
-								{...field}
-								label="PT"
-								type="number"
-								className={salaryType === 'OnRoll' ? 'mx-4' : 'mx-4 salaryHiddenClass'}
-								InputProps={{
-									inputProps: {
-										min: 1
-									},
-									startAdornment: <InputAdornment position="start">₹</InputAdornment>
-								}}
-								fullWidth
-								error={!!errors.employeeWorkInformation?.pt}
-								helperText={errors.employeeWorkInformation?.pt?.message as string}
-							/>
-						)}
-					/>
-				</div>
+				{salaryType === 'OnRoll' && (
+					<div className="flex -mx-4">
+						<Controller
+							name="employeeWorkInformation.gratuity"
+							control={control}
+							render={({ field }) => (
+								<TextField
+									{...field}
+									label="Gratuity"
+									type="number"
+									className="mx-4"
+									InputProps={{
+										inputProps: {
+											min: 0
+										},
+										startAdornment: <InputAdornment position="start">₹</InputAdornment>
+									}}
+									fullWidth
+									required
+									error={!!errors.employeeWorkInformation?.gratuity}
+									helperText={errors.employeeWorkInformation?.gratuity?.message as string}
+								/>
+							)}
+						/>
+						<Controller
+							name="employeeWorkInformation.pf"
+							control={control}
+							render={({ field }) => (
+								<TextField
+									{...field}
+									label="PF"
+									type="number"
+									className="mx-4"
+									InputProps={{
+										inputProps: {
+											min: 0
+										},
+										startAdornment: <InputAdornment position="start">₹</InputAdornment>
+									}}
+									fullWidth
+									required
+									error={!!errors.employeeWorkInformation?.pf}
+									helperText={errors.employeeWorkInformation?.pf?.message as string}
+								/>
+							)}
+						/>
+						<Controller
+							name="employeeWorkInformation.esi"
+							control={control}
+							render={({ field }) => (
+								<TextField
+									{...field}
+									label="ESI"
+									type="number"
+									className="mx-4"
+									InputProps={{
+										inputProps: {
+											min: 0
+										},
+										startAdornment: <InputAdornment position="start">₹</InputAdornment>
+									}}
+									fullWidth
+									error={!!errors.employeeWorkInformation?.esi}
+									helperText={errors.employeeWorkInformation?.esi?.message as string}
+								/>
+							)}
+						/>
+						<Controller
+							name="employeeWorkInformation.pt"
+							control={control}
+							render={({ field }) => (
+								<TextField
+									{...field}
+									label="PT"
+									type="number"
+									className="mx-4"
+									InputProps={{
+										inputProps: {
+											min: 0
+										},
+										startAdornment: <InputAdornment position="start">₹</InputAdornment>
+									}}
+									fullWidth
+									error={!!errors.employeeWorkInformation?.pt}
+									helperText={errors.employeeWorkInformation?.pt?.message as string}
+								/>
+							)}
+						/>
+					</div>
+				)}
 			</div>
 
 			{/* Hiring Information section */}
@@ -935,3 +978,4 @@ function WorkInfoTab({ UserRole }) {
 }
 
 export default WorkInfoTab;
+
