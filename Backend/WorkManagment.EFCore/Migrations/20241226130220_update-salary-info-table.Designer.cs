@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WorkManagmentSolution.EFCore;
 
@@ -11,9 +12,11 @@ using WorkManagmentSolution.EFCore;
 namespace WorkManagement.EFCore.Migrations
 {
     [DbContext(typeof(WorkManagementDbContext))]
-    partial class WorkManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241226130220_update-salary-info-table")]
+    partial class updatesalaryinfotable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -775,14 +778,46 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 1,
-                            Description = "Project Module Dashboard",
-                            Name = "ProjectModule_Dashboard",
-                            PermissionCategoryId = 1,
-                            Value = 10
+                            Description = "Employee Module view",
+                            Name = "EmployeeModule_View",
+                            PermissionCategoryId = 2,
+                            Value = 1
                         },
                         new
                         {
                             Id = 2,
+                            Description = "Employee Module Add",
+                            Name = "EmployeeModule_Add",
+                            PermissionCategoryId = 2,
+                            Value = 3
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "Employee Module Delete",
+                            Name = "EmployeeModule_Delete",
+                            PermissionCategoryId = 2,
+                            Value = 4
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Description = "Employee Module Edit",
+                            Name = "EmployeeModule_Edit",
+                            PermissionCategoryId = 2,
+                            Value = 2
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Description = "Project Module view",
+                            Name = "ProjectModule_View",
+                            PermissionCategoryId = 1,
+                            Value = 5
+                        },
+                        new
+                        {
+                            Id = 6,
                             Description = "Project Module Add",
                             Name = "ProjectModule_Add",
                             PermissionCategoryId = 1,
@@ -790,219 +825,19 @@ namespace WorkManagement.EFCore.Migrations
                         },
                         new
                         {
-                            Id = 3,
+                            Id = 7,
                             Description = "Project Module Delete",
                             Name = "ProjectModule_Delete",
                             PermissionCategoryId = 1,
-                            Value = 9
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Description = "Project Module Update",
-                            Name = "ProjectModule_Update",
-                            PermissionCategoryId = 1,
                             Value = 8
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Description = "Project Module Employee Add",
-                            Name = "ProjectModule_Employee_Add",
-                            PermissionCategoryId = 1,
-                            Value = 10
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Description = "Project Module Employee Delete",
-                            Name = "ProjectModule_Employee_Delete",
-                            PermissionCategoryId = 1,
-                            Value = 7
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Description = "Project Module Employee Update",
-                            Name = "ProjectModule_Employee_Update",
-                            PermissionCategoryId = 1,
-                            Value = 9
                         },
                         new
                         {
                             Id = 8,
-                            Description = "Project Link Add",
-                            Name = "ProjectModule_Link_Add",
+                            Description = "Project Module Edit",
+                            Name = "ProjectModule_Edit",
                             PermissionCategoryId = 1,
-                            Value = 8
-                        },
-                        new
-                        {
-                            Id = 9,
-                            Description = "Project Link Delete",
-                            Name = "ProjectModule_Link_Delete",
-                            PermissionCategoryId = 1,
-                            Value = 8
-                        },
-                        new
-                        {
-                            Id = 10,
-                            Description = "Project Link Update",
-                            Name = "ProjectModule_Link_Update",
-                            PermissionCategoryId = 1,
-                            Value = 8
-                        },
-                        new
-                        {
-                            Id = 11,
-                            Description = "LeaveModule_Add",
-                            Name = "LeaveModule_Add",
-                            PermissionCategoryId = 4,
-                            Value = 17
-                        },
-                        new
-                        {
-                            Id = 12,
-                            Description = "LeaveModule_Delete",
-                            Name = "LeaveModule_Delete",
-                            PermissionCategoryId = 4,
-                            Value = 18
-                        },
-                        new
-                        {
-                            Id = 13,
-                            Description = "LeaveModule_Update",
-                            Name = "LeaveModule_Update",
-                            PermissionCategoryId = 4,
-                            Value = 19
-                        },
-                        new
-                        {
-                            Id = 14,
-                            Description = "LeaveModule_Approvals",
-                            Name = "LeaveModule_Approvals",
-                            PermissionCategoryId = 4,
-                            Value = 20
-                        },
-                        new
-                        {
-                            Id = 15,
-                            Description = "LeaveModule_Employee_LeaveHistory",
-                            Name = "LeaveModule_Employee_LeaveHistory",
-                            PermissionCategoryId = 4,
-                            Value = 21
-                        },
-                        new
-                        {
-                            Id = 16,
-                            Description = "SettingModule_DropDownSettings",
-                            Name = "SettingModule_DropDownSettings",
-                            PermissionCategoryId = 5,
-                            Value = 22
-                        },
-                        new
-                        {
-                            Id = 17,
-                            Description = "SettingModule_LeaveType_Add",
-                            Name = "SettingModule_LeaveType_Add",
-                            PermissionCategoryId = 5,
-                            Value = 23
-                        },
-                        new
-                        {
-                            Id = 18,
-                            Description = "SettingModule_LeaveType_Update",
-                            Name = "SettingModule_LeaveType_Update",
-                            PermissionCategoryId = 5,
-                            Value = 24
-                        },
-                        new
-                        {
-                            Id = 19,
-                            Description = "SettingModule_LeaveType_Delete",
-                            Name = "SettingModule_LeaveType_Delete",
-                            PermissionCategoryId = 5,
-                            Value = 25
-                        },
-                        new
-                        {
-                            Id = 20,
-                            Description = "SettingModule_Holidays_Add",
-                            Name = "SettingModule_Holidays_Add",
-                            PermissionCategoryId = 5,
-                            Value = 26
-                        },
-                        new
-                        {
-                            Id = 21,
-                            Description = "SettingModule_Holidays_Update",
-                            Name = "SettingModule_Holidays_Update",
-                            PermissionCategoryId = 5,
-                            Value = 27
-                        },
-                        new
-                        {
-                            Id = 22,
-                            Description = "SettingModule_Holidays_Delete",
-                            Name = "SettingModule_Holidays_Delete",
-                            PermissionCategoryId = 5,
-                            Value = 28
-                        },
-                        new
-                        {
-                            Id = 23,
-                            Description = "EmployeeModule_Add",
-                            Name = "EmployeeModule_Add",
-                            PermissionCategoryId = 2,
-                            Value = 1
-                        },
-                        new
-                        {
-                            Id = 24,
-                            Description = "EmployeeModule_Update",
-                            Name = "EmployeeModule_Update",
-                            PermissionCategoryId = 2,
-                            Value = 2
-                        },
-                        new
-                        {
-                            Id = 25,
-                            Description = "EmployeeModule_Delete",
-                            Name = "EmployeeModule_Delete",
-                            PermissionCategoryId = 2,
-                            Value = 3
-                        },
-                        new
-                        {
-                            Id = 26,
-                            Description = "EmployeeModule_Salary_Update",
-                            Name = "EmployeeModule_Salary_Update",
-                            PermissionCategoryId = 2,
-                            Value = 4
-                        },
-                        new
-                        {
-                            Id = 27,
-                            Description = "EmployeeModule_Leave_Update",
-                            Name = "EmployeeModule_Leave_Update",
-                            PermissionCategoryId = 2,
-                            Value = 5
-                        },
-                        new
-                        {
-                            Id = 28,
-                            Description = "EmployeeModule_Dashboard",
-                            Name = "EmployeeModule_Dashboard",
-                            PermissionCategoryId = 2,
                             Value = 6
-                        },
-                        new
-                        {
-                            Id = 29,
-                            Description = "IntegrationModule_UploadCSV",
-                            Name = "IntegrationModule_UploadCSV",
-                            PermissionCategoryId = 3,
-                            Value = 29
                         });
                 });
 
@@ -1050,20 +885,6 @@ namespace WorkManagement.EFCore.Migrations
                             Description = "Integration Module",
                             Name = "IntegrationModule",
                             Value = 3
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Description = "Leave Module",
-                            Name = "LeaveModule",
-                            Value = 4
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Description = "Setting Module",
-                            Name = "SettingModule",
-                            Value = 5
                         });
                 });
 
@@ -1294,113 +1115,6 @@ namespace WorkManagement.EFCore.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("RolePermissions");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            IsDeleted = false,
-                            PermissionActionId = 1,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
-                        },
-                        new
-                        {
-                            Id = 2,
-                            IsDeleted = false,
-                            PermissionActionId = 2,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
-                        },
-                        new
-                        {
-                            Id = 3,
-                            IsDeleted = false,
-                            PermissionActionId = 3,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
-                        },
-                        new
-                        {
-                            Id = 4,
-                            IsDeleted = false,
-                            PermissionActionId = 4,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
-                        },
-                        new
-                        {
-                            Id = 5,
-                            IsDeleted = false,
-                            PermissionActionId = 5,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
-                        },
-                        new
-                        {
-                            Id = 6,
-                            IsDeleted = false,
-                            PermissionActionId = 6,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
-                        },
-                        new
-                        {
-                            Id = 7,
-                            IsDeleted = false,
-                            PermissionActionId = 7,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
-                        },
-                        new
-                        {
-                            Id = 8,
-                            IsDeleted = false,
-                            PermissionActionId = 8,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
-                        },
-                        new
-                        {
-                            Id = 9,
-                            IsDeleted = false,
-                            PermissionActionId = 9,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
-                        },
-                        new
-                        {
-                            Id = 10,
-                            IsDeleted = false,
-                            PermissionActionId = 10,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
-                        },
-                        new
-                        {
-                            Id = 11,
-                            IsDeleted = false,
-                            PermissionActionId = 11,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
-                        },
-                        new
-                        {
-                            Id = 12,
-                            IsDeleted = false,
-                            PermissionActionId = 12,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
-                        },
-                        new
-                        {
-                            Id = 13,
-                            IsDeleted = false,
-                            PermissionActionId = 13,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
-                        },
-                        new
-                        {
-                            Id = 14,
-                            IsDeleted = false,
-                            PermissionActionId = 14,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
-                        },
-                        new
-                        {
-                            Id = 15,
-                            IsDeleted = false,
-                            PermissionActionId = 15,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
-                        });
                 });
 
             modelBuilder.Entity("WorkManagementSolution.Employee.Employee", b =>

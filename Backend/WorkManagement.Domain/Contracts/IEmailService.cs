@@ -12,5 +12,7 @@ namespace WorkManagement.Domain.Contracts
     {
         public Task SendWelcomeMail(EmailModel<WelcomeModel> emailModel);
         public Task SendLeaveEmail(EmailModel<LeaveEmailModel> emailModel);
+        public Task SendSalaryUpdateEmail(EmailModel<SalaryEmailModel> emailModel);
+        public Task SendEmployeeSalaryUpdateEmail(EmailModel<EmployeeSalaryUpdateEmailModel> emailModel);
     }
 }

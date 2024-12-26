@@ -901,15 +901,15 @@ namespace WorkManagement.Service
                             employeeWorkInformationData.Designation = employee.EmployeeWorkInformation.Designation;
                             employeeWorkInformationData.GRPHead = employee.EmployeeWorkInformation.GRPHead;
                             employeeWorkInformationData.SiteId = employee.EmployeeWorkInformation.SiteId;
-                            employeeWorkInformationData.SalaryType = employee.EmployeeWorkInformation.SalaryType;
-                            employeeWorkInformationData.Salary = employee.EmployeeWorkInformation.Salary;
-                            employeeWorkInformationData.Basic = employee.EmployeeWorkInformation.Basic;
-                            employeeWorkInformationData.HRAllowances = employee.EmployeeWorkInformation.HRAllowances;
-                            employeeWorkInformationData.Bonus = employee.EmployeeWorkInformation.Bonus;
-                            employeeWorkInformationData.Gratuity = employee.EmployeeWorkInformation.Gratuity;
-                            employeeWorkInformationData.PF = employee.EmployeeWorkInformation.PF;
-                            employeeWorkInformationData.ESI = employee.EmployeeWorkInformation.ESI;
-                            employeeWorkInformationData.PT = employee.EmployeeWorkInformation.PT;
+                            //employeeWorkInformationData.SalaryType = employee.EmployeeWorkInformation.SalaryType;
+                            //employeeWorkInformationData.Salary = employee.EmployeeWorkInformation.Salary;
+                            //employeeWorkInformationData.Basic = employee.EmployeeWorkInformation.Basic;
+                            //employeeWorkInformationData.HRAllowances = employee.EmployeeWorkInformation.HRAllowances;
+                            //employeeWorkInformationData.Bonus = employee.EmployeeWorkInformation.Bonus;
+                            //employeeWorkInformationData.Gratuity = employee.EmployeeWorkInformation.Gratuity;
+                            //employeeWorkInformationData.PF = employee.EmployeeWorkInformation.PF;
+                            //employeeWorkInformationData.ESI = employee.EmployeeWorkInformation.ESI;
+                            //employeeWorkInformationData.PT = employee.EmployeeWorkInformation.PT;
                             employeeWorkInformationData.TotalPreviousExperience = employee.EmployeeWorkInformation.TotalPreviousExperience;
                             employeeWorkInformationData.UseDefaultLeaves = employee.EmployeeWorkInformation.UseDefaultLeaves;
                             grossSalary = employeeWorkInformationData.Salary;
@@ -1054,6 +1054,33 @@ namespace WorkManagement.Service
                     _dbContext.Employees.Update(employeeData);
                     _dbContext.SaveChanges();
 
+                    if(employeeData.EmployeeWorkInformation.Salary != employee.EmployeeWorkInformation.Salary)
+                    {
+                        var salaryInfo = new EmployeeSalaryUpdateModel();
+                        if (employeeData.EmployeeWorkInformation.SalaryType.Value == SalaryType.OnRoll)
+                        {
+                            salaryInfo.EmployeeId = employeeData.Id;
+                            salaryInfo.SalaryType = employee.EmployeeWorkInformation.SalaryType.Value;
+                            salaryInfo.CurrentSalary = employeeData.EmployeeWorkInformation.Salary;
+                            salaryInfo.ExpectedToBeSalary = employee.EmployeeWorkInformation.Salary;
+                            salaryInfo.Basic = employee.EmployeeWorkInformation.Basic;
+                            salaryInfo.HRAllowances = employee.EmployeeWorkInformation.HRAllowances;
+                            salaryInfo.Bonus = employee.EmployeeWorkInformation.Bonus;
+                            salaryInfo.Gratuity = employee.EmployeeWorkInformation.Gratuity;
+                            salaryInfo.PF = employee.EmployeeWorkInformation.PF;
+                            salaryInfo.ESI = employee.EmployeeWorkInformation.ESI;
+                            salaryInfo.PT = employee.EmployeeWorkInformation.PT;
+                        }
+                        else
+                        {
+                            salaryInfo.EmployeeId = employeeData.Id;
+                            salaryInfo.SalaryType = employee.EmployeeWorkInformation.SalaryType.Value;
+                            salaryInfo.CurrentSalary = employeeData.EmployeeWorkInformation.Salary;
+                            salaryInfo.ExpectedToBeSalary = employee.EmployeeWorkInformation.Salary;
+                        }
+                        UpdateSalaryInformation(salaryInfo);
+                    }
+
                     return employee;
                 }
                 else
@@ -1066,7 +1093,7 @@ namespace WorkManagement.Service
             {
                 return null;
             }
-        }
+        }        
 
         public async Task<string> GetEmployeeDocumentFileName(int id, string fileName)
         {
@@ -1696,9 +1723,191 @@ namespace WorkManagement.Service
 
             return employee.Id;
         }
+
+        public async Task<EmployeeSalary> AprroveSalary(int salaryId, string loggedUserId, int employeeId)
+        {
+            var employeeSalary = new EmployeeSalary();
+            var targetEmployeeId = CheckValidEmployeeId(loggedUserId);
+            if (targetEmployeeId == -1)
+            {
+                throw new Exception("Invalid User data");
+                return employeeSalary;
+            }
+
+            var employee = _dbContext.Employees.FirstOrDefault(s => s.Id == employeeId);
+            if(employee != null)
+            {
+                employeeSalary = _dbContext.EmployeeSalaries.FirstOrDefault(s => s.Id == salaryId && s.EmployeeId == employeeId);
+                if(employeeSalary != null)
+                {
+                    if (employeeSalary.SalaryStatus == SalaryStatus.Approved)
+                    {
+                        return employeeSalary;
+                    }
+                    else if (employeeSalary.SalaryStatus == SalaryStatus.Pending)
+                    {
+                        employeeSalary.SalaryStatus = SalaryStatus.Approved;
+                        employeeSalary.UpdatedBy = targetEmployeeId;
+                        employeeSalary.UpdatedDateTime = DateTime.Now;
+
+                        if (employee.EmployeeReportToId == targetEmployeeId)
+                        {
+                            employeeSalary.IsApprovedByDepartmentHead = true;
+                        }
+
+                        var HRHeadRole = roleManager.Roles.FirstOrDefault(x => x.Name == "HR Admin");
+                        var HRHeadEmployee = new Employee();
+                        if (HRHeadRole != null)
+                        {
+                            HRHeadEmployee = _dbContext.Employees.FirstOrDefault(s => s.RoleId == HRHeadRole.Id);
+                            if(HRHeadEmployee.Id == targetEmployeeId)
+                            {
+                                employeeSalary.IsApprovedByHRHead = true;
+                            }
+                        }
+                    }
+
+                    _dbContext.EmployeeSalaries.Update(employeeSalary);
+                    _dbContext.SaveChanges();
+                }
+
+                employeeSalary = _dbContext.EmployeeSalaries.FirstOrDefault(s => s.Id == salaryId && s.EmployeeId == employeeId);
+                if(employeeSalary != null)
+                {
+                    var isHRHeadApprove = employeeSalary.IsApprovedByHRHead ?? false;
+                    var isDepartmentHeadApprove = employeeSalary.IsApprovedByDepartmentHead ?? false;
+
+                    if(isHRHeadApprove && isDepartmentHeadApprove)
+                    {
+                        if(employeeSalary.SalaryType == SalaryType.OnRoll)
+                        {
+                            employee.EmployeeWorkInformation.Salary = employeeSalary.ExpectedToBeSalary;
+                            employee.EmployeeWorkInformation.Basic = employeeSalary.Basic;
+                            employee.EmployeeWorkInformation.HRAllowances = employeeSalary.HRAllowances;
+                            employee.EmployeeWorkInformation.Bonus = employeeSalary.Bonus;
+                            employee.EmployeeWorkInformation.Gratuity = employeeSalary.Gratuity;
+                            employee.EmployeeWorkInformation.PF = employeeSalary.PF;
+                            employee.EmployeeWorkInformation.ESI = employeeSalary.ESI;
+                            employee.EmployeeWorkInformation.PT = employeeSalary.PT;
+                        }
+                        else
+                        {
+                            employee.EmployeeWorkInformation.Salary = employeeSalary.ExpectedToBeSalary;
+                        }
+                        
+                        _dbContext.Employees.Update(employee);
+                        _dbContext.SaveChanges();
+                    }
+                }
+
+            }
+
+           
+            return employeeSalary;
+        }
+
         #endregion
 
         #region Private methods
+
+        private void UpdateSalaryInformation(EmployeeSalaryUpdateModel salaryInfo)
+        {
+            var employee = _dbContext.Employees.FirstOrDefault(s => s.Id == salaryInfo.EmployeeId);
+            if(employee != null)
+            {
+                EmployeeSalary employeeSalary = new EmployeeSalary();
+                employeeSalary.EmployeeId = salaryInfo.EmployeeId; 
+                employeeSalary.SalaryType = salaryInfo.SalaryType;
+                employeeSalary.SalaryStatus = SalaryStatus.Pending;
+                employeeSalary.IsApprovedByDepartmentHead = false;
+                employeeSalary.IsApprovedByHRHead = false;
+                employeeSalary.CurrentSalary = salaryInfo.CurrentSalary;
+                employeeSalary.ExpectedToBeSalary = salaryInfo.ExpectedToBeSalary;
+                employeeSalary.Basic = salaryInfo.Basic;
+                employeeSalary.HRAllowances = salaryInfo.HRAllowances;
+                employeeSalary.Bonus = salaryInfo.Bonus;
+                employeeSalary.Gratuity = salaryInfo.Gratuity;
+                employeeSalary.PF = salaryInfo.PF;
+                employeeSalary.ESI = salaryInfo.ESI;
+                employeeSalary.PT = salaryInfo.PT;
+                employeeSalary.UpdatedBy = null;
+                employeeSalary.UpdatedDateTime = DateTime.Now;
+
+                _dbContext.EmployeeSalaries.Add(employeeSalary);
+
+                _dbContext.SaveChanges();
+
+                var pendingSalaryRequestEmailList = new List<SalaryEmailModel>();
+                var pendingRequestEmailModel = new SalaryEmailModel();
+
+               
+
+                var reportToEmployee = _dbContext.Employees.FirstOrDefault(s => s.Id == employee.EmployeeReportToId);
+                if(reportToEmployee != null)
+                {
+                    pendingRequestEmailModel = new SalaryEmailModel();
+                    pendingRequestEmailModel.SalaryType = "Pending Request for salary update";
+                    pendingRequestEmailModel.EmployeeName = employee.FirstName + " " + employee.LastName;
+                    pendingRequestEmailModel.ApprovalStatus = "Pending";
+                    pendingRequestEmailModel.ManagerName = reportToEmployee.FirstName;
+                    pendingRequestEmailModel.ManagerEmail = reportToEmployee.Email;
+                    pendingRequestEmailModel.CurrentSalary = salaryInfo.CurrentSalary;
+                    pendingRequestEmailModel.ExpectedToBeSalary = salaryInfo.ExpectedToBeSalary;
+                    pendingRequestEmailModel.UpdatedDate = DateTime.Now;
+
+                    pendingSalaryRequestEmailList.Add(pendingRequestEmailModel);
+
+                }
+
+                var HRHeadRole = roleManager.Roles.FirstOrDefault(x => x.Name == "HR Admin");
+                var HRHeadEmployee = new Employee();
+                if (HRHeadRole != null)
+                {
+                    HRHeadEmployee = _dbContext.Employees.FirstOrDefault(s => s.RoleId == HRHeadRole.Id);
+                    if (HRHeadEmployee != null)
+                    {
+                        pendingRequestEmailModel = new SalaryEmailModel();
+                        pendingRequestEmailModel.SalaryType = "Pending Request for salary update";
+                        pendingRequestEmailModel.EmployeeName = employee.FirstName + " " + employee.LastName;
+                        pendingRequestEmailModel.ApprovalStatus = "Pending";
+                        pendingRequestEmailModel.ManagerName = HRHeadEmployee.FirstName;
+                        pendingRequestEmailModel.ManagerEmail = HRHeadEmployee.Email;
+                        pendingRequestEmailModel.CurrentSalary = salaryInfo.CurrentSalary;
+                        pendingRequestEmailModel.ExpectedToBeSalary = salaryInfo.ExpectedToBeSalary;
+                        pendingRequestEmailModel.UpdatedDate = DateTime.Now;
+
+                        pendingSalaryRequestEmailList.Add(pendingRequestEmailModel);
+
+
+                    }
+                }
+
+                var employeeSalaryInfoEmail = new EmployeeSalaryUpdateEmailModel();
+                employeeSalaryInfoEmail.EmployeeName = employee.FirstName + " " + employee.LastName;
+                employeeSalaryInfoEmail.ApprovalStatus = "Pending";
+                if(reportToEmployee != null)
+                {
+                    employeeSalaryInfoEmail.ManagerName = reportToEmployee.FirstName;
+                }
+
+                if (HRHeadEmployee != null)
+                {
+                    employeeSalaryInfoEmail.HRManagerName = HRHeadEmployee.FirstName;
+                }
+
+                employeeSalaryInfoEmail.CurrentSalary = salaryInfo.CurrentSalary;
+                employeeSalaryInfoEmail.ExpectedToBeSalary = salaryInfo.ExpectedToBeSalary;
+                employeeSalaryInfoEmail.UpdatedDate = DateTime.Now;
+
+                foreach (var salaryEmail in pendingSalaryRequestEmailList)
+                {
+                    SendPendingSalaryRequestEmailToManager(salaryEmail.ManagerEmail, salaryEmail);
+
+                }
+
+                SendPendingSalaryRequestEmailToEmployee(employee.Email, employeeSalaryInfoEmail);
+            }
+        }
 
         private async Task SendEmail(ApplicationUser user, string password)
         {
@@ -1725,7 +1934,29 @@ namespace WorkManagement.Service
             _emailService.SendLeaveEmail(emailModel);
         }
 
-        
+        private async Task SendPendingSalaryRequestEmailToManager(string userEmail, SalaryEmailModel pendingRequestEmailModel)
+        {
+
+            var emailModel = new EmailModel<SalaryEmailModel>();
+            emailModel.From = "naupul30@gmail.com";
+            emailModel.To = userEmail;
+            emailModel.Subject = $"Salary update request from: {pendingRequestEmailModel.EmployeeName}";
+            emailModel.repModel = pendingRequestEmailModel;
+            _emailService.SendSalaryUpdateEmail(emailModel);
+        }
+
+        private async Task SendPendingSalaryRequestEmailToEmployee(string userEmail, EmployeeSalaryUpdateEmailModel pendingRequestEmailModel)
+        {
+
+            var emailModel = new EmailModel<EmployeeSalaryUpdateEmailModel>();
+            emailModel.From = "naupul30@gmail.com";
+            emailModel.To = userEmail;
+            emailModel.Subject = $"Salary update information";
+            emailModel.repModel = pendingRequestEmailModel;
+            _emailService.SendEmployeeSalaryUpdateEmail(emailModel);
+        }
+
+
 
 
         #endregion

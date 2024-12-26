@@ -53,6 +53,7 @@ namespace WorkManagmentSolution.EFCore
         public virtual DbSet<RolePermission> RolePermissions { get; set; }
         public virtual DbSet<PermissionAction> PermissionActions { get; set; }
         public virtual DbSet<PermissionCategory> PermissionCategories { get; set; }
+        public virtual DbSet<EmployeeSalary> EmployeeSalaries { get; set; }
 
 
         public IHttpContextAccessor HttpContextAccessor { get; }
