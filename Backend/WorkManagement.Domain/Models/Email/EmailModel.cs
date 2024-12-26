@@ -34,4 +34,27 @@ namespace WorkManagement.Domain.Models.Email
         public string ManagerName { get; set; }
         public string RequestType { get; set; }
     }
+
+    public class SalaryEmailModel
+    {
+        public string SalaryType { get; set; }
+        public string EmployeeName { get; set; }
+        public string ApprovalStatus { get; set; }
+        public string ManagerName { get; set; }
+        public string ManagerEmail { get; set; }
+        public decimal? CurrentSalary { get; set; }
+        public decimal? ExpectedToBeSalary { get; set; }
+        public DateTime UpdatedDate { get; set; }
+    }
+
+    public class EmployeeSalaryUpdateEmailModel
+    {
+        public string EmployeeName { get; set; }
+        public string ApprovalStatus { get; set; }
+        public string ManagerName { get; set; }
+        public string HRManagerName { get; set; }
+        public decimal? CurrentSalary { get; set; }
+        public decimal? ExpectedToBeSalary { get; set; }
+        public DateTime UpdatedDate { get; set; }
+    }
 }

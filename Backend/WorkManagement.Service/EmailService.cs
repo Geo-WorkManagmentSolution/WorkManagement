@@ -155,6 +155,72 @@ namespace WorkManagement.Service
 
         }
 
+        public async Task SendSalaryUpdateEmail(EmailModel<SalaryEmailModel> emailModel)
+        {
+            try
+            {
+                var sender = new SmtpSender(() => new SmtpClient("smtp.gmail.com")
+                {
+                    UseDefaultCredentials = false,
+                    Port = _smtpsettings.Value.Port,
+                    Credentials = new NetworkCredential(_smtpsettings.Value.Sender, _smtpsettings.Value.Password),
+                    EnableSsl = true,
+                    DeliveryMethod = SmtpDeliveryMethod.Network
+                });
+
+                Email.DefaultSender = sender;
+                Email.DefaultRenderer = new RazorRenderer();
+
+                var email = await Email
+                           .From(emailModel.From)
+                           .To(emailModel.To)
+                           .Subject(emailModel.Subject)
+                           .UsingTemplateFromFile(@"EmailTemplate\ManagerSalaryUpdate_EmailTemplate.cshtml", emailModel.repModel)
+                           .SendAsync();
+                Log.Information("Salary update email sent successfully.");
+
+
+            }
+            catch (Exception ex)
+            {
+                Log.Information(ex.Message);
+            }
+
+        }
+
+        public async Task SendEmployeeSalaryUpdateEmail(EmailModel<EmployeeSalaryUpdateEmailModel> emailModel)
+        {
+            try
+            {
+                var sender = new SmtpSender(() => new SmtpClient("smtp.gmail.com")
+                {
+                    UseDefaultCredentials = false,
+                    Port = _smtpsettings.Value.Port,
+                    Credentials = new NetworkCredential(_smtpsettings.Value.Sender, _smtpsettings.Value.Password),
+                    EnableSsl = true,
+                    DeliveryMethod = SmtpDeliveryMethod.Network
+                });
+
+                Email.DefaultSender = sender;
+                Email.DefaultRenderer = new RazorRenderer();
+
+                var email = await Email
+                           .From(emailModel.From)
+                           .To(emailModel.To)
+                           .Subject(emailModel.Subject)
+                           .UsingTemplateFromFile(@"EmailTemplate\EmployeeSalaryUpdate_EmailTemplate.cshtml", emailModel.repModel)
+                           .SendAsync();
+                Log.Information("Salary update email to employee sent successfully.");
+
+
+            }
+            catch (Exception ex)
+            {
+                Log.Information(ex.Message);
+            }
+
+        }
+
 
     }
 }

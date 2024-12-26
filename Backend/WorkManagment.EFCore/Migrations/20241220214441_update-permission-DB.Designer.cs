@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WorkManagmentSolution.EFCore;
 
@@ -11,9 +12,11 @@ using WorkManagmentSolution.EFCore;
 namespace WorkManagement.EFCore.Migrations
 {
     [DbContext(typeof(WorkManagementDbContext))]
-    partial class WorkManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241220214441_update-permission-DB")]
+    partial class updatepermissionDB
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -274,12 +277,12 @@ namespace WorkManagement.EFCore.Migrations
                         {
                             Id = new Guid("8e445865-a24d-4543-a6c6-9443d048cdb9"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "47587caa-ce71-4a77-b4e6-bedb9815a891",
+                            ConcurrencyStamp = "a1297d9f-178c-4e5f-9692-24f810fc1c73",
                             Email = "admin1@admin.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKe+QzMz2doFXYFXNdP5np1Dinx6NAgoJx1AAgUNx6ih8zhwP7w25rYqQaarpqlTew==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEFGSbzQRDfxTF6rtYEcJmW3wLR5WUrUmPaM2WCYDm5CpXIuCu6WpRs3js0ROWGdykQ==",
                             PhoneNumberConfirmed = false,
                             Shortcuts = "[]",
                             TwoFactorEnabled = false,
@@ -677,72 +680,6 @@ namespace WorkManagement.EFCore.Migrations
                         });
                 });
 
-            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeSalary", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Basic")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("Bonus")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("CurrentSalary")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("ESI")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("EmployeeId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("ExpectedToBeSalary")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("Gratuity")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("HRAllowances")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<bool?>("IsApprovedByDepartmentHead")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("IsApprovedByHRHead")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal>("PF")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("PT")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("SalaryStatus")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("SalaryType")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("UpdatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.ToTable("EmployeeSalaries");
-                });
-
             modelBuilder.Entity("WorkManagement.Domain.Entity.PermissionAction", b =>
                 {
                     b.Property<int>("Id")
@@ -1123,6 +1060,7 @@ namespace WorkManagement.EFCore.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AlternateEmail")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long?>("AlternateNumber")
@@ -1582,6 +1520,7 @@ namespace WorkManagement.EFCore.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("EmployeeId")
@@ -1591,9 +1530,11 @@ namespace WorkManagement.EFCore.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("RelationshipType")
@@ -1800,15 +1741,6 @@ namespace WorkManagement.EFCore.Migrations
                     b.Navigation("Employee");
 
                     b.Navigation("EmployeeLeaveTypes");
-                });
-
-            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeSalary", b =>
-                {
-                    b.HasOne("WorkManagementSolution.Employee.Employee", "Employee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeId");
-
-                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("WorkManagement.Domain.Entity.PermissionAction", b =>
