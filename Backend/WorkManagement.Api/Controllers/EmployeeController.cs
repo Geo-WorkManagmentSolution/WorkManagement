@@ -90,7 +90,7 @@ namespace WorkManagement.API.Controllers
             return Ok(Sites);
         }
 
-        [HttpGet("ReportToE mployeeList")]
+        [HttpGet("ReportToEmployeeList")]
         public async Task<ActionResult<IEnumerable<EmployeeReportToModel>>> GetReportToEmployeeList(int? departmentId, int? employeeId)
         {
             var reportToEmployeeList = await employeeService.GetReportToEmployeeList(departmentId, employeeId);
@@ -239,7 +239,7 @@ namespace WorkManagement.API.Controllers
         }
 
         [HttpPut("SalaryReject/{salaryId}")]
-        public async Task<ActionResult<EmployeeLeave>> RejectSalary(int salaryId, int employeeId)
+        public async Task<ActionResult<EmployeeSalary>> RejectSalary(int salaryId, int employeeId)
         {
             var loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var employeeSalary = await employeeService.RejectSalary(salaryId, loggedUserId, employeeId);
@@ -247,7 +247,7 @@ namespace WorkManagement.API.Controllers
         }
 
         [HttpGet("Salary/PendingSalaryRequest")]
-        public async Task<ActionResult<IEnumerable<EmployeeLeaveSummaryModel>>> GetEmployeePendingSalaryRequest([FromQuery] int? employeeId = null)
+        public async Task<ActionResult<IEnumerable<EmployeeSalaryDataModel>>> GetEmployeePendingSalaryRequest([FromQuery] int? employeeId = null)
         {
             List<EmployeeSalaryDataModel> salaryRequests = new List<EmployeeSalaryDataModel>();
             var loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -264,7 +264,7 @@ namespace WorkManagement.API.Controllers
 
         // GET api/employee/leaves/current
         [HttpGet("leaves/current")]
-        public async Task<ActionResult<IEnumerable<EmployeeLeaveSummaryModel>>> GetEmployeeLeaves([FromQuery] int? employeeId = null)
+        public async Task<ActionResult<IEnumerable<EmployeeLeaveSummary>>> GetEmployeeLeaves([FromQuery] int? employeeId = null)
         {
             List<EmployeeLeaveSummaryModel> leaves; if (employeeId.HasValue)
             { // Fetch data based on employeeId

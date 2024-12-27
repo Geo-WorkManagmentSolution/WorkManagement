@@ -25,7 +25,7 @@ function BasicInfoTab({UserRole}) {
 	const { employeeId } = useParams();
 	const handleOptionAdd = async (newOption: Omit<Option, 'id'>) => {
 		try {
-			const result = await AddCategory({
+			const result = await AddCategory({	
 				employeeCategory: newOption
 			}).unwrap();
 			return { ...newOption, id: result.id };

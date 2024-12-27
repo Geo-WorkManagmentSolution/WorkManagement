@@ -1908,7 +1908,7 @@ namespace WorkManagement.Service
             var targetEmployeeId = CheckValidEmployeeId(loggedUserId);
             if (targetEmployeeId == -1)
             {
-                throw new Exception("Invalid User data");
+                //throw new Exception("Invalid User data");
                 return returnData;
             }
 

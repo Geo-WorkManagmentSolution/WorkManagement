@@ -785,7 +785,7 @@ function WorkInfoTab({ UserRole }) {
 										field.onChange(e.target.checked);
 
 										if (!e.target.checked) {
-											setValue('jobLevelLeaveType', '');
+											setValue('jobLevelLeaveType', null);
 											setValue('employeeLeaves', []);
 										}
 									}}
@@ -811,7 +811,7 @@ function WorkInfoTab({ UserRole }) {
 									{...field}
 									labelId="job-level-select-label"
 									label="Job Level"
-									value={field.value || ''}
+									// value={field.value || ''}
 									onChange={(e) => {
 										field.onChange(e.target.value);
 										setSelectedJobLevel(e.target.value);

@@ -14,6 +14,7 @@ const EmployeeModelClone = (data: PartialDeep<EmployeeModel>) =>
 		phoneNumber: undefined,
 		employeeCategoryId:null,
 		roleId: '',
+		jobLevelLeaveType: null,
 		employeePersonalDetails: {
 			isDeleted: false,
 			dateOfBirth: '',

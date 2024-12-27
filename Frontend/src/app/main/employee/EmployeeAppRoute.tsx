@@ -6,6 +6,7 @@ import LeaveApprovalTable from './leave-management/approval/LeaveApprovalTable';
 import EmployeeLeaveHistory from './leave-management/employeeLeaveHiistory/EmployeeLeaveHistory';
 import EmployeeLeaveHistoryWithApproval from './leave-management/approval/EmployeeLeaveHistoryWithApproval';
 import EmployeesLeaveHistories from './leave-management/employeeLeaveHiistory/EmployeesLeaveHistories';
+import SalaryApprovalTable from './salary-managment/SalaryApprovalTable';
 // import Employees from './employees/Employees';
 
 const EmployeeApp = lazy(() => import('./EmployeeApp'));
@@ -49,7 +50,12 @@ const EmployeeAppRoute: FuseRouteItemType = {
 					path: ':employeeId',
 					element: <Employee />
 				}
+				
 			]
+		},
+		{
+			path:'salary-approval',
+			element:<SalaryApprovalTable />
 		},
 		{
 			path: 'leave-management',

@@ -124,7 +124,7 @@ const injectedRtkApi = api.injectEndpoints({
 });
 export { injectedRtkApi as enhancedApi };
 export type GetApiEmployeesLeavesCurrentApiResponse =
-  /** status 200 OK */ EmployeeLeaveSummaryModel[];
+  /** status 200 OK */ EmployeeSalaryDataModel[];
 export type GetApiEmployeesLeavesCurrentApiArg = {
   employeeId?: number;
 };
@@ -184,12 +184,19 @@ export type GetApiLeavesSettingsHolidaysByYearApiArg = {
 export type GetApiLeavesSettingsLeaveTypesApiResponse =
   /** status 200 OK */ EmployeeLeaveType[];
 export type GetApiLeavesSettingsLeaveTypesApiArg = void;
-export type EmployeeLeaveSummaryModel = {
-  employeeLeaveSummaryId?: number;
-  id?: number;
-  employeeLeaveType?: string | null;
-  totalLeaves?: number;
-  remainingLeaves?: number;
+export type EmployeeSalaryDataModel = {
+  employeeId?: number | null;
+  employeeName?: string | null;
+  managerName?: string | null;
+  salaryType?: SalaryType;
+  salaryStatus?: SalaryStatus;
+  isApprovedByDepartmentHead?: boolean;
+  isApprovedByHRHead?: boolean;
+  currentSalary?: number;
+  expectedToBeSalary?: number;
+  updatedBy?: number | null;
+  updatedByUserName?: string | null;
+  updatedDateTime?: string | null;
 };
 export type EmployeeLeaveModel = {
   id?: number;
@@ -256,6 +263,18 @@ export type DefaultLeaveModel = {
   jobLevelLeaveTypeId?: number;
   totalLeaves?: number;
 };
+export enum SalaryType {
+  OnRoll = "OnRoll",
+  Consultant = "Consultant",
+  Labour = "Labour",
+  Apprentice = "Apprentice",
+  VisitBased = "VisitBased",
+}
+export enum SalaryStatus {
+  Approved = "Approved",
+  Pending = "Pending",
+  Rejected = "Rejected",
+}
 export enum LeaveStatus {
   Approved = "Approved",
   Pending = "Pending",

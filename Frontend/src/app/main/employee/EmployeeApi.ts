@@ -152,6 +152,35 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.employeeDesignation,
       }),
     }),
+    putApiEmployeesSalaryApproveBySalaryId: build.mutation<
+      PutApiEmployeesSalaryApproveBySalaryIdApiResponse,
+      PutApiEmployeesSalaryApproveBySalaryIdApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/SalaryApprove/${queryArg.salaryId}`,
+        method: "PUT",
+        params: { employeeId: queryArg.employeeId },
+      }),
+    }),
+    putApiEmployeesSalaryRejectBySalaryId: build.mutation<
+      PutApiEmployeesSalaryRejectBySalaryIdApiResponse,
+      PutApiEmployeesSalaryRejectBySalaryIdApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/SalaryReject/${queryArg.salaryId}`,
+        method: "PUT",
+        params: { employeeId: queryArg.employeeId },
+      }),
+    }),
+    getApiEmployeesSalaryPendingSalaryRequest: build.query<
+      GetApiEmployeesSalaryPendingSalaryRequestApiResponse,
+      GetApiEmployeesSalaryPendingSalaryRequestApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/Salary/PendingSalaryRequest`,
+        params: { employeeId: queryArg.employeeId },
+      }),
+    }),
     getApiEmployeesLeavesCurrent: build.query<
       GetApiEmployeesLeavesCurrentApiResponse,
       GetApiEmployeesLeavesCurrentApiArg
@@ -377,8 +406,25 @@ export type PostApiEmployeesAddNewDesignationApiResponse = unknown;
 export type PostApiEmployeesAddNewDesignationApiArg = {
   employeeDesignation: EmployeeDesignation;
 };
+export type PutApiEmployeesSalaryApproveBySalaryIdApiResponse =
+  /** status 200 OK */ EmployeeSalary;
+export type PutApiEmployeesSalaryApproveBySalaryIdApiArg = {
+  salaryId: number;
+  employeeId?: number;
+};
+export type PutApiEmployeesSalaryRejectBySalaryIdApiResponse =
+  /** status 200 OK */ EmployeeLeave;
+export type PutApiEmployeesSalaryRejectBySalaryIdApiArg = {
+  salaryId: number;
+  employeeId?: number;
+};
+export type GetApiEmployeesSalaryPendingSalaryRequestApiResponse =
+  /** status 200 OK */ EmployeeSalaryDataModel[];
+export type GetApiEmployeesSalaryPendingSalaryRequestApiArg = {
+  employeeId?: number;
+};
 export type GetApiEmployeesLeavesCurrentApiResponse =
-  /** status 200 OK */ EmployeeLeaveSummaryModel[];
+  /** status 200 OK */ EmployeeSalaryDataModel[];
 export type GetApiEmployeesLeavesCurrentApiArg = {
   employeeId?: number;
 };
@@ -631,6 +677,245 @@ export type Criterion = {
   value?: any | null;
   nextOperator?: string | null;
 };
+export type ApplicationUser = {
+  id?: string;
+  userName?: string | null;
+  normalizedUserName?: string | null;
+  email?: string | null;
+  normalizedEmail?: string | null;
+  emailConfirmed?: boolean;
+  passwordHash?: string | null;
+  securityStamp?: string | null;
+  concurrencyStamp?: string | null;
+  phoneNumber?: string | null;
+  phoneNumberConfirmed?: boolean;
+  twoFactorEnabled?: boolean;
+  lockoutEnd?: string | null;
+  lockoutEnabled?: boolean;
+  accessFailedCount?: number;
+  shortcuts?: string[] | null;
+};
+export type ApplicationRole = {
+  id?: string;
+  name?: string | null;
+  normalizedName?: string | null;
+  concurrencyStamp?: string | null;
+};
+export type EmployeePersonalDetails = {
+  id?: number;
+  isDeleted?: boolean;
+  dateOfBirth?: string | null;
+  gender?: string | null;
+  maritalStatus?: MaritalStatus;
+  bloodGroup?: BloodGroup;
+  relationWithEmployee?: RelationWithEmployee;
+};
+export type EmployeeWorkInformation = {
+  id?: number;
+  isDeleted?: boolean;
+  designation?: string | null;
+  salaryType?: SalaryType;
+  hireDate?: string | null;
+  confirmationDate?: string | null;
+  totalPreviousExperience?: number;
+  useDefaultLeaves?: boolean;
+  salary?: number;
+  basic?: number;
+  hrAllowances?: number;
+  bonus?: number;
+  gratuity?: number;
+  pf?: number;
+  esi?: number;
+  pt?: number;
+  siteId?: number | null;
+  site?: Site;
+  bond?: number | null;
+  previousDateOfJoiningInGDR?: string | null;
+  previousDateOfLeavingInGDR?: string | null;
+  grpHead?: string | null;
+};
+export type EmployeeInsuranceDetail = {
+  id?: number;
+  isDeleted?: boolean;
+  employeeDesignationId?: number | null;
+  employeeDesignation?: EmployeeDesignation;
+  serialNumber?: string | null;
+  dateOfJoining?: string | null;
+  dateOfBirth?: string | null;
+  age?: number;
+  grossSalary?: number;
+  totalSIWider?: number;
+  comprehensive?: number;
+  risk?: string | null;
+};
+export type EmployeeAddress = {
+  id?: number;
+  isDeleted?: boolean;
+  userAddressLine1?: string | null;
+  userAddressLine2?: string | null;
+  userCity?: string | null;
+  userCountry?: string | null;
+  userState?: string | null;
+  userAddressPinCode?: number | null;
+  mailingAddressLine1?: string | null;
+  mailingAddressLine2?: string | null;
+  mailingCity?: string | null;
+  mailingCountry?: string | null;
+  mailingState?: string | null;
+  mailingAddressPinCode?: number | null;
+};
+export type EmployeeIdentityInfo = {
+  id?: number;
+  isDeleted?: boolean;
+  uid?: string | null;
+  bankAccountNumber?: string | null;
+  bankName?: string | null;
+  branch?: string | null;
+  ifsc?: string | null;
+  accountHolderName?: string | null;
+  pan?: string | null;
+  providentFundNumber?: string | null;
+  employeeStateInsuranceNumber?: string | null;
+  biometricCode?: string | null;
+};
+export type EmployeeEducationDetail = {
+  id?: number;
+  isDeleted?: boolean;
+  employee?: Employee;
+  type?: string | null;
+  passingYear?: string | null;
+  degreeCertificateDate?: string | null;
+  university?: string | null;
+  grade?: string | null;
+  employeeId?: number | null;
+};
+export type EmployeeRelationshipDetail = {
+  id?: number;
+  isDeleted?: boolean;
+  employeeId?: number | null;
+  employee?: Employee;
+  relationshipType?: RelationshipType;
+  name?: string | null;
+  email?: string | null;
+  phoneNumber?: string | null;
+};
+export type EmployeeDocuments = {
+  id?: number;
+  isDeleted?: boolean;
+  fileName?: string | null;
+  filePath?: string | null;
+  fileSize?: number | null;
+  fileContent?: string | null;
+  fileType?: FileType;
+  employeeId?: number | null;
+  employee?: Employee;
+};
+export type EmployeeLeaveType = {
+  id?: number;
+  isDeleted?: boolean;
+  name?: string | null;
+  isPaid?: boolean;
+};
+export type EmployeeLeaveSummary = {
+  id?: number;
+  isDeleted?: boolean;
+  employeeId?: number;
+  employee?: Employee;
+  remainingLeaves?: number;
+  employeeLeaveTypeId?: number | null;
+  employeeLeaveTypes?: EmployeeLeaveType;
+  totalLeaves?: number;
+};
+export type Employee = {
+  id?: number;
+  createdBy?: string;
+  createdOn?: string;
+  lastModifiedBy?: string | null;
+  lastModifiedOn?: string;
+  isDeleted?: boolean;
+  photoURL?: string | null;
+  employeeNumber?: number;
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  email: string;
+  alternateEmail?: string | null;
+  phoneNumber?: number | null;
+  alternateNumber?: number | null;
+  employeeDepartmentId?: number | null;
+  employeeDesignationId?: number | null;
+  employeeReportToId?: number | null;
+  userId?: string;
+  roleId?: string;
+  employeeCategoryId?: number | null;
+  employeePersonalDetailsId?: number | null;
+  employeeWorkInformationId?: number | null;
+  employeeInsuranceDetailsId?: number | null;
+  employeeAddressesId?: number | null;
+  employeeIdentityInfoId?: number | null;
+  employeeDepartment?: EmployeeDepartment;
+  employeeDesignation?: EmployeeDesignation;
+  employeeReportTo?: Employee;
+  applicationUser?: ApplicationUser;
+  applicationRole?: ApplicationRole;
+  employeeCategory?: EmployeeCategory;
+  employeePersonalDetails?: EmployeePersonalDetails;
+  employeeWorkInformation?: EmployeeWorkInformation;
+  employeeInsuranceDetails?: EmployeeInsuranceDetail;
+  employeeAddresses?: EmployeeAddress;
+  employeeIdentityInfos?: EmployeeIdentityInfo;
+  employeeEducationDetail?: EmployeeEducationDetail[] | null;
+  employeeRelationshipDetails?: EmployeeRelationshipDetail[] | null;
+  employeeDocuments?: EmployeeDocuments[] | null;
+  employeeLeaves?: EmployeeLeaveSummary[] | null;
+};
+export type EmployeeSalary = {
+  id?: number;
+  isDeleted?: boolean;
+  employeeId?: number | null;
+  employee?: Employee;
+  salaryType?: SalaryType;
+  salaryStatus?: SalaryStatus;
+  isApprovedByDepartmentHead?: boolean;
+  isApprovedByHRHead?: boolean;
+  currentSalary?: number;
+  expectedToBeSalary?: number;
+  basic?: number;
+  hrAllowances?: number;
+  bonus?: number;
+  gratuity?: number;
+  pf?: number;
+  esi?: number;
+  pt?: number;
+  updatedBy?: number | null;
+  updatedDateTime?: string | null;
+};
+export type EmployeeLeave = {
+  id?: number;
+  isDeleted?: boolean;
+  employeeId?: number;
+  status?: LeaveStatus;
+  description?: string | null;
+  reason?: string | null;
+  startDate?: string;
+  endDate?: string;
+  leaveDays?: number;
+  employeeLeaveTypeId?: number;
+};
+export type EmployeeSalaryDataModel = {
+  employeeId?: number | null;
+  employeeName?: string | null;
+  managerName?: string | null;
+  salaryType?: SalaryType;
+  salaryStatus?: SalaryStatus;
+  isApprovedByDepartmentHead?: boolean;
+  isApprovedByHRHead?: boolean;
+  currentSalary?: number;
+  expectedToBeSalary?: number;
+  updatedBy?: number | null;
+  updatedByUserName?: string | null;
+  updatedDateTime?: string | null;
+};
 export type EmployeeLeaveModel = {
   id?: number;
   employeeId?: number;
@@ -644,18 +929,6 @@ export type EmployeeLeaveModel = {
   employeeLeaveTypeId?: number;
   leaveType?: string | null;
   employeeName?: string | null;
-};
-export type EmployeeLeave = {
-  id?: number;
-  isDeleted?: boolean;
-  employeeId?: number;
-  status?: LeaveStatus;
-  description?: string | null;
-  reason?: string | null;
-  startDate?: string;
-  endDate?: string;
-  leaveDays?: number;
-  employeeLeaveTypeId?: number;
 };
 export type DropdownModel = {
   category?: string | null;
@@ -721,6 +994,21 @@ export enum FileType {
   Csv = "CSV",
   Other = "Other",
 }
+export enum RelationWithEmployee {
+  Colleague = "Colleague",
+  Supervisor = "Supervisor",
+  Subordinate = "Subordinate",
+  Manager = "Manager",
+  Mentor = "Mentor",
+  Friend = "Friend",
+  FamilyMember = "FamilyMember",
+  Other = "Other",
+}
+export enum SalaryStatus {
+  Approved = "Approved",
+  Pending = "Pending",
+  Rejected = "Rejected",
+}
 export enum LeaveStatus {
   Approved = "Approved",
   Pending = "Pending",
@@ -761,6 +1049,10 @@ export const {
   usePostApiEmployeesAddNewDepartmentMutation,
   usePostApiEmployeesAddNewSiteMutation,
   usePostApiEmployeesAddNewDesignationMutation,
+  usePutApiEmployeesSalaryApproveBySalaryIdMutation,
+  usePutApiEmployeesSalaryRejectBySalaryIdMutation,
+  useGetApiEmployeesSalaryPendingSalaryRequestQuery,
+  useLazyGetApiEmployeesSalaryPendingSalaryRequestQuery,
   useGetApiEmployeesLeavesCurrentQuery,
   useLazyGetApiEmployeesLeavesCurrentQuery,
   usePostApiEmployeesLeavesAddLeaveMutation,
