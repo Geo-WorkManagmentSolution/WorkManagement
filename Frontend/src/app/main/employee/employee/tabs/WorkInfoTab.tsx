@@ -32,7 +32,7 @@ import {
 	useGetApiEmployeesSitesQuery,
 	usePostApiEmployeesAddNewDesignationMutation,
 	usePostApiEmployeesAddNewSiteMutation,
-	useGetApiEmployeesReportToEmployeeListQuery,
+	useGetApiEmployeesReportToEMployeeListQuery,
 	ProjectModel,
 	useGetApiEmployeesProjectByEmployeeIdQuery
 } from '../../EmployeeApi';
@@ -80,7 +80,7 @@ function WorkInfoTab({ UserRole }) {
 		keyName: 'key'
 	});
 
-	const { data: employeesReportToOptions = [] } = useGetApiEmployeesReportToEmployeeListQuery(
+	const { data: employeesReportToOptions = [] } = useGetApiEmployeesReportToEMployeeListQuery(
 		{
 			departmentId,
 			employeeId: parsedEmployeeId

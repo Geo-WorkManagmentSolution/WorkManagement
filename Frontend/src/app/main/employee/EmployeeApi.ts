@@ -41,12 +41,12 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: () => ({ url: `/api/Employees/sites` }),
     }),
-    getApiEmployeesReportToEmployeeList: build.query<
-      GetApiEmployeesReportToEmployeeListApiResponse,
-      GetApiEmployeesReportToEmployeeListApiArg
+    getApiEmployeesReportToEMployeeList: build.query<
+      GetApiEmployeesReportToEMployeeListApiResponse,
+      GetApiEmployeesReportToEMployeeListApiArg
     >({
       query: (queryArg) => ({
-        url: `/api/Employees/ReportToEmployeeList`,
+        url: `/api/Employees/ReportToE mployeeList`,
         params: {
           departmentId: queryArg.departmentId,
           employeeId: queryArg.employeeId,
@@ -325,9 +325,9 @@ export type GetApiEmployeesDesignationsApiResponse =
 export type GetApiEmployeesDesignationsApiArg = void;
 export type GetApiEmployeesSitesApiResponse = /** status 200 OK */ Site[];
 export type GetApiEmployeesSitesApiArg = void;
-export type GetApiEmployeesReportToEmployeeListApiResponse =
+export type GetApiEmployeesReportToEMployeeListApiResponse =
   /** status 200 OK */ EmployeeReportToModel[];
-export type GetApiEmployeesReportToEmployeeListApiArg = {
+export type GetApiEmployeesReportToEMployeeListApiArg = {
   departmentId?: number;
   employeeId?: number;
 };
@@ -745,8 +745,8 @@ export const {
   useLazyGetApiEmployeesDesignationsQuery,
   useGetApiEmployeesSitesQuery,
   useLazyGetApiEmployeesSitesQuery,
-  useGetApiEmployeesReportToEmployeeListQuery,
-  useLazyGetApiEmployeesReportToEmployeeListQuery,
+  useGetApiEmployeesReportToEMployeeListQuery,
+  useLazyGetApiEmployeesReportToEMployeeListQuery,
   useGetApiEmployeesTeamMembersListQuery,
   useLazyGetApiEmployeesTeamMembersListQuery,
   useGetApiEmployeesByIdQuery,
