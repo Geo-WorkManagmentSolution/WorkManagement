@@ -204,13 +204,40 @@ namespace WorkManagement.Service
                 Email.DefaultSender = sender;
                 Email.DefaultRenderer = new RazorRenderer();
 
-                var email = await Email
-                           .From(emailModel.From)
-                           .To(emailModel.To)
-                           .Subject(emailModel.Subject)
-                           .UsingTemplateFromFile(@"EmailTemplate\EmployeeSalaryUpdate_EmailTemplate.cshtml", emailModel.repModel)
-                           .SendAsync();
-                Log.Information("Salary update email to employee sent successfully.");
+                if(emailModel.repModel.ApprovalStatus == "Approve")
+                {
+                    var email = await Email
+                          .From(emailModel.From)
+                          .To(emailModel.To)
+                          .Subject(emailModel.Subject)
+                          .UsingTemplateFromFile(@"EmailTemplate\EmployeeSalaryApprove_EmailTemplate.cshtml", emailModel.repModel)
+                          .SendAsync();
+                    Log.Information("Salary approval email to employee sent successfully.");
+                }
+
+                if (emailModel.repModel.ApprovalStatus == "Reject")
+                {
+                    var email = await Email
+                          .From(emailModel.From)
+                          .To(emailModel.To)
+                          .Subject(emailModel.Subject)
+                          .UsingTemplateFromFile(@"EmailTemplate\EmployeeSalaryReject_EmailTemplate.cshtml", emailModel.repModel)
+                          .SendAsync();
+                    Log.Information("Salary approval email to employee sent successfully.");
+                }
+
+                if (emailModel.repModel.ApprovalStatus == "Pending")
+                {
+                    var email = await Email
+                          .From(emailModel.From)
+                          .To(emailModel.To)
+                          .Subject(emailModel.Subject)
+                          .UsingTemplateFromFile(@"EmailTemplate\EmployeeSalaryUpdate_EmailTemplate.cshtml", emailModel.repModel)
+                          .SendAsync();
+                    Log.Information("Salary update email to employee sent successfully.");
+                }
+
+               
 
 
             }

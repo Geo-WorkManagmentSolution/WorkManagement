@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using WorkManagement.Domain.Contracts;
 using WorkManagement.Domain.Entity;
@@ -14,7 +15,7 @@ using WorkManagmentSolution.EFCore;
 
 namespace WorkManagement.Service
 {
-    public class EmployeeService :  IEmployeeService
+    public class EmployeeService : IEmployeeService
     {
         private readonly WorkManagementDbContext _dbContext;
         private readonly IMapper mapper;
@@ -34,7 +35,7 @@ namespace WorkManagement.Service
             _emailService = emailService;
         }
 
-        public async Task<List<EmployeeDashboardDataModel>> GetAllEmployeesAsync(string loggedUserId,string userRole)
+        public async Task<List<EmployeeDashboardDataModel>> GetAllEmployeesAsync(string loggedUserId, string userRole)
         {
             try
             {
@@ -49,7 +50,7 @@ namespace WorkManagement.Service
                 //var Employee = await _dbContext.Employees.ToListAsync();
                 //return mapper.Map<List<EmployeeModel>>(Employee);
 
-                if(userRole != "HR Admin")
+                if (userRole != "HR Admin")
                 {
                     employeeData = (from e in _dbContext.Employees.Where(s => !s.IsDeleted && (s.EmployeeReportToId == targetEmployeeId || s.Id == targetEmployeeId))
                                     select new EmployeeDashboardDataModel
@@ -90,7 +91,7 @@ namespace WorkManagement.Service
                                     }).ToList();
                 }
 
-               
+
 
 
                 if (employeeData != null)
@@ -187,7 +188,7 @@ namespace WorkManagement.Service
                                       Avatar = "",
                                       Designation = e.EmployeeDesignation != null ? e.EmployeeDesignation.Name : "",
                                       EmployeeId = e.Id,
-                                      EmployeeNumber=e.EmployeeNumber
+                                      EmployeeNumber = e.EmployeeNumber
                                   }).ToListAsync();
 
                 return data.Any() ? data : new List<EmployeeTeamMemberList>();
@@ -409,7 +410,8 @@ namespace WorkManagement.Service
                         returnEployeeData.EmployeeDocuments = employeeDocumentData;
                     }
                 }
-                else {
+                else
+                {
                     var documentData = new EmployeeDocumentsModel();
                     documentData.FileContent = null;
                     documentData.FileName = "";
@@ -740,7 +742,7 @@ namespace WorkManagement.Service
 
                     employee.JobLevelLeaveType = employee.JobLevelLeaveType.HasValue ? employee.JobLevelLeaveType.Value : 1;
 
-                    var defaultLeaves = (from ed in _dbContext.EmployeeDefaultLeave.Where(s=>s.JobLevelLeaveId == employee.JobLevelLeaveType)
+                    var defaultLeaves = (from ed in _dbContext.EmployeeDefaultLeave.Where(s => s.JobLevelLeaveId == employee.JobLevelLeaveType)
                                          select new EmployeeLeaveSummaryModel
                                          {
                                              Id = ed.EmployeeLeaveTypeId.HasValue ? ed.EmployeeLeaveTypeId.Value : 0,
@@ -751,7 +753,8 @@ namespace WorkManagement.Service
                     newEmployee.EmployeeLeaves = new List<EmployeeLeaveSummary>();
                     if (defaultLeaves.Any())
                     {
-                        if (employee.EmployeeWorkInformation.UseDefaultLeaves) {
+                        if (employee.EmployeeWorkInformation.UseDefaultLeaves)
+                        {
 
                             foreach (var leave in defaultLeaves)
                             {
@@ -816,7 +819,7 @@ namespace WorkManagement.Service
             {
                 throw new InvalidOperationException("Somthing wrong while creating Users and Roles for employee");
             }
-            }
+        }
 
         public async Task<EmployeeModel> UpdateEmployeeAsync(int id, EmployeeModel employee)
         {
@@ -1054,7 +1057,7 @@ namespace WorkManagement.Service
                     _dbContext.Employees.Update(employeeData);
                     _dbContext.SaveChanges();
 
-                    if(employeeData.EmployeeWorkInformation.Salary != employee.EmployeeWorkInformation.Salary)
+                    if (employeeData.EmployeeWorkInformation.Salary != employee.EmployeeWorkInformation.Salary)
                     {
                         var salaryInfo = new EmployeeSalaryUpdateModel();
                         if (employeeData.EmployeeWorkInformation.SalaryType.Value == SalaryType.OnRoll)
@@ -1093,13 +1096,13 @@ namespace WorkManagement.Service
             {
                 return null;
             }
-        }        
+        }
 
         public async Task<string> GetEmployeeDocumentFileName(int id, string fileName)
         {
             var returnFilePath = fileName;
-            var employee = _dbContext.Employees.FirstOrDefault(s=>s.Id == id && !s.IsDeleted);
-            if(employee != null)
+            var employee = _dbContext.Employees.FirstOrDefault(s => s.Id == id && !s.IsDeleted);
+            if (employee != null)
             {
                 returnFilePath = fileName;
             }
@@ -1125,8 +1128,8 @@ namespace WorkManagement.Service
             var employee = _dbContext.Employees.FirstOrDefault(s => s.Id == id && !s.IsDeleted);
             if (employee != null)
             {
-                var employeeDocument = _dbContext.EmployeeDocuments.FirstOrDefault(s=>s.FileName == fileName && s.EmployeeId == id && !s.IsDeleted);
-                if(employeeDocument != null)
+                var employeeDocument = _dbContext.EmployeeDocuments.FirstOrDefault(s => s.FileName == fileName && s.EmployeeId == id && !s.IsDeleted);
+                if (employeeDocument != null)
                 {
                     retunrFilePath = employeeDocument.FilePath;
                 }
@@ -1135,13 +1138,13 @@ namespace WorkManagement.Service
             return retunrFilePath;
         }
 
-        public async Task<string> UpdateEmployeeDocumentData(int id, string fileName,FileType fileType,long fileSize, string filePath, byte[] fileContent)
+        public async Task<string> UpdateEmployeeDocumentData(int id, string fileName, FileType fileType, long fileSize, string filePath, byte[] fileContent)
         {
             var employee = _dbContext.Employees.FirstOrDefault(s => s.Id == id && !s.IsDeleted);
             if (employee != null)
             {
-                var availableEmployeeDocument = _dbContext.EmployeeDocuments.FirstOrDefault(s=>s.EmployeeId == id && s.FileName == fileName);
-                if(availableEmployeeDocument == null)
+                var availableEmployeeDocument = _dbContext.EmployeeDocuments.FirstOrDefault(s => s.EmployeeId == id && s.FileName == fileName);
+                if (availableEmployeeDocument == null)
                 {
                     var employeeDocument = new EmployeeDocuments();
                     employeeDocument.EmployeeId = employee.Id;
@@ -1151,7 +1154,7 @@ namespace WorkManagement.Service
                     employeeDocument.FileType = fileType;
                     employeeDocument.FileContent = fileContent;
                     employeeDocument.IsDeleted = false;
-                    
+
 
 
                     _dbContext.EmployeeDocuments.Add(employeeDocument);
@@ -1161,8 +1164,8 @@ namespace WorkManagement.Service
                     availableEmployeeDocument.EmployeeId = employee.Id;
                     availableEmployeeDocument.FileName = fileName;
                     availableEmployeeDocument.FilePath = filePath;
-                    availableEmployeeDocument.IsDeleted = false; 
-                    
+                    availableEmployeeDocument.IsDeleted = false;
+
 
                     _dbContext.EmployeeDocuments.Update(availableEmployeeDocument);
                 }
@@ -1470,8 +1473,8 @@ namespace WorkManagement.Service
                     throw new Exception("Invalid User data");
                 }
 
-               
-              var leaveSummary = await _dbContext.EmployeeLeaveSummary.FirstAsync(x => x.EmployeeId == employeeId && x.EmployeeLeaveTypeId == employeeLeaveData.EmployeeLeaveTypeId);
+
+                var leaveSummary = await _dbContext.EmployeeLeaveSummary.FirstAsync(x => x.EmployeeId == employeeId && x.EmployeeLeaveTypeId == employeeLeaveData.EmployeeLeaveTypeId);
 
                 if (leaveSummary.RemainingLeaves <= 0)
                 {
@@ -1515,14 +1518,14 @@ namespace WorkManagement.Service
                     pendingRequestEmailModel.StartDate = employeeLeaveData.StartDate.HasValue ? employeeLeaveData.StartDate.Value : DateTime.Now;
                     pendingRequestEmailModel.EndDate = employeeLeaveData.EndDate.HasValue ? employeeLeaveData.EndDate.Value : DateTime.Now;
 
-                   
+
 
                     SendPendingRequestEmailToManager(reportToEmployee.Email, pendingRequestEmailModel);
                 }
 
                 return employeeLeaveData;
             }
-             catch (Exception ex)
+            catch (Exception ex)
             {
                 // Log the exception (use your preferred logging framework)
                 Console.WriteLine(ex.ToString());
@@ -1624,11 +1627,12 @@ namespace WorkManagement.Service
 
             if (employeeLeave != null)
             {
-                if (employeeLeave.Status == LeaveStatus.Approved) {
+                if (employeeLeave.Status == LeaveStatus.Approved)
+                {
                     return employeeLeave;
                 }
 
-               else if (employeeLeave.Status == LeaveStatus.Pending)
+                else if (employeeLeave.Status == LeaveStatus.Pending)
                 {
                     employeeLeave.Status = LeaveStatus.Approved;
                     await _dbContext.SaveChangesAsync();
@@ -1653,7 +1657,8 @@ namespace WorkManagement.Service
 
                     await _emailService.SendLeaveEmail(emailModel);
                 }
-                else {
+                else
+                {
                     throw new Exception("Cannot Approve Rejected Leave");
                 }
             }
@@ -1665,7 +1670,8 @@ namespace WorkManagement.Service
                 .Include(l => l.employee)
                 .Include(l => l.EmployeeLeaveTypes)
                 .FirstOrDefaultAsync(l => l.Id == leaveId);
-            if (employeeLeave.Status == LeaveStatus.Rejected) {
+            if (employeeLeave.Status == LeaveStatus.Rejected)
+            {
                 return employeeLeave;
             }
 
@@ -1724,7 +1730,7 @@ namespace WorkManagement.Service
             return employee.Id;
         }
 
-        public async Task<EmployeeSalary> AprroveSalary(int salaryId, string loggedUserId, int employeeId)
+        public async Task<EmployeeSalary> ApproveSalary(int salaryId, string loggedUserId, int employeeId)
         {
             var employeeSalary = new EmployeeSalary();
             var targetEmployeeId = CheckValidEmployeeId(loggedUserId);
@@ -1735,10 +1741,10 @@ namespace WorkManagement.Service
             }
 
             var employee = _dbContext.Employees.FirstOrDefault(s => s.Id == employeeId);
-            if(employee != null)
+            if (employee != null)
             {
                 employeeSalary = _dbContext.EmployeeSalaries.FirstOrDefault(s => s.Id == salaryId && s.EmployeeId == employeeId);
-                if(employeeSalary != null)
+                if (employeeSalary != null)
                 {
                     if (employeeSalary.SalaryStatus == SalaryStatus.Approved)
                     {
@@ -1746,10 +1752,8 @@ namespace WorkManagement.Service
                     }
                     else if (employeeSalary.SalaryStatus == SalaryStatus.Pending)
                     {
-                        employeeSalary.SalaryStatus = SalaryStatus.Approved;
                         employeeSalary.UpdatedBy = targetEmployeeId;
                         employeeSalary.UpdatedDateTime = DateTime.Now;
-
                         if (employee.EmployeeReportToId == targetEmployeeId)
                         {
                             employeeSalary.IsApprovedByDepartmentHead = true;
@@ -1760,10 +1764,15 @@ namespace WorkManagement.Service
                         if (HRHeadRole != null)
                         {
                             HRHeadEmployee = _dbContext.Employees.FirstOrDefault(s => s.RoleId == HRHeadRole.Id);
-                            if(HRHeadEmployee.Id == targetEmployeeId)
+                            if (HRHeadEmployee.Id == targetEmployeeId)
                             {
                                 employeeSalary.IsApprovedByHRHead = true;
                             }
+                        }
+
+                        if (employeeSalary.IsApprovedByDepartmentHead && employeeSalary.IsApprovedByHRHead)
+                        {
+                            employeeSalary.SalaryStatus = SalaryStatus.Approved;
                         }
                     }
 
@@ -1772,14 +1781,14 @@ namespace WorkManagement.Service
                 }
 
                 employeeSalary = _dbContext.EmployeeSalaries.FirstOrDefault(s => s.Id == salaryId && s.EmployeeId == employeeId);
-                if(employeeSalary != null)
+                if (employeeSalary != null)
                 {
-                    var isHRHeadApprove = employeeSalary.IsApprovedByHRHead ?? false;
-                    var isDepartmentHeadApprove = employeeSalary.IsApprovedByDepartmentHead ?? false;
+                    var isHRHeadApprove = employeeSalary.IsApprovedByHRHead;
+                    var isDepartmentHeadApprove = employeeSalary.IsApprovedByDepartmentHead;
 
-                    if(isHRHeadApprove && isDepartmentHeadApprove)
+                    if (isHRHeadApprove && isDepartmentHeadApprove)
                     {
-                        if(employeeSalary.SalaryType == SalaryType.OnRoll)
+                        if (employeeSalary.SalaryType == SalaryType.OnRoll)
                         {
                             employee.EmployeeWorkInformation.Salary = employeeSalary.ExpectedToBeSalary;
                             employee.EmployeeWorkInformation.Basic = employeeSalary.Basic;
@@ -1794,16 +1803,203 @@ namespace WorkManagement.Service
                         {
                             employee.EmployeeWorkInformation.Salary = employeeSalary.ExpectedToBeSalary;
                         }
-                        
+
                         _dbContext.Employees.Update(employee);
                         _dbContext.SaveChanges();
+
+                        var employeeSalaryInfoEmail = new EmployeeSalaryUpdateEmailModel();
+                        employeeSalaryInfoEmail.EmployeeName = employee.FirstName + " " + employee.LastName;
+                        employeeSalaryInfoEmail.ApprovalStatus = "Approve";
+                        var reportToEmployee = _dbContext.Employees.FirstOrDefault(s => s.Id == employee.EmployeeReportToId);
+
+                        if (reportToEmployee != null)
+                        {
+                            employeeSalaryInfoEmail.ManagerName = reportToEmployee.FirstName;
+                        }
+
+
+                        employeeSalaryInfoEmail.CurrentSalary = employeeSalary.CurrentSalary;
+                        employeeSalaryInfoEmail.ExpectedToBeSalary = employeeSalary.ExpectedToBeSalary;
+                        employeeSalaryInfoEmail.UpdatedDate = DateTime.Now;
+
+                        SendPendingSalaryRequestEmailToEmployee(employee.Email, employeeSalaryInfoEmail);
+
                     }
                 }
 
             }
 
-           
+
             return employeeSalary;
+        }
+
+        public async Task<EmployeeSalary> RejectSalary(int salaryId, string loggedUserId, int employeeId)
+        {
+            var employeeSalary = new EmployeeSalary();
+            var targetEmployeeId = CheckValidEmployeeId(loggedUserId);
+            if (targetEmployeeId == -1)
+            {
+                throw new Exception("Invalid User data");
+                return employeeSalary;
+            }
+
+            var employee = _dbContext.Employees.FirstOrDefault(s => s.Id == employeeId);
+            if (employee != null)
+            {
+                employeeSalary = _dbContext.EmployeeSalaries.FirstOrDefault(s => s.Id == salaryId && s.EmployeeId == employeeId);
+                if (employeeSalary != null)
+                {
+                    if (employeeSalary.SalaryStatus == SalaryStatus.Rejected)
+                    {
+                        return employeeSalary;
+                    }
+                    else if (employeeSalary.SalaryStatus == SalaryStatus.Pending)
+                    {
+                        employeeSalary.UpdatedBy = targetEmployeeId;
+                        employeeSalary.UpdatedDateTime = DateTime.Now;
+                        if (employee.EmployeeReportToId == targetEmployeeId)
+                        {
+                            employeeSalary.IsApprovedByDepartmentHead = false;
+                        }
+
+                        var HRHeadRole = roleManager.Roles.FirstOrDefault(x => x.Name == "HR Admin");
+                        var HRHeadEmployee = new Employee();
+                        if (HRHeadRole != null)
+                        {
+                            HRHeadEmployee = _dbContext.Employees.FirstOrDefault(s => s.RoleId == HRHeadRole.Id);
+                            if (HRHeadEmployee.Id == targetEmployeeId)
+                            {
+                                employeeSalary.IsApprovedByHRHead = false;
+                            }
+                        }
+
+                        employeeSalary.SalaryStatus = SalaryStatus.Rejected;
+                    }
+
+                    _dbContext.EmployeeSalaries.Update(employeeSalary);
+                    _dbContext.SaveChanges();
+
+                    var employeeSalaryInfoEmail = new EmployeeSalaryUpdateEmailModel();
+                    employeeSalaryInfoEmail.EmployeeName = employee.FirstName + " " + employee.LastName;
+                    employeeSalaryInfoEmail.ApprovalStatus = "Reject";
+                    var reportToEmployee = _dbContext.Employees.FirstOrDefault(s => s.Id == employee.EmployeeReportToId);
+
+                    if (reportToEmployee != null)
+                    {
+                        employeeSalaryInfoEmail.ManagerName = reportToEmployee.FirstName;
+                    }
+
+
+                    employeeSalaryInfoEmail.CurrentSalary = employeeSalary.CurrentSalary;
+                    employeeSalaryInfoEmail.ExpectedToBeSalary = employeeSalary.ExpectedToBeSalary;
+                    employeeSalaryInfoEmail.UpdatedDate = DateTime.Now;
+
+                    SendPendingSalaryRequestEmailToEmployee(employee.Email, employeeSalaryInfoEmail);
+                }
+            }
+
+
+            return employeeSalary;
+        }
+
+        public async Task<List<EmployeeSalaryDataModel>> GetAllPenidngSalaryRequestList(string loggedUserId)
+        {
+            var returnData = new List<EmployeeSalaryDataModel>();
+            var targetEmployeeId = CheckValidEmployeeId(loggedUserId);
+            if (targetEmployeeId == -1)
+            {
+                throw new Exception("Invalid User data");
+                return returnData;
+            }
+
+            var HRHeadRole = roleManager.Roles.FirstOrDefault(x => x.Name == "HR Admin");
+            var HRHeadEmployee = new Employee();
+            if (HRHeadRole != null)
+            {
+                HRHeadEmployee = _dbContext.Employees.FirstOrDefault(s => s.RoleId == HRHeadRole.Id);
+                if (HRHeadEmployee.Id == targetEmployeeId)
+                {
+
+                    returnData = (from es in _dbContext.EmployeeSalaries.Where(s => s.SalaryStatus == SalaryStatus.Pending && s.EmployeeId.HasValue)
+                                  join e in _dbContext.Employees on es.UpdatedBy equals e.Id into employee_default
+                                  from ed in employee_default.DefaultIfEmpty()
+                                  select new EmployeeSalaryDataModel
+                                  {
+                                      EmployeeId = es.EmployeeId,
+                                      EmployeeName = es.Employee.FirstName + " " + es.Employee.LastName,
+                                      SalaryType = es.SalaryType,
+                                      SalaryStatus = es.SalaryStatus,
+                                      IsApprovedByDepartmentHead = es.IsApprovedByDepartmentHead,
+                                      IsApprovedByHRHead = es.IsApprovedByHRHead,
+                                      CurrentSalary = es.CurrentSalary,
+                                      ExpectedToBeSalary = es.ExpectedToBeSalary,
+                                      UpdatedDateTime = (es.UpdatedDateTime.HasValue ? es.UpdatedDateTime.Value.ToString("yyyy-MM-dd") : ""),
+                                      UpdatedBy = es.UpdatedBy,
+                                      UpdatedByUserName = (ed == null) ? "" : ed.FirstName + " " + ed.LastName,
+                                  }).ToList();
+                }
+            }
+            else
+            {
+                var employeeData = _dbContext.Employees.Where(s => s.EmployeeReportToId == targetEmployeeId);
+                returnData = (from es in _dbContext.EmployeeSalaries.Where(s => s.SalaryStatus == SalaryStatus.Pending && s.EmployeeId.HasValue)
+                              join er in employeeData on es.EmployeeId equals er.Id
+                              join e in _dbContext.Employees on es.UpdatedBy equals e.Id into employee_default
+                              from ed in employee_default.DefaultIfEmpty()
+                              select new EmployeeSalaryDataModel
+                              {
+                                  EmployeeId = es.EmployeeId,
+                                  EmployeeName = es.Employee.FirstName + " " + es.Employee.LastName,
+                                  SalaryType = es.SalaryType,
+                                  SalaryStatus = es.SalaryStatus,
+                                  IsApprovedByDepartmentHead = es.IsApprovedByDepartmentHead,
+                                  IsApprovedByHRHead = es.IsApprovedByHRHead,
+                                  CurrentSalary = es.CurrentSalary,
+                                  ExpectedToBeSalary = es.ExpectedToBeSalary,
+                                  UpdatedDateTime = (es.UpdatedDateTime.HasValue ? es.UpdatedDateTime.Value.ToString("yyyy-MM-dd") : ""),
+                                  UpdatedBy = es.UpdatedBy,
+                                  UpdatedByUserName = (ed == null) ? "" : ed.FirstName + " " + ed.LastName,
+                              }).ToList();
+            }
+
+            return returnData;
+
+
+
+        }
+
+        public async Task<List<EmployeeSalaryDataModel>> GetEmployeeSalaryRequestList(string loggedUserId,int employeeId)
+        {
+            var returnData = new List<EmployeeSalaryDataModel>();
+            var targetEmployeeId = CheckValidEmployeeId(loggedUserId);
+            if (targetEmployeeId == -1)
+            {
+                throw new Exception("Invalid User data");
+                return returnData;
+            }
+
+            returnData = (from es in _dbContext.EmployeeSalaries.Where(s => s.EmployeeId == employeeId)
+                          join e in _dbContext.Employees on es.UpdatedBy equals e.Id into employee_default
+                          from ed in employee_default.DefaultIfEmpty()
+                          select new EmployeeSalaryDataModel
+                          {
+                              EmployeeId = es.EmployeeId,
+                              EmployeeName = es.Employee.FirstName + " " + es.Employee.LastName,
+                              SalaryType = es.SalaryType,
+                              SalaryStatus = es.SalaryStatus,
+                              IsApprovedByDepartmentHead = es.IsApprovedByDepartmentHead,
+                              IsApprovedByHRHead = es.IsApprovedByHRHead,
+                              CurrentSalary = es.CurrentSalary,
+                              ExpectedToBeSalary = es.ExpectedToBeSalary,
+                              UpdatedDateTime = (es.UpdatedDateTime.HasValue ? es.UpdatedDateTime.Value.ToString("yyyy-MM-dd") : ""),
+                              UpdatedBy = es.UpdatedBy,
+                              UpdatedByUserName = (ed == null) ? "" : ed.FirstName + " " + ed.LastName,
+                          }).ToList();
+
+            return returnData;
+
+
+
         }
 
         #endregion
@@ -1813,10 +2009,10 @@ namespace WorkManagement.Service
         private void UpdateSalaryInformation(EmployeeSalaryUpdateModel salaryInfo)
         {
             var employee = _dbContext.Employees.FirstOrDefault(s => s.Id == salaryInfo.EmployeeId);
-            if(employee != null)
+            if (employee != null)
             {
                 EmployeeSalary employeeSalary = new EmployeeSalary();
-                employeeSalary.EmployeeId = salaryInfo.EmployeeId; 
+                employeeSalary.EmployeeId = salaryInfo.EmployeeId;
                 employeeSalary.SalaryType = salaryInfo.SalaryType;
                 employeeSalary.SalaryStatus = SalaryStatus.Pending;
                 employeeSalary.IsApprovedByDepartmentHead = false;
@@ -1840,10 +2036,10 @@ namespace WorkManagement.Service
                 var pendingSalaryRequestEmailList = new List<SalaryEmailModel>();
                 var pendingRequestEmailModel = new SalaryEmailModel();
 
-               
+
 
                 var reportToEmployee = _dbContext.Employees.FirstOrDefault(s => s.Id == employee.EmployeeReportToId);
-                if(reportToEmployee != null)
+                if (reportToEmployee != null)
                 {
                     pendingRequestEmailModel = new SalaryEmailModel();
                     pendingRequestEmailModel.SalaryType = "Pending Request for salary update";
@@ -1885,7 +2081,7 @@ namespace WorkManagement.Service
                 var employeeSalaryInfoEmail = new EmployeeSalaryUpdateEmailModel();
                 employeeSalaryInfoEmail.EmployeeName = employee.FirstName + " " + employee.LastName;
                 employeeSalaryInfoEmail.ApprovalStatus = "Pending";
-                if(reportToEmployee != null)
+                if (reportToEmployee != null)
                 {
                     employeeSalaryInfoEmail.ManagerName = reportToEmployee.FirstName;
                 }
@@ -1956,9 +2152,6 @@ namespace WorkManagement.Service
             _emailService.SendEmployeeSalaryUpdateEmail(emailModel);
         }
 
-
-
-
         #endregion
 
         #region Settings Tab 
@@ -1978,7 +2171,8 @@ namespace WorkManagement.Service
                 _dbContext.EmployeeDepartments.Add(newDepartment);
                 await _dbContext.SaveChangesAsync();
                 model.Id = newDepartment.Id;
-            } else if (model.Category.Equals("JobLevel",StringComparison.OrdinalIgnoreCase)) 
+            }
+            else if (model.Category.Equals("JobLevel", StringComparison.OrdinalIgnoreCase))
             {
                 var newJobLevel = new JobLevelLeave { JobLevel = model.Name };
                 _dbContext.JobLevelLeave.Add(newJobLevel);
@@ -1995,40 +2189,40 @@ namespace WorkManagement.Service
         }
 
         public async Task DeleteDropdownItem(int id, string dropdownName)
-{
-    if (dropdownName.Equals("Designation", StringComparison.OrdinalIgnoreCase))
-    {
-        var designation = await _dbContext.EmployeeDesignations.FindAsync(id);
-        if (designation != null)
         {
-            _dbContext.EmployeeDesignations.Remove(designation);
-            await _dbContext.SaveChangesAsync();
-            return;
-        }
-    }
-    else if (dropdownName.Equals("Department", StringComparison.OrdinalIgnoreCase))
-    {
-        var department = await _dbContext.EmployeeDepartments.FindAsync(id);
-        if (department != null)
-        {
-            _dbContext.EmployeeDepartments.Remove(department);
-            await _dbContext.SaveChangesAsync();
-            return;
-        }
-    }
-    else if (dropdownName.Equals("JobLevel", StringComparison.OrdinalIgnoreCase))
-    {
-        var jobLevel = await _dbContext.JobLevelLeave.FindAsync(id);
-        if (jobLevel != null)
-        {
-            _dbContext.JobLevelLeave.Remove(jobLevel);
-            await _dbContext.SaveChangesAsync();
-            return;
-        }
-    }
+            if (dropdownName.Equals("Designation", StringComparison.OrdinalIgnoreCase))
+            {
+                var designation = await _dbContext.EmployeeDesignations.FindAsync(id);
+                if (designation != null)
+                {
+                    _dbContext.EmployeeDesignations.Remove(designation);
+                    await _dbContext.SaveChangesAsync();
+                    return;
+                }
+            }
+            else if (dropdownName.Equals("Department", StringComparison.OrdinalIgnoreCase))
+            {
+                var department = await _dbContext.EmployeeDepartments.FindAsync(id);
+                if (department != null)
+                {
+                    _dbContext.EmployeeDepartments.Remove(department);
+                    await _dbContext.SaveChangesAsync();
+                    return;
+                }
+            }
+            else if (dropdownName.Equals("JobLevel", StringComparison.OrdinalIgnoreCase))
+            {
+                var jobLevel = await _dbContext.JobLevelLeave.FindAsync(id);
+                if (jobLevel != null)
+                {
+                    _dbContext.JobLevelLeave.Remove(jobLevel);
+                    await _dbContext.SaveChangesAsync();
+                    return;
+                }
+            }
 
-    throw new ArgumentException("Item not found");
-}
+            throw new ArgumentException("Item not found");
+        }
 
         public async Task<DropdownModel> UpdateDropdownItem(DropdownModel model)
         {
@@ -2133,6 +2327,6 @@ namespace WorkManagement.Service
             return (true, string.Empty);
         }
 
-        
+
     }
 }

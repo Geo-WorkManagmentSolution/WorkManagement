@@ -16,8 +16,8 @@ namespace WorkManagement.Domain.Entity
         public Employee? Employee { get; set; }
         public SalaryType? SalaryType { get; set; }
         public SalaryStatus? SalaryStatus { get; set; }
-        public bool? IsApprovedByDepartmentHead { get; set; }
-        public bool? IsApprovedByHRHead { get; set; }
+        public bool IsApprovedByDepartmentHead { get; set; }
+        public bool IsApprovedByHRHead { get; set; }
         public decimal CurrentSalary { get; set; }
         public decimal ExpectedToBeSalary { get; set; }
         public decimal Basic { get; set; }

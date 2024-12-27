@@ -74,9 +74,12 @@ namespace WorkManagement.Domain.Contracts
 
 
         public Task<bool> CheckEmailExists(string email);
-        public int CheckValidEmployeeId(string loggedUserId);
 
         public Task SendEmail();
-       
+        public Task<EmployeeSalary> ApproveSalary(int salaryId, string? loggedUserId, int employeeId);
+        public Task<EmployeeSalary> RejectSalary(int salaryId, string? loggedUserId, int employeeId);
+        public int CheckValidEmployeeId(string loggedUserId);
+        public Task<List<EmployeeSalaryDataModel>> GetAllPenidngSalaryRequestList(string loggedUserId);
+        public Task<List<EmployeeSalaryDataModel>> GetEmployeeSalaryRequestList(string loggedUserId, int employeeId);
     }
 }

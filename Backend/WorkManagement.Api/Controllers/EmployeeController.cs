@@ -223,6 +223,45 @@ namespace WorkManagement.API.Controllers
             return Ok(newOption);
         }
 
+        [HttpPut("SalaryApprove/{salaryId}")]
+        public async Task<ActionResult<EmployeeSalary>> ApproveSalary(int salaryId, int employeeId)
+        {
+            try
+            {
+                var loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var employeeSalary = await employeeService.ApproveSalary(salaryId, loggedUserId, employeeId);
+                return Ok(employeeSalary);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
+        }
+
+        [HttpPut("SalaryReject/{salaryId}")]
+        public async Task<ActionResult<EmployeeLeave>> RejectSalary(int salaryId, int employeeId)
+        {
+            var loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var employeeSalary = await employeeService.RejectSalary(salaryId, loggedUserId, employeeId);
+            return Ok(employeeSalary);
+        }
+
+        [HttpGet("Salary/PendingSalaryRequest")]
+        public async Task<ActionResult<IEnumerable<EmployeeLeaveSummaryModel>>> GetEmployeePendingSalaryRequest([FromQuery] int? employeeId = null)
+        {
+            List<EmployeeSalaryDataModel> salaryRequests = new List<EmployeeSalaryDataModel>();
+            var loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (employeeId.HasValue)
+            { // Fetch data based on employeeId
+                salaryRequests = await employeeService.GetEmployeeSalaryRequestList(loggedUserId, employeeId.Value);
+            }
+            else
+            {
+                salaryRequests = await employeeService.GetAllPenidngSalaryRequestList(loggedUserId);
+            }
+            return Ok(salaryRequests);
+        }
+
         // GET api/employee/leaves/current
         [HttpGet("leaves/current")]
         public async Task<ActionResult<IEnumerable<EmployeeLeaveSummaryModel>>> GetEmployeeLeaves([FromQuery] int? employeeId = null)
@@ -238,8 +277,8 @@ namespace WorkManagement.API.Controllers
             } return Ok(leaves); 
         }
 
-                // GET api/employee/leaves/addLeave
-                [HttpPost("leaves/addLeave")]
+        // GET api/employee/leaves/addLeave
+        [HttpPost("leaves/addLeave")]
         public async Task<ActionResult<EmployeeLeaveModel>> AddLeave(EmployeeLeaveModel employeeLeaveData)
         {
             var leaves = await employeeService.AddLeave(employeeLeaveData, User.FindFirst(ClaimTypes.NameIdentifier).Value);
