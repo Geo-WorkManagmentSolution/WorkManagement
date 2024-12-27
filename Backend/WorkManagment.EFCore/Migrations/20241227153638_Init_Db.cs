@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WorkManagement.EFCore.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class Init_Db : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -582,7 +582,7 @@ namespace WorkManagement.EFCore.Migrations
                     MiddleName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AlternateEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AlternateEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PhoneNumber = table.Column<long>(type: "bigint", nullable: true),
                     AlternateNumber = table.Column<long>(type: "bigint", nullable: true),
                     EmployeeDepartmentId = table.Column<int>(type: "int", nullable: true),
@@ -781,9 +781,9 @@ namespace WorkManagement.EFCore.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     EmployeeId = table.Column<int>(type: "int", nullable: true),
                     RelationshipType = table.Column<int>(type: "int", nullable: true),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -791,6 +791,40 @@ namespace WorkManagement.EFCore.Migrations
                     table.PrimaryKey("PK_EmployeeRelationshipDetails", x => x.Id);
                     table.ForeignKey(
                         name: "FK_EmployeeRelationshipDetails_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "Employees",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EmployeeSalaries",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    EmployeeId = table.Column<int>(type: "int", nullable: true),
+                    SalaryType = table.Column<int>(type: "int", nullable: true),
+                    SalaryStatus = table.Column<int>(type: "int", nullable: true),
+                    IsApprovedByDepartmentHead = table.Column<bool>(type: "bit", nullable: false),
+                    IsApprovedByHRHead = table.Column<bool>(type: "bit", nullable: false),
+                    CurrentSalary = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ExpectedToBeSalary = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Basic = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    HRAllowances = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Bonus = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Gratuity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PF = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ESI = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PT = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    UpdatedBy = table.Column<int>(type: "int", nullable: true),
+                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmployeeSalaries", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EmployeeSalaries_Employees_EmployeeId",
                         column: x => x.EmployeeId,
                         principalTable: "Employees",
                         principalColumn: "Id");
@@ -843,7 +877,7 @@ namespace WorkManagement.EFCore.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "Shortcuts", "TwoFactorEnabled", "UserName" },
-                values: new object[] { new Guid("8e445865-a24d-4543-a6c6-9443d048cdb9"), 0, "78208e0f-0ff8-4aa1-8e1c-dc332b331119", "admin1@admin.com", false, false, null, null, "admin", "AQAAAAIAAYagAAAAEBqIwYF4moK8/wMAkaJjjC21/7fwc3VFCbWVdGHVNZpF/yr0kADkXMbG5hueXwixZg==", null, false, null, "[]", false, "admin1@admin.com" });
+                values: new object[] { new Guid("8e445865-a24d-4543-a6c6-9443d048cdb9"), 0, "c209a901-e315-4d8e-b46b-92de9e972b8a", "admin1@admin.com", false, false, null, null, "admin", "AQAAAAIAAYagAAAAEN5heEDTdGRJQLgtFgqKwflGVxFwOXjYOYPvp4mvW3TZfgr8NPc0YuGHzXsYpzULOg==", null, false, null, "[]", false, "admin1@admin.com" });
 
             migrationBuilder.InsertData(
                 table: "EmployeeCategories",
@@ -922,7 +956,9 @@ namespace WorkManagement.EFCore.Migrations
                 {
                     { 1, "Project Module", "ProjectModule", 2 },
                     { 2, "Employee Module", "EmployeeModule", 1 },
-                    { 3, "Integration Module", "IntegrationModule", 3 }
+                    { 3, "Integration Module", "IntegrationModule", 3 },
+                    { 4, "Leave Module", "LeaveModule", 4 },
+                    { 5, "Setting Module", "SettingModule", 5 }
                 });
 
             migrationBuilder.InsertData(
@@ -948,14 +984,57 @@ namespace WorkManagement.EFCore.Migrations
                 columns: new[] { "Id", "Description", "Name", "PermissionCategoryId", "Value" },
                 values: new object[,]
                 {
-                    { 1, "Employee Module view", "EmployeeModule_View", 2, 1 },
-                    { 2, "Employee Module Add", "EmployeeModule_Add", 2, 3 },
-                    { 3, "Employee Module Delete", "EmployeeModule_Delete", 2, 4 },
-                    { 4, "Employee Module Edit", "EmployeeModule_Edit", 2, 2 },
-                    { 5, "Project Module view", "ProjectModule_View", 1, 5 },
-                    { 6, "Project Module Add", "ProjectModule_Add", 1, 7 },
-                    { 7, "Project Module Delete", "ProjectModule_Delete", 1, 8 },
-                    { 8, "Project Module Edit", "ProjectModule_Edit", 1, 6 }
+                    { 1, "Project Dashboard", "ProjectModule_Dashboard", 1, 10 },
+                    { 2, "Project Add", "ProjectModule_Add", 1, 7 },
+                    { 3, "Project Delete", "ProjectModule_Delete", 1, 9 },
+                    { 4, "Project Update", "ProjectModule_Update", 1, 8 },
+                    { 5, "Add Employees to Project", "ProjectModule_Employee_Add", 1, 10 },
+                    { 6, "Delete Employees to Project", "ProjectModule_Employee_Delete", 1, 7 },
+                    { 7, "Update Employees to Project", "ProjectModule_Employee_Update", 1, 9 },
+                    { 8, "Add Tasks to Project", "ProjectModule_Link_Add", 1, 8 },
+                    { 9, "Delete Tasks to Project", "ProjectModule_Link_Delete", 1, 8 },
+                    { 10, "Update Tasks to Project", "ProjectModule_Link_Update", 1, 8 },
+                    { 11, "Add Leaves", "LeaveModule_Add", 4, 17 },
+                    { 12, "Delete Leaves", "LeaveModule_Delete", 4, 18 },
+                    { 13, "Update Leaves", "LeaveModule_Update", 4, 19 },
+                    { 14, "Approve/Reject Leaves", "LeaveModule_Approvals", 4, 20 },
+                    { 15, "Leave History Dashboard", "LeaveModule_Employee_LeaveHistory", 4, 21 },
+                    { 16, "Update Dropdown values", "SettingModule_DropDownSettings", 5, 22 },
+                    { 17, "Add Leave Types", "SettingModule_LeaveType_Add", 5, 23 },
+                    { 18, "Update Leave Types", "SettingModule_LeaveType_Update", 5, 24 },
+                    { 19, "Delete Leave Types", "SettingModule_LeaveType_Delete", 5, 25 },
+                    { 20, "Add Public Holidays", "SettingModule_Holidays_Add", 5, 26 },
+                    { 21, "Update Public Holidays", "SettingModule_Holidays_Update", 5, 27 },
+                    { 22, "Delete Public Holidays", "SettingModule_Holidays_Delete", 5, 28 },
+                    { 23, "Add Employee", "EmployeeModule_Add", 2, 1 },
+                    { 24, "Updated Employee", "EmployeeModule_Update", 2, 2 },
+                    { 25, "Delete Employee", "EmployeeModule_Delete", 2, 3 },
+                    { 26, "Employee Salary Update", "EmployeeModule_Salary_Update", 2, 4 },
+                    { 27, "Employee Leave Update", "EmployeeModule_Leave_Update", 2, 5 },
+                    { 28, "Employee Dashboard", "EmployeeModule_Dashboard", 2, 6 },
+                    { 29, "IntegrationModule_UploadCSV", "IntegrationModule_UploadCSV", 3, 29 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "RolePermissions",
+                columns: new[] { "Id", "IsDeleted", "PermissionActionId", "RoleId" },
+                values: new object[,]
+                {
+                    { 1, false, 1, new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f") },
+                    { 2, false, 2, new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f") },
+                    { 3, false, 3, new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f") },
+                    { 4, false, 4, new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f") },
+                    { 5, false, 5, new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f") },
+                    { 6, false, 6, new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f") },
+                    { 7, false, 7, new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f") },
+                    { 8, false, 8, new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f") },
+                    { 9, false, 9, new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f") },
+                    { 10, false, 10, new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f") },
+                    { 11, false, 11, new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f") },
+                    { 12, false, 12, new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f") },
+                    { 13, false, 13, new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f") },
+                    { 14, false, 14, new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f") },
+                    { 15, false, 15, new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f") }
                 });
 
             migrationBuilder.CreateIndex(
@@ -1103,6 +1182,11 @@ namespace WorkManagement.EFCore.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_EmployeeSalaries_EmployeeId",
+                table: "EmployeeSalaries",
+                column: "EmployeeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_EmployeeWorkInformations_SiteId",
                 table: "EmployeeWorkInformations",
                 column: "SiteId");
@@ -1181,6 +1265,9 @@ namespace WorkManagement.EFCore.Migrations
 
             migrationBuilder.DropTable(
                 name: "EmployeeRelationshipDetails");
+
+            migrationBuilder.DropTable(
+                name: "EmployeeSalaries");
 
             migrationBuilder.DropTable(
                 name: "ProjectEmployees");

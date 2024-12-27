@@ -79,8 +79,8 @@ namespace WorkManagmentSolution.EFCore
             //}
 
             modelBuilder.HasSequence<int>("EmployeeNumber")
-          .StartsAt(1000)
-          .IncrementsBy(1);
+            .StartsAt(1000)
+            .IncrementsBy(1);
 
             modelBuilder.Entity<Employee>()
                 .Property(o => o.EmployeeNumber)
@@ -236,37 +236,37 @@ namespace WorkManagmentSolution.EFCore
             );
             //seed permission actions
             modelBuilder.Entity<PermissionAction>().HasData(
-             new PermissionAction { Id = 1, PermissionCategoryId = 1, Name = PermissionActionEnum.ProjectModule_Dashboard.convertToString(), Value = PermissionActionEnum.ProjectModule_Dashboard, Description = "Project Module Dashboard" },
-             new PermissionAction { Id = 2, PermissionCategoryId = 1, Name = PermissionActionEnum.ProjectModule_Add.convertToString(), Value = PermissionActionEnum.ProjectModule_Add, Description = "Project Module Add" },
-             new PermissionAction { Id = 3, PermissionCategoryId = 1, Name = PermissionActionEnum.ProjectModule_Delete.convertToString(), Value = PermissionActionEnum.ProjectModule_Delete, Description = "Project Module Delete" },
-             new PermissionAction { Id = 4, PermissionCategoryId = 1, Name = PermissionActionEnum.ProjectModule_Update.convertToString(), Value = PermissionActionEnum.ProjectModule_Update, Description = "Project Module Update" },
-             new PermissionAction { Id = 5, PermissionCategoryId = 1, Name = PermissionActionEnum.ProjectModule_Employee_Add.convertToString(), Value = PermissionActionEnum.ProjectModule_Dashboard, Description = "Project Module Employee Add" },
-             new PermissionAction { Id = 6, PermissionCategoryId = 1, Name = PermissionActionEnum.ProjectModule_Employee_Delete.convertToString(), Value = PermissionActionEnum.ProjectModule_Add, Description = "Project Module Employee Delete" },
-             new PermissionAction { Id = 7, PermissionCategoryId = 1, Name = PermissionActionEnum.ProjectModule_Employee_Update.convertToString(), Value = PermissionActionEnum.ProjectModule_Delete, Description = "Project Module Employee Update" },
-             new PermissionAction { Id = 8, PermissionCategoryId = 1, Name = PermissionActionEnum.ProjectModule_Link_Add.convertToString(), Value = PermissionActionEnum.ProjectModule_Update, Description = "Project Link Add" },
-             new PermissionAction { Id = 9, PermissionCategoryId = 1, Name = PermissionActionEnum.ProjectModule_Link_Delete.convertToString(), Value = PermissionActionEnum.ProjectModule_Update, Description = "Project Link Delete" },
-             new PermissionAction { Id = 10, PermissionCategoryId = 1, Name = PermissionActionEnum.ProjectModule_Link_Update.convertToString(), Value = PermissionActionEnum.ProjectModule_Update, Description = "Project Link Update" },
+             new PermissionAction { Id = 1, PermissionCategoryId = 1, Name = PermissionActionEnum.ProjectModule_Dashboard.convertToString(), Value = PermissionActionEnum.ProjectModule_Dashboard, Description = "Project Dashboard" },
+             new PermissionAction { Id = 2, PermissionCategoryId = 1, Name = PermissionActionEnum.ProjectModule_Add.convertToString(), Value = PermissionActionEnum.ProjectModule_Add, Description = "Project Add" },
+             new PermissionAction { Id = 3, PermissionCategoryId = 1, Name = PermissionActionEnum.ProjectModule_Delete.convertToString(), Value = PermissionActionEnum.ProjectModule_Delete, Description = "Project Delete" },
+             new PermissionAction { Id = 4, PermissionCategoryId = 1, Name = PermissionActionEnum.ProjectModule_Update.convertToString(), Value = PermissionActionEnum.ProjectModule_Update, Description = "Project Update" },
+             new PermissionAction { Id = 5, PermissionCategoryId = 1, Name = PermissionActionEnum.ProjectModule_Employee_Add.convertToString(), Value = PermissionActionEnum.ProjectModule_Dashboard, Description = "Add Employees to Project" },
+             new PermissionAction { Id = 6, PermissionCategoryId = 1, Name = PermissionActionEnum.ProjectModule_Employee_Delete.convertToString(), Value = PermissionActionEnum.ProjectModule_Add, Description = "Delete Employees to Project" },
+             new PermissionAction { Id = 7, PermissionCategoryId = 1, Name = PermissionActionEnum.ProjectModule_Employee_Update.convertToString(), Value = PermissionActionEnum.ProjectModule_Delete, Description = "Update Employees to Project" },
+             new PermissionAction { Id = 8, PermissionCategoryId = 1, Name = PermissionActionEnum.ProjectModule_Link_Add.convertToString(), Value = PermissionActionEnum.ProjectModule_Update, Description = "Add Tasks to Project" },
+             new PermissionAction { Id = 9, PermissionCategoryId = 1, Name = PermissionActionEnum.ProjectModule_Link_Delete.convertToString(), Value = PermissionActionEnum.ProjectModule_Update, Description = "Delete Tasks to Project" },
+             new PermissionAction { Id = 10, PermissionCategoryId = 1, Name = PermissionActionEnum.ProjectModule_Link_Update.convertToString(), Value = PermissionActionEnum.ProjectModule_Update, Description = "Update Tasks to Project" },
 
-             new PermissionAction { Id = 11, PermissionCategoryId = 4, Name = PermissionActionEnum.LeaveModule_Add.convertToString(), Value = PermissionActionEnum.LeaveModule_Add, Description = "LeaveModule_Add" },
-             new PermissionAction { Id = 12, PermissionCategoryId = 4, Name = PermissionActionEnum.LeaveModule_Delete.convertToString(), Value = PermissionActionEnum.LeaveModule_Delete, Description = "LeaveModule_Delete" },
-             new PermissionAction { Id = 13, PermissionCategoryId = 4, Name = PermissionActionEnum.LeaveModule_Update.convertToString(), Value = PermissionActionEnum.LeaveModule_Update, Description = "LeaveModule_Update" },
-             new PermissionAction { Id = 14, PermissionCategoryId = 4, Name = PermissionActionEnum.LeaveModule_Approvals.convertToString(), Value = PermissionActionEnum.LeaveModule_Approvals, Description = "LeaveModule_Approvals" },
-             new PermissionAction { Id = 15, PermissionCategoryId = 4, Name = PermissionActionEnum.LeaveModule_Employee_LeaveHistory.convertToString(), Value = PermissionActionEnum.LeaveModule_Employee_LeaveHistory, Description = "LeaveModule_Employee_LeaveHistory" },
+             new PermissionAction { Id = 11, PermissionCategoryId = 4, Name = PermissionActionEnum.LeaveModule_Add.convertToString(), Value = PermissionActionEnum.LeaveModule_Add, Description = "Add Leaves" },
+             new PermissionAction { Id = 12, PermissionCategoryId = 4, Name = PermissionActionEnum.LeaveModule_Delete.convertToString(), Value = PermissionActionEnum.LeaveModule_Delete, Description = "Delete Leaves" },
+             new PermissionAction { Id = 13, PermissionCategoryId = 4, Name = PermissionActionEnum.LeaveModule_Update.convertToString(), Value = PermissionActionEnum.LeaveModule_Update, Description = "Update Leaves" },
+             new PermissionAction { Id = 14, PermissionCategoryId = 4, Name = PermissionActionEnum.LeaveModule_Approvals.convertToString(), Value = PermissionActionEnum.LeaveModule_Approvals, Description = "Approve/Reject Leaves" },
+             new PermissionAction { Id = 15, PermissionCategoryId = 4, Name = PermissionActionEnum.LeaveModule_Employee_LeaveHistory.convertToString(), Value = PermissionActionEnum.LeaveModule_Employee_LeaveHistory, Description = "Leave History Dashboard" },
 
-             new PermissionAction { Id = 16, PermissionCategoryId = 5, Name = PermissionActionEnum.SettingModule_DropDownSettings.convertToString(), Value = PermissionActionEnum.SettingModule_DropDownSettings, Description = "SettingModule_DropDownSettings" },
-             new PermissionAction { Id = 17, PermissionCategoryId = 5, Name = PermissionActionEnum.SettingModule_LeaveType_Add.convertToString(), Value = PermissionActionEnum.SettingModule_LeaveType_Add, Description = "SettingModule_LeaveType_Add" },
-             new PermissionAction { Id = 18, PermissionCategoryId = 5, Name = PermissionActionEnum.SettingModule_LeaveType_Update.convertToString(), Value = PermissionActionEnum.SettingModule_LeaveType_Update, Description = "SettingModule_LeaveType_Update" },
-             new PermissionAction { Id = 19, PermissionCategoryId = 5, Name = PermissionActionEnum.SettingModule_LeaveType_Delete.convertToString(), Value = PermissionActionEnum.SettingModule_LeaveType_Delete, Description = "SettingModule_LeaveType_Delete" },
-             new PermissionAction { Id = 20, PermissionCategoryId = 5, Name = PermissionActionEnum.SettingModule_Holidays_Add.convertToString(), Value = PermissionActionEnum.SettingModule_Holidays_Add, Description = "SettingModule_Holidays_Add" },
-             new PermissionAction { Id = 21, PermissionCategoryId = 5, Name = PermissionActionEnum.SettingModule_Holidays_Update.convertToString(), Value = PermissionActionEnum.SettingModule_Holidays_Update, Description = "SettingModule_Holidays_Update" },
-             new PermissionAction { Id = 22, PermissionCategoryId = 5, Name = PermissionActionEnum.SettingModule_Holidays_Delete.convertToString(), Value = PermissionActionEnum.SettingModule_Holidays_Delete, Description = "SettingModule_Holidays_Delete" },
+             new PermissionAction { Id = 16, PermissionCategoryId = 5, Name = PermissionActionEnum.SettingModule_DropDownSettings.convertToString(), Value = PermissionActionEnum.SettingModule_DropDownSettings, Description = "Update Dropdown values" },
+             new PermissionAction { Id = 17, PermissionCategoryId = 5, Name = PermissionActionEnum.SettingModule_LeaveType_Add.convertToString(), Value = PermissionActionEnum.SettingModule_LeaveType_Add, Description = "Add Leave Types" },
+             new PermissionAction { Id = 18, PermissionCategoryId = 5, Name = PermissionActionEnum.SettingModule_LeaveType_Update.convertToString(), Value = PermissionActionEnum.SettingModule_LeaveType_Update, Description = "Update Leave Types" },
+             new PermissionAction { Id = 19, PermissionCategoryId = 5, Name = PermissionActionEnum.SettingModule_LeaveType_Delete.convertToString(), Value = PermissionActionEnum.SettingModule_LeaveType_Delete, Description = "Delete Leave Types" },
+             new PermissionAction { Id = 20, PermissionCategoryId = 5, Name = PermissionActionEnum.SettingModule_Holidays_Add.convertToString(), Value = PermissionActionEnum.SettingModule_Holidays_Add, Description = "Add Public Holidays" },
+             new PermissionAction { Id = 21, PermissionCategoryId = 5, Name = PermissionActionEnum.SettingModule_Holidays_Update.convertToString(), Value = PermissionActionEnum.SettingModule_Holidays_Update, Description = "Update Public Holidays" },
+             new PermissionAction { Id = 22, PermissionCategoryId = 5, Name = PermissionActionEnum.SettingModule_Holidays_Delete.convertToString(), Value = PermissionActionEnum.SettingModule_Holidays_Delete, Description = "Delete Public Holidays" },
 
-             new PermissionAction { Id = 23, PermissionCategoryId = 2, Name = PermissionActionEnum.EmployeeModule_Add.convertToString(), Value = PermissionActionEnum.EmployeeModule_Add, Description = "EmployeeModule_Add" },
-             new PermissionAction { Id = 24, PermissionCategoryId = 2, Name = PermissionActionEnum.EmployeeModule_Update.convertToString(), Value = PermissionActionEnum.EmployeeModule_Update, Description = "EmployeeModule_Update" },
-             new PermissionAction { Id = 25, PermissionCategoryId = 2, Name = PermissionActionEnum.EmployeeModule_Delete.convertToString(), Value = PermissionActionEnum.EmployeeModule_Delete, Description = "EmployeeModule_Delete" },
-             new PermissionAction { Id = 26, PermissionCategoryId = 2, Name = PermissionActionEnum.EmployeeModule_Salary_Update.convertToString(), Value = PermissionActionEnum.EmployeeModule_Salary_Update, Description = "EmployeeModule_Salary_Update" },
-             new PermissionAction { Id = 27, PermissionCategoryId = 2, Name = PermissionActionEnum.EmployeeModule_Leave_Update.convertToString(), Value = PermissionActionEnum.EmployeeModule_Leave_Update, Description = "EmployeeModule_Leave_Update" },
-             new PermissionAction { Id = 28, PermissionCategoryId = 2, Name = PermissionActionEnum.EmployeeModule_Dashboard.convertToString(), Value = PermissionActionEnum.EmployeeModule_Dashboard, Description = "EmployeeModule_Dashboard" },
+             new PermissionAction { Id = 23, PermissionCategoryId = 2, Name = PermissionActionEnum.EmployeeModule_Add.convertToString(), Value = PermissionActionEnum.EmployeeModule_Add, Description = "Add Employee" },
+             new PermissionAction { Id = 24, PermissionCategoryId = 2, Name = PermissionActionEnum.EmployeeModule_Update.convertToString(), Value = PermissionActionEnum.EmployeeModule_Update, Description = "Updated Employee" },
+             new PermissionAction { Id = 25, PermissionCategoryId = 2, Name = PermissionActionEnum.EmployeeModule_Delete.convertToString(), Value = PermissionActionEnum.EmployeeModule_Delete, Description = "Delete Employee" },
+             new PermissionAction { Id = 26, PermissionCategoryId = 2, Name = PermissionActionEnum.EmployeeModule_Salary_Update.convertToString(), Value = PermissionActionEnum.EmployeeModule_Salary_Update, Description = "Employee Salary Update" },
+             new PermissionAction { Id = 27, PermissionCategoryId = 2, Name = PermissionActionEnum.EmployeeModule_Leave_Update.convertToString(), Value = PermissionActionEnum.EmployeeModule_Leave_Update, Description = "Employee Leave Update" },
+             new PermissionAction { Id = 28, PermissionCategoryId = 2, Name = PermissionActionEnum.EmployeeModule_Dashboard.convertToString(), Value = PermissionActionEnum.EmployeeModule_Dashboard, Description = "Employee Dashboard" },
 
              new PermissionAction { Id = 29, PermissionCategoryId = 3, Name = PermissionActionEnum.IntegrationModule_UploadCSV.convertToString(), Value = PermissionActionEnum.IntegrationModule_UploadCSV, Description = "IntegrationModule_UploadCSV" }
 
