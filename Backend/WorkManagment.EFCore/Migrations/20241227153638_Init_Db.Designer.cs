@@ -12,8 +12,8 @@ using WorkManagmentSolution.EFCore;
 namespace WorkManagement.EFCore.Migrations
 {
     [DbContext(typeof(WorkManagementDbContext))]
-    [Migration("20241220194509_Init")]
-    partial class Init
+    [Migration("20241227153638_Init_Db")]
+    partial class Init_Db
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -277,12 +277,12 @@ namespace WorkManagement.EFCore.Migrations
                         {
                             Id = new Guid("8e445865-a24d-4543-a6c6-9443d048cdb9"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "78208e0f-0ff8-4aa1-8e1c-dc332b331119",
+                            ConcurrencyStamp = "c209a901-e315-4d8e-b46b-92de9e972b8a",
                             Email = "admin1@admin.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin",
-                            PasswordHash = "AQAAAAIAAYagAAAAEBqIwYF4moK8/wMAkaJjjC21/7fwc3VFCbWVdGHVNZpF/yr0kADkXMbG5hueXwixZg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEN5heEDTdGRJQLgtFgqKwflGVxFwOXjYOYPvp4mvW3TZfgr8NPc0YuGHzXsYpzULOg==",
                             PhoneNumberConfirmed = false,
                             Shortcuts = "[]",
                             TwoFactorEnabled = false,
@@ -680,6 +680,72 @@ namespace WorkManagement.EFCore.Migrations
                         });
                 });
 
+            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeSalary", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Basic")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Bonus")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("CurrentSalary")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("ESI")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("ExpectedToBeSalary")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Gratuity")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("HRAllowances")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsApprovedByDepartmentHead")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsApprovedByHRHead")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("PF")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("PT")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("SalaryStatus")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SalaryType")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("EmployeeSalaries");
+                });
+
             modelBuilder.Entity("WorkManagement.Domain.Entity.PermissionAction", b =>
                 {
                     b.Property<int>("Id")
@@ -712,66 +778,234 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 1,
-                            Description = "Employee Module view",
-                            Name = "EmployeeModule_View",
-                            PermissionCategoryId = 2,
-                            Value = 1
+                            Description = "Project Dashboard",
+                            Name = "ProjectModule_Dashboard",
+                            PermissionCategoryId = 1,
+                            Value = 10
                         },
                         new
                         {
                             Id = 2,
-                            Description = "Employee Module Add",
-                            Name = "EmployeeModule_Add",
-                            PermissionCategoryId = 2,
-                            Value = 3
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Description = "Employee Module Delete",
-                            Name = "EmployeeModule_Delete",
-                            PermissionCategoryId = 2,
-                            Value = 4
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Description = "Employee Module Edit",
-                            Name = "EmployeeModule_Edit",
-                            PermissionCategoryId = 2,
-                            Value = 2
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Description = "Project Module view",
-                            Name = "ProjectModule_View",
-                            PermissionCategoryId = 1,
-                            Value = 5
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Description = "Project Module Add",
+                            Description = "Project Add",
                             Name = "ProjectModule_Add",
                             PermissionCategoryId = 1,
                             Value = 7
                         },
                         new
                         {
-                            Id = 7,
-                            Description = "Project Module Delete",
+                            Id = 3,
+                            Description = "Project Delete",
                             Name = "ProjectModule_Delete",
+                            PermissionCategoryId = 1,
+                            Value = 9
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Description = "Project Update",
+                            Name = "ProjectModule_Update",
                             PermissionCategoryId = 1,
                             Value = 8
                         },
                         new
                         {
-                            Id = 8,
-                            Description = "Project Module Edit",
-                            Name = "ProjectModule_Edit",
+                            Id = 5,
+                            Description = "Add Employees to Project",
+                            Name = "ProjectModule_Employee_Add",
                             PermissionCategoryId = 1,
+                            Value = 10
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Description = "Delete Employees to Project",
+                            Name = "ProjectModule_Employee_Delete",
+                            PermissionCategoryId = 1,
+                            Value = 7
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Description = "Update Employees to Project",
+                            Name = "ProjectModule_Employee_Update",
+                            PermissionCategoryId = 1,
+                            Value = 9
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Description = "Add Tasks to Project",
+                            Name = "ProjectModule_Link_Add",
+                            PermissionCategoryId = 1,
+                            Value = 8
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Description = "Delete Tasks to Project",
+                            Name = "ProjectModule_Link_Delete",
+                            PermissionCategoryId = 1,
+                            Value = 8
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Description = "Update Tasks to Project",
+                            Name = "ProjectModule_Link_Update",
+                            PermissionCategoryId = 1,
+                            Value = 8
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Description = "Add Leaves",
+                            Name = "LeaveModule_Add",
+                            PermissionCategoryId = 4,
+                            Value = 17
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Description = "Delete Leaves",
+                            Name = "LeaveModule_Delete",
+                            PermissionCategoryId = 4,
+                            Value = 18
+                        },
+                        new
+                        {
+                            Id = 13,
+                            Description = "Update Leaves",
+                            Name = "LeaveModule_Update",
+                            PermissionCategoryId = 4,
+                            Value = 19
+                        },
+                        new
+                        {
+                            Id = 14,
+                            Description = "Approve/Reject Leaves",
+                            Name = "LeaveModule_Approvals",
+                            PermissionCategoryId = 4,
+                            Value = 20
+                        },
+                        new
+                        {
+                            Id = 15,
+                            Description = "Leave History Dashboard",
+                            Name = "LeaveModule_Employee_LeaveHistory",
+                            PermissionCategoryId = 4,
+                            Value = 21
+                        },
+                        new
+                        {
+                            Id = 16,
+                            Description = "Update Dropdown values",
+                            Name = "SettingModule_DropDownSettings",
+                            PermissionCategoryId = 5,
+                            Value = 22
+                        },
+                        new
+                        {
+                            Id = 17,
+                            Description = "Add Leave Types",
+                            Name = "SettingModule_LeaveType_Add",
+                            PermissionCategoryId = 5,
+                            Value = 23
+                        },
+                        new
+                        {
+                            Id = 18,
+                            Description = "Update Leave Types",
+                            Name = "SettingModule_LeaveType_Update",
+                            PermissionCategoryId = 5,
+                            Value = 24
+                        },
+                        new
+                        {
+                            Id = 19,
+                            Description = "Delete Leave Types",
+                            Name = "SettingModule_LeaveType_Delete",
+                            PermissionCategoryId = 5,
+                            Value = 25
+                        },
+                        new
+                        {
+                            Id = 20,
+                            Description = "Add Public Holidays",
+                            Name = "SettingModule_Holidays_Add",
+                            PermissionCategoryId = 5,
+                            Value = 26
+                        },
+                        new
+                        {
+                            Id = 21,
+                            Description = "Update Public Holidays",
+                            Name = "SettingModule_Holidays_Update",
+                            PermissionCategoryId = 5,
+                            Value = 27
+                        },
+                        new
+                        {
+                            Id = 22,
+                            Description = "Delete Public Holidays",
+                            Name = "SettingModule_Holidays_Delete",
+                            PermissionCategoryId = 5,
+                            Value = 28
+                        },
+                        new
+                        {
+                            Id = 23,
+                            Description = "Add Employee",
+                            Name = "EmployeeModule_Add",
+                            PermissionCategoryId = 2,
+                            Value = 1
+                        },
+                        new
+                        {
+                            Id = 24,
+                            Description = "Updated Employee",
+                            Name = "EmployeeModule_Update",
+                            PermissionCategoryId = 2,
+                            Value = 2
+                        },
+                        new
+                        {
+                            Id = 25,
+                            Description = "Delete Employee",
+                            Name = "EmployeeModule_Delete",
+                            PermissionCategoryId = 2,
+                            Value = 3
+                        },
+                        new
+                        {
+                            Id = 26,
+                            Description = "Employee Salary Update",
+                            Name = "EmployeeModule_Salary_Update",
+                            PermissionCategoryId = 2,
+                            Value = 4
+                        },
+                        new
+                        {
+                            Id = 27,
+                            Description = "Employee Leave Update",
+                            Name = "EmployeeModule_Leave_Update",
+                            PermissionCategoryId = 2,
+                            Value = 5
+                        },
+                        new
+                        {
+                            Id = 28,
+                            Description = "Employee Dashboard",
+                            Name = "EmployeeModule_Dashboard",
+                            PermissionCategoryId = 2,
                             Value = 6
+                        },
+                        new
+                        {
+                            Id = 29,
+                            Description = "IntegrationModule_UploadCSV",
+                            Name = "IntegrationModule_UploadCSV",
+                            PermissionCategoryId = 3,
+                            Value = 29
                         });
                 });
 
@@ -819,6 +1053,20 @@ namespace WorkManagement.EFCore.Migrations
                             Description = "Integration Module",
                             Name = "IntegrationModule",
                             Value = 3
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Description = "Leave Module",
+                            Name = "LeaveModule",
+                            Value = 4
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Description = "Setting Module",
+                            Name = "SettingModule",
+                            Value = 5
                         });
                 });
 
@@ -1049,6 +1297,113 @@ namespace WorkManagement.EFCore.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("RolePermissions");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            IsDeleted = false,
+                            PermissionActionId = 1,
+                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                        },
+                        new
+                        {
+                            Id = 2,
+                            IsDeleted = false,
+                            PermissionActionId = 2,
+                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                        },
+                        new
+                        {
+                            Id = 3,
+                            IsDeleted = false,
+                            PermissionActionId = 3,
+                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                        },
+                        new
+                        {
+                            Id = 4,
+                            IsDeleted = false,
+                            PermissionActionId = 4,
+                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                        },
+                        new
+                        {
+                            Id = 5,
+                            IsDeleted = false,
+                            PermissionActionId = 5,
+                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                        },
+                        new
+                        {
+                            Id = 6,
+                            IsDeleted = false,
+                            PermissionActionId = 6,
+                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                        },
+                        new
+                        {
+                            Id = 7,
+                            IsDeleted = false,
+                            PermissionActionId = 7,
+                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                        },
+                        new
+                        {
+                            Id = 8,
+                            IsDeleted = false,
+                            PermissionActionId = 8,
+                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                        },
+                        new
+                        {
+                            Id = 9,
+                            IsDeleted = false,
+                            PermissionActionId = 9,
+                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                        },
+                        new
+                        {
+                            Id = 10,
+                            IsDeleted = false,
+                            PermissionActionId = 10,
+                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                        },
+                        new
+                        {
+                            Id = 11,
+                            IsDeleted = false,
+                            PermissionActionId = 11,
+                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                        },
+                        new
+                        {
+                            Id = 12,
+                            IsDeleted = false,
+                            PermissionActionId = 12,
+                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                        },
+                        new
+                        {
+                            Id = 13,
+                            IsDeleted = false,
+                            PermissionActionId = 13,
+                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                        },
+                        new
+                        {
+                            Id = 14,
+                            IsDeleted = false,
+                            PermissionActionId = 14,
+                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                        },
+                        new
+                        {
+                            Id = 15,
+                            IsDeleted = false,
+                            PermissionActionId = 15,
+                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                        });
                 });
 
             modelBuilder.Entity("WorkManagementSolution.Employee.Employee", b =>
@@ -1060,7 +1415,6 @@ namespace WorkManagement.EFCore.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AlternateEmail")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long?>("AlternateNumber")
@@ -1520,7 +1874,6 @@ namespace WorkManagement.EFCore.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("EmployeeId")
@@ -1530,11 +1883,9 @@ namespace WorkManagement.EFCore.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("RelationshipType")
@@ -1741,6 +2092,15 @@ namespace WorkManagement.EFCore.Migrations
                     b.Navigation("Employee");
 
                     b.Navigation("EmployeeLeaveTypes");
+                });
+
+            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeSalary", b =>
+                {
+                    b.HasOne("WorkManagementSolution.Employee.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId");
+
+                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("WorkManagement.Domain.Entity.PermissionAction", b =>

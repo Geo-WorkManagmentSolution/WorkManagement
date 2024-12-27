@@ -274,12 +274,12 @@ namespace WorkManagement.EFCore.Migrations
                         {
                             Id = new Guid("8e445865-a24d-4543-a6c6-9443d048cdb9"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "47587caa-ce71-4a77-b4e6-bedb9815a891",
+                            ConcurrencyStamp = "c209a901-e315-4d8e-b46b-92de9e972b8a",
                             Email = "admin1@admin.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKe+QzMz2doFXYFXNdP5np1Dinx6NAgoJx1AAgUNx6ih8zhwP7w25rYqQaarpqlTew==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEN5heEDTdGRJQLgtFgqKwflGVxFwOXjYOYPvp4mvW3TZfgr8NPc0YuGHzXsYpzULOg==",
                             PhoneNumberConfirmed = false,
                             Shortcuts = "[]",
                             TwoFactorEnabled = false,
@@ -709,10 +709,10 @@ namespace WorkManagement.EFCore.Migrations
                     b.Property<decimal>("HRAllowances")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<bool?>("IsApprovedByDepartmentHead")
+                    b.Property<bool>("IsApprovedByDepartmentHead")
                         .HasColumnType("bit");
 
-                    b.Property<bool?>("IsApprovedByHRHead")
+                    b.Property<bool>("IsApprovedByHRHead")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
@@ -775,7 +775,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 1,
-                            Description = "Project Module Dashboard",
+                            Description = "Project Dashboard",
                             Name = "ProjectModule_Dashboard",
                             PermissionCategoryId = 1,
                             Value = 10
@@ -783,7 +783,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 2,
-                            Description = "Project Module Add",
+                            Description = "Project Add",
                             Name = "ProjectModule_Add",
                             PermissionCategoryId = 1,
                             Value = 7
@@ -791,7 +791,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 3,
-                            Description = "Project Module Delete",
+                            Description = "Project Delete",
                             Name = "ProjectModule_Delete",
                             PermissionCategoryId = 1,
                             Value = 9
@@ -799,7 +799,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 4,
-                            Description = "Project Module Update",
+                            Description = "Project Update",
                             Name = "ProjectModule_Update",
                             PermissionCategoryId = 1,
                             Value = 8
@@ -807,7 +807,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 5,
-                            Description = "Project Module Employee Add",
+                            Description = "Add Employees to Project",
                             Name = "ProjectModule_Employee_Add",
                             PermissionCategoryId = 1,
                             Value = 10
@@ -815,7 +815,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 6,
-                            Description = "Project Module Employee Delete",
+                            Description = "Delete Employees to Project",
                             Name = "ProjectModule_Employee_Delete",
                             PermissionCategoryId = 1,
                             Value = 7
@@ -823,7 +823,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 7,
-                            Description = "Project Module Employee Update",
+                            Description = "Update Employees to Project",
                             Name = "ProjectModule_Employee_Update",
                             PermissionCategoryId = 1,
                             Value = 9
@@ -831,7 +831,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 8,
-                            Description = "Project Link Add",
+                            Description = "Add Tasks to Project",
                             Name = "ProjectModule_Link_Add",
                             PermissionCategoryId = 1,
                             Value = 8
@@ -839,7 +839,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 9,
-                            Description = "Project Link Delete",
+                            Description = "Delete Tasks to Project",
                             Name = "ProjectModule_Link_Delete",
                             PermissionCategoryId = 1,
                             Value = 8
@@ -847,7 +847,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 10,
-                            Description = "Project Link Update",
+                            Description = "Update Tasks to Project",
                             Name = "ProjectModule_Link_Update",
                             PermissionCategoryId = 1,
                             Value = 8
@@ -855,7 +855,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 11,
-                            Description = "LeaveModule_Add",
+                            Description = "Add Leaves",
                             Name = "LeaveModule_Add",
                             PermissionCategoryId = 4,
                             Value = 17
@@ -863,7 +863,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 12,
-                            Description = "LeaveModule_Delete",
+                            Description = "Delete Leaves",
                             Name = "LeaveModule_Delete",
                             PermissionCategoryId = 4,
                             Value = 18
@@ -871,7 +871,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 13,
-                            Description = "LeaveModule_Update",
+                            Description = "Update Leaves",
                             Name = "LeaveModule_Update",
                             PermissionCategoryId = 4,
                             Value = 19
@@ -879,7 +879,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 14,
-                            Description = "LeaveModule_Approvals",
+                            Description = "Approve/Reject Leaves",
                             Name = "LeaveModule_Approvals",
                             PermissionCategoryId = 4,
                             Value = 20
@@ -887,7 +887,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 15,
-                            Description = "LeaveModule_Employee_LeaveHistory",
+                            Description = "Leave History Dashboard",
                             Name = "LeaveModule_Employee_LeaveHistory",
                             PermissionCategoryId = 4,
                             Value = 21
@@ -895,7 +895,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 16,
-                            Description = "SettingModule_DropDownSettings",
+                            Description = "Update Dropdown values",
                             Name = "SettingModule_DropDownSettings",
                             PermissionCategoryId = 5,
                             Value = 22
@@ -903,7 +903,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 17,
-                            Description = "SettingModule_LeaveType_Add",
+                            Description = "Add Leave Types",
                             Name = "SettingModule_LeaveType_Add",
                             PermissionCategoryId = 5,
                             Value = 23
@@ -911,7 +911,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 18,
-                            Description = "SettingModule_LeaveType_Update",
+                            Description = "Update Leave Types",
                             Name = "SettingModule_LeaveType_Update",
                             PermissionCategoryId = 5,
                             Value = 24
@@ -919,7 +919,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 19,
-                            Description = "SettingModule_LeaveType_Delete",
+                            Description = "Delete Leave Types",
                             Name = "SettingModule_LeaveType_Delete",
                             PermissionCategoryId = 5,
                             Value = 25
@@ -927,7 +927,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 20,
-                            Description = "SettingModule_Holidays_Add",
+                            Description = "Add Public Holidays",
                             Name = "SettingModule_Holidays_Add",
                             PermissionCategoryId = 5,
                             Value = 26
@@ -935,7 +935,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 21,
-                            Description = "SettingModule_Holidays_Update",
+                            Description = "Update Public Holidays",
                             Name = "SettingModule_Holidays_Update",
                             PermissionCategoryId = 5,
                             Value = 27
@@ -943,7 +943,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 22,
-                            Description = "SettingModule_Holidays_Delete",
+                            Description = "Delete Public Holidays",
                             Name = "SettingModule_Holidays_Delete",
                             PermissionCategoryId = 5,
                             Value = 28
@@ -951,7 +951,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 23,
-                            Description = "EmployeeModule_Add",
+                            Description = "Add Employee",
                             Name = "EmployeeModule_Add",
                             PermissionCategoryId = 2,
                             Value = 1
@@ -959,7 +959,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 24,
-                            Description = "EmployeeModule_Update",
+                            Description = "Updated Employee",
                             Name = "EmployeeModule_Update",
                             PermissionCategoryId = 2,
                             Value = 2
@@ -967,7 +967,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 25,
-                            Description = "EmployeeModule_Delete",
+                            Description = "Delete Employee",
                             Name = "EmployeeModule_Delete",
                             PermissionCategoryId = 2,
                             Value = 3
@@ -975,7 +975,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 26,
-                            Description = "EmployeeModule_Salary_Update",
+                            Description = "Employee Salary Update",
                             Name = "EmployeeModule_Salary_Update",
                             PermissionCategoryId = 2,
                             Value = 4
@@ -983,7 +983,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 27,
-                            Description = "EmployeeModule_Leave_Update",
+                            Description = "Employee Leave Update",
                             Name = "EmployeeModule_Leave_Update",
                             PermissionCategoryId = 2,
                             Value = 5
@@ -991,7 +991,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 28,
-                            Description = "EmployeeModule_Dashboard",
+                            Description = "Employee Dashboard",
                             Name = "EmployeeModule_Dashboard",
                             PermissionCategoryId = 2,
                             Value = 6
