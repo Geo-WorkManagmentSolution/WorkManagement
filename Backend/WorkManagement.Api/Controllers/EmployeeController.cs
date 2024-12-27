@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Security.Claims;
 using WorkManagement.Domain.Attribute;
 using WorkManagement.Domain.Contracts;
@@ -30,7 +31,7 @@ namespace WorkManagement.API.Controllers
         private readonly AdvanceSearchService advanceSearchService;
         private IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper mapper;
-        private readonly string _storagePath = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles\\EmployeeDocuments");
+        private string _storagePath = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles\\EmployeeDocuments");
 
         public EmployeesController(IEmployeeService employeeService, AdvanceSearchService AdvanceSearchService, IHttpContextAccessor httpContextAccessor, IMapper mapper, IEmailService emailService)
         {
@@ -39,11 +40,6 @@ namespace WorkManagement.API.Controllers
             _httpContextAccessor = httpContextAccessor;
             this.mapper = mapper;
             _emailService = emailService;
-
-            if (!Directory.Exists(_storagePath))
-            {
-                Directory.CreateDirectory(_storagePath);
-            }
         }
 
         // GET: api/employees
@@ -332,6 +328,11 @@ namespace WorkManagement.API.Controllers
                 var employeeFilePath = await employeeService.GetEmployeeDocumentFileName(id, file.FileName);
 
                 var employeeFolderPath = await employeeService.GetEmployeeFolderPath(id);
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    _storagePath = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles/EmployeeDocuments");
+                }
 
                 var folderPath = Path.Combine(_storagePath, employeeFolderPath);
 

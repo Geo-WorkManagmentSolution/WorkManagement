@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Security.Claims;
 using WorkManagement.Domain.Contracts;
 using WorkManagement.Domain.Entity;
@@ -25,7 +26,7 @@ namespace WorkManagement.API.Controllers
         private IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper mapper;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly string _storagePath = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles\\ProjectDocuments");
+        private string _storagePath = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles\\ProjectDocuments");
         public ProjectController(IProjectService projectService, IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> userManager, IMapper mapper)
         {
             this._projectService = projectService;
@@ -173,6 +174,11 @@ namespace WorkManagement.API.Controllers
                 var projectFilePath = await _projectService.GetProjectDocumentFileName(id, file.FileName);
 
                 var projectFolderPath = await _projectService.GetProjectFolderPath(id);
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    _storagePath = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles/ProjectDocuments");
+                }
 
                 var folderPath = Path.Combine(_storagePath, projectFolderPath);
 

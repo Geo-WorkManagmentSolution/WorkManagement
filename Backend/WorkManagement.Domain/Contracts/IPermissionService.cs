@@ -5,10 +5,10 @@ namespace WorkManagement.API.Controllers
 {
     public interface IPermissionService
     {
-        Task<List<RolePermission>> AssignRolePermissionsAsync(IEnumerable<RolePermission> featurePermissions);
-        Task<List<PermissionCategoryClaim>> GetPermissionClaimsByUserAsync(Guid userId);
-        Task<List<RolePermission>> GetRolePermissionsByRoleAsync(Guid roleId);
-        Task<List<RolePermission>> GetRolePermissionsByUserAsync(Guid userId);
-        Task<List<PermissionAction>> GetAllPermissionActions();
+        public Task<List<RolePermission>> AssignRolePermissionsAsync(IEnumerable<RolePermission> featurePermissions);
+        public Task<List<PermissionCategoryClaim>> GetPermissionClaimsByUserAsync(Guid userId);
+        public Task<List<RolePermission>> GetRolePermissionsByRoleAsync(Guid roleId);
+        public Task<List<RolePermission>> GetRolePermissionsByUserAsync(Guid userId);
+        public Task<List<PermissionAction>> GetAllPermissionActions();
     }
 }
