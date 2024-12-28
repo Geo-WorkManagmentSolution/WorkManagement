@@ -21,18 +21,42 @@ function SalaryStatusCell({ row }) {
 	return <SalaryStatusComponent status={row.original.salaryStatus} />;
 }
 
+function isApprovedByDepartmentHead({ row }) {
+	return (
+		<>
+			{row.original.isApprovedByDepartmentHead === true ? (
+				<FuseSvgIcon color="success" size={28}>heroicons-outline:check-circle</FuseSvgIcon>
+			) : (
+				<FuseSvgIcon color="error" size={28}>heroicons-outline:minus-circle</FuseSvgIcon>
+			)}
+		</>
+	);
+}
+
+function isApprovedByHRHead({ row }) {
+	return (
+		<>
+			{row.original.isApprovedByHRHead === true ? (
+				<FuseSvgIcon color="success" size={28}>heroicons-outline:check-circle</FuseSvgIcon>
+			) : (
+				<FuseSvgIcon color="error" size={28} >heroicons-outline:minus-circle</FuseSvgIcon>
+			)}
+		</>
+	);
+}
+
 function SalaryApprovalTable() {
 	const dispatch = useDispatch();
 	const { isLoading, data: pendingSalaries, refetch } = useGetApiEmployeesSalaryPendingSalaryRequestQuery({});
 	const [approveSalary, { isLoading: approveLoading }] = usePutApiEmployeesSalaryApproveBySalaryIdMutation();
 	const [rejectSalary, { isLoading: rejectLoading }] = usePutApiEmployeesSalaryRejectBySalaryIdMutation();
 
-	const handleSalaryAction = async (action: 'approve' | 'reject', salaryId: number) => {
+	const handleSalaryAction = async (action: 'approve' | 'reject', salaryId: number,employeeId:number) => {
 		try {
 			if (action === 'approve') {
-				await approveSalary({ salaryId }).unwrap();
+				await approveSalary({ salaryId,employeeId }).unwrap();
 			} else {
-				await rejectSalary({ salaryId }).unwrap();
+				await rejectSalary({ salaryId,employeeId }).unwrap();
 			}
 
 			dispatch(
@@ -82,33 +106,37 @@ function SalaryApprovalTable() {
 			{
 				accessorKey: 'currentSalary',
 				header: 'Current Salary',
-				accessorFn: (row) => `$${row.currentSalary?.toFixed(2)}`
+				accessorFn: (row) => `₹ ${row.currentSalary?.toFixed(2)}`
 			},
 			{
 				accessorKey: 'expectedToBeSalary',
 				header: 'Expected Salary',
-				accessorFn: (row) => `$${row.expectedToBeSalary?.toFixed(2)}`
+				accessorFn: (row) => ` ₹ ${row.expectedToBeSalary?.toFixed(2)}`
+			},{
+				accessorKey: 'status',
+				header: 'Status',
+				Cell: SalaryStatusCell // Use SalaryStatusCell here
 			},
 			{
 				accessorKey: 'isApprovedByDepartmentHead',
 				header: 'Approved By Department Head',
-				accessorFn: (row) => row.isApprovedByDepartmentHead
+				Cell: isApprovedByDepartmentHead // Use isApprovedByDepartmentHead here
 			},
 			{
 				accessorKey: 'isApprovedByHRHead',
 				header: 'Approved By HR Head',
-				accessorFn: (row) => row.isApprovedByHRHead
+				Cell: isApprovedByHRHead
 			},
 			{
 				accessorKey: 'updatedDateTime',
 				header: 'Updated Date',
 				accessorFn: (row) => format(new Date(row.updatedDateTime || ''), 'dd/MM/yyyy')
-			},
-			{
-				accessorKey: 'status',
-				header: 'Status',
-				Cell: SalaryStatusCell // Use SalaryStatusCell here
+			},{
+				accessorKey: 'updatedByUserName',
+				header: 'Updated By',
+				accessorFn: (row) => row.updatedByUserName
 			}
+			
 		],
 		[]
 	);
@@ -130,7 +158,7 @@ function SalaryApprovalTable() {
 					<MenuItem
 						key={`approve-${row.original.employeeId}`}
 						onClick={() => {
-							handleSalaryAction('approve', row.original.employeeId || 0);
+							handleSalaryAction('approve',row.original.salaryid, row.original.employeeId);
 							closeMenu();
 							table.resetRowSelection();
 						}}
@@ -144,7 +172,7 @@ function SalaryApprovalTable() {
 					<MenuItem
 						key={`reject-${row.original.employeeId}`}
 						onClick={() => {
-							handleSalaryAction('reject', row.original.employeeId || 0);
+							handleSalaryAction('reject',row.original.salaryid , row.original.employeeId);
 							closeMenu();
 							table.resetRowSelection();
 						}}

@@ -41,12 +41,12 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: () => ({ url: `/api/Employees/sites` }),
     }),
-    getApiEmployeesReportToEMployeeList: build.query<
-      GetApiEmployeesReportToEMployeeListApiResponse,
-      GetApiEmployeesReportToEMployeeListApiArg
+    getApiEmployeesReportToEmployeeList: build.query<
+      GetApiEmployeesReportToEmployeeListApiResponse,
+      GetApiEmployeesReportToEmployeeListApiArg
     >({
       query: (queryArg) => ({
-        url: `/api/Employees/ReportToE mployeeList`,
+        url: `/api/Employees/ReportToEmployeeList`,
         params: {
           departmentId: queryArg.departmentId,
           employeeId: queryArg.employeeId,
@@ -354,9 +354,9 @@ export type GetApiEmployeesDesignationsApiResponse =
 export type GetApiEmployeesDesignationsApiArg = void;
 export type GetApiEmployeesSitesApiResponse = /** status 200 OK */ Site[];
 export type GetApiEmployeesSitesApiArg = void;
-export type GetApiEmployeesReportToEMployeeListApiResponse =
+export type GetApiEmployeesReportToEmployeeListApiResponse =
   /** status 200 OK */ EmployeeReportToModel[];
-export type GetApiEmployeesReportToEMployeeListApiArg = {
+export type GetApiEmployeesReportToEmployeeListApiArg = {
   departmentId?: number;
   employeeId?: number;
 };
@@ -413,7 +413,7 @@ export type PutApiEmployeesSalaryApproveBySalaryIdApiArg = {
   employeeId?: number;
 };
 export type PutApiEmployeesSalaryRejectBySalaryIdApiResponse =
-  /** status 200 OK */ EmployeeLeave;
+  /** status 200 OK */ EmployeeSalary;
 export type PutApiEmployeesSalaryRejectBySalaryIdApiArg = {
   salaryId: number;
   employeeId?: number;
@@ -424,7 +424,7 @@ export type GetApiEmployeesSalaryPendingSalaryRequestApiArg = {
   employeeId?: number;
 };
 export type GetApiEmployeesLeavesCurrentApiResponse =
-  /** status 200 OK */ EmployeeSalaryDataModel[];
+  /** status 200 OK */ EmployeeLeaveSummary[];
 export type GetApiEmployeesLeavesCurrentApiArg = {
   employeeId?: number;
 };
@@ -890,19 +890,8 @@ export type EmployeeSalary = {
   updatedBy?: number | null;
   updatedDateTime?: string | null;
 };
-export type EmployeeLeave = {
-  id?: number;
-  isDeleted?: boolean;
-  employeeId?: number;
-  status?: LeaveStatus;
-  description?: string | null;
-  reason?: string | null;
-  startDate?: string;
-  endDate?: string;
-  leaveDays?: number;
-  employeeLeaveTypeId?: number;
-};
 export type EmployeeSalaryDataModel = {
+  salaryid?: number;
   employeeId?: number | null;
   employeeName?: string | null;
   managerName?: string | null;
@@ -929,6 +918,18 @@ export type EmployeeLeaveModel = {
   employeeLeaveTypeId?: number;
   leaveType?: string | null;
   employeeName?: string | null;
+};
+export type EmployeeLeave = {
+  id?: number;
+  isDeleted?: boolean;
+  employeeId?: number;
+  status?: LeaveStatus;
+  description?: string | null;
+  reason?: string | null;
+  startDate?: string;
+  endDate?: string;
+  leaveDays?: number;
+  employeeLeaveTypeId?: number;
 };
 export type DropdownModel = {
   category?: string | null;
@@ -1033,8 +1034,8 @@ export const {
   useLazyGetApiEmployeesDesignationsQuery,
   useGetApiEmployeesSitesQuery,
   useLazyGetApiEmployeesSitesQuery,
-  useGetApiEmployeesReportToEMployeeListQuery,
-  useLazyGetApiEmployeesReportToEMployeeListQuery,
+  useGetApiEmployeesReportToEmployeeListQuery,
+  useLazyGetApiEmployeesReportToEmployeeListQuery,
   useGetApiEmployeesTeamMembersListQuery,
   useLazyGetApiEmployeesTeamMembersListQuery,
   useGetApiEmployeesByIdQuery,

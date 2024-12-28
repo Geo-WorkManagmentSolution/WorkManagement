@@ -16,7 +16,6 @@ const HolidayForm = lazy(() => import('./tabs/HolidayForm'));
 const SettingsAppRoute: FuseRouteItemType = {
 	path: 'apps/settings',
 	element: <SettingsApp />,
-	auth: authRoles.admin,
 	children: [
 		{
 			path: 'permission-manager',

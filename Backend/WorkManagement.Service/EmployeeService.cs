@@ -1925,9 +1925,35 @@ namespace WorkManagement.Service
                                   from ed in employee_default.DefaultIfEmpty()
                                   select new EmployeeSalaryDataModel
                                   {
+                                      Salaryid = es.Id,
                                       EmployeeId = es.EmployeeId,
                                       EmployeeName = es.Employee.FirstName + " " + es.Employee.LastName,
                                       SalaryType = es.SalaryType,
+                                      ManagerName = ed.EmployeeReportTo.FirstName + " " + ed.EmployeeReportTo.LastName,
+                                      SalaryStatus = es.SalaryStatus,
+                                      IsApprovedByDepartmentHead = es.IsApprovedByDepartmentHead,
+                                      IsApprovedByHRHead = es.IsApprovedByHRHead,
+                                      CurrentSalary = es.CurrentSalary,
+                                      ExpectedToBeSalary = es.ExpectedToBeSalary,
+                                      UpdatedDateTime = (es.UpdatedDateTime.HasValue ? es.UpdatedDateTime.Value.ToString("yyyy-MM-dd") : ""),
+                                      UpdatedBy = es.UpdatedBy,
+                                      UpdatedByUserName = (ed == null) ? "" : ed.FirstName + " " + ed.LastName,
+                                  }).ToList();
+                }
+                else
+                {
+                    var employeeData = _dbContext.Employees.Where(s => s.EmployeeReportToId == targetEmployeeId);
+                    returnData = (from es in _dbContext.EmployeeSalaries.Where(s => s.SalaryStatus == SalaryStatus.Pending && s.EmployeeId.HasValue)
+                                  join er in employeeData on es.EmployeeId equals er.Id
+                                  join e in _dbContext.Employees on es.UpdatedBy equals e.Id into employee_default
+                                  from ed in employee_default.DefaultIfEmpty()
+                                  select new EmployeeSalaryDataModel
+                                  {
+                                      Salaryid = es.Id,
+                                      EmployeeId = es.EmployeeId,
+                                      EmployeeName = es.Employee.FirstName + " " + es.Employee.LastName,
+                                      SalaryType = es.SalaryType,
+                                      ManagerName = ed.EmployeeReportTo.FirstName + " " + ed.EmployeeReportTo.LastName,
                                       SalaryStatus = es.SalaryStatus,
                                       IsApprovedByDepartmentHead = es.IsApprovedByDepartmentHead,
                                       IsApprovedByHRHead = es.IsApprovedByHRHead,
@@ -1939,28 +1965,7 @@ namespace WorkManagement.Service
                                   }).ToList();
                 }
             }
-            else
-            {
-                var employeeData = _dbContext.Employees.Where(s => s.EmployeeReportToId == targetEmployeeId);
-                returnData = (from es in _dbContext.EmployeeSalaries.Where(s => s.SalaryStatus == SalaryStatus.Pending && s.EmployeeId.HasValue)
-                              join er in employeeData on es.EmployeeId equals er.Id
-                              join e in _dbContext.Employees on es.UpdatedBy equals e.Id into employee_default
-                              from ed in employee_default.DefaultIfEmpty()
-                              select new EmployeeSalaryDataModel
-                              {
-                                  EmployeeId = es.EmployeeId,
-                                  EmployeeName = es.Employee.FirstName + " " + es.Employee.LastName,
-                                  SalaryType = es.SalaryType,
-                                  SalaryStatus = es.SalaryStatus,
-                                  IsApprovedByDepartmentHead = es.IsApprovedByDepartmentHead,
-                                  IsApprovedByHRHead = es.IsApprovedByHRHead,
-                                  CurrentSalary = es.CurrentSalary,
-                                  ExpectedToBeSalary = es.ExpectedToBeSalary,
-                                  UpdatedDateTime = (es.UpdatedDateTime.HasValue ? es.UpdatedDateTime.Value.ToString("yyyy-MM-dd") : ""),
-                                  UpdatedBy = es.UpdatedBy,
-                                  UpdatedByUserName = (ed == null) ? "" : ed.FirstName + " " + ed.LastName,
-                              }).ToList();
-            }
+           
 
             return returnData;
 
@@ -1983,9 +1988,11 @@ namespace WorkManagement.Service
                           from ed in employee_default.DefaultIfEmpty()
                           select new EmployeeSalaryDataModel
                           {
+                              Salaryid=es.Id,
                               EmployeeId = es.EmployeeId,
                               EmployeeName = es.Employee.FirstName + " " + es.Employee.LastName,
                               SalaryType = es.SalaryType,
+                              ManagerName = ed.EmployeeReportTo.FirstName + " " + ed.EmployeeReportTo.LastName,
                               SalaryStatus = es.SalaryStatus,
                               IsApprovedByDepartmentHead = es.IsApprovedByDepartmentHead,
                               IsApprovedByHRHead = es.IsApprovedByHRHead,
