@@ -45,21 +45,25 @@
                 return false;
             }
 
-            var permissions = JsonConvert.DeserializeObject<PermissionCategoryClaim>(permissionsString);
+            var permissions = JsonConvert.DeserializeObject<List<PermissionCategoryClaim>>(permissionsString);
 
             // Now check the hierarchical structure for the specific permission action
             return HasRequiredPermission(permissions, permissionAction);
         }
 
-        private bool HasRequiredPermission(PermissionCategoryClaim permissionActionClaims, PermissionActionEnum requiredPermission)
+        private bool HasRequiredPermission(List<PermissionCategoryClaim> permissionActionClaims, PermissionActionEnum requiredPermission)
         {
-            foreach (var categoryAction in permissionActionClaims.Actions)
+            foreach(var claim in permissionActionClaims)
             {
-                if (categoryAction.Id == requiredPermission)
+                foreach (var categoryAction in claim.Actions)
                 {
-                    return true;
+                    if (categoryAction.Id == requiredPermission)
+                    {
+                        return true;
+                    }
                 }
             }
+            
             return false;
         }
     }
