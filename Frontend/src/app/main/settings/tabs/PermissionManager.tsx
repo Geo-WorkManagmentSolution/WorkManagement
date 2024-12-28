@@ -132,7 +132,8 @@ export default function PermissionManager() {
 														onChange={(e) => field.onChange(e.target.checked)}
 													/>
 												}
-												label={permission.name}
+												label={permission.description || permission.name}
+
 												labelPlacement="start"
 												sx={{
 													display: 'flex',
