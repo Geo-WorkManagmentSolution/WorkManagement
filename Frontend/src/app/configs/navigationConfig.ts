@@ -108,7 +108,7 @@ const navigationConfig: FuseNavItemType[] = [
 				id: 'applicationmanagement.settings',
 				title: 'Settings',
 				type: 'item',
-				// auth:[PermissionActionEnum.SettingModuleDropDownSettings],
+				auth:authRoles.HRAdmin,
 				icon: 'heroicons-outline:cog-8-tooth',
 				url: '/apps/settings'
 			}

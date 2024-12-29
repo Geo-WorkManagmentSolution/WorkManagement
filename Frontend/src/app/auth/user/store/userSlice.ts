@@ -47,6 +47,19 @@ export const userSlice = createSlice({
 		/**
 		 * Updates the user's settings
 		 */
+
+		setUserPermissions: (state, action) => {
+			const oldState = _.cloneDeep(state);
+			const newUser = _.setIn(oldState, 'permissions', action.payload) as User;
+	  
+			if (_.isEqual(oldState, newUser)) {
+			  return undefined;
+			}
+	  
+			return newUser;
+		  },
+
+
 		setUserShortcuts: (state, action) => {
 			const oldState = _.cloneDeep(state);
 			const newUser = _.setIn(oldState, 'data.shortcuts', action.payload) as User;
@@ -84,7 +97,9 @@ export const userSlice = createSlice({
 
 			return newUser as User;
 		},
-		userSignOut: () => initialState
+		userSignOut: () => initialState,
+
+		
 	},
 	extraReducers: (builder) => {
 		builder.addCase(setUser.fulfilled, (state, action) => {
@@ -107,7 +122,7 @@ export const userSlice = createSlice({
 	}
 });
 
-export const { userSignOut, updateUser, setUserShortcuts, setUserSettings } = userSlice.actions;
+export const { userSignOut, updateUser, setUserShortcuts, setUserSettings,setUserPermissions } = userSlice.actions;
 
 export const selectUser = (state: RootState) => state?.user;
 

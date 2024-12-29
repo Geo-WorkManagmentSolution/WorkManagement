@@ -92,6 +92,12 @@ namespace WorkManagement.API.Controllers
             var reportToEmployeeList = await employeeService.GetReportToEmployeeList(departmentId, employeeId);
             return Ok(reportToEmployeeList);
         }
+        //[HttpGet("ReportToEmployeeList")]
+        //public async Task<ActionResult<IEnumerable<EmployeeReportToModel>>> GetReportToEmployeeList(int? departmentId)
+        //{
+        //    var reportToEmployeeList = await employeeService.GetReportToEmployeeList(departmentId);
+        //    return Ok(reportToEmployeeList);
+        //}
 
 
         [HttpGet("TeamMembersList")]
