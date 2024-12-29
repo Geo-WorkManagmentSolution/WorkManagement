@@ -422,12 +422,6 @@ namespace WorkManagement.Service
 
 
 
-
-
-
-
-
-
                 if (employeeEducationData != null)
                 {
                     if (employeeEducationData.Count == 0)
@@ -1759,17 +1753,20 @@ namespace WorkManagement.Service
                             employeeSalary.IsApprovedByDepartmentHead = true;
                         }
 
-                        var HRHeadRole = roleManager.Roles.FirstOrDefault(x => x.Name == "HR Admin");
-                        var HRHeadEmployee = new Employee();
-                        if (HRHeadRole != null)
+                        if (!employeeSalary.IsApprovedByHRHead)
                         {
-                            HRHeadEmployee = _dbContext.Employees.FirstOrDefault(s => s.RoleId == HRHeadRole.Id);
-                            if (HRHeadEmployee.Id == targetEmployeeId)
+                            var HRHeadRole = roleManager.Roles.FirstOrDefault(x => x.Name == "HR Admin");
+                            var HRHeadEmployee = new Employee();
+                            if (HRHeadRole != null)
                             {
-                                employeeSalary.IsApprovedByHRHead = true;
+                                HRHeadEmployee = _dbContext.Employees.FirstOrDefault(s => s.RoleId == HRHeadRole.Id);
+                                if (HRHeadEmployee.Id == targetEmployeeId)
+                                {
+                                    employeeSalary.IsApprovedByHRHead = true;
+                                }
                             }
                         }
-
+                        
                         if (employeeSalary.IsApprovedByDepartmentHead && employeeSalary.IsApprovedByHRHead)
                         {
                             employeeSalary.SalaryStatus = SalaryStatus.Approved;
@@ -1788,42 +1785,45 @@ namespace WorkManagement.Service
 
                     if (isHRHeadApprove && isDepartmentHeadApprove)
                     {
-                        if (employeeSalary.SalaryType == SalaryType.OnRoll)
+                        var employeeWorkInfo = _dbContext.EmployeeWorkInformations.FirstOrDefault(s => s.Id == employee.EmployeeWorkInformationId);
+                        if(employeeWorkInfo != null)
                         {
-                            employee.EmployeeWorkInformation.Salary = employeeSalary.ExpectedToBeSalary;
-                            employee.EmployeeWorkInformation.Basic = employeeSalary.Basic;
-                            employee.EmployeeWorkInformation.HRAllowances = employeeSalary.HRAllowances;
-                            employee.EmployeeWorkInformation.Bonus = employeeSalary.Bonus;
-                            employee.EmployeeWorkInformation.Gratuity = employeeSalary.Gratuity;
-                            employee.EmployeeWorkInformation.PF = employeeSalary.PF;
-                            employee.EmployeeWorkInformation.ESI = employeeSalary.ESI;
-                            employee.EmployeeWorkInformation.PT = employeeSalary.PT;
+                            if (employeeSalary.SalaryType == SalaryType.OnRoll)
+                            {
+                                employeeWorkInfo.Salary = employeeSalary.ExpectedToBeSalary;
+                                employeeWorkInfo.Basic = employeeSalary.Basic;
+                                employeeWorkInfo.HRAllowances = employeeSalary.HRAllowances;
+                                employeeWorkInfo.Bonus = employeeSalary.Bonus;
+                                employeeWorkInfo.Gratuity = employeeSalary.Gratuity;
+                                employeeWorkInfo.PF = employeeSalary.PF;
+                                employeeWorkInfo.ESI = employeeSalary.ESI;
+                                employeeWorkInfo.PT = employeeSalary.PT;
+                            }
+                            else
+                            {
+                                employeeWorkInfo.Salary = employeeSalary.ExpectedToBeSalary;
+                            }
+
+                            _dbContext.EmployeeWorkInformations.Update(employeeWorkInfo);
+                            _dbContext.SaveChanges();
+
+                            var employeeSalaryInfoEmail = new EmployeeSalaryUpdateEmailModel();
+                            employeeSalaryInfoEmail.EmployeeName = employee.FirstName + " " + employee.LastName;
+                            employeeSalaryInfoEmail.ApprovalStatus = "Approve";
+                            var reportToEmployee = _dbContext.Employees.FirstOrDefault(s => s.Id == employee.EmployeeReportToId);
+
+                            if (reportToEmployee != null)
+                            {
+                                employeeSalaryInfoEmail.ManagerName = reportToEmployee.FirstName;
+                            }
+
+
+                            employeeSalaryInfoEmail.CurrentSalary = employeeSalary.CurrentSalary;
+                            employeeSalaryInfoEmail.ExpectedToBeSalary = employeeSalary.ExpectedToBeSalary;
+                            employeeSalaryInfoEmail.UpdatedDate = DateTime.Now;
+
+                            SendPendingSalaryRequestEmailToEmployee(employee.Email, employeeSalaryInfoEmail);
                         }
-                        else
-                        {
-                            employee.EmployeeWorkInformation.Salary = employeeSalary.ExpectedToBeSalary;
-                        }
-
-                        _dbContext.Employees.Update(employee);
-                        _dbContext.SaveChanges();
-
-                        var employeeSalaryInfoEmail = new EmployeeSalaryUpdateEmailModel();
-                        employeeSalaryInfoEmail.EmployeeName = employee.FirstName + " " + employee.LastName;
-                        employeeSalaryInfoEmail.ApprovalStatus = "Approve";
-                        var reportToEmployee = _dbContext.Employees.FirstOrDefault(s => s.Id == employee.EmployeeReportToId);
-
-                        if (reportToEmployee != null)
-                        {
-                            employeeSalaryInfoEmail.ManagerName = reportToEmployee.FirstName;
-                        }
-
-
-                        employeeSalaryInfoEmail.CurrentSalary = employeeSalary.CurrentSalary;
-                        employeeSalaryInfoEmail.ExpectedToBeSalary = employeeSalary.ExpectedToBeSalary;
-                        employeeSalaryInfoEmail.UpdatedDate = DateTime.Now;
-
-                        SendPendingSalaryRequestEmailToEmployee(employee.Email, employeeSalaryInfoEmail);
-
                     }
                 }
 
