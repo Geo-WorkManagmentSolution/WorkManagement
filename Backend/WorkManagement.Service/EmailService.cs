@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Serilog;
 using System.Net;
 using System.Net.Mail;
+using System.Runtime.InteropServices;
 using WorkManagement.Domain.Contracts;
 using WorkManagement.Domain.Models.Email;
 
@@ -22,6 +23,8 @@ namespace WorkManagement.Service
         {
             try
             {
+                Log.Information("Trying to send mail.");
+
                 var sender = new SmtpSender(() => new SmtpClient("smtp.gmail.com")
                 {
                     UseDefaultCredentials = false,
@@ -33,12 +36,20 @@ namespace WorkManagement.Service
 
                 Email.DefaultSender = sender;
                 Email.DefaultRenderer = new RazorRenderer();
-
+                string EmailTemplatepath = "";
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    EmailTemplatepath = "EmailTemplate/Welcome_EmailTemplate.cshtml";
+                }
+                else
+                {
+                    EmailTemplatepath = "EmailTemplate\\Welcome_EmailTemplate.cshtml";
+                }
                 var email = await Email
                             .From(emailModel.From)
                             .To(emailModel.To)
                             .Subject(emailModel.Subject)
-                            .UsingTemplateFromFile(@"EmailTemplate\Welcome_EmailTemplate.cshtml", emailModel.repModel)
+                            .UsingTemplateFromFile(EmailTemplatepath, emailModel.repModel)
                             .SendAsync();
                 Log.Information("Email sent successfully.");
             }
@@ -124,24 +135,45 @@ namespace WorkManagement.Service
                 Email.DefaultSender = sender;
                 Email.DefaultRenderer = new RazorRenderer();
 
-                if(emailModel.repModel.LeaveEmailType == "Approval")
+          
+                if (emailModel.repModel.LeaveEmailType == "Approval")
                 {
+                    string EmailTemplatepath = "";
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                    {
+                        EmailTemplatepath = "EmailTemplate/LeaveApproval_EmailTemplate.cshtml";
+                    }
+                    else
+                    {
+                        EmailTemplatepath = "EmailTemplate\\LeaveApproval_EmailTemplate.cshtml";
+                    }
+
                     var email = await Email
                             .From(emailModel.From)
                             .To(emailModel.To)
                             .Subject(emailModel.Subject)
-                            .UsingTemplateFromFile(@"EmailTemplate\LeaveApproval_EmailTemplate.cshtml", emailModel.repModel)
+                            .UsingTemplateFromFile(EmailTemplatepath, emailModel.repModel)
                             .SendAsync();
                     Log.Information("Leave approval email sent successfully.");
                 }
 
                 if(emailModel.repModel.LeaveEmailType == "Pending Request")
                 {
+                    string EmailTemplatepath = "";
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                    {
+                        EmailTemplatepath = "EmailTemplate/LeavePendingRequest_EmailTemplate.cshtml";
+                    }
+                    else
+                    {
+                        EmailTemplatepath = "EmailTemplate\\LeavePendingRequest_EmailTemplate.cshtml";
+                    }
+
                     var email = await Email
                             .From(emailModel.From)
                             .To(emailModel.To)
                             .Subject(emailModel.Subject)
-                            .UsingTemplateFromFile(@"EmailTemplate\LeavePendingRequest_EmailTemplate.cshtml", emailModel.repModel)
+                            .UsingTemplateFromFile(EmailTemplatepath, emailModel.repModel)
                             .SendAsync();
                     Log.Information("Leave approval email sent successfully.");
                 }
@@ -170,12 +202,21 @@ namespace WorkManagement.Service
 
                 Email.DefaultSender = sender;
                 Email.DefaultRenderer = new RazorRenderer();
+                string EmailTemplatepath = "";
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    EmailTemplatepath = "EmailTemplate/ManagerSalaryUpdate_EmailTemplate.cshtml";
+                }
+                else
+                {
+                    EmailTemplatepath = "EmailTemplate\\ManagerSalaryUpdate_EmailTemplate.cshtml";
+                }
 
                 var email = await Email
                            .From(emailModel.From)
                            .To(emailModel.To)
                            .Subject(emailModel.Subject)
-                           .UsingTemplateFromFile(@"EmailTemplate\ManagerSalaryUpdate_EmailTemplate.cshtml", emailModel.repModel)
+                           .UsingTemplateFromFile(EmailTemplatepath, emailModel.repModel)
                            .SendAsync();
                 Log.Information("Salary update email sent successfully.");
 
@@ -206,6 +247,15 @@ namespace WorkManagement.Service
 
                 if(emailModel.repModel.ApprovalStatus == "Approve")
                 {
+                    string EmailTemplatepath = "";
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                    {
+                        EmailTemplatepath = "EmailTemplate/EmployeeSalaryApprove_EmailTemplate.cshtml";
+                    }
+                    else
+                    {
+                        EmailTemplatepath = "EmailTemplate\\EmployeeSalaryApprove_EmailTemplate.cshtml";
+                    }
                     var email = await Email
                           .From(emailModel.From)
                           .To(emailModel.To)
@@ -217,6 +267,15 @@ namespace WorkManagement.Service
 
                 if (emailModel.repModel.ApprovalStatus == "Reject")
                 {
+                    string EmailTemplatepath = "";
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                    {
+                        EmailTemplatepath = "EmailTemplate/EmployeeSalaryReject_EmailTemplate.cshtml";
+                    }
+                    else
+                    {
+                        EmailTemplatepath = "EmailTemplate\\EmployeeSalaryReject_EmailTemplate.cshtml";
+                    }
                     var email = await Email
                           .From(emailModel.From)
                           .To(emailModel.To)
@@ -228,11 +287,21 @@ namespace WorkManagement.Service
 
                 if (emailModel.repModel.ApprovalStatus == "Pending")
                 {
+                    string EmailTemplatepath = "";
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                    {
+                        EmailTemplatepath = "EmailTemplate/EmployeeSalaryUpdate_EmailTemplate.cshtml";
+                    }
+                    else
+                    {
+                        EmailTemplatepath = "EmailTemplate\\EmployeeSalaryUpdate_EmailTemplate.cshtml";
+                    }
+
                     var email = await Email
                           .From(emailModel.From)
                           .To(emailModel.To)
                           .Subject(emailModel.Subject)
-                          .UsingTemplateFromFile(@"EmailTemplate\EmployeeSalaryUpdate_EmailTemplate.cshtml", emailModel.repModel)
+                          .UsingTemplateFromFile(EmailTemplatepath, emailModel.repModel)
                           .SendAsync();
                     Log.Information("Salary update email to employee sent successfully.");
                 }
