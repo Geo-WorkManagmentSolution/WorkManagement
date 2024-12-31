@@ -210,7 +210,7 @@ function Error401Page() {
 						color="text.secondary"
 						className="mt-8 text-center text-lg font-medium tracking-tight md:text-xl"
 					>
-						You do not have permission to view this page.
+						You do not have permission to view this page or to perform this action .
 					</Typography>
 				</motion.div>
 				{!isUserGuest ? (

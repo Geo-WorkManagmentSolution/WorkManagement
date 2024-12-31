@@ -27,6 +27,9 @@ import { useGetApiEmployeesByIdQuery } from '../EmployeeApi';
 import EmployeeModelClone from '../models/EmployeeModelClone';
 import './Employee.css';
 
+const customYupResolver = (schema) => { return async (data, context, options) => { return yupResolver(schema)(data, { ...context, isNew: context.isNew }, options); }; };
+
+
 const schema = yup.object().shape({
 	firstName: yup.string().required('First Name is required'),
 	middleName: yup.string().required('Middle Name is required'),
@@ -55,13 +58,21 @@ const schema = yup.object().shape({
 		otherwise: (schema) => schema.notRequired()
 	}),
 	employeeWorkInformation: yup.object().shape({
-		salaryType: yup.string().required('Salary Type is required'),
+		salaryType: yup.string().when('$isNew', {
+			is: false,
+			then: (schema) => schema.required('Salary Type is required'),
+			otherwise: (schema) => schema.notRequired()
+		}),
 		hireDate: yup.date().required('Hire Date is required'),
-		salary: yup
-			.number()
-			.required('Salary is required')
-			.typeError('Salary must be a number')
-			.positive('Salary must be greater than zero'),
+		salary: yup.number().when('$isNew', {
+			is: false,
+			then: (schema) =>
+				schema
+					.required('Salary is required')
+					.typeError('Salary must be a number')
+					.positive('Salary must be greater than zero'),
+			otherwise: (schema) => schema.notRequired()
+		}),
 		useDefaultLeaves: yup.boolean().required(),
 		basic: yup.number().when('salaryType', {
 			is: (value) => value === 'OnRoll',
@@ -149,6 +160,7 @@ function Employee() {
 	const methods = useForm<EmployeeFormValues>({
 		mode: 'onChange',
 		resolver: yupResolver(schema),
+		context: { isNew: employeeId === 'new' },
 		defaultValues: useMemo(() => {
 			if (employeeId === 'new') {
 				return EmployeeModelClone({});
@@ -156,7 +168,10 @@ function Employee() {
 
 			return Employee ? EmployeeModelClone(Employee) : {};
 		}, [employeeId, Employee])
-	});
+	});	
+
+
+
 
 	const handleTabChange = useCallback((event, newValue: string) => {
 		setTabValue(newValue);
@@ -172,6 +187,17 @@ function Employee() {
 			methods.reset(EmployeeModelClone(Employee));
 		}
 	}, [Employee, methods]);
+
+	React.useEffect(() => {
+		const subscription = methods.watch((value, { name, type }) => {
+			if (type === 'change') {
+				console.log('Changed field:', name);
+				console.log('Current values:', value);
+				console.log('Current errors:', methods.formState.errors);
+			}
+		});
+		return () => subscription.unsubscribe();
+	}, [methods]);
 
 	if (isLoading) {
 		return <FuseLoading />;
@@ -288,3 +314,4 @@ const TabContent = React.memo(({ tabValue, UserRole }) => {
 });
 
 export default Employee;
+

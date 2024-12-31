@@ -1,27 +1,12 @@
-import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
-import {
-	Typography,
-	Paper,
-	MenuItem,
-	ListItemIcon,
-	Accordion,
-	AccordionSummary,
-	AccordionDetails
-} from '@mui/material';
-import React, { useMemo } from 'react';
+import { Typography, Paper } from '@mui/material';
+import React, { useEffect, useMemo } from 'react';
 import { useParams } from 'react-router';
 import FuseLoading from '@fuse/core/FuseLoading';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import DataTable from 'app/shared-components/data-table/DataTable';
 import { type MRT_ColumnDef } from 'material-react-table';
 import { format } from 'date-fns';
 
-import {
-	useGetApiEmployeesByIdQuery,
-	useGetApiEmployeesDesignationsQuery,
-	usePutApiEmployeesApproveByLeaveIdMutation,
-	usePutApiEmployeesRejectByLeaveIdMutation
-} from '../../EmployeeApi';
+import { useGetApiEmployeesByIdQuery, useGetApiEmployeesDesignationsQuery } from '../../EmployeeApi';
 import {
 	EmployeeLeaveModel,
 	EmployeeLeaveSummaryModel,
@@ -35,12 +20,18 @@ function EmployeeLeaveHistory() {
 	const routeParams = useParams();
 	const { employeeId } = routeParams;
 	const parsedEmployeeId = employeeId ? parseInt(employeeId, 10) : undefined;
-	console.log("employee id ", employeeId);
-	
-	const { data: currentLeaves, isLoading: leavesBalanceLoading } = useGetApiEmployeesLeavesCurrentQuery({ employeeId: parsedEmployeeId })
-	console.log("currunt leaves",currentLeaves);
-	
-	const { data: employee, isLoading: employeeLoading } = useGetApiEmployeesByIdQuery({ id: parsedEmployeeId });
+
+	const {
+		data: currentLeaves,
+		refetch:refetchLeaves,
+		isLoading: leavesBalanceLoading
+	} = useGetApiEmployeesLeavesCurrentQuery({ employeeId: parsedEmployeeId });
+
+	const {
+		data: employee,
+		refetch: refetchemployee,
+		isLoading: employeeLoading
+	} = useGetApiEmployeesByIdQuery({ id: parsedEmployeeId });
 	const { data: designations, isLoading: designationsLoading } = useGetApiEmployeesDesignationsQuery();
 	const designation = designations?.find((d) => d.id === employee?.employeeDesignationId);
 
@@ -122,9 +113,18 @@ function EmployeeLeaveHistory() {
 		[]
 	);
 
-	if (employeeLoading || designationsLoading || leavesLoading 
-        // || approveLoading || rejectLoading
-        ) {
+	useEffect(() => {
+		refetchLeaves();
+		refetchemployee();
+	},[employeeId, refetchLeaves, refetchemployee]);
+
+
+	if (
+		employeeLoading ||
+		designationsLoading ||
+		leavesLoading
+		// || approveLoading || rejectLoading
+	) {
 		return <FuseLoading />;
 	}
 
@@ -191,66 +191,63 @@ function EmployeeLeaveHistory() {
 						aria-controls="panel1-content"
 						id="panel1-header"
 					> */}
-						<Typography>Employee Leave Balance</Typography>
-					{/* </AccordionSummary>
+				<Typography>Employee Leave Balance</Typography>
+				{/* </AccordionSummary>
 					<AccordionDetails> */}
-                    <Paper className=' shadow-1 rounded-xl overflow-hidden rounded-b-0 w-full h-full p-20'
-                    elevation={0}
-                    >
-						<div className="flex justify-between ">
-							{leavesBalanceLoading ? (
-								<FuseLoading />
-							) : (
-								currentLeaves?.map((eachData: EmployeeLeaveSummaryModel) => (
-									<div
-										key={eachData.id}
-										className="grid grid-cols-1  "
-									>
-										<Paper className="flex flex-col flex-auto shadow-md rounded-xl overflow-hidden bg-white p-6 w-224">
-											<div className="flex items-center justify-between px-8 pt-8">
-												<Typography
-													className="px-12 text-lg font-medium tracking-tight leading-6 truncate"
-													color="text.secondary"
-												>
-													{eachData.employeeLeaveType} :
-												</Typography>
-												{/* <IconButton aria-label="more">
+				<Paper
+					className=" shadow-1 rounded-xl  rounded-b-0 w-full h-full p-20"
+					elevation={0}
+				>
+					<div className="flex justify-start gap-16 ">
+						{leavesBalanceLoading ? (
+							<FuseLoading />
+						) : (
+							currentLeaves?.map((eachData: EmployeeLeaveSummaryModel) => (
+								<div
+									key={eachData.id}
+									className="grid grid-cols-1  "
+								>
+									<Paper className="flex flex-col flex-auto shadow-md rounded-xl overflow-hidden bg-white p-6 w-224">
+										<div className="flex items-center  px-8 pt-8">
+											<Typography
+												className="px-12 text-lg font-medium tracking-tight leading-6 truncate"
+												color="text.secondary"
+											>
+												{eachData.employeeLeaveType} :
+											</Typography>
+											{/* <IconButton aria-label="more">
 													<FuseSvgIcon>heroicons-outline:ellipsis-vertical</FuseSvgIcon>
 												</IconButton> */}
-											</div>
-											<div className="text-center mt-16">
-												<Typography className="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-yellow-700">
-													{eachData.remainingLeaves}
-												</Typography>
-												<Typography className="text-lg font-medium text-yellow-600">
-													Remaining Leaves
-												</Typography>
-											</div>
-                                            <Typography
-												className="flex items-baseline justify-center w-full mt-20 mb-24 space-x-8"
-												color="text.secondary"
-											>
-                                      
-
-                                      <span className="truncate">Booked Leaves : </span>
-                                      <b>{eachData.totalLeaves-eachData.remainingLeaves}</b>
+										</div>
+										<div className="text-center mt-16">
+											<Typography className="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-yellow-700">
+												{eachData.remainingLeaves}
 											</Typography>
-											<Typography
-												className="flex items-baseline justify-center w-full  mb-24 space-x-8"
-												color="text.secondary"
-											>
-                                      
-
-												<span className="truncate">Openning Balance : </span>
-												<b>{eachData.totalLeaves}</b>
+											<Typography className="text-lg font-medium text-yellow-600">
+												Remaining Leaves
 											</Typography>
-										</Paper>
-									</div>
-								))
-							)}
-						</div>
-                        </Paper>
-					{/* </AccordionDetails>
+										</div>
+										<Typography
+											className="flex items-baseline justify-center w-full mt-20 mb-24 space-x-8"
+											color="text.secondary"
+										>
+											<span className="truncate">Booked Leaves : </span>
+											<b>{eachData.totalLeaves - eachData.remainingLeaves}</b>
+										</Typography>
+										<Typography
+											className="flex items-baseline justify-center w-full  mb-24 space-x-8"
+											color="text.secondary"
+										>
+											<span className="truncate">Openning Balance : </span>
+											<b>{eachData.totalLeaves}</b>
+										</Typography>
+									</Paper>
+								</div>
+							))
+						)}
+					</div>
+				</Paper>
+				{/* </AccordionDetails>
 				</Accordion> */}
 
 				<Paper
@@ -258,7 +255,7 @@ function EmployeeLeaveHistory() {
 					elevation={0}
 				>
 					<DataTable
-			 enableRowActions={false}  
+						enableRowActions={false}
 						enableRowSelection={false}
 						data={employeeLeaves}
 						columns={columns}

@@ -4,6 +4,8 @@ import ar from './navigation-i18n/ar';
 import en from './navigation-i18n/en';
 import tr from './navigation-i18n/tr';
 import { authRoles } from '../auth';
+import { PermissionActionEnum } from '../main/settings/PermissionsApi';
+
 
 i18next.addResourceBundle('en', 'navigation', en);
 i18next.addResourceBundle('tr', 'navigation', tr);
@@ -13,6 +15,7 @@ i18next.addResourceBundle('ar', 'navigation', ar);
  * The navigationConfig object is an array of navigation items for the Fuse application.
  */
 const navigationConfig: FuseNavItemType[] = [
+
 	{
 		id: 'applicationmanagement',
 		title: 'Employee Management',
@@ -33,12 +36,33 @@ const navigationConfig: FuseNavItemType[] = [
 						url: '/apps/employees',
 						end: true
 					},
+
 					{
 						id: 'applicationmanagement.employees.new',
 						title: 'Add Employee',
 						type: 'item',
-						auth:authRoles.admin,
+						// auth:PermissionActionEnum.EmployeeModuleAdd,
 						url: '/apps/employees/employeesSearch/new'
+					},
+					{
+						id: 'applicationmanagement.employees.salarymanagment',
+						title: 'Salary Management',
+						type: 'collapse',
+						children:[
+							{
+								id: 'applicationmanagement.employees.salaryApproval',
+								title: 'Salary Approval',
+								type: 'item',
+								url: '/apps/employees/salary-management/salary-approval',
+							},
+							{
+								id: 'applicationmanagement.employees.salaryHistory',
+								title: 'Salary History',
+								type: 'item',
+								url: '/apps/employees/salary-management/salary-history',
+							}
+						]
+						
 					},
 					{
 						id: 'applicationmanagement.employees.leavemanagement',
@@ -49,27 +73,32 @@ const navigationConfig: FuseNavItemType[] = [
 								id: 'applicationmanagement.employees.leave-management.add-leave',
 								title: 'Add Leave',
 								type: 'item',
+								// auth:PermissionActionEnum.LeaveModuleAdd,
 								url: '/apps/employees/leave-management/addleave',
-								end: true
+								// end: true
 							},
 							{
 								id: 'applicationmanagement.employees.leave-management.leave-approval',
 								title: 'Leave Approval',
 								type: 'item',
-								auth: authRoles.Manager,
+								// auth:PermissionActionEnum.LeaveModuleApprovals,
 								url: '/apps/employees/leave-management/leave-approval'
 							},
 							{
 								id: 'applicationmanagement.employees.leave-management.leave-history',
-                                title: 'Employee Leave History',
+                                title: 'Leave History',
                                 type: 'item',
-								auth: authRoles.Manager,
+								// auth:PermissionActionEnum.LeaveModuleEmployeeLeaveHistory ,
                                 url: '/apps/employees/leave-management/leave-history'
 							}
 						]
 					}
 				]
 			},
+			// {
+			// 	id: 'divider-1',
+			// 	type: 'divider'
+			// },
 			{
 				id: 'applicationmanagement.projects',
 				title: 'Project',
@@ -80,6 +109,7 @@ const navigationConfig: FuseNavItemType[] = [
 						id: 'applicationmanagement.projects.search',
 						title: 'Project Dashboard',
 						type: 'item',
+						// auth:PermissionActionEnum.ProjectModuleDashboard,
 						url: '/apps/projects',
 						end: true
 					},
@@ -87,7 +117,9 @@ const navigationConfig: FuseNavItemType[] = [
 						id: 'applicationmanagement.projects.new',
 						title: 'Add Project',
 						type: 'item',
-						url: '/apps/projects/projectSearch/new'
+						// auth:PermissionActionEnum.ProjectModuleAdd,
+						url: '/apps/projects/projectSearch/new',
+						
 					}
 				]
 			},
@@ -95,7 +127,7 @@ const navigationConfig: FuseNavItemType[] = [
 				id: 'applicationmanagement.settings',
 				title: 'Settings',
 				type: 'item',
-				auth: authRoles.admin,
+				auth:authRoles.admin,
 				icon: 'heroicons-outline:cog-8-tooth',
 				url: '/apps/settings'
 			}

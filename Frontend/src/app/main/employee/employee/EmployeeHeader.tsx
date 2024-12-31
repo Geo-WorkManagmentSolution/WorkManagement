@@ -40,35 +40,63 @@ function EmployeeHeader() {
 	const { photoURL, firstName, lastName } = watch() as EmployeeModel;
 
 	const handleUpdateProduct = async () => {
-		const data = getValues() as EmployeeModel;
-		console.log(data);
+		// 'const data = getValues() as EmployeeModel;
+		// console.log(data);
 
-		if (!isValid) {
-			await trigger(); // Trigger validation to ensure all errors are shown
+		// if (!isValid) {
+		// 	await trigger(); // Trigger validation to ensure all errors are shown
 
-			if (Object.keys(errors).length > 0) {
-				dispatch(
-					showMessage({
-						message: 'Required fields must be filled out',
-						variant: 'warning'
-					})
-				);
-				return;
-			}
+		// 	if (Object.keys(errors).length > 0) {
+		// 		dispatch(
+		// 			showMessage({
+		// 				message: 'Required fields must be filled out',
+		// 				variant: 'warning'
+		// 			})
+		// 		);
+		// 		return;
+		// 	}
+		// }
+
+		// updateEmployee({
+		// 	id: parseInt(employeeId, 10),
+		// 	employeeModel: data
+		// })
+		// 	.unwrap()
+		// 	.then((data) => {
+		// 		dispatch(showMessage({ message: 'An employee updated successfully.' }));
+		// 	})
+		// 	.catch((error) => {
+		// 		console.error('Error updating employee:', error);
+		// 		dispatch(showMessage({ message: 'Error updating employee', variant: 'error' }));
+		// 	});
+		
+		const result = await methods.trigger();
+		if (result) {
+			const data = methods.getValues() as EmployeeModel;
+			updateEmployee({
+					id: parseInt(employeeId, 10),
+					employeeModel: data
+				}).unwrap()
+				.then((data) => {
+					dispatch(
+						showMessage({
+							message: 'An employee Updated successfully.'
+						})
+					);
+					// navigate(`/apps/employees/employeesSearch`);
+				})
+				.catch((error) => {
+					console.error('Error updating employee:', error);
+					dispatch(showMessage({ message: 'Error updating employee', variant: 'error' }));
+				});
+		} else {
+			dispatch(
+				showMessage({
+					message: 'Please fill all required fields',
+					variant: 'warning'
+				})
+			);
 		}
-
-		updateEmployee({
-			id: parseInt(employeeId, 10),
-			employeeModel: data
-		})
-			.unwrap()
-			.then((data) => {
-				dispatch(showMessage({ message: 'An employee updated successfully.' }));
-			})
-			.catch((error) => {
-				console.error('Error updating employee:', error);
-				dispatch(showMessage({ message: 'Error updating employee', variant: 'error' }));
-			});
 	};
 
 	const handleCreateEmployee = async () => {

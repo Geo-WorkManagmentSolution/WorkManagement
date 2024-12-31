@@ -18,7 +18,7 @@
             }
 
             //Admin should allow all actions
-            if (user.Claims.Any(x=>x.Type == ClaimTypes.Role && x.Value == "admin")) {
+            if (user.Claims.Any(x=>x.Type == ClaimTypes.Role && x.Value == "Admin")) {
                 context.Succeed(requirement);
                 return Task.CompletedTask;
             }

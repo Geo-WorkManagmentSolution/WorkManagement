@@ -75,12 +75,22 @@ function JwtAuthProvider(props: JwtAuthProviderProps) {
 	/**
 	 * Handle sign-in success
 	 */
-	const handleSignInSuccess = useCallback((userData: User, accessToken: string) => {
+	const handleSignInSuccess = useCallback((userData: User, accessToken: string, permissions: any[]) => {
 		setSession(accessToken);
 
 		setIsAuthenticated(true);
 
-		setUser(userData);
+		// Include permissions in the user data
+		const userWithPermissions = {
+			...userData,
+			data: {
+				...userData.data,
+				 permissions
+			}
+		};
+		console.log("userDataWithPermissions ", userWithPermissions);
+		
+		setUser(userWithPermissions);
 	}, []);
 
 	/**
@@ -176,7 +186,7 @@ function JwtAuthProvider(props: JwtAuthProviderProps) {
 
 					const userData = response?.data;
 
-					handleSignInSuccess(userData, accessToken);
+					handleSignInSuccess(userData, accessToken, []); //passing empty array for permissions
 
 					return true;
 				} catch (error) {
@@ -210,15 +220,17 @@ function JwtAuthProvider(props: JwtAuthProviderProps) {
 	const handleRequest = async (
 		url: string,
 		data: SignInPayload | SignUpPayload,
-		handleSuccess: (T: User, H: string) => void,
+		handleSuccess: (T: User, H: string, P: any[]) => void,
 		handleFailure: (T: AxiosError) => void
 	): Promise<User | AxiosError> => {
 		try {
-			const response: AxiosResponse<{ user: User; accessToken: string }> = await axios.post(url, data);
+			const response: AxiosResponse<{ user: User; accessToken: string; permissions: any[] }> = await axios.post(url, data);
 			const userData = response?.data?.user;
 			const accessToken = response?.data?.accessToken;
-
-			handleSuccess(userData, accessToken);
+			const permissions = response?.data?.permissions;
+			console.log("permissions got is  ", permissions);
+			
+			handleSuccess(userData, accessToken, permissions);
 
 			return userData;
 		} catch (error) {
@@ -352,3 +364,4 @@ function JwtAuthProvider(props: JwtAuthProviderProps) {
 }
 
 export default JwtAuthProvider;
+
