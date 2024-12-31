@@ -34,8 +34,9 @@ const navigationConfig: FuseNavItemType[] = [
 						title: 'Employee Dashboard',
 						type: 'item',
 						url: '/apps/employees',
-						// auth:PermissionActionEnum.EmployeeModuleDashboard,
-						end: true
+						// auth:authRoles.HRAdmin,
+						// hasPermission:false,
+						// end: true
 					},
 					{
 						id: 'applicationmanagement.employees.new',
@@ -45,10 +46,24 @@ const navigationConfig: FuseNavItemType[] = [
 						url: '/apps/employees/employeesSearch/new'
 					},
 					{
-						id: 'applicationmanagement.employees.salaryApproval',
-						title: 'Salary Approval',
-						type: 'item',
-						url: '/apps/employees/salary-approval',
+						id: 'applicationmanagement.employees.salarymanagment',
+						title: 'Salary Management',
+						type: 'collapse',
+						children:[
+							{
+								id: 'applicationmanagement.employees.salaryApproval',
+								title: 'Salary Approval',
+								type: 'item',
+								url: '/apps/employees/salary-management/salary-approval',
+							},
+							{
+								id: 'applicationmanagement.employees.salaryHistory',
+								title: 'Salary History',
+								type: 'item',
+								url: '/apps/employees/salary-management/salary-history',
+							}
+						]
+						
 					},
 					{
 						id: 'applicationmanagement.employees.leavemanagement',
@@ -72,7 +87,7 @@ const navigationConfig: FuseNavItemType[] = [
 							},
 							{
 								id: 'applicationmanagement.employees.leave-management.leave-history',
-                                title: 'Employee Leave History',
+                                title: 'Leave History',
                                 type: 'item',
 								// auth:PermissionActionEnum.LeaveModuleEmployeeLeaveHistory ,
                                 url: '/apps/employees/leave-management/leave-history'
@@ -81,6 +96,10 @@ const navigationConfig: FuseNavItemType[] = [
 					}
 				]
 			},
+			// {
+			// 	id: 'divider-1',
+			// 	type: 'divider'
+			// },
 			{
 				id: 'applicationmanagement.projects',
 				title: 'Project',

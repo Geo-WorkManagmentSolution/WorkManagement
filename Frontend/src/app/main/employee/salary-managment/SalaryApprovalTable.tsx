@@ -15,6 +15,7 @@ import {
 	usePutApiEmployeesSalaryRejectBySalaryIdMutation
 } from '../EmployeeApi';
 import SalaryStatusComponent from './SalaryStatusComponent';
+import SalaryHeader from './SalaryHeader';
 
 // Define SalaryStatusCell outside of SalaryApprovalTable
 function SalaryStatusCell({ row }) {
@@ -146,6 +147,10 @@ function SalaryApprovalTable() {
 	}
 
 	return (
+		<>
+		<div className="m-10">
+			<SalaryHeader/>
+		</div>
 		<Paper
 			className="flex flex-col flex-auto shadow-1 rounded-t-lg overflow-hidden rounded-b-0 w-full h-full"
 			elevation={0}
@@ -186,6 +191,7 @@ function SalaryApprovalTable() {
 				]}
 			/>
 		</Paper>
+		</>
 	);
 }
 
