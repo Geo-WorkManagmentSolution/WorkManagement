@@ -47,7 +47,7 @@ namespace WorkManagement.API.Controllers
 
         // GET: api/project/5
         [HttpGet("{id}")]
-        [PermissionAuth(PermissionActionEnum.ProjectModule_View)]
+        //[PermissionAuth(PermissionActionEnum.ProjectModule_View)]
         public async Task<ActionResult<ProjectModel>> GetProject(int id)
         {
             var project = await _projectService.GetProjectByIdAsync(id);

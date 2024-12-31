@@ -58,7 +58,7 @@ namespace WorkManagement.API.Controllers
         
         // GET: api/employees/5
         [HttpGet("{id}")]
-        [PermissionAuth(PermissionActionEnum.EmployeeModule_View)]
+        //[PermissionAuth(PermissionActionEnum.EmployeeModule_View)]
         public async Task<ActionResult<EmployeeModel>> GetEmployee(int id)
         {
             var employee = await employeeService.GetEmployeeByIdAsync(id);
@@ -153,7 +153,7 @@ namespace WorkManagement.API.Controllers
         }
 
         [HttpGet("Salary/PendingSalaryRequest")]
-        [PermissionAuth(PermissionActionEnum.EmployeeModule_Salary_History_View)]
+        //[PermissionAuth(PermissionActionEnum.EmployeeModule_Salary_History_View)]
         public async Task<ActionResult<IEnumerable<EmployeeSalaryDataModel>>> GetEmployeePendingSalaryRequest([FromQuery] int? employeeId = null)
         {
             List<EmployeeSalaryDataModel> salaryRequests = new List<EmployeeSalaryDataModel>();

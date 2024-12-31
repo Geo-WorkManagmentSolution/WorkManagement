@@ -34,10 +34,9 @@ const navigationConfig: FuseNavItemType[] = [
 						title: 'Employee Dashboard',
 						type: 'item',
 						url: '/apps/employees',
-						// auth:authRoles.admin,						
-						// hasPermission:false,
-						// end: true
+						end: true
 					},
+
 					{
 						id: 'applicationmanagement.employees.new',
 						title: 'Add Employee',
@@ -76,7 +75,7 @@ const navigationConfig: FuseNavItemType[] = [
 								type: 'item',
 								// auth:PermissionActionEnum.LeaveModuleAdd,
 								url: '/apps/employees/leave-management/addleave',
-								end: true
+								// end: true
 							},
 							{
 								id: 'applicationmanagement.employees.leave-management.leave-approval',
@@ -119,7 +118,8 @@ const navigationConfig: FuseNavItemType[] = [
 						title: 'Add Project',
 						type: 'item',
 						// auth:PermissionActionEnum.ProjectModuleAdd,
-						url: '/apps/projects/projectSearch/new'
+						url: '/apps/projects/projectSearch/new',
+						
 					}
 				]
 			},

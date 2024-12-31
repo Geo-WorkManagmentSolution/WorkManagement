@@ -17,51 +17,6 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.employeeModel,
       }),
     }),
-    getApiEmployeesCategories: build.query<
-      GetApiEmployeesCategoriesApiResponse,
-      GetApiEmployeesCategoriesApiArg
-    >({
-      query: () => ({ url: `/api/Employees/categories` }),
-    }),
-    getApiEmployeesDepartments: build.query<
-      GetApiEmployeesDepartmentsApiResponse,
-      GetApiEmployeesDepartmentsApiArg
-    >({
-      query: () => ({ url: `/api/Employees/departments` }),
-    }),
-    getApiEmployeesDesignations: build.query<
-      GetApiEmployeesDesignationsApiResponse,
-      GetApiEmployeesDesignationsApiArg
-    >({
-      query: () => ({ url: `/api/Employees/designations` }),
-    }),
-    getApiEmployeesSites: build.query<
-      GetApiEmployeesSitesApiResponse,
-      GetApiEmployeesSitesApiArg
-    >({
-      query: () => ({ url: `/api/Employees/sites` }),
-    }),
-    getApiEmployeesReportToEmployeeList: build.query<
-      GetApiEmployeesReportToEmployeeListApiResponse,
-      GetApiEmployeesReportToEmployeeListApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/Employees/ReportToEmployeeList`,
-        params: {
-          departmentId: queryArg.departmentId,
-          employeeId: queryArg.employeeId,
-        },
-      }),
-    }),
-    getApiEmployeesTeamMembersList: build.query<
-      GetApiEmployeesTeamMembersListApiResponse,
-      GetApiEmployeesTeamMembersListApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/Employees/TeamMembersList`,
-        params: { employeeId: queryArg.employeeId },
-      }),
-    }),
     getApiEmployeesById: build.query<
       GetApiEmployeesByIdApiResponse,
       GetApiEmployeesByIdApiArg
@@ -87,77 +42,12 @@ const injectedRtkApi = api.injectEndpoints({
         method: "DELETE",
       }),
     }),
-    getApiEmployeesCheckEmailExists: build.query<
-      GetApiEmployeesCheckEmailExistsApiResponse,
-      GetApiEmployeesCheckEmailExistsApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/Employees/CheckEmailExists`,
-        params: { email: queryArg.email },
-      }),
-    }),
-    postApiEmployeesSendEmail: build.mutation<
-      PostApiEmployeesSendEmailApiResponse,
-      PostApiEmployeesSendEmailApiArg
-    >({
-      query: () => ({ url: `/api/Employees/sendEmail`, method: "POST" }),
-    }),
-    postApiEmployeesSearch: build.mutation<
-      PostApiEmployeesSearchApiResponse,
-      PostApiEmployeesSearchApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/Employees/Search`,
-        method: "POST",
-        body: queryArg.body,
-      }),
-    }),
     getApiEmployeesPartialByEmployeeId: build.query<
       GetApiEmployeesPartialByEmployeeIdApiResponse,
       GetApiEmployeesPartialByEmployeeIdApiArg
     >({
       query: (queryArg) => ({
         url: `/api/Employees/partial/${queryArg.employeeId}`,
-      }),
-    }),
-    postApiEmployeesAddNewCategory: build.mutation<
-      PostApiEmployeesAddNewCategoryApiResponse,
-      PostApiEmployeesAddNewCategoryApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/Employees/AddNewCategory`,
-        method: "POST",
-        body: queryArg.employeeCategory,
-      }),
-    }),
-    postApiEmployeesAddNewDepartment: build.mutation<
-      PostApiEmployeesAddNewDepartmentApiResponse,
-      PostApiEmployeesAddNewDepartmentApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/Employees/AddNewDepartment`,
-        method: "POST",
-        body: queryArg.employeeDepartment,
-      }),
-    }),
-    postApiEmployeesAddNewSite: build.mutation<
-      PostApiEmployeesAddNewSiteApiResponse,
-      PostApiEmployeesAddNewSiteApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/Employees/AddNewSite`,
-        method: "POST",
-        body: queryArg.site,
-      }),
-    }),
-    postApiEmployeesAddNewDesignation: build.mutation<
-      PostApiEmployeesAddNewDesignationApiResponse,
-      PostApiEmployeesAddNewDesignationApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/Employees/AddNewDesignation`,
-        method: "POST",
-        body: queryArg.employeeDesignation,
       }),
     }),
     putApiEmployeesSalaryApproveBySalaryId: build.mutation<
@@ -252,36 +142,6 @@ const injectedRtkApi = api.injectEndpoints({
         method: "PUT",
       }),
     }),
-    postApiEmployeesDocumnetUpload: build.mutation<
-      PostApiEmployeesDocumnetUploadApiResponse,
-      PostApiEmployeesDocumnetUploadApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/Employees/documnet/upload`,
-        method: "POST",
-        body: queryArg.body,
-        params: { id: queryArg.id },
-      }),
-    }),
-    deleteApiEmployeesDocumentByFileName: build.mutation<
-      DeleteApiEmployeesDocumentByFileNameApiResponse,
-      DeleteApiEmployeesDocumentByFileNameApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/Employees/document/${queryArg.fileName}`,
-        method: "DELETE",
-        params: { id: queryArg.id },
-      }),
-    }),
-    getApiEmployeesDownloadByFileName: build.query<
-      GetApiEmployeesDownloadByFileNameApiResponse,
-      GetApiEmployeesDownloadByFileNameApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/Employees/download/${queryArg.fileName}`,
-        params: { id: queryArg.id },
-      }),
-    }),
     postApiEmployeesSettingsAddDropdownItem: build.mutation<
       PostApiEmployeesSettingsAddDropdownItemApiResponse,
       PostApiEmployeesSettingsAddDropdownItemApiArg
@@ -310,6 +170,146 @@ const injectedRtkApi = api.injectEndpoints({
         url: `/api/Employees/settings/ updateDropdownItem`,
         method: "PUT",
         body: queryArg.dropdownModel,
+      }),
+    }),
+    getApiEmployeesCategories: build.query<
+      GetApiEmployeesCategoriesApiResponse,
+      GetApiEmployeesCategoriesApiArg
+    >({
+      query: () => ({ url: `/api/Employees/categories` }),
+    }),
+    getApiEmployeesDepartments: build.query<
+      GetApiEmployeesDepartmentsApiResponse,
+      GetApiEmployeesDepartmentsApiArg
+    >({
+      query: () => ({ url: `/api/Employees/departments` }),
+    }),
+    getApiEmployeesDesignations: build.query<
+      GetApiEmployeesDesignationsApiResponse,
+      GetApiEmployeesDesignationsApiArg
+    >({
+      query: () => ({ url: `/api/Employees/designations` }),
+    }),
+    getApiEmployeesSites: build.query<
+      GetApiEmployeesSitesApiResponse,
+      GetApiEmployeesSitesApiArg
+    >({
+      query: () => ({ url: `/api/Employees/sites` }),
+    }),
+    getApiEmployeesReportToEmployeeList: build.query<
+      GetApiEmployeesReportToEmployeeListApiResponse,
+      GetApiEmployeesReportToEmployeeListApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/ReportToEmployeeList`,
+        params: {
+          departmentId: queryArg.departmentId,
+          employeeId: queryArg.employeeId,
+        },
+      }),
+    }),
+    getApiEmployeesTeamMembersList: build.query<
+      GetApiEmployeesTeamMembersListApiResponse,
+      GetApiEmployeesTeamMembersListApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/TeamMembersList`,
+        params: { employeeId: queryArg.employeeId },
+      }),
+    }),
+    getApiEmployeesCheckEmailExists: build.query<
+      GetApiEmployeesCheckEmailExistsApiResponse,
+      GetApiEmployeesCheckEmailExistsApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/CheckEmailExists`,
+        params: { email: queryArg.email },
+      }),
+    }),
+    postApiEmployeesSendEmail: build.mutation<
+      PostApiEmployeesSendEmailApiResponse,
+      PostApiEmployeesSendEmailApiArg
+    >({
+      query: () => ({ url: `/api/Employees/sendEmail`, method: "POST" }),
+    }),
+    postApiEmployeesSearch: build.mutation<
+      PostApiEmployeesSearchApiResponse,
+      PostApiEmployeesSearchApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/Search`,
+        method: "POST",
+        body: queryArg.body,
+      }),
+    }),
+    postApiEmployeesAddNewCategory: build.mutation<
+      PostApiEmployeesAddNewCategoryApiResponse,
+      PostApiEmployeesAddNewCategoryApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/AddNewCategory`,
+        method: "POST",
+        body: queryArg.employeeCategory,
+      }),
+    }),
+    postApiEmployeesAddNewDepartment: build.mutation<
+      PostApiEmployeesAddNewDepartmentApiResponse,
+      PostApiEmployeesAddNewDepartmentApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/AddNewDepartment`,
+        method: "POST",
+        body: queryArg.employeeDepartment,
+      }),
+    }),
+    postApiEmployeesAddNewSite: build.mutation<
+      PostApiEmployeesAddNewSiteApiResponse,
+      PostApiEmployeesAddNewSiteApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/AddNewSite`,
+        method: "POST",
+        body: queryArg.site,
+      }),
+    }),
+    postApiEmployeesAddNewDesignation: build.mutation<
+      PostApiEmployeesAddNewDesignationApiResponse,
+      PostApiEmployeesAddNewDesignationApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/AddNewDesignation`,
+        method: "POST",
+        body: queryArg.employeeDesignation,
+      }),
+    }),
+    postApiEmployeesDocumnetUpload: build.mutation<
+      PostApiEmployeesDocumnetUploadApiResponse,
+      PostApiEmployeesDocumnetUploadApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/documnet/upload`,
+        method: "POST",
+        body: queryArg.body,
+        params: { id: queryArg.id },
+      }),
+    }),
+    deleteApiEmployeesDocumentByFileName: build.mutation<
+      DeleteApiEmployeesDocumentByFileNameApiResponse,
+      DeleteApiEmployeesDocumentByFileNameApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/document/${queryArg.fileName}`,
+        method: "DELETE",
+        params: { id: queryArg.id },
+      }),
+    }),
+    getApiEmployeesDownloadByFileName: build.query<
+      GetApiEmployeesDownloadByFileNameApiResponse,
+      GetApiEmployeesDownloadByFileNameApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/download/${queryArg.fileName}`,
+        params: { id: queryArg.id },
       }),
     }),
     getApiEmployeesProjectByEmployeeId: build.query<
@@ -357,28 +357,6 @@ export type PostApiEmployeesApiResponse = /** status 200 OK */ EmployeeModel;
 export type PostApiEmployeesApiArg = {
   employeeModel: EmployeeModel;
 };
-export type GetApiEmployeesCategoriesApiResponse =
-  /** status 200 OK */ EmployeeCategory[];
-export type GetApiEmployeesCategoriesApiArg = void;
-export type GetApiEmployeesDepartmentsApiResponse =
-  /** status 200 OK */ EmployeeDepartment[];
-export type GetApiEmployeesDepartmentsApiArg = void;
-export type GetApiEmployeesDesignationsApiResponse =
-  /** status 200 OK */ EmployeeDesignation[];
-export type GetApiEmployeesDesignationsApiArg = void;
-export type GetApiEmployeesSitesApiResponse = /** status 200 OK */ Site[];
-export type GetApiEmployeesSitesApiArg = void;
-export type GetApiEmployeesReportToEmployeeListApiResponse =
-  /** status 200 OK */ EmployeeReportToModel[];
-export type GetApiEmployeesReportToEmployeeListApiArg = {
-  departmentId?: number;
-  employeeId?: number;
-};
-export type GetApiEmployeesTeamMembersListApiResponse =
-  /** status 200 OK */ EmployeeTeamMemberList[];
-export type GetApiEmployeesTeamMembersListApiArg = {
-  employeeId?: number;
-};
 export type GetApiEmployeesByIdApiResponse = /** status 200 OK */ EmployeeModel;
 export type GetApiEmployeesByIdApiArg = {
   id: number;
@@ -392,38 +370,10 @@ export type DeleteApiEmployeesByIdApiResponse = unknown;
 export type DeleteApiEmployeesByIdApiArg = {
   id: number;
 };
-export type GetApiEmployeesCheckEmailExistsApiResponse =
-  /** status 200 OK */ boolean;
-export type GetApiEmployeesCheckEmailExistsApiArg = {
-  email?: string;
-};
-export type PostApiEmployeesSendEmailApiResponse = unknown;
-export type PostApiEmployeesSendEmailApiArg = void;
-export type PostApiEmployeesSearchApiResponse =
-  /** status 200 OK */ EmployeeModel[];
-export type PostApiEmployeesSearchApiArg = {
-  body: Criterion[];
-};
 export type GetApiEmployeesPartialByEmployeeIdApiResponse =
   /** status 200 OK */ SalaryEmployeeDashboardModel;
 export type GetApiEmployeesPartialByEmployeeIdApiArg = {
   employeeId: number;
-};
-export type PostApiEmployeesAddNewCategoryApiResponse = unknown;
-export type PostApiEmployeesAddNewCategoryApiArg = {
-  employeeCategory: EmployeeCategory;
-};
-export type PostApiEmployeesAddNewDepartmentApiResponse = unknown;
-export type PostApiEmployeesAddNewDepartmentApiArg = {
-  employeeDepartment: EmployeeDepartment;
-};
-export type PostApiEmployeesAddNewSiteApiResponse = unknown;
-export type PostApiEmployeesAddNewSiteApiArg = {
-  site: Site;
-};
-export type PostApiEmployeesAddNewDesignationApiResponse = unknown;
-export type PostApiEmployeesAddNewDesignationApiArg = {
-  employeeDesignation: EmployeeDesignation;
 };
 export type PutApiEmployeesSalaryApproveBySalaryIdApiResponse =
   /** status 200 OK */ EmployeeSalary;
@@ -475,6 +425,71 @@ export type PutApiEmployeesRejectByLeaveIdApiResponse =
 export type PutApiEmployeesRejectByLeaveIdApiArg = {
   leaveId: number;
 };
+export type PostApiEmployeesSettingsAddDropdownItemApiResponse = unknown;
+export type PostApiEmployeesSettingsAddDropdownItemApiArg = {
+  dropdownModel: DropdownModel;
+};
+export type DeleteApiEmployeesSettingsDeleteDropdownItemByIdAndDropdownNameApiResponse =
+  unknown;
+export type DeleteApiEmployeesSettingsDeleteDropdownItemByIdAndDropdownNameApiArg =
+  {
+    id: number;
+    dropdownName: string;
+  };
+export type PutApiEmployeesSettingsUpdateDropdownItemApiResponse = unknown;
+export type PutApiEmployeesSettingsUpdateDropdownItemApiArg = {
+  dropdownModel: DropdownModel;
+};
+export type GetApiEmployeesCategoriesApiResponse =
+  /** status 200 OK */ EmployeeCategory[];
+export type GetApiEmployeesCategoriesApiArg = void;
+export type GetApiEmployeesDepartmentsApiResponse =
+  /** status 200 OK */ EmployeeDepartment[];
+export type GetApiEmployeesDepartmentsApiArg = void;
+export type GetApiEmployeesDesignationsApiResponse =
+  /** status 200 OK */ EmployeeDesignation[];
+export type GetApiEmployeesDesignationsApiArg = void;
+export type GetApiEmployeesSitesApiResponse = /** status 200 OK */ Site[];
+export type GetApiEmployeesSitesApiArg = void;
+export type GetApiEmployeesReportToEmployeeListApiResponse =
+  /** status 200 OK */ EmployeeReportToModel[];
+export type GetApiEmployeesReportToEmployeeListApiArg = {
+  departmentId?: number;
+  employeeId?: number;
+};
+export type GetApiEmployeesTeamMembersListApiResponse =
+  /** status 200 OK */ EmployeeTeamMemberList[];
+export type GetApiEmployeesTeamMembersListApiArg = {
+  employeeId?: number;
+};
+export type GetApiEmployeesCheckEmailExistsApiResponse =
+  /** status 200 OK */ boolean;
+export type GetApiEmployeesCheckEmailExistsApiArg = {
+  email?: string;
+};
+export type PostApiEmployeesSendEmailApiResponse = unknown;
+export type PostApiEmployeesSendEmailApiArg = void;
+export type PostApiEmployeesSearchApiResponse =
+  /** status 200 OK */ EmployeeModel[];
+export type PostApiEmployeesSearchApiArg = {
+  body: Criterion[];
+};
+export type PostApiEmployeesAddNewCategoryApiResponse = unknown;
+export type PostApiEmployeesAddNewCategoryApiArg = {
+  employeeCategory: EmployeeCategory;
+};
+export type PostApiEmployeesAddNewDepartmentApiResponse = unknown;
+export type PostApiEmployeesAddNewDepartmentApiArg = {
+  employeeDepartment: EmployeeDepartment;
+};
+export type PostApiEmployeesAddNewSiteApiResponse = unknown;
+export type PostApiEmployeesAddNewSiteApiArg = {
+  site: Site;
+};
+export type PostApiEmployeesAddNewDesignationApiResponse = unknown;
+export type PostApiEmployeesAddNewDesignationApiArg = {
+  employeeDesignation: EmployeeDesignation;
+};
 export type PostApiEmployeesDocumnetUploadApiResponse =
   /** status 200 OK */ string;
 export type PostApiEmployeesDocumnetUploadApiArg = {
@@ -492,21 +507,6 @@ export type GetApiEmployeesDownloadByFileNameApiResponse = unknown;
 export type GetApiEmployeesDownloadByFileNameApiArg = {
   id?: number;
   fileName: string;
-};
-export type PostApiEmployeesSettingsAddDropdownItemApiResponse = unknown;
-export type PostApiEmployeesSettingsAddDropdownItemApiArg = {
-  dropdownModel: DropdownModel;
-};
-export type DeleteApiEmployeesSettingsDeleteDropdownItemByIdAndDropdownNameApiResponse =
-  unknown;
-export type DeleteApiEmployeesSettingsDeleteDropdownItemByIdAndDropdownNameApiArg =
-  {
-    id: number;
-    dropdownName: string;
-  };
-export type PutApiEmployeesSettingsUpdateDropdownItemApiResponse = unknown;
-export type PutApiEmployeesSettingsUpdateDropdownItemApiArg = {
-  dropdownModel: DropdownModel;
 };
 export type GetApiEmployeesProjectByEmployeeIdApiResponse =
   /** status 200 OK */ ProjectModel[];
@@ -661,10 +661,13 @@ export type EmployeeModel = {
   employeeDocuments?: EmployeeDocumentsModel[] | null;
   employeeLeaves?: EmployeeLeaveSummaryModel[] | null;
 };
-export type EmployeeCategory = {
+export type SalaryEmployeeDashboardModel = {
   id?: number;
-  isDeleted?: boolean;
-  name?: string | null;
+  employeeNumber?: number;
+  fullName?: string | null;
+  email?: string | null;
+  departmentName?: string | null;
+  designationName?: string | null;
 };
 export type EmployeeDepartment = {
   id?: number;
@@ -675,37 +678,6 @@ export type EmployeeDesignation = {
   id?: number;
   isDeleted?: boolean;
   name?: string | null;
-};
-export type Site = {
-  id?: number;
-  isDeleted?: boolean;
-  name?: string | null;
-};
-export type EmployeeReportToModel = {
-  name?: string | null;
-  id?: number;
-};
-export type EmployeeTeamMemberList = {
-  name?: string | null;
-  email?: string | null;
-  avatar?: string | null;
-  employeeNumber?: number;
-  designation?: string | null;
-  employeeId?: number;
-};
-export type Criterion = {
-  field?: string | null;
-  operator?: string | null;
-  value?: any | null;
-  nextOperator?: string | null;
-};
-export type SalaryEmployeeDashboardModel = {
-  id?: number;
-  employeeNumber?: number;
-  fullName?: string | null;
-  email?: string | null;
-  departmentName?: string | null;
-  designationName?: string | null;
 };
 export type ApplicationUser = {
   id?: string;
@@ -731,6 +703,11 @@ export type ApplicationRole = {
   normalizedName?: string | null;
   concurrencyStamp?: string | null;
 };
+export type EmployeeCategory = {
+  id?: number;
+  isDeleted?: boolean;
+  name?: string | null;
+};
 export type EmployeePersonalDetails = {
   id?: number;
   isDeleted?: boolean;
@@ -739,6 +716,11 @@ export type EmployeePersonalDetails = {
   maritalStatus?: MaritalStatus;
   bloodGroup?: BloodGroup;
   relationWithEmployee?: RelationWithEmployee;
+};
+export type Site = {
+  id?: number;
+  isDeleted?: boolean;
+  name?: string | null;
 };
 export type EmployeeWorkInformation = {
   id?: number;
@@ -966,6 +948,24 @@ export type DropdownModel = {
   id?: number;
   name?: string | null;
 };
+export type EmployeeReportToModel = {
+  name?: string | null;
+  id?: number;
+};
+export type EmployeeTeamMemberList = {
+  name?: string | null;
+  email?: string | null;
+  avatar?: string | null;
+  employeeNumber?: number;
+  designation?: string | null;
+  employeeId?: number;
+};
+export type Criterion = {
+  field?: string | null;
+  operator?: string | null;
+  value?: any | null;
+  nextOperator?: string | null;
+};
 export type ProjectModel = {
   id?: number;
   projectName?: string | null;
@@ -1056,32 +1056,12 @@ export const {
   useGetApiEmployeesQuery,
   useLazyGetApiEmployeesQuery,
   usePostApiEmployeesMutation,
-  useGetApiEmployeesCategoriesQuery,
-  useLazyGetApiEmployeesCategoriesQuery,
-  useGetApiEmployeesDepartmentsQuery,
-  useLazyGetApiEmployeesDepartmentsQuery,
-  useGetApiEmployeesDesignationsQuery,
-  useLazyGetApiEmployeesDesignationsQuery,
-  useGetApiEmployeesSitesQuery,
-  useLazyGetApiEmployeesSitesQuery,
-  useGetApiEmployeesReportToEmployeeListQuery,
-  useLazyGetApiEmployeesReportToEmployeeListQuery,
-  useGetApiEmployeesTeamMembersListQuery,
-  useLazyGetApiEmployeesTeamMembersListQuery,
   useGetApiEmployeesByIdQuery,
   useLazyGetApiEmployeesByIdQuery,
   usePutApiEmployeesByIdMutation,
   useDeleteApiEmployeesByIdMutation,
-  useGetApiEmployeesCheckEmailExistsQuery,
-  useLazyGetApiEmployeesCheckEmailExistsQuery,
-  usePostApiEmployeesSendEmailMutation,
-  usePostApiEmployeesSearchMutation,
   useGetApiEmployeesPartialByEmployeeIdQuery,
   useLazyGetApiEmployeesPartialByEmployeeIdQuery,
-  usePostApiEmployeesAddNewCategoryMutation,
-  usePostApiEmployeesAddNewDepartmentMutation,
-  usePostApiEmployeesAddNewSiteMutation,
-  usePostApiEmployeesAddNewDesignationMutation,
   usePutApiEmployeesSalaryApproveBySalaryIdMutation,
   usePutApiEmployeesSalaryRejectBySalaryIdMutation,
   useGetApiEmployeesSalaryPendingSalaryRequestQuery,
@@ -1095,13 +1075,33 @@ export const {
   useDeleteApiEmployeesLeavesCancelLeaveMutation,
   usePutApiEmployeesApproveByLeaveIdMutation,
   usePutApiEmployeesRejectByLeaveIdMutation,
+  usePostApiEmployeesSettingsAddDropdownItemMutation,
+  useDeleteApiEmployeesSettingsDeleteDropdownItemByIdAndDropdownNameMutation,
+  usePutApiEmployeesSettingsUpdateDropdownItemMutation,
+  useGetApiEmployeesCategoriesQuery,
+  useLazyGetApiEmployeesCategoriesQuery,
+  useGetApiEmployeesDepartmentsQuery,
+  useLazyGetApiEmployeesDepartmentsQuery,
+  useGetApiEmployeesDesignationsQuery,
+  useLazyGetApiEmployeesDesignationsQuery,
+  useGetApiEmployeesSitesQuery,
+  useLazyGetApiEmployeesSitesQuery,
+  useGetApiEmployeesReportToEmployeeListQuery,
+  useLazyGetApiEmployeesReportToEmployeeListQuery,
+  useGetApiEmployeesTeamMembersListQuery,
+  useLazyGetApiEmployeesTeamMembersListQuery,
+  useGetApiEmployeesCheckEmailExistsQuery,
+  useLazyGetApiEmployeesCheckEmailExistsQuery,
+  usePostApiEmployeesSendEmailMutation,
+  usePostApiEmployeesSearchMutation,
+  usePostApiEmployeesAddNewCategoryMutation,
+  usePostApiEmployeesAddNewDepartmentMutation,
+  usePostApiEmployeesAddNewSiteMutation,
+  usePostApiEmployeesAddNewDesignationMutation,
   usePostApiEmployeesDocumnetUploadMutation,
   useDeleteApiEmployeesDocumentByFileNameMutation,
   useGetApiEmployeesDownloadByFileNameQuery,
   useLazyGetApiEmployeesDownloadByFileNameQuery,
-  usePostApiEmployeesSettingsAddDropdownItemMutation,
-  useDeleteApiEmployeesSettingsDeleteDropdownItemByIdAndDropdownNameMutation,
-  usePutApiEmployeesSettingsUpdateDropdownItemMutation,
   useGetApiEmployeesProjectByEmployeeIdQuery,
   useLazyGetApiEmployeesProjectByEmployeeIdQuery,
   useGetApiProjectByProjectIdEmployeesQuery,

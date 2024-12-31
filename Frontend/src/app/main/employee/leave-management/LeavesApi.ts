@@ -40,18 +40,6 @@ const injectedRtkApi = api.injectEndpoints({
         params: { employeeLeaveId: queryArg.employeeLeaveId },
       }),
     }),
-    getApiLeavesHolidays: build.query<
-      GetApiLeavesHolidaysApiResponse,
-      GetApiLeavesHolidaysApiArg
-    >({
-      query: () => ({ url: `/api/Leaves/holidays` }),
-    }),
-    getApiLeavesLeavesAll: build.query<
-      GetApiLeavesLeavesAllApiResponse,
-      GetApiLeavesLeavesAllApiArg
-    >({
-      query: () => ({ url: `/api/Leaves/leaves/all` }),
-    }),
     postApiLeavesLeavesEmployeeLeaveHistory: build.mutation<
       PostApiLeavesLeavesEmployeeLeaveHistoryApiResponse,
       PostApiLeavesLeavesEmployeeLeaveHistoryApiArg
@@ -119,6 +107,18 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: () => ({ url: `/api/Leaves/settings/leaveTypes` }),
     }),
+    getApiLeavesHolidays: build.query<
+      GetApiLeavesHolidaysApiResponse,
+      GetApiLeavesHolidaysApiArg
+    >({
+      query: () => ({ url: `/api/Leaves/holidays` }),
+    }),
+    getApiLeavesLeavesAll: build.query<
+      GetApiLeavesLeavesAllApiResponse,
+      GetApiLeavesLeavesAllApiArg
+    >({
+      query: () => ({ url: `/api/Leaves/leaves/all` }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -143,12 +143,6 @@ export type DeleteApiEmployeesLeavesCancelLeaveApiResponse =
 export type DeleteApiEmployeesLeavesCancelLeaveApiArg = {
   employeeLeaveId?: number;
 };
-export type GetApiLeavesHolidaysApiResponse =
-  /** status 200 OK */ EmployeeHoliday[];
-export type GetApiLeavesHolidaysApiArg = void;
-export type GetApiLeavesLeavesAllApiResponse =
-  /** status 200 OK */ EmployeeLeaveModel[];
-export type GetApiLeavesLeavesAllApiArg = void;
 export type PostApiLeavesLeavesEmployeeLeaveHistoryApiResponse =
   /** status 200 OK */ EmployeeLeaveHistoryDto[];
 export type PostApiLeavesLeavesEmployeeLeaveHistoryApiArg = {
@@ -184,6 +178,12 @@ export type GetApiLeavesSettingsHolidaysByYearApiArg = {
 export type GetApiLeavesSettingsLeaveTypesApiResponse =
   /** status 200 OK */ EmployeeLeaveType[];
 export type GetApiLeavesSettingsLeaveTypesApiArg = void;
+export type GetApiLeavesHolidaysApiResponse =
+  /** status 200 OK */ EmployeeHoliday[];
+export type GetApiLeavesHolidaysApiArg = void;
+export type GetApiLeavesLeavesAllApiResponse =
+  /** status 200 OK */ EmployeeLeaveModel[];
+export type GetApiLeavesLeavesAllApiArg = void;
 export type EmployeeDepartment = {
   id?: number;
   isDeleted?: boolean;
@@ -410,14 +410,6 @@ export type EmployeeLeaveModel = {
   leaveType?: string | null;
   employeeName?: string | null;
 };
-export type EmployeeHoliday = {
-  id?: number;
-  isDeleted?: boolean;
-  name?: string | null;
-  isFloater?: boolean;
-  startDate?: string;
-  endDate?: string;
-};
 export type EmployeeLeaveHistoryDto = {
   employeeId?: number;
   name?: string | null;
@@ -448,6 +440,14 @@ export type EmployeeDefaultLeaveSummary = {
   employeeLeaveTypes?: EmployeeLeaveType;
   jobLevelLeaves?: JobLevelLeave;
   totalLeaves?: number;
+};
+export type EmployeeHoliday = {
+  id?: number;
+  isDeleted?: boolean;
+  name?: string | null;
+  isFloater?: boolean;
+  startDate?: string;
+  endDate?: string;
 };
 export type DefaultLeaveModel = {
   id?: number | null;
@@ -521,10 +521,6 @@ export const {
   usePostApiEmployeesLeavesAddLeaveMutation,
   usePutApiEmployeesLeavesUpdateLeaveMutation,
   useDeleteApiEmployeesLeavesCancelLeaveMutation,
-  useGetApiLeavesHolidaysQuery,
-  useLazyGetApiLeavesHolidaysQuery,
-  useGetApiLeavesLeavesAllQuery,
-  useLazyGetApiLeavesLeavesAllQuery,
   usePostApiLeavesLeavesEmployeeLeaveHistoryMutation,
   useGetApiLeavesDefaultLeavesByJobLevelIdQuery,
   useLazyGetApiLeavesDefaultLeavesByJobLevelIdQuery,
@@ -537,4 +533,8 @@ export const {
   useLazyGetApiLeavesSettingsHolidaysByYearQuery,
   useGetApiLeavesSettingsLeaveTypesQuery,
   useLazyGetApiLeavesSettingsLeaveTypesQuery,
+  useGetApiLeavesHolidaysQuery,
+  useLazyGetApiLeavesHolidaysQuery,
+  useGetApiLeavesLeavesAllQuery,
+  useLazyGetApiLeavesLeavesAllQuery,
 } = injectedRtkApi;

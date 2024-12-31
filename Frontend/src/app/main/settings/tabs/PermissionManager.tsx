@@ -26,6 +26,21 @@ import {
 } from '../PermissionsApi';
 import { useGetApiAuthRolesQuery } from '../../../auth/services/AuthApi';
 
+// Define an interface for the permission categories
+interface PermissionCategory {
+  id: number;
+  name: string;
+}
+
+// Mock data for permission categories (replace this with actual data from your API)
+const permissionCategories: PermissionCategory[] = [
+  { id: 1, name: 'Project Module' },
+  { id: 2, name: 'Employee Module' },
+  { id: 3, name: 'Integration Module' },
+  { id: 4, name: 'Leave Module' },
+  { id: 5, name: 'Setting Module' },
+];
+
 export default function PermissionManager() {
   const dispatch = useDispatch();
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
@@ -46,14 +61,12 @@ export default function PermissionManager() {
 
   const { control, handleSubmit, reset } = useForm<Record<number, boolean>>();
 
-  // Initialize selectedRole when roles are loaded
   useEffect(() => {
     if (roles && roles.length > 0 && !selectedRole) {
       setSelectedRole(roles[0].id);
     }
   }, [roles, selectedRole]);
 
-  // Reset form when rolePermissions or permissionActions change
   useEffect(() => {
     if (permissionActions && rolePermissions) {
       const initialFormState = permissionActions.reduce(
@@ -71,14 +84,14 @@ export default function PermissionManager() {
     if (!permissionActions) return {};
     return permissionActions.reduce(
       (acc, permission) => {
-        const category = permission.value?.split('_')[0] as keyof typeof PermissionCategoryEnum;
-        if (!acc[category]) {
-          acc[category] = [];
+        const categoryId = permission.permissionCategoryId;
+        if (!acc[categoryId]) {
+          acc[categoryId] = [];
         }
-        acc[category].push(permission);
+        acc[categoryId].push(permission);
         return acc;
       },
-      {} as Record<keyof typeof PermissionCategoryEnum, PermissionAction[]>
+      {} as Record<number, PermissionAction[]>
     );
   }, [permissionActions]);
 
@@ -92,7 +105,6 @@ export default function PermissionManager() {
       try {
         await updatePermissions({ roleId: selectedRole, body: enabledPermissionIds }).unwrap();
         dispatch(showMessage({ message: 'Permissions saved successfully', variant: 'success' }));
-        // Refetch role permissions after successful update
         await refetchRolePermissions();
       } catch (error) {
         console.error('Error saving permissions:', error);
@@ -140,15 +152,15 @@ export default function PermissionManager() {
 
       {selectedRole && (
         <>
-          {Object.entries(groupedPermissions).map(([category, permissions]) => (
-            <Accordion key={category}>
+          {permissionCategories.map((category) => (
+            <Accordion key={category.id}>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography>
-                  {PermissionCategoryEnum[category as keyof typeof PermissionCategoryEnum]}
+                  {category.name}
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
-                {permissions.map((permission, index) => (
+                {groupedPermissions[category.id]?.map((permission, index, array) => (
                   <React.Fragment key={permission.id}>
                     <Controller
                       name={`${permission.id}`}
@@ -173,7 +185,7 @@ export default function PermissionManager() {
                         />
                       )}
                     />
-                    {index < permissions.length - 1 && <Divider sx={{ my: 1 }} />}
+                    {index < array.length - 1 && <Divider sx={{ my: 1 }} />}
                   </React.Fragment>
                 ))}
               </AccordionDetails>
