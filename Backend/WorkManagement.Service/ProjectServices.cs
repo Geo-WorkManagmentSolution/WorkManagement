@@ -89,11 +89,19 @@ namespace WorkManagement.Service
             }
         }
 
-        public async Task<ProjectModel> CreateProjectAsync(ProjectModel projectData)
+        public async Task<ProjectModel> CreateProjectAsync(string loggedUserId, ProjectModel projectData)
         {
             try
             {
-                var user = _dbContext.Users.FirstOrDefault(s => s.UserName == "admin1@admin.com");
+                // Check if the loggedUserId can be parsed to a GUID
+                if (!Guid.TryParse(loggedUserId, out Guid userGuid))
+                {
+                    return null;
+                    throw new Exception("Invalid User ID");
+
+                }
+
+                var user = _dbContext.Users.FirstOrDefault(s => s.Id == userGuid);
 
                 Project project = new Project();
 
@@ -131,13 +139,21 @@ namespace WorkManagement.Service
             }
         }
 
-        public async Task<ProjectModel> UpdateProjectAsync(ProjectModel projectData)
+        public async Task<ProjectModel> UpdateProjectAsync(string loggedUserId, ProjectModel projectData)
         {
             try
             {
+                // Check if the loggedUserId can be parsed to a GUID
+                if (!Guid.TryParse(loggedUserId, out Guid userGuid))
+                {
+                    return null;
+                    throw new Exception("Invalid User ID");
+
+                }
+
                 var existingProject = _dbContext.Projects.FirstOrDefault(s => s.Id == projectData.Id);
 
-                var user = _dbContext.Users.FirstOrDefault(s => s.UserName == "admin1@admin.com");
+                var user = _dbContext.Users.FirstOrDefault(s => s.Id == userGuid);
 
                 existingProject.ProjectName = projectData.ProjectName;
                 existingProject.ProjectNumber = projectData.ProjectNumber;
@@ -170,10 +186,17 @@ namespace WorkManagement.Service
             }
         }
 
-        public async Task<bool> DeleteProjectAsync(int id)
+        public async Task<bool> DeleteProjectAsync(string loggedUserId, int id)
         {
             try
             {
+                // Check if the loggedUserId can be parsed to a GUID
+                if (!Guid.TryParse(loggedUserId, out Guid userGuid))
+                {
+                    return false;
+                    throw new Exception("Invalid User ID");
+
+                }
                 var project = await _dbContext.Projects.FindAsync(id);
                 if (project == null)
                 {
@@ -181,7 +204,7 @@ namespace WorkManagement.Service
                 }
                     
 
-                var user = _dbContext.Users.FirstOrDefault(s => s.UserName == "admin1@admin.com");
+                var user = _dbContext.Users.FirstOrDefault(s => s.Id == userGuid);
 
                 project.IsDeleted = true;
                 project.LastModifiedBy = user.Id;
@@ -316,9 +339,17 @@ namespace WorkManagement.Service
 
 
 
-        public async Task<bool> AssignProjectToEmployee(int projectId, int employeeId)
+        public async Task<bool> AssignProjectToEmployee(string loggedUserId, int projectId, int employeeId)
         {
-            var user = _dbContext.Users.FirstOrDefault(s => s.UserName == "admin1@admin.com");
+            // Check if the loggedUserId can be parsed to a GUID
+            if (!Guid.TryParse(loggedUserId, out Guid userGuid))
+            {
+                return false;
+                throw new Exception("Invalid User ID");
+
+            }
+
+            var user = _dbContext.Users.FirstOrDefault(s => s.Id == userGuid);
             try
             {
                 var project = await _dbContext.Projects.FindAsync(projectId);

@@ -55,6 +55,243 @@ namespace WorkManagement.API.Controllers
             return Ok(employees);
         }
 
+        
+        // GET: api/employees/5
+        [HttpGet("{id}")]
+        [PermissionAuth(PermissionActionEnum.EmployeeModule_View)]
+        public async Task<ActionResult<EmployeeModel>> GetEmployee(int id)
+        {
+            var employee = await employeeService.GetEmployeeByIdAsync(id);
+            if (employee == null)
+            {
+                return NotFound();
+            }
+            return Ok(employee);
+        }
+
+        // POST: api/employees
+        [HttpPost]
+        [PermissionAuth(PermissionActionEnum.EmployeeModule_Add)]
+        public async Task<ActionResult<EmployeeModel>> CreateEmployee([FromBody] EmployeeModel employeeModel)
+        {
+            var userRole = this.User.FindFirst(ClaimTypes.Role).Value;
+
+            if (userRole == "Employee")
+            {
+                return BadRequest("Employee user can not add new employee");
+            }
+            var createdEmployee = await employeeService.CreateEmployeeAsync(employeeModel);
+            return CreatedAtAction(nameof(GetEmployee), new { id = createdEmployee.Id }, createdEmployee);
+        }
+
+        // PUT: api/employees/5
+        [HttpPut("{id}")]
+        [PermissionAuth(PermissionActionEnum.EmployeeModule_Update)]
+        public async Task<IActionResult> UpdateEmployee(int id, EmployeeModel employee)
+        {
+            if (id != employee.Id)
+            {
+                return BadRequest();
+            }
+
+
+            await employeeService.UpdateEmployeeAsync(id, employee);
+            return NoContent();
+        }
+
+        [HttpGet("partial/{employeeId}")]
+        public async Task<ActionResult<SalaryEmployeeDashboardModel>> GetPartialEmployeeData(int employeeId)
+        {
+            var employee = await employeeService.EmployeePartialDetailsById(employeeId);
+            if (employee == null)
+            {
+                return NotFound();
+            }
+            return Ok(employee);
+        }
+
+        // DELETE: api/employees/5
+        [HttpDelete("{id}")]
+        [PermissionAuth(PermissionActionEnum.EmployeeModule_Delete)]
+        public async Task<IActionResult> DeleteEmployee(int id)
+        {
+            //delete one to many manually
+
+
+            var deleted = await employeeService.DeleteEmployeeAsync(id);
+            if (!deleted)
+            {
+                return NotFound();
+            }
+            return NoContent();
+        }
+        
+
+        [HttpPut("SalaryApprove/{salaryId}")]
+        [PermissionAuth(PermissionActionEnum.EmployeeModule_Salary_Approve_Reject)]
+        public async Task<ActionResult<EmployeeSalary>> ApproveSalary(int salaryId, int employeeId)
+        {
+            try
+            {
+                var loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var employeeSalary = await employeeService.ApproveSalary(salaryId, loggedUserId, employeeId);
+                return Ok(employeeSalary);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
+        }
+
+        [HttpPut("SalaryReject/{salaryId}")]
+        [PermissionAuth(PermissionActionEnum.EmployeeModule_Salary_Approve_Reject)]
+        public async Task<ActionResult<EmployeeSalary>> RejectSalary(int salaryId, int employeeId)
+        {
+            var loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var employeeSalary = await employeeService.RejectSalary(salaryId, loggedUserId, employeeId);
+            return Ok(employeeSalary);
+        }
+
+        [HttpGet("Salary/PendingSalaryRequest")]
+        [PermissionAuth(PermissionActionEnum.EmployeeModule_Salary_History_View)]
+        public async Task<ActionResult<IEnumerable<EmployeeSalaryDataModel>>> GetEmployeePendingSalaryRequest([FromQuery] int? employeeId = null)
+        {
+            List<EmployeeSalaryDataModel> salaryRequests = new List<EmployeeSalaryDataModel>();
+            var loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (employeeId.HasValue)
+            { // Fetch data based on employeeId
+                salaryRequests = await employeeService.GetEmployeeSalaryRequestList(loggedUserId, employeeId.Value);
+            }
+            else
+            {
+                salaryRequests = await employeeService.GetAllPenidngSalaryRequestList(loggedUserId);
+            }
+            return Ok(salaryRequests);
+        }
+
+        [HttpGet("SalaryDashboard")]
+        public async Task<ActionResult<IEnumerable<SalaryEmployeeDashboardModel>>> GetEmployeesForSalaryDashboard()
+        {
+            var userRole = this.User.FindFirst(ClaimTypes.Role).Value;
+            string loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var employees = await employeeService.GetDashboardForEmployeeSalary(loggedUserId, userRole);
+            return Ok(employees);
+        }
+
+
+
+        // GET api/employee/leaves/current
+        [HttpGet("leaves/current")]
+        [PermissionAuth(PermissionActionEnum.LeaveModule_Employee_LeaveHistory)]
+        public async Task<ActionResult<IEnumerable<EmployeeLeaveSummary>>> GetEmployeeLeaves([FromQuery] int? employeeId = null)
+        {
+            List<EmployeeLeaveSummaryModel> leaves; if (employeeId.HasValue)
+            { // Fetch data based on employeeId
+              leaves = await employeeService.GetEmployeeLeaves(null, employeeId); 
+            } else 
+            { 
+                // Fetch data based on loggedUserId
+                var loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                leaves = await employeeService.GetEmployeeLeaves(loggedUserId, null); 
+            } return Ok(leaves); 
+        }
+
+        // GET api/employee/leaves/addLeave
+        [HttpPost("leaves/addLeave")]
+        [PermissionAuth(PermissionActionEnum.LeaveModule_Add)]
+        public async Task<ActionResult<EmployeeLeaveModel>> AddLeave(EmployeeLeaveModel employeeLeaveData)
+        {
+            var leaves = await employeeService.AddLeave(employeeLeaveData, User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            return Ok(leaves);
+        }
+
+        // GET api/employee/leaves/updateLeave
+        [HttpPut("leaves/updateLeave")]
+        [PermissionAuth(PermissionActionEnum.LeaveModule_Update)]
+        public async Task<ActionResult<EmployeeLeaveModel>> UpdateLeave(EmployeeLeaveModel employeeLeaveData)
+        {
+            var leaves = await employeeService.UpdateLeave(employeeLeaveData, User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            return Ok(leaves);
+        }
+
+        // GET api/employee/leaves/CancelLeave
+        [HttpDelete("leaves/cancelLeave")]
+        [PermissionAuth(PermissionActionEnum.LeaveModule_Delete)]
+        public async Task<ActionResult<bool>> CancelLeave(int employeeLeaveId)
+        {
+            await employeeService.CancelLeave(employeeLeaveId, User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            return Ok(true);
+        }
+
+        [HttpPut("approve/{leaveId}")]
+        [PermissionAuth(PermissionActionEnum.LeaveModule_Approvals)]
+        public async Task<ActionResult<EmployeeLeave>> ApproveLeave(int leaveId)
+        {
+            try
+            {
+                var employeeLeave = await employeeService.ApproveLeave(leaveId);
+                return Ok(employeeLeave);
+            }
+            catch(Exception e) {
+                return BadRequest(new { message = e.Message });
+            }
+        }
+
+        [HttpPut("reject/{leaveId}")]
+        [PermissionAuth(PermissionActionEnum.LeaveModule_Approvals)]
+        public async Task<ActionResult<EmployeeLeave>> RejectLeave(int leaveId)
+        {
+            var employeeLeave = await employeeService.RejectLeave(leaveId);
+            return Ok(employeeLeave);
+        }       
+
+        [HttpPost("settings/addDropdownItem")]
+        [PermissionAuth(PermissionActionEnum.SettingModule_DropDownSettings_Update)]
+        public async Task<IActionResult> AddDropdownItem([FromBody] DropdownModel model)
+        {
+            try
+            {
+                var newItem = await employeeService.AddDropdownItem(model);
+                return Ok(newItem);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpDelete("settings/deleteDropdownItem/{id}/{dropdownName}")]
+        [PermissionAuth(PermissionActionEnum.SettingModule_DropDownSettings_Update)]
+        public async Task<IActionResult> DeleteDropdownItem(int id,string dropdownName)
+        {
+            try
+            {
+                await employeeService.DeleteDropdownItem(id,dropdownName);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpPut("settings/ updateDropdownItem")]
+        [PermissionAuth(PermissionActionEnum.SettingModule_DropDownSettings_Update)]
+        public async Task<IActionResult> UpdateDropdownItem([FromBody] DropdownModel model)
+        {
+            try
+            {
+                var updatedItem = await employeeService.UpdateDropdownItem(model);
+                return Ok(updatedItem);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        #region Without Permission Methods
 
         // GET: api/employees/categories
         [HttpGet("categories")]
@@ -108,18 +345,6 @@ namespace WorkManagement.API.Controllers
             return Ok(teamMembersList);
         }
 
-        // GET: api/employees/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<EmployeeModel>> GetEmployee(int id)
-        {
-            var employee = await employeeService.GetEmployeeByIdAsync(id);
-            if (employee == null)
-            {
-                return NotFound();
-            }
-            return Ok(employee);
-        }
-
         // GET: api/employees/checkEmail
         [HttpGet]
         [Route("CheckEmailExists")]
@@ -127,19 +352,6 @@ namespace WorkManagement.API.Controllers
         {
             var result = await employeeService.CheckEmailExists(email);
             return Ok(result);
-        }
-
-        // POST: api/employees
-        [HttpPost]
-        public async Task<ActionResult<EmployeeModel>> CreateEmployee([FromBody] EmployeeModel employeeModel)
-        {
-            var userRole = this.User.FindFirst(ClaimTypes.Role).Value;
-            
-            if(userRole == "Employee") {
-                return BadRequest("Employee user can not add new employee");            
-            }
-            var createdEmployee = await employeeService.CreateEmployeeAsync(employeeModel);
-            return CreatedAtAction(nameof(GetEmployee), new { id = createdEmployee.Id }, createdEmployee);
         }
 
         // POST: api/employees
@@ -165,45 +377,6 @@ namespace WorkManagement.API.Controllers
             return mapper.Map<List<EmployeeModel>>(SearchResult);
         }
 
-        // PUT: api/employees/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateEmployee(int id, EmployeeModel employee)
-        {
-            if (id != employee.Id)
-            {
-                return BadRequest();
-            }
-
-
-            await employeeService.UpdateEmployeeAsync(id, employee);
-            return NoContent();
-        }
-
-        [HttpGet("partial/{employeeId}")]
-        public async Task<ActionResult<SalaryEmployeeDashboardModel>> GetPartialEmployeeData(int employeeId)
-        {
-            var employee = await employeeService.EmployeePartialDetailsById(employeeId);
-            if (employee == null)
-            {
-                return NotFound();
-            }
-            return Ok(employee);
-        }
-
-        // DELETE: api/employees/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEmployee(int id)
-        {
-            //delete one to many manually
-
-
-            var deleted = await employeeService.DeleteEmployeeAsync(id);
-            if (!deleted)
-            {
-                return NotFound();
-            }
-            return NoContent();
-        }
         [HttpPost]
         [Route("AddNewCategory")]
         public async Task<IActionResult> AddNewCategory(EmployeeCategory employeeCategory)
@@ -236,118 +409,8 @@ namespace WorkManagement.API.Controllers
             return Ok(newOption);
         }
 
-        [HttpPut("SalaryApprove/{salaryId}")]
-        public async Task<ActionResult<EmployeeSalary>> ApproveSalary(int salaryId, int employeeId)
-        {
-            try
-            {
-                var loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                var employeeSalary = await employeeService.ApproveSalary(salaryId, loggedUserId, employeeId);
-                return Ok(employeeSalary);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(new { message = e.Message });
-            }
-        }
-
-        [HttpPut("SalaryReject/{salaryId}")]
-        public async Task<ActionResult<EmployeeSalary>> RejectSalary(int salaryId, int employeeId)
-        {
-            var loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var employeeSalary = await employeeService.RejectSalary(salaryId, loggedUserId, employeeId);
-            return Ok(employeeSalary);
-        }
-
-        [HttpGet("Salary/PendingSalaryRequest")]
-        public async Task<ActionResult<IEnumerable<EmployeeSalaryDataModel>>> GetEmployeePendingSalaryRequest([FromQuery] int? employeeId = null)
-        {
-            List<EmployeeSalaryDataModel> salaryRequests = new List<EmployeeSalaryDataModel>();
-            var loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (employeeId.HasValue)
-            { // Fetch data based on employeeId
-                salaryRequests = await employeeService.GetEmployeeSalaryRequestList(loggedUserId, employeeId.Value);
-            }
-            else
-            {
-                salaryRequests = await employeeService.GetAllPenidngSalaryRequestList(loggedUserId);
-            }
-            return Ok(salaryRequests);
-        }
-
-        [HttpGet("SalaryDashboard")]
-        public async Task<ActionResult<IEnumerable<SalaryEmployeeDashboardModel>>> GetEmployeesForSalaryDashboard()
-        {
-            var userRole = this.User.FindFirst(ClaimTypes.Role).Value;
-            string loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            var employees = await employeeService.GetDashboardForEmployeeSalary(loggedUserId, userRole);
-            return Ok(employees);
-        }
-
-
-
-        // GET api/employee/leaves/current
-        [HttpGet("leaves/current")]
-        public async Task<ActionResult<IEnumerable<EmployeeLeaveSummary>>> GetEmployeeLeaves([FromQuery] int? employeeId = null)
-        {
-            List<EmployeeLeaveSummaryModel> leaves; if (employeeId.HasValue)
-            { // Fetch data based on employeeId
-              leaves = await employeeService.GetEmployeeLeaves(null, employeeId); 
-            } else 
-            { 
-                // Fetch data based on loggedUserId
-                var loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                leaves = await employeeService.GetEmployeeLeaves(loggedUserId, null); 
-            } return Ok(leaves); 
-        }
-
-        // GET api/employee/leaves/addLeave
-        [HttpPost("leaves/addLeave")]
-        public async Task<ActionResult<EmployeeLeaveModel>> AddLeave(EmployeeLeaveModel employeeLeaveData)
-        {
-            var leaves = await employeeService.AddLeave(employeeLeaveData, User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            return Ok(leaves);
-        }
-
-        // GET api/employee/leaves/updateLeave
-        [HttpPut("leaves/updateLeave")]
-        public async Task<ActionResult<EmployeeLeaveModel>> UpdateLeave(EmployeeLeaveModel employeeLeaveData)
-        {
-            var leaves = await employeeService.UpdateLeave(employeeLeaveData, User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            return Ok(leaves);
-        }
-
-        // GET api/employee/leaves/CancelLeave
-        [HttpDelete("leaves/cancelLeave")]
-        public async Task<ActionResult<bool>> CancelLeave(int employeeLeaveId)
-        {
-            await employeeService.CancelLeave(employeeLeaveId, User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            return Ok(true);
-        }
-
-        [HttpPut("approve/{leaveId}")]
-        public async Task<ActionResult<EmployeeLeave>> ApproveLeave(int leaveId)
-        {
-            try
-            {
-                var employeeLeave = await employeeService.ApproveLeave(leaveId);
-                return Ok(employeeLeave);
-            }
-            catch(Exception e) {
-                return BadRequest(new { message = e.Message });
-            }
-        }
-
-        [HttpPut("reject/{leaveId}")]
-        public async Task<ActionResult<EmployeeLeave>> RejectLeave(int leaveId)
-        {
-            var employeeLeave = await employeeService.RejectLeave(leaveId);
-            return Ok(employeeLeave);
-        }
-
         [HttpPost("documnet/upload")]
-        public async Task<ActionResult<string>> Upload(int id,IFormFile file)
+        public async Task<ActionResult<string>> Upload(int id, IFormFile file)
         {
             try
             {
@@ -378,13 +441,13 @@ namespace WorkManagement.API.Controllers
                 {
                     var types = GetMimeTypes();
                     var ext = file.ContentType.ToLower();
-                    fileTypeStr = types.ContainsValue(ext) ? types.FirstOrDefault(s=>s.Value == ext).Key : "";
+                    fileTypeStr = types.ContainsValue(ext) ? types.FirstOrDefault(s => s.Value == ext).Key : "";
                     fileTypeStr = fileTypeStr.Replace(".", "");
 
                     switch (fileTypeStr)
                     {
                         case "txt":
-                            fileType = FileType.TXT; 
+                            fileType = FileType.TXT;
                             break;
                         case "pdf":
                             fileType = FileType.PDF;
@@ -409,7 +472,7 @@ namespace WorkManagement.API.Controllers
                 {
                     await file.CopyToAsync(stream);
 
-                    await employeeService.UpdateEmployeeDocumentData(id, file.FileName,fileType, file.Length, filePath,fileContent);
+                    await employeeService.UpdateEmployeeDocumentData(id, file.FileName, fileType, file.Length, filePath, fileContent);
                 }
 
 
@@ -419,7 +482,7 @@ namespace WorkManagement.API.Controllers
             {
                 return BadRequest(new { message = e.Message });
             }
-            
+
         }
 
         [HttpDelete("document/{fileName}")]
@@ -451,55 +514,13 @@ namespace WorkManagement.API.Controllers
             return File(memory, GetContentType(filePath), fileName);
         }
 
-        [HttpPost("settings/addDropdownItem")]
-        public async Task<IActionResult> AddDropdownItem([FromBody] DropdownModel model)
-        {
-            try
-            {
-                var newItem = await employeeService.AddDropdownItem(model);
-                return Ok(newItem);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
-
-        [HttpDelete("settings/deleteDropdownItem/{id}/{dropdownName}")]
-        public async Task<IActionResult> DeleteDropdownItem(int id,string dropdownName)
-        {
-            try
-            {
-                await employeeService.DeleteDropdownItem(id,dropdownName);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
-
-        [HttpPut("settings/ updateDropdownItem")]
-        public async Task<IActionResult> UpdateDropdownItem([FromBody] DropdownModel model)
-        {
-            try
-            {
-                var updatedItem = await employeeService.UpdateDropdownItem(model);
-                return Ok(updatedItem);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
-
         [HttpGet("project/{employeeId}")]
         public async Task<ActionResult<IEnumerable<ProjectModel>>> GetProjectsByEmployeeId(int employeeId)
         {
             try
             {
                 var projects = await employeeService.GetProjectsByEmployeeIdAsync(employeeId);
-                if (projects == null )
+                if (projects == null)
                 {
                     return NotFound(new { message = "No projects found for this employee." });
                 }
@@ -511,6 +532,10 @@ namespace WorkManagement.API.Controllers
             }
         }
 
+
+        #endregion
+
+        #region Private Methobds
 
         private string GetContentType(string path)
         {
@@ -536,6 +561,8 @@ namespace WorkManagement.API.Controllers
                 { ".csv", "text/csv" }
             };
         }
+
+        #endregion
 
     }
 }
