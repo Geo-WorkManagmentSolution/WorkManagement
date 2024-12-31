@@ -99,6 +99,17 @@ namespace WorkManagement.API.Controllers
             return NoContent();
         }
 
+        [HttpGet("partial/{employeeId}")]
+        public async Task<ActionResult<SalaryEmployeeDashboardModel>> GetPartialEmployeeData(int employeeId)
+        {
+            var employee = await employeeService.EmployeePartialDetailsById(employeeId);
+            if (employee == null)
+            {
+                return NotFound();
+            }
+            return Ok(employee);
+        }
+
         // DELETE: api/employees/5
         [HttpDelete("{id}")]
         [PermissionAuth(PermissionActionEnum.EmployeeModule_Delete)]
@@ -157,6 +168,18 @@ namespace WorkManagement.API.Controllers
             }
             return Ok(salaryRequests);
         }
+
+        [HttpGet("SalaryDashboard")]
+        public async Task<ActionResult<IEnumerable<SalaryEmployeeDashboardModel>>> GetEmployeesForSalaryDashboard()
+        {
+            var userRole = this.User.FindFirst(ClaimTypes.Role).Value;
+            string loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var employees = await employeeService.GetDashboardForEmployeeSalary(loggedUserId, userRole);
+            return Ok(employees);
+        }
+
+
 
         // GET api/employee/leaves/current
         [HttpGet("leaves/current")]

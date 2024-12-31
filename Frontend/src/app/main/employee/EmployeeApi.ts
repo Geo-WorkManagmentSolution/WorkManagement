@@ -112,6 +112,14 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.body,
       }),
     }),
+    getApiEmployeesPartialByEmployeeId: build.query<
+      GetApiEmployeesPartialByEmployeeIdApiResponse,
+      GetApiEmployeesPartialByEmployeeIdApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/partial/${queryArg.employeeId}`,
+      }),
+    }),
     postApiEmployeesAddNewCategory: build.mutation<
       PostApiEmployeesAddNewCategoryApiResponse,
       PostApiEmployeesAddNewCategoryApiArg
@@ -180,6 +188,12 @@ const injectedRtkApi = api.injectEndpoints({
         url: `/api/Employees/Salary/PendingSalaryRequest`,
         params: { employeeId: queryArg.employeeId },
       }),
+    }),
+    getApiEmployeesSalaryDashboard: build.query<
+      GetApiEmployeesSalaryDashboardApiResponse,
+      GetApiEmployeesSalaryDashboardApiArg
+    >({
+      query: () => ({ url: `/api/Employees/SalaryDashboard` }),
     }),
     getApiEmployeesLeavesCurrent: build.query<
       GetApiEmployeesLeavesCurrentApiResponse,
@@ -390,6 +404,11 @@ export type PostApiEmployeesSearchApiResponse =
 export type PostApiEmployeesSearchApiArg = {
   body: Criterion[];
 };
+export type GetApiEmployeesPartialByEmployeeIdApiResponse =
+  /** status 200 OK */ SalaryEmployeeDashboardModel;
+export type GetApiEmployeesPartialByEmployeeIdApiArg = {
+  employeeId: number;
+};
 export type PostApiEmployeesAddNewCategoryApiResponse = unknown;
 export type PostApiEmployeesAddNewCategoryApiArg = {
   employeeCategory: EmployeeCategory;
@@ -423,6 +442,9 @@ export type GetApiEmployeesSalaryPendingSalaryRequestApiResponse =
 export type GetApiEmployeesSalaryPendingSalaryRequestApiArg = {
   employeeId?: number;
 };
+export type GetApiEmployeesSalaryDashboardApiResponse =
+  /** status 200 OK */ SalaryEmployeeDashboardModel[];
+export type GetApiEmployeesSalaryDashboardApiArg = void;
 export type GetApiEmployeesLeavesCurrentApiResponse =
   /** status 200 OK */ EmployeeLeaveSummary[];
 export type GetApiEmployeesLeavesCurrentApiArg = {
@@ -676,6 +698,14 @@ export type Criterion = {
   operator?: string | null;
   value?: any | null;
   nextOperator?: string | null;
+};
+export type SalaryEmployeeDashboardModel = {
+  id?: number;
+  employeeNumber?: number;
+  fullName?: string | null;
+  email?: string | null;
+  departmentName?: string | null;
+  designationName?: string | null;
 };
 export type ApplicationUser = {
   id?: string;
@@ -1046,6 +1076,8 @@ export const {
   useLazyGetApiEmployeesCheckEmailExistsQuery,
   usePostApiEmployeesSendEmailMutation,
   usePostApiEmployeesSearchMutation,
+  useGetApiEmployeesPartialByEmployeeIdQuery,
+  useLazyGetApiEmployeesPartialByEmployeeIdQuery,
   usePostApiEmployeesAddNewCategoryMutation,
   usePostApiEmployeesAddNewDepartmentMutation,
   usePostApiEmployeesAddNewSiteMutation,
@@ -1054,6 +1086,8 @@ export const {
   usePutApiEmployeesSalaryRejectBySalaryIdMutation,
   useGetApiEmployeesSalaryPendingSalaryRequestQuery,
   useLazyGetApiEmployeesSalaryPendingSalaryRequestQuery,
+  useGetApiEmployeesSalaryDashboardQuery,
+  useLazyGetApiEmployeesSalaryDashboardQuery,
   useGetApiEmployeesLeavesCurrentQuery,
   useLazyGetApiEmployeesLeavesCurrentQuery,
   usePostApiEmployeesLeavesAddLeaveMutation,

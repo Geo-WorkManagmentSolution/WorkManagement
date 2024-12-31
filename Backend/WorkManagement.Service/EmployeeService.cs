@@ -780,10 +780,13 @@ namespace WorkManagement.Service
                                              RemainingLeaves = ed.TotalLeaves
                                          }).ToList();
                     newEmployee.EmployeeLeaves = new List<EmployeeLeaveSummary>();
-                    if (defaultLeaves.Any())
+                    if (employee.EmployeeWorkInformation.UseDefaultLeaves)
                     {
-                        if (employee.EmployeeWorkInformation.UseDefaultLeaves)
+
+                        if (defaultLeaves.Any())
                         {
+                        //if (employee.EmployeeWorkInformation.UseDefaultLeaves)
+                        //{
 
                             foreach (var leave in defaultLeaves)
                             {
@@ -805,23 +808,42 @@ namespace WorkManagement.Service
                             //newEmployee.EmployeeLeaves.AddRange(leaves.ToList());
 
                         }
-                        else
+                        //else
+                        //{
+
+
+                        //    foreach (var leave in employee.EmployeeLeaves)
+                        //    {
+                        //        var employeeLeave = new EmployeeLeaveSummary();
+                        //        employeeLeave.EmployeeLeaveTypeId = leave.Id;
+                        //        employeeLeave.RemainingLeaves = leave.TotalLeaves;
+
+                        //        employeeLeave.TotalLeaves = leave.TotalLeaves;
+
+                        //        newEmployee.EmployeeLeaves.Add(employeeLeave);
+                        //    }
+
+
+
+                        //}
+
+                    }
+                    else
+                    {
+
+
+                        foreach (var leave in employee.EmployeeLeaves)
                         {
+                            var employeeLeave = new EmployeeLeaveSummary();
+                            employeeLeave.EmployeeLeaveTypeId = leave.Id;
+                            employeeLeave.RemainingLeaves = leave.TotalLeaves;
 
+                            employeeLeave.TotalLeaves = leave.TotalLeaves;
 
-                            foreach (var leave in defaultLeaves)
-                            {
-                                var employeeLeave = new EmployeeLeaveSummary();
-                                employeeLeave.EmployeeLeaveTypeId = leave.Id;
-                                employeeLeave.RemainingLeaves = leave.RemainingLeaves;
-                                employeeLeave.TotalLeaves = leave.TotalLeaves;
-
-                                newEmployee.EmployeeLeaves.Add(employeeLeave);
-                            }
-
-
-
+                            newEmployee.EmployeeLeaves.Add(employeeLeave);
                         }
+
+
 
                     }
 
@@ -1318,6 +1340,106 @@ namespace WorkManagement.Service
             }
 
         }
+
+
+        public async Task<List<SalaryEmployeeDashboardModel>> GetDashboardForEmployeeSalary(string loggedUserId, string userRole)
+        {
+            try
+            {
+                var targetEmployeeId = CheckValidEmployeeId(loggedUserId);
+                if (targetEmployeeId == -1)
+                {
+                    throw new Exception("Invalid User data");
+                }
+
+                var employeeData = new List<SalaryEmployeeDashboardModel>();
+
+                //var Employee = await _dbContext.Employees.ToListAsync();
+                //return mapper.Map<List<EmployeeModel>>(Employee);
+
+                if (userRole != "HR Admin")
+                {
+                    employeeData = (from e in _dbContext.Employees.Where(s => !s.IsDeleted && (s.EmployeeReportToId == targetEmployeeId || s.Id == targetEmployeeId))
+                                    select new SalaryEmployeeDashboardModel
+                                    {
+                                        Id = e.Id,
+                                        EmployeeNumber = e.EmployeeNumber,
+                                        FullName = e.FirstName + " " + e.MiddleName + " " + e.LastName,
+                                        Email = e.Email,
+                                        DepartmentName = e.EmployeeDepartment == null ? "" : e.EmployeeDepartment.Name,
+                                        DesignationName = e.EmployeeDesignation == null ? "" : e.EmployeeDesignation.Name,
+                                        
+                                    }).ToList();
+                }
+                else
+                {
+                    employeeData = (from e in _dbContext.Employees.Where(s => !s.IsDeleted)
+                                    select new SalaryEmployeeDashboardModel
+                                    {
+                                        Id = e.Id,
+                                        EmployeeNumber = e.EmployeeNumber,
+                                        FullName = e.FirstName + " " + e.MiddleName + " " + e.LastName,
+                                        Email = e.Email,
+                                        DepartmentName = e.EmployeeDepartment == null ? "" : e.EmployeeDepartment.Name,
+                                        DesignationName = e.EmployeeDesignation == null ? "" : e.EmployeeDesignation.Name,
+                                    }).ToList();
+                }
+
+
+
+
+                if (employeeData != null)
+                {
+                    return employeeData;
+                }
+                else
+                {
+                    return new List<SalaryEmployeeDashboardModel>();
+                }
+            }
+            catch (Exception ex)
+            {
+                return new List<SalaryEmployeeDashboardModel>();
+            }
+
+        }
+
+        public async Task<SalaryEmployeeDashboardModel> EmployeePartialDetailsById(int employeeId)
+        {
+
+            var employeeData = (from e in _dbContext.Employees.Where(s => s.Id == employeeId)
+                                select new SalaryEmployeeDashboardModel
+                                {
+                                    Id = e.Id,
+                                    EmployeeNumber = e.EmployeeNumber,
+                                    FullName = e.FirstName + " " + e.MiddleName + " " + e.LastName,
+                                    Email = e.Email,
+                                    DepartmentName = e.EmployeeDepartment == null ? "" : e.EmployeeDepartment.Name,
+                                    DesignationName = e.EmployeeDesignation == null ? "" : e.EmployeeDesignation.Name,
+
+                                });
+
+
+            if (employeeData != null)
+            {
+                return await employeeData.FirstOrDefaultAsync();
+            }
+            else
+            {
+                return new SalaryEmployeeDashboardModel();
+            }
+
+        }
+
+
+
+
+
+
+
+
+
+
 
         #region Leave management
 

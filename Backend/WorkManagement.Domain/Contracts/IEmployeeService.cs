@@ -48,6 +48,9 @@ namespace WorkManagement.Domain.Contracts
         public string GetEmployeeFilePath(int id, string fileName);
         public Task<bool> DeleteEmployeeFile(int employeeId, string fileName);
         public Task<List<ProjectModel>> GetProjectsByEmployeeIdAsync(int employeeId);
+        public Task<List<SalaryEmployeeDashboardModel>> GetDashboardForEmployeeSalary(string loggedUserId, string userRole);
+
+        public Task<SalaryEmployeeDashboardModel> EmployeePartialDetailsById(int employeeId);
         #endregion
 
         #region Employee Leave
