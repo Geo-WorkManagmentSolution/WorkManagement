@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FluentEmail.Core;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Diagnostics;
 using Microsoft.EntityFrameworkCore;
@@ -884,6 +885,25 @@ namespace WorkManagement.Service
             {
                 if (employeeData != null)
                 {
+                    if(employeeData.RoleId != employee.RoleId)
+                    {
+                        var user = await userManager.FindByEmailAsync(employeeData.Email);
+                        if(user != null)
+                        {
+                            var currentRoles = await userManager.GetRolesAsync(user);
+                            var removeRolesResult = await userManager.RemoveFromRolesAsync(user, currentRoles);
+                            if (removeRolesResult.Succeeded)
+                            {
+                                var role = await roleManager.Roles.FirstAsync(x => x.Id == employee.RoleId);
+                                var roleResult = await userManager.AddToRoleAsync(user, role.Name);
+                                if(roleResult.Succeeded)
+                                {
+                                    employeeData.RoleId = employee.RoleId;
+                                }
+                            }
+                        }
+                    }
+
                     employeeData.PhotoURL = employee.PhotoURL;
                     employeeData.FirstName = employee.FirstName;
                     employeeData.MiddleName = employee.MiddleName;
@@ -892,7 +912,6 @@ namespace WorkManagement.Service
                     employeeData.AlternateEmail = employee.AlternateEmail;
                     employeeData.PhoneNumber = employee.PhoneNumber;
                     employeeData.AlternateNumber = employee.AlternateNumber;
-                    employeeData.RoleId = employee.RoleId;
                     employeeData.EmployeeCategoryId = employee.EmployeeCategoryId;
                     employeeData.EmployeeDepartmentId = employee.EmployeeDepartmentId;
                     employeeData.EmployeeReportToId = employee.EmployeeReportToId;
