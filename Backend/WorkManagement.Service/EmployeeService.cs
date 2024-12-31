@@ -40,7 +40,7 @@ namespace WorkManagement.Service
             try
             {
                 var targetEmployeeId = CheckValidEmployeeId(loggedUserId);
-                if (targetEmployeeId == -1)
+                if (targetEmployeeId == -1 && userRole != "HR Admin")
                 {
                     throw new Exception("Invalid User data");
                 }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Claims;
+using WorkManagement.Domain.Attribute;
 using WorkManagement.Domain.Contracts;
 using WorkManagement.Domain.Entity;
 using WorkManagement.Domain.Models;
@@ -37,6 +38,7 @@ namespace WorkManagement.API.Controllers
 
         // GET: api/projects
         [HttpGet]
+        [PermissionAuth(PermissionActionEnum.ProjectModule_Dashboard)]
         public async Task<ActionResult<IEnumerable<ProjectDashboardModel>>> GetProjects()
         {
             var projects = await _projectService.GetAllProjectsAsync();
@@ -45,6 +47,7 @@ namespace WorkManagement.API.Controllers
 
         // GET: api/project/5
         [HttpGet("{id}")]
+        [PermissionAuth(PermissionActionEnum.ProjectModule_View)]
         public async Task<ActionResult<ProjectModel>> GetProject(int id)
         {
             var project = await _projectService.GetProjectByIdAsync(id);
@@ -57,6 +60,7 @@ namespace WorkManagement.API.Controllers
 
         // GET: api/project/projectTask/5
         [HttpGet("projectTask/{id}")]
+        [PermissionAuth(PermissionActionEnum.ProjectModule_Task)]
         public async Task<ActionResult<TaskModel>> GetProjectTask(int id)
         {
             var projectTask = await _projectService.GetProjectTaskByIdAsync(id);
@@ -69,6 +73,7 @@ namespace WorkManagement.API.Controllers
 
         // GET: api/projects/projectTask
         [HttpGet("projectTasks/{projectId}")]
+        [PermissionAuth(PermissionActionEnum.ProjectModule_Task)]
         public async Task<ActionResult<IEnumerable<TaskDashboardModel>>> GetProjectTasks(int projectId)
         {
             var projectTasks = await _projectService.GetAllProjectTasksAsync(projectId);
@@ -77,9 +82,11 @@ namespace WorkManagement.API.Controllers
 
         // POST: api/project
         [HttpPost]
+        [PermissionAuth(PermissionActionEnum.ProjectModule_Add)]
         public async Task<ActionResult<EmployeeModel>> CreateProject([FromBody] ProjectModel projectModel)
         {
-            var createdProject = await _projectService.CreateProjectAsync(projectModel);
+            string loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var createdProject = await _projectService.CreateProjectAsync(loggedUserId,projectModel);
             return Ok(createdProject);
 
         }
@@ -87,6 +94,7 @@ namespace WorkManagement.API.Controllers
 
         // PUT: api/project/5
         [HttpPut("{id}")]
+        [PermissionAuth(PermissionActionEnum.ProjectModule_Update)]
         public async Task<IActionResult> UpdateProject(int id, ProjectModel projectModel)
         {
             if (id != projectModel.Id)
@@ -95,17 +103,19 @@ namespace WorkManagement.API.Controllers
             }
 
             projectModel.Id = id;
-
-            var updatedProject = await _projectService.UpdateProjectAsync(projectModel);
+            string loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var updatedProject = await _projectService.UpdateProjectAsync(loggedUserId,projectModel);
             return Ok(updatedProject);
         }
 
 
         // DELETE: api/project/5
         [HttpDelete("{id}")]
+        [PermissionAuth(PermissionActionEnum.ProjectModule_Delete)]
         public async Task<IActionResult> DeleteProject(int id)
         {
-            var deleted = await _projectService.DeleteProjectAsync(id);
+            string loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var deleted = await _projectService.DeleteProjectAsync(loggedUserId,id);
             if (!deleted)
             {
                 return NotFound();
@@ -116,6 +126,7 @@ namespace WorkManagement.API.Controllers
 
         // POST: api/project/projectTask
         [HttpPost("projectTask")]
+        [PermissionAuth(PermissionActionEnum.ProjectModule_Task)]
         public async Task<ActionResult<EmployeeModel>> CreateProjectTask([FromBody] TaskModel taskModel)
         {
             string loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -127,6 +138,7 @@ namespace WorkManagement.API.Controllers
 
         // PUT: api/project/projectTask/5
         [HttpPut("projectTask/{id}")]
+        [PermissionAuth(PermissionActionEnum.ProjectModule_Task)]
         public async Task<IActionResult> UpdateProjectTask(int id, TaskModel taskModel)
         {
             if (id != taskModel.Id)
@@ -143,6 +155,7 @@ namespace WorkManagement.API.Controllers
 
         // DELETE: api/project/projectTask/5
         [HttpDelete("Task/{taskId}/{projectId}")]
+        [PermissionAuth(PermissionActionEnum.ProjectModule_Task)]
         public async Task<IActionResult> DeleteProjectTask(int taskId,int projectId)
         {
             var deleted = await _projectService.DeleteProjectTaskAsync(taskId,projectId);
@@ -153,6 +166,73 @@ namespace WorkManagement.API.Controllers
             return NoContent();
         }
 
+        [HttpPost("assign")]
+        [PermissionAuth(PermissionActionEnum.ProjectModule_Employee)]
+        public async Task<IActionResult> AssignProjectToEmployee(int projectId, int employeeId)
+        {
+            try
+            {
+                string loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var result = await _projectService.AssignProjectToEmployee(loggedUserId,projectId, employeeId);
+                if (result)
+                {
+                    return Ok(new { message = "Project assigned to employee successfully" });
+                }
+                else
+                {
+                    return BadRequest(new { message = "Failed to assign project to employee" });
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return StatusCode(500, new { message = "An error occurred while processing your request" });
+            }
+        }
+        [HttpGet("{projectId}/employees")]
+        [PermissionAuth(PermissionActionEnum.ProjectModule_Employee)]
+        public async Task<ActionResult<IEnumerable<EmployeeTeamMemberList>>> GetEmployeesByProjectId(int projectId)
+        {
+            try
+            {
+                var employees = await _projectService.GetEmployeesByProjectIdAsync(projectId);
+                if (employees == null)
+                {
+                    return NotFound("No employees found for this project.");
+                }
+                return Ok(employees);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
+        }
+
+        [HttpDelete("{projectId}/employees/{employeeId}")]
+        [PermissionAuth(PermissionActionEnum.ProjectModule_Employee)]
+        public async Task<IActionResult> RemoveEmployeeFromProject(int projectId, int employeeId)
+        {
+            try
+            {
+                var result = await _projectService.RemoveEmployeeFromProjectAsync(projectId, employeeId);
+                if (result)
+                {
+                    return Ok("Employee removed from project successfully.");
+                }
+                else
+                {
+                    return NotFound("Employee not found in the project or already removed.");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
+        }
+
+        #region Without Permission Methods
 
         [HttpGet("documents/{projectId}")]
         public async Task<ActionResult<IEnumerable<ProjectWorkOrders>>> GetWorkOrderDocuments(int projectId)
@@ -160,8 +240,6 @@ namespace WorkManagement.API.Controllers
             var documents = await _projectService.GetProjectDocumentsAsync(projectId);
             return Ok(documents);
         }
-
-
 
         [HttpPost("documnet/upload")]
         public async Task<ActionResult<string>> Upload(int id, IFormFile file)
@@ -266,75 +344,16 @@ namespace WorkManagement.API.Controllers
 
             return File(memory, GetContentType(filePath), fileName);
         }
-        [HttpPost("assign")]
-        public async Task<IActionResult> AssignProjectToEmployee(int projectId, int employeeId)
-        {
-            try
-            {
-                var result = await _projectService.AssignProjectToEmployee(projectId, employeeId);
-                if (result)
-                {
-                    return Ok(new { message = "Project assigned to employee successfully" });
-                }
-                else
-                {
-                    return BadRequest(new { message = "Failed to assign project to employee" });
-                }
-            }
-            catch (Exception ex)
-            {
-                // Log the exception
-                return StatusCode(500, new { message = "An error occurred while processing your request" });
-            }
-        }
-        [HttpGet("{projectId}/employees")]
-        public async Task<ActionResult<IEnumerable<EmployeeTeamMemberList>>> GetEmployeesByProjectId(int projectId)
-        {
-            try
-            {
-                var employees = await _projectService.GetEmployeesByProjectIdAsync(projectId);
-                if (employees == null)
-                {
-                    return NotFound("No employees found for this project.");
-                }
-                return Ok(employees);
-            }
-            catch (Exception ex)
-            {
-                // Log the exception
-                return StatusCode(500, "An error occurred while processing your request.");
-            }
-        }
 
-        [HttpDelete("{projectId}/employees/{employeeId}")]
-        public async Task<IActionResult> RemoveEmployeeFromProject(int projectId, int employeeId)
-        {
-            try
-            {
-                var result = await _projectService.RemoveEmployeeFromProjectAsync(projectId, employeeId);
-                if (result)
-                {
-                    return Ok("Employee removed from project successfully.");
-                }
-                else
-                {
-                    return NotFound("Employee not found in the project or already removed.");
-                }
-            }
-            catch (Exception ex)
-            {
-                // Log the exception
-                return StatusCode(500, "An error occurred while processing your request.");
-            }
-        }
         [HttpGet("department-employees/{departmentId}")]
-        public async Task<IEnumerable<EmployeeModel>> GetEmployeeByDepartment(int projectId ,int departmentId)
+        public async Task<IEnumerable<EmployeeModel>> GetEmployeeByDepartment(int projectId, int departmentId)
         {
             return await _projectService.GetEmployeesNotAssignedToProjectByDepartment(projectId, departmentId);
         }
 
+        #endregion
 
-
+        #region Private Methods
         private string GetContentType(string path)
         {
             var types = GetMimeTypes();
@@ -358,6 +377,10 @@ namespace WorkManagement.API.Controllers
                 { ".csv", "text/csv" }
             };
         }
+
+        #endregion
+
+
 
 
 
