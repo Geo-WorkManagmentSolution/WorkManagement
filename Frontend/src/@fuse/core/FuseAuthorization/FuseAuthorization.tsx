@@ -85,7 +85,7 @@ class FuseAuthorization extends Component<FuseAuthorizationProps, State> {
 			if (isOnlyGuestAllowed) {
 				setSessionRedirectUrl('401');
 			} else {
-				setSessionRedirectUrl('/');
+				setSessionRedirectUrl('401');
 			}
 		}
 

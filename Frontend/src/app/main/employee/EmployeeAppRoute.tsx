@@ -9,6 +9,7 @@ import EmployeesLeaveHistories from './leave-management/employeeLeaveHiistory/Em
 import SalaryApprovalTable from './salary-managment/SalaryApprovalTable';
 import SalaryEmployees from './salary-managment/SalaryEmployees';
 import EmployeeSalaryHistory from './salary-managment/EmployeeSalaryHistory';
+import { authRoles } from 'src/app/auth';
 // import Employees from './employees/Employees';
 
 const EmployeeApp = lazy(() => import('./EmployeeApp'));
@@ -46,6 +47,7 @@ const EmployeeAppRoute: FuseRouteItemType = {
 			children: [
 				{
 					path: '',
+					// auth:authRoles.admin,
 					element: <Employees />
 				},
 				{

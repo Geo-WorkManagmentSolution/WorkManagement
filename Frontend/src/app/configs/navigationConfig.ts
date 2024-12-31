@@ -34,7 +34,7 @@ const navigationConfig: FuseNavItemType[] = [
 						title: 'Employee Dashboard',
 						type: 'item',
 						url: '/apps/employees',
-						// auth:authRoles.HRAdmin,
+						// auth:authRoles.admin,						
 						// hasPermission:false,
 						// end: true
 					},
@@ -127,7 +127,7 @@ const navigationConfig: FuseNavItemType[] = [
 				id: 'applicationmanagement.settings',
 				title: 'Settings',
 				type: 'item',
-				auth:authRoles.HRAdmin,
+				auth:authRoles.admin,
 				icon: 'heroicons-outline:cog-8-tooth',
 				url: '/apps/settings'
 			}
