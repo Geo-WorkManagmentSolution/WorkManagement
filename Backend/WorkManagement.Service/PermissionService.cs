@@ -25,18 +25,26 @@ namespace WorkManagement.API.Controllers
         }
 
         public async Task<List<RolePermission>> AssignRolePermissionsAsync(IEnumerable<RolePermission> featurePermissions)
-        {
-            foreach (var permission in featurePermissions)
-            {
-                if (await _dbContext.RolePermissions.AnyAsync(x => x.RoleId == permission.RoleId && x.PermissionActionId == permission.PermissionActionId))
-                    continue;
-                _dbContext.RolePermissions.Add(permission);
-            }
+{
+    if (!featurePermissions.Any())
+    {
+        return new List<RolePermission>();
+    }
 
-            await _dbContext.SaveChangesAsync();
-            return featurePermissions.ToList();
+    var roleId = featurePermissions.First().RoleId;
 
-        }
+    // Remove existing permissions for the role
+    var existingPermissions = await _dbContext.RolePermissions
+        .Where(x => x.RoleId == roleId)
+        .ToListAsync();
+    _dbContext.RolePermissions.RemoveRange(existingPermissions);
+
+    // Add new permissions
+    await _dbContext.RolePermissions.AddRangeAsync(featurePermissions);
+
+    await _dbContext.SaveChangesAsync();
+    return featurePermissions.ToList();
+}
 
         public async Task<List<PermissionCategoryClaim>> GetPermissionClaimsByUserAsync(Guid UserId)
         {

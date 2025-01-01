@@ -17,10 +17,10 @@ namespace WorkManagement.Service
 
         public Task<ProjectModel> GetProjectByIdAsync(int id);
 
-        public Task<ProjectModel> CreateProjectAsync(ProjectModel project);
+        public Task<ProjectModel> CreateProjectAsync(string loggedUserId,ProjectModel project);
                                                                    
-        public Task<ProjectModel> UpdateProjectAsync(ProjectModel project);
-        public Task<bool> DeleteProjectAsync(int id);
+        public Task<ProjectModel> UpdateProjectAsync(string loggedUserId,ProjectModel project);
+        public Task<bool> DeleteProjectAsync(string loggedUserId,int id);
         public Task<List<ProjectWorkOrders>> GetProjectDocumentsAsync(int projectId);
         public Task<string> GetProjectFolderPath(int id);
 
@@ -32,7 +32,7 @@ namespace WorkManagement.Service
         public Task<string> UpdateProjectDocumentData(int id, string fileName, FileType fileType, long fileSize, string filePath, byte[] fileContent);
         public string GetProjectFilePath(int id, string fileName);
         public Task<bool> DeleteProjectFile(int employeeId, string fileName);
-        public Task<bool> AssignProjectToEmployee(int projectId, int employeeId);
+        public Task<bool> AssignProjectToEmployee(string loggedUserId,int projectId, int employeeId);
         public  Task<bool> RemoveEmployeeFromProjectAsync(int projectId, int employeeId);
         public  Task<List<EmployeeTeamMemberList>> GetEmployeesByProjectIdAsync(int projectId);
         public Task<List<EmployeeModel>> GetEmployeesNotAssignedToProjectByDepartment(int projectId, int departmentId);

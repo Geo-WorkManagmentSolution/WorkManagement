@@ -3,6 +3,7 @@ import FusePageSimple from '@fuse/core/FusePageSimple';
 import { useTranslation } from 'react-i18next';
 import { styled } from '@mui/material/styles';
 import GeoDemoContent from './GeoDemoContent';
+import { useAppSelector } from 'app/store/hooks';
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
 	'& .FusePageSimple-header': {
@@ -17,6 +18,9 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
 }));
 
 function Example() {
+	const user = useAppSelector((state) => state.user);
+	console.log("user",user);
+	
 	const { t } = useTranslation('examplePage');
 
 	return (

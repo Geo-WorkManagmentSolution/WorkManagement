@@ -18,7 +18,7 @@
             }
 
             //Admin should allow all actions
-            if (user.Claims.Any(x=>x.Type == ClaimTypes.Role && x.Value == "admin")) {
+            if (user.Claims.Any(x=>x.Type == ClaimTypes.Role && x.Value == "Admin")) {
                 context.Succeed(requirement);
                 return Task.CompletedTask;
             }
@@ -45,15 +45,15 @@
                 return false;
             }
 
-            var permissions = JsonConvert.DeserializeObject<PermissionCategoryClaim>(permissionsString);
+            var permissions = JsonConvert.DeserializeObject<List<PermissionCategoryClaim>>(permissionsString);
 
             // Now check the hierarchical structure for the specific permission action
             return HasRequiredPermission(permissions, permissionAction);
         }
 
-        private bool HasRequiredPermission(PermissionCategoryClaim permissionActionClaims, PermissionActionEnum requiredPermission)
+        private bool HasRequiredPermission(List<PermissionCategoryClaim> permissionActionClaims, PermissionActionEnum requiredPermission)
         {
-            foreach (var categoryAction in permissionActionClaims.Actions)
+            foreach (var categoryAction in permissionActionClaims.SelectMany(x=>x.Actions))
             {
                 if (categoryAction.Id == requiredPermission)
                 {

@@ -90,6 +90,36 @@ const injectedRtkApi = api.injectEndpoints({
         method: "DELETE",
       }),
     }),
+    postApiProjectAssign: build.mutation<
+      PostApiProjectAssignApiResponse,
+      PostApiProjectAssignApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Project/assign`,
+        method: "POST",
+        params: {
+          projectId: queryArg.projectId,
+          employeeId: queryArg.employeeId,
+        },
+      }),
+    }),
+    getApiProjectByProjectIdEmployees: build.query<
+      GetApiProjectByProjectIdEmployeesApiResponse,
+      GetApiProjectByProjectIdEmployeesApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Project/${queryArg.projectId}/employees`,
+      }),
+    }),
+    deleteApiProjectByProjectIdEmployeesAndEmployeeId: build.mutation<
+      DeleteApiProjectByProjectIdEmployeesAndEmployeeIdApiResponse,
+      DeleteApiProjectByProjectIdEmployeesAndEmployeeIdApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Project/${queryArg.projectId}/employees/${queryArg.employeeId}`,
+        method: "DELETE",
+      }),
+    }),
     getApiProjectDocumentsByProjectId: build.query<
       GetApiProjectDocumentsByProjectIdApiResponse,
       GetApiProjectDocumentsByProjectIdApiArg
@@ -126,36 +156,6 @@ const injectedRtkApi = api.injectEndpoints({
       query: (queryArg) => ({
         url: `/api/Project/download/${queryArg.fileName}`,
         params: { id: queryArg.id },
-      }),
-    }),
-    postApiProjectAssign: build.mutation<
-      PostApiProjectAssignApiResponse,
-      PostApiProjectAssignApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/Project/assign`,
-        method: "POST",
-        params: {
-          projectId: queryArg.projectId,
-          employeeId: queryArg.employeeId,
-        },
-      }),
-    }),
-    getApiProjectByProjectIdEmployees: build.query<
-      GetApiProjectByProjectIdEmployeesApiResponse,
-      GetApiProjectByProjectIdEmployeesApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/Project/${queryArg.projectId}/employees`,
-      }),
-    }),
-    deleteApiProjectByProjectIdEmployeesAndEmployeeId: build.mutation<
-      DeleteApiProjectByProjectIdEmployeesAndEmployeeIdApiResponse,
-      DeleteApiProjectByProjectIdEmployeesAndEmployeeIdApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/Project/${queryArg.projectId}/employees/${queryArg.employeeId}`,
-        method: "DELETE",
       }),
     }),
     getApiProjectDepartmentEmployeesByDepartmentId: build.query<
@@ -221,6 +221,22 @@ export type DeleteApiProjectTaskByTaskIdAndProjectIdApiArg = {
   taskId: number;
   projectId: number;
 };
+export type PostApiProjectAssignApiResponse = unknown;
+export type PostApiProjectAssignApiArg = {
+  projectId?: number;
+  employeeId?: number;
+};
+export type GetApiProjectByProjectIdEmployeesApiResponse =
+  /** status 200 OK */ EmployeeTeamMemberList[];
+export type GetApiProjectByProjectIdEmployeesApiArg = {
+  projectId: number;
+};
+export type DeleteApiProjectByProjectIdEmployeesAndEmployeeIdApiResponse =
+  unknown;
+export type DeleteApiProjectByProjectIdEmployeesAndEmployeeIdApiArg = {
+  projectId: number;
+  employeeId: number;
+};
 export type GetApiProjectDocumentsByProjectIdApiResponse =
   /** status 200 OK */ ProjectWorkOrders[];
 export type GetApiProjectDocumentsByProjectIdApiArg = {
@@ -243,22 +259,6 @@ export type GetApiProjectDownloadByFileNameApiResponse = unknown;
 export type GetApiProjectDownloadByFileNameApiArg = {
   id?: number;
   fileName: string;
-};
-export type PostApiProjectAssignApiResponse = unknown;
-export type PostApiProjectAssignApiArg = {
-  projectId?: number;
-  employeeId?: number;
-};
-export type GetApiProjectByProjectIdEmployeesApiResponse =
-  /** status 200 OK */ EmployeeTeamMemberList[];
-export type GetApiProjectByProjectIdEmployeesApiArg = {
-  projectId: number;
-};
-export type DeleteApiProjectByProjectIdEmployeesAndEmployeeIdApiResponse =
-  unknown;
-export type DeleteApiProjectByProjectIdEmployeesAndEmployeeIdApiArg = {
-  projectId: number;
-  employeeId: number;
 };
 export type GetApiProjectDepartmentEmployeesByDepartmentIdApiResponse =
   /** status 200 OK */ EmployeeModel[];
@@ -438,6 +438,14 @@ export type TaskDashboardModel = {
   remainingHours?: number | null;
   completedHours?: number | null;
 };
+export type EmployeeTeamMemberList = {
+  name?: string | null;
+  email?: string | null;
+  avatar?: string | null;
+  employeeNumber?: number;
+  designation?: string | null;
+  employeeId?: number;
+};
 export type Project = {
   id?: number;
   createdBy?: string;
@@ -467,14 +475,6 @@ export type ProjectWorkOrders = {
   fileType?: FileType;
   projectId?: number | null;
   project?: Project;
-};
-export type EmployeeTeamMemberList = {
-  name?: string | null;
-  email?: string | null;
-  avatar?: string | null;
-  employeeNumber?: number;
-  designation?: string | null;
-  employeeId?: number;
 };
 export enum ProjectStatus {
   Upcoming = "Upcoming",
@@ -556,16 +556,16 @@ export const {
   useLazyGetApiProjectProjectTasksByProjectIdQuery,
   usePostApiProjectProjectTaskMutation,
   useDeleteApiProjectTaskByTaskIdAndProjectIdMutation,
+  usePostApiProjectAssignMutation,
+  useGetApiProjectByProjectIdEmployeesQuery,
+  useLazyGetApiProjectByProjectIdEmployeesQuery,
+  useDeleteApiProjectByProjectIdEmployeesAndEmployeeIdMutation,
   useGetApiProjectDocumentsByProjectIdQuery,
   useLazyGetApiProjectDocumentsByProjectIdQuery,
   usePostApiProjectDocumnetUploadMutation,
   useDeleteApiProjectDocumentByFileNameMutation,
   useGetApiProjectDownloadByFileNameQuery,
   useLazyGetApiProjectDownloadByFileNameQuery,
-  usePostApiProjectAssignMutation,
-  useGetApiProjectByProjectIdEmployeesQuery,
-  useLazyGetApiProjectByProjectIdEmployeesQuery,
-  useDeleteApiProjectByProjectIdEmployeesAndEmployeeIdMutation,
   useGetApiProjectDepartmentEmployeesByDepartmentIdQuery,
   useLazyGetApiProjectDepartmentEmployeesByDepartmentIdQuery,
 } = injectedRtkApi;

@@ -31,6 +31,17 @@ const axiosBaseQuery =
 			};
 		}
 	};
+
+Axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+      // Redirect to the unauthorized page
+      window.location.href = '/401';
+    }
+    return Promise.reject(error);
+  }
+);
 // useEffect(() => {
 // 	if (config.updateTokenFromHeader && isAuthenticated) {
 // 		axios.interceptors.response.use(
@@ -69,3 +80,4 @@ export const apiService = createApi({
 });
 
 export default apiService;
+

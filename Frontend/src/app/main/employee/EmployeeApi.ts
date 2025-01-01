@@ -17,6 +17,161 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.employeeModel,
       }),
     }),
+    getApiEmployeesById: build.query<
+      GetApiEmployeesByIdApiResponse,
+      GetApiEmployeesByIdApiArg
+    >({
+      query: (queryArg) => ({ url: `/api/Employees/${queryArg.id}` }),
+    }),
+    putApiEmployeesById: build.mutation<
+      PutApiEmployeesByIdApiResponse,
+      PutApiEmployeesByIdApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/${queryArg.id}`,
+        method: "PUT",
+        body: queryArg.employeeModel,
+      }),
+    }),
+    deleteApiEmployeesById: build.mutation<
+      DeleteApiEmployeesByIdApiResponse,
+      DeleteApiEmployeesByIdApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/${queryArg.id}`,
+        method: "DELETE",
+      }),
+    }),
+    getApiEmployeesPartialByEmployeeId: build.query<
+      GetApiEmployeesPartialByEmployeeIdApiResponse,
+      GetApiEmployeesPartialByEmployeeIdApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/partial/${queryArg.employeeId}`,
+      }),
+    }),
+    putApiEmployeesSalaryApproveBySalaryId: build.mutation<
+      PutApiEmployeesSalaryApproveBySalaryIdApiResponse,
+      PutApiEmployeesSalaryApproveBySalaryIdApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/SalaryApprove/${queryArg.salaryId}`,
+        method: "PUT",
+        params: { employeeId: queryArg.employeeId },
+      }),
+    }),
+    putApiEmployeesSalaryRejectBySalaryId: build.mutation<
+      PutApiEmployeesSalaryRejectBySalaryIdApiResponse,
+      PutApiEmployeesSalaryRejectBySalaryIdApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/SalaryReject/${queryArg.salaryId}`,
+        method: "PUT",
+        params: { employeeId: queryArg.employeeId },
+      }),
+    }),
+    getApiEmployeesSalaryPendingSalaryRequest: build.query<
+      GetApiEmployeesSalaryPendingSalaryRequestApiResponse,
+      GetApiEmployeesSalaryPendingSalaryRequestApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/Salary/PendingSalaryRequest`,
+        params: { employeeId: queryArg.employeeId },
+      }),
+    }),
+    getApiEmployeesSalaryDashboard: build.query<
+      GetApiEmployeesSalaryDashboardApiResponse,
+      GetApiEmployeesSalaryDashboardApiArg
+    >({
+      query: () => ({ url: `/api/Employees/SalaryDashboard` }),
+    }),
+    getApiEmployeesLeavesCurrent: build.query<
+      GetApiEmployeesLeavesCurrentApiResponse,
+      GetApiEmployeesLeavesCurrentApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/leaves/current`,
+        params: { employeeId: queryArg.employeeId },
+      }),
+    }),
+    postApiEmployeesLeavesAddLeave: build.mutation<
+      PostApiEmployeesLeavesAddLeaveApiResponse,
+      PostApiEmployeesLeavesAddLeaveApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/leaves/addLeave`,
+        method: "POST",
+        body: queryArg.employeeLeaveModel,
+      }),
+    }),
+    putApiEmployeesLeavesUpdateLeave: build.mutation<
+      PutApiEmployeesLeavesUpdateLeaveApiResponse,
+      PutApiEmployeesLeavesUpdateLeaveApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/leaves/updateLeave`,
+        method: "PUT",
+        body: queryArg.employeeLeaveModel,
+      }),
+    }),
+    deleteApiEmployeesLeavesCancelLeave: build.mutation<
+      DeleteApiEmployeesLeavesCancelLeaveApiResponse,
+      DeleteApiEmployeesLeavesCancelLeaveApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/leaves/cancelLeave`,
+        method: "DELETE",
+        params: { employeeLeaveId: queryArg.employeeLeaveId },
+      }),
+    }),
+    putApiEmployeesApproveByLeaveId: build.mutation<
+      PutApiEmployeesApproveByLeaveIdApiResponse,
+      PutApiEmployeesApproveByLeaveIdApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/approve/${queryArg.leaveId}`,
+        method: "PUT",
+      }),
+    }),
+    putApiEmployeesRejectByLeaveId: build.mutation<
+      PutApiEmployeesRejectByLeaveIdApiResponse,
+      PutApiEmployeesRejectByLeaveIdApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/reject/${queryArg.leaveId}`,
+        method: "PUT",
+      }),
+    }),
+    postApiEmployeesSettingsAddDropdownItem: build.mutation<
+      PostApiEmployeesSettingsAddDropdownItemApiResponse,
+      PostApiEmployeesSettingsAddDropdownItemApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/settings/addDropdownItem`,
+        method: "POST",
+        body: queryArg.dropdownModel,
+      }),
+    }),
+    deleteApiEmployeesSettingsDeleteDropdownItemByIdAndDropdownName:
+      build.mutation<
+        DeleteApiEmployeesSettingsDeleteDropdownItemByIdAndDropdownNameApiResponse,
+        DeleteApiEmployeesSettingsDeleteDropdownItemByIdAndDropdownNameApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/api/Employees/settings/deleteDropdownItem/${queryArg.id}/${queryArg.dropdownName}`,
+          method: "DELETE",
+        }),
+      }),
+    putApiEmployeesSettingsUpdateDropdownItem: build.mutation<
+      PutApiEmployeesSettingsUpdateDropdownItemApiResponse,
+      PutApiEmployeesSettingsUpdateDropdownItemApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/settings/ updateDropdownItem`,
+        method: "PUT",
+        body: queryArg.dropdownModel,
+      }),
+    }),
     getApiEmployeesCategories: build.query<
       GetApiEmployeesCategoriesApiResponse,
       GetApiEmployeesCategoriesApiArg
@@ -41,12 +196,12 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: () => ({ url: `/api/Employees/sites` }),
     }),
-    getApiEmployeesReportToEMployeeList: build.query<
-      GetApiEmployeesReportToEMployeeListApiResponse,
-      GetApiEmployeesReportToEMployeeListApiArg
+    getApiEmployeesReportToEmployeeList: build.query<
+      GetApiEmployeesReportToEmployeeListApiResponse,
+      GetApiEmployeesReportToEmployeeListApiArg
     >({
       query: (queryArg) => ({
-        url: `/api/Employees/ReportToE mployeeList`,
+        url: `/api/Employees/ReportToEmployeeList`,
         params: {
           departmentId: queryArg.departmentId,
           employeeId: queryArg.employeeId,
@@ -60,31 +215,6 @@ const injectedRtkApi = api.injectEndpoints({
       query: (queryArg) => ({
         url: `/api/Employees/TeamMembersList`,
         params: { employeeId: queryArg.employeeId },
-      }),
-    }),
-    getApiEmployeesById: build.query<
-      GetApiEmployeesByIdApiResponse,
-      GetApiEmployeesByIdApiArg
-    >({
-      query: (queryArg) => ({ url: `/api/Employees/${queryArg.id}` }),
-    }),
-    putApiEmployeesById: build.mutation<
-      PutApiEmployeesByIdApiResponse,
-      PutApiEmployeesByIdApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/Employees/${queryArg.id}`,
-        method: "PUT",
-        body: queryArg.employeeModel,
-      }),
-    }),
-    deleteApiEmployeesById: build.mutation<
-      DeleteApiEmployeesByIdApiResponse,
-      DeleteApiEmployeesByIdApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/Employees/${queryArg.id}`,
-        method: "DELETE",
       }),
     }),
     getApiEmployeesCheckEmailExists: build.query<
@@ -152,63 +282,6 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.employeeDesignation,
       }),
     }),
-    getApiEmployeesLeavesCurrent: build.query<
-      GetApiEmployeesLeavesCurrentApiResponse,
-      GetApiEmployeesLeavesCurrentApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/Employees/leaves/current`,
-        params: { employeeId: queryArg.employeeId },
-      }),
-    }),
-    postApiEmployeesLeavesAddLeave: build.mutation<
-      PostApiEmployeesLeavesAddLeaveApiResponse,
-      PostApiEmployeesLeavesAddLeaveApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/Employees/leaves/addLeave`,
-        method: "POST",
-        body: queryArg.employeeLeaveModel,
-      }),
-    }),
-    putApiEmployeesLeavesUpdateLeave: build.mutation<
-      PutApiEmployeesLeavesUpdateLeaveApiResponse,
-      PutApiEmployeesLeavesUpdateLeaveApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/Employees/leaves/updateLeave`,
-        method: "PUT",
-        body: queryArg.employeeLeaveModel,
-      }),
-    }),
-    deleteApiEmployeesLeavesCancelLeave: build.mutation<
-      DeleteApiEmployeesLeavesCancelLeaveApiResponse,
-      DeleteApiEmployeesLeavesCancelLeaveApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/Employees/leaves/cancelLeave`,
-        method: "DELETE",
-        params: { employeeLeaveId: queryArg.employeeLeaveId },
-      }),
-    }),
-    putApiEmployeesApproveByLeaveId: build.mutation<
-      PutApiEmployeesApproveByLeaveIdApiResponse,
-      PutApiEmployeesApproveByLeaveIdApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/Employees/approve/${queryArg.leaveId}`,
-        method: "PUT",
-      }),
-    }),
-    putApiEmployeesRejectByLeaveId: build.mutation<
-      PutApiEmployeesRejectByLeaveIdApiResponse,
-      PutApiEmployeesRejectByLeaveIdApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/Employees/reject/${queryArg.leaveId}`,
-        method: "PUT",
-      }),
-    }),
     postApiEmployeesDocumnetUpload: build.mutation<
       PostApiEmployeesDocumnetUploadApiResponse,
       PostApiEmployeesDocumnetUploadApiArg
@@ -237,36 +310,6 @@ const injectedRtkApi = api.injectEndpoints({
       query: (queryArg) => ({
         url: `/api/Employees/download/${queryArg.fileName}`,
         params: { id: queryArg.id },
-      }),
-    }),
-    postApiEmployeesSettingsAddDropdownItem: build.mutation<
-      PostApiEmployeesSettingsAddDropdownItemApiResponse,
-      PostApiEmployeesSettingsAddDropdownItemApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/Employees/settings/addDropdownItem`,
-        method: "POST",
-        body: queryArg.dropdownModel,
-      }),
-    }),
-    deleteApiEmployeesSettingsDeleteDropdownItemByIdAndDropdownName:
-      build.mutation<
-        DeleteApiEmployeesSettingsDeleteDropdownItemByIdAndDropdownNameApiResponse,
-        DeleteApiEmployeesSettingsDeleteDropdownItemByIdAndDropdownNameApiArg
-      >({
-        query: (queryArg) => ({
-          url: `/api/Employees/settings/deleteDropdownItem/${queryArg.id}/${queryArg.dropdownName}`,
-          method: "DELETE",
-        }),
-      }),
-    putApiEmployeesSettingsUpdateDropdownItem: build.mutation<
-      PutApiEmployeesSettingsUpdateDropdownItemApiResponse,
-      PutApiEmployeesSettingsUpdateDropdownItemApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/api/Employees/settings/ updateDropdownItem`,
-        method: "PUT",
-        body: queryArg.dropdownModel,
       }),
     }),
     getApiEmployeesProjectByEmployeeId: build.query<
@@ -314,28 +357,6 @@ export type PostApiEmployeesApiResponse = /** status 200 OK */ EmployeeModel;
 export type PostApiEmployeesApiArg = {
   employeeModel: EmployeeModel;
 };
-export type GetApiEmployeesCategoriesApiResponse =
-  /** status 200 OK */ EmployeeCategory[];
-export type GetApiEmployeesCategoriesApiArg = void;
-export type GetApiEmployeesDepartmentsApiResponse =
-  /** status 200 OK */ EmployeeDepartment[];
-export type GetApiEmployeesDepartmentsApiArg = void;
-export type GetApiEmployeesDesignationsApiResponse =
-  /** status 200 OK */ EmployeeDesignation[];
-export type GetApiEmployeesDesignationsApiArg = void;
-export type GetApiEmployeesSitesApiResponse = /** status 200 OK */ Site[];
-export type GetApiEmployeesSitesApiArg = void;
-export type GetApiEmployeesReportToEMployeeListApiResponse =
-  /** status 200 OK */ EmployeeReportToModel[];
-export type GetApiEmployeesReportToEMployeeListApiArg = {
-  departmentId?: number;
-  employeeId?: number;
-};
-export type GetApiEmployeesTeamMembersListApiResponse =
-  /** status 200 OK */ EmployeeTeamMemberList[];
-export type GetApiEmployeesTeamMembersListApiArg = {
-  employeeId?: number;
-};
 export type GetApiEmployeesByIdApiResponse = /** status 200 OK */ EmployeeModel;
 export type GetApiEmployeesByIdApiArg = {
   id: number;
@@ -348,6 +369,98 @@ export type PutApiEmployeesByIdApiArg = {
 export type DeleteApiEmployeesByIdApiResponse = unknown;
 export type DeleteApiEmployeesByIdApiArg = {
   id: number;
+};
+export type GetApiEmployeesPartialByEmployeeIdApiResponse =
+  /** status 200 OK */ SalaryEmployeeDashboardModel;
+export type GetApiEmployeesPartialByEmployeeIdApiArg = {
+  employeeId: number;
+};
+export type PutApiEmployeesSalaryApproveBySalaryIdApiResponse =
+  /** status 200 OK */ EmployeeSalary;
+export type PutApiEmployeesSalaryApproveBySalaryIdApiArg = {
+  salaryId: number;
+  employeeId?: number;
+};
+export type PutApiEmployeesSalaryRejectBySalaryIdApiResponse =
+  /** status 200 OK */ EmployeeSalary;
+export type PutApiEmployeesSalaryRejectBySalaryIdApiArg = {
+  salaryId: number;
+  employeeId?: number;
+};
+export type GetApiEmployeesSalaryPendingSalaryRequestApiResponse =
+  /** status 200 OK */ EmployeeSalaryDataModel[];
+export type GetApiEmployeesSalaryPendingSalaryRequestApiArg = {
+  employeeId?: number;
+};
+export type GetApiEmployeesSalaryDashboardApiResponse =
+  /** status 200 OK */ SalaryEmployeeDashboardModel[];
+export type GetApiEmployeesSalaryDashboardApiArg = void;
+export type GetApiEmployeesLeavesCurrentApiResponse =
+  /** status 200 OK */ EmployeeLeaveSummary[];
+export type GetApiEmployeesLeavesCurrentApiArg = {
+  employeeId?: number;
+};
+export type PostApiEmployeesLeavesAddLeaveApiResponse =
+  /** status 200 OK */ EmployeeLeaveModel;
+export type PostApiEmployeesLeavesAddLeaveApiArg = {
+  employeeLeaveModel: EmployeeLeaveModel;
+};
+export type PutApiEmployeesLeavesUpdateLeaveApiResponse =
+  /** status 200 OK */ EmployeeLeaveModel;
+export type PutApiEmployeesLeavesUpdateLeaveApiArg = {
+  employeeLeaveModel: EmployeeLeaveModel;
+};
+export type DeleteApiEmployeesLeavesCancelLeaveApiResponse =
+  /** status 200 OK */ boolean;
+export type DeleteApiEmployeesLeavesCancelLeaveApiArg = {
+  employeeLeaveId?: number;
+};
+export type PutApiEmployeesApproveByLeaveIdApiResponse =
+  /** status 200 OK */ EmployeeLeave;
+export type PutApiEmployeesApproveByLeaveIdApiArg = {
+  leaveId: number;
+};
+export type PutApiEmployeesRejectByLeaveIdApiResponse =
+  /** status 200 OK */ EmployeeLeave;
+export type PutApiEmployeesRejectByLeaveIdApiArg = {
+  leaveId: number;
+};
+export type PostApiEmployeesSettingsAddDropdownItemApiResponse = unknown;
+export type PostApiEmployeesSettingsAddDropdownItemApiArg = {
+  dropdownModel: DropdownModel;
+};
+export type DeleteApiEmployeesSettingsDeleteDropdownItemByIdAndDropdownNameApiResponse =
+  unknown;
+export type DeleteApiEmployeesSettingsDeleteDropdownItemByIdAndDropdownNameApiArg =
+  {
+    id: number;
+    dropdownName: string;
+  };
+export type PutApiEmployeesSettingsUpdateDropdownItemApiResponse = unknown;
+export type PutApiEmployeesSettingsUpdateDropdownItemApiArg = {
+  dropdownModel: DropdownModel;
+};
+export type GetApiEmployeesCategoriesApiResponse =
+  /** status 200 OK */ EmployeeCategory[];
+export type GetApiEmployeesCategoriesApiArg = void;
+export type GetApiEmployeesDepartmentsApiResponse =
+  /** status 200 OK */ EmployeeDepartment[];
+export type GetApiEmployeesDepartmentsApiArg = void;
+export type GetApiEmployeesDesignationsApiResponse =
+  /** status 200 OK */ EmployeeDesignation[];
+export type GetApiEmployeesDesignationsApiArg = void;
+export type GetApiEmployeesSitesApiResponse = /** status 200 OK */ Site[];
+export type GetApiEmployeesSitesApiArg = void;
+export type GetApiEmployeesReportToEmployeeListApiResponse =
+  /** status 200 OK */ EmployeeReportToModel[];
+export type GetApiEmployeesReportToEmployeeListApiArg = {
+  departmentId?: number;
+  employeeId?: number;
+};
+export type GetApiEmployeesTeamMembersListApiResponse =
+  /** status 200 OK */ EmployeeTeamMemberList[];
+export type GetApiEmployeesTeamMembersListApiArg = {
+  employeeId?: number;
 };
 export type GetApiEmployeesCheckEmailExistsApiResponse =
   /** status 200 OK */ boolean;
@@ -377,36 +490,6 @@ export type PostApiEmployeesAddNewDesignationApiResponse = unknown;
 export type PostApiEmployeesAddNewDesignationApiArg = {
   employeeDesignation: EmployeeDesignation;
 };
-export type GetApiEmployeesLeavesCurrentApiResponse =
-  /** status 200 OK */ EmployeeLeaveSummaryModel[];
-export type GetApiEmployeesLeavesCurrentApiArg = {
-  employeeId?: number;
-};
-export type PostApiEmployeesLeavesAddLeaveApiResponse =
-  /** status 200 OK */ EmployeeLeaveModel;
-export type PostApiEmployeesLeavesAddLeaveApiArg = {
-  employeeLeaveModel: EmployeeLeaveModel;
-};
-export type PutApiEmployeesLeavesUpdateLeaveApiResponse =
-  /** status 200 OK */ EmployeeLeaveModel;
-export type PutApiEmployeesLeavesUpdateLeaveApiArg = {
-  employeeLeaveModel: EmployeeLeaveModel;
-};
-export type DeleteApiEmployeesLeavesCancelLeaveApiResponse =
-  /** status 200 OK */ boolean;
-export type DeleteApiEmployeesLeavesCancelLeaveApiArg = {
-  employeeLeaveId?: number;
-};
-export type PutApiEmployeesApproveByLeaveIdApiResponse =
-  /** status 200 OK */ EmployeeLeave;
-export type PutApiEmployeesApproveByLeaveIdApiArg = {
-  leaveId: number;
-};
-export type PutApiEmployeesRejectByLeaveIdApiResponse =
-  /** status 200 OK */ EmployeeLeave;
-export type PutApiEmployeesRejectByLeaveIdApiArg = {
-  leaveId: number;
-};
 export type PostApiEmployeesDocumnetUploadApiResponse =
   /** status 200 OK */ string;
 export type PostApiEmployeesDocumnetUploadApiArg = {
@@ -424,21 +507,6 @@ export type GetApiEmployeesDownloadByFileNameApiResponse = unknown;
 export type GetApiEmployeesDownloadByFileNameApiArg = {
   id?: number;
   fileName: string;
-};
-export type PostApiEmployeesSettingsAddDropdownItemApiResponse = unknown;
-export type PostApiEmployeesSettingsAddDropdownItemApiArg = {
-  dropdownModel: DropdownModel;
-};
-export type DeleteApiEmployeesSettingsDeleteDropdownItemByIdAndDropdownNameApiResponse =
-  unknown;
-export type DeleteApiEmployeesSettingsDeleteDropdownItemByIdAndDropdownNameApiArg =
-  {
-    id: number;
-    dropdownName: string;
-  };
-export type PutApiEmployeesSettingsUpdateDropdownItemApiResponse = unknown;
-export type PutApiEmployeesSettingsUpdateDropdownItemApiArg = {
-  dropdownModel: DropdownModel;
 };
 export type GetApiEmployeesProjectByEmployeeIdApiResponse =
   /** status 200 OK */ ProjectModel[];
@@ -593,10 +661,13 @@ export type EmployeeModel = {
   employeeDocuments?: EmployeeDocumentsModel[] | null;
   employeeLeaves?: EmployeeLeaveSummaryModel[] | null;
 };
-export type EmployeeCategory = {
+export type SalaryEmployeeDashboardModel = {
   id?: number;
-  isDeleted?: boolean;
-  name?: string | null;
+  employeeNumber?: number;
+  fullName?: string | null;
+  email?: string | null;
+  departmentName?: string | null;
+  designationName?: string | null;
 };
 export type EmployeeDepartment = {
   id?: number;
@@ -608,28 +679,243 @@ export type EmployeeDesignation = {
   isDeleted?: boolean;
   name?: string | null;
 };
+export type ApplicationUser = {
+  id?: string;
+  userName?: string | null;
+  normalizedUserName?: string | null;
+  email?: string | null;
+  normalizedEmail?: string | null;
+  emailConfirmed?: boolean;
+  passwordHash?: string | null;
+  securityStamp?: string | null;
+  concurrencyStamp?: string | null;
+  phoneNumber?: string | null;
+  phoneNumberConfirmed?: boolean;
+  twoFactorEnabled?: boolean;
+  lockoutEnd?: string | null;
+  lockoutEnabled?: boolean;
+  accessFailedCount?: number;
+  shortcuts?: string[] | null;
+};
+export type ApplicationRole = {
+  id?: string;
+  name?: string | null;
+  normalizedName?: string | null;
+  concurrencyStamp?: string | null;
+};
+export type EmployeeCategory = {
+  id?: number;
+  isDeleted?: boolean;
+  name?: string | null;
+};
+export type EmployeePersonalDetails = {
+  id?: number;
+  isDeleted?: boolean;
+  dateOfBirth?: string | null;
+  gender?: string | null;
+  maritalStatus?: MaritalStatus;
+  bloodGroup?: BloodGroup;
+  relationWithEmployee?: RelationWithEmployee;
+};
 export type Site = {
   id?: number;
   isDeleted?: boolean;
   name?: string | null;
 };
-export type EmployeeReportToModel = {
-  name?: string | null;
+export type EmployeeWorkInformation = {
   id?: number;
+  isDeleted?: boolean;
+  designation?: string | null;
+  salaryType?: SalaryType;
+  hireDate?: string | null;
+  confirmationDate?: string | null;
+  totalPreviousExperience?: number;
+  useDefaultLeaves?: boolean;
+  salary?: number;
+  basic?: number;
+  hrAllowances?: number;
+  bonus?: number;
+  gratuity?: number;
+  pf?: number;
+  esi?: number;
+  pt?: number;
+  siteId?: number | null;
+  site?: Site;
+  bond?: number | null;
+  previousDateOfJoiningInGDR?: string | null;
+  previousDateOfLeavingInGDR?: string | null;
+  grpHead?: string | null;
 };
-export type EmployeeTeamMemberList = {
+export type EmployeeInsuranceDetail = {
+  id?: number;
+  isDeleted?: boolean;
+  employeeDesignationId?: number | null;
+  employeeDesignation?: EmployeeDesignation;
+  serialNumber?: string | null;
+  dateOfJoining?: string | null;
+  dateOfBirth?: string | null;
+  age?: number;
+  grossSalary?: number;
+  totalSIWider?: number;
+  comprehensive?: number;
+  risk?: string | null;
+};
+export type EmployeeAddress = {
+  id?: number;
+  isDeleted?: boolean;
+  userAddressLine1?: string | null;
+  userAddressLine2?: string | null;
+  userCity?: string | null;
+  userCountry?: string | null;
+  userState?: string | null;
+  userAddressPinCode?: number | null;
+  mailingAddressLine1?: string | null;
+  mailingAddressLine2?: string | null;
+  mailingCity?: string | null;
+  mailingCountry?: string | null;
+  mailingState?: string | null;
+  mailingAddressPinCode?: number | null;
+};
+export type EmployeeIdentityInfo = {
+  id?: number;
+  isDeleted?: boolean;
+  uid?: string | null;
+  bankAccountNumber?: string | null;
+  bankName?: string | null;
+  branch?: string | null;
+  ifsc?: string | null;
+  accountHolderName?: string | null;
+  pan?: string | null;
+  providentFundNumber?: string | null;
+  employeeStateInsuranceNumber?: string | null;
+  biometricCode?: string | null;
+};
+export type EmployeeEducationDetail = {
+  id?: number;
+  isDeleted?: boolean;
+  employee?: Employee;
+  type?: string | null;
+  passingYear?: string | null;
+  degreeCertificateDate?: string | null;
+  university?: string | null;
+  grade?: string | null;
+  employeeId?: number | null;
+};
+export type EmployeeRelationshipDetail = {
+  id?: number;
+  isDeleted?: boolean;
+  employeeId?: number | null;
+  employee?: Employee;
+  relationshipType?: RelationshipType;
   name?: string | null;
   email?: string | null;
-  avatar?: string | null;
-  employeeNumber?: number;
-  designation?: string | null;
-  employeeId?: number;
+  phoneNumber?: string | null;
 };
-export type Criterion = {
-  field?: string | null;
-  operator?: string | null;
-  value?: any | null;
-  nextOperator?: string | null;
+export type EmployeeDocuments = {
+  id?: number;
+  isDeleted?: boolean;
+  fileName?: string | null;
+  filePath?: string | null;
+  fileSize?: number | null;
+  fileContent?: string | null;
+  fileType?: FileType;
+  employeeId?: number | null;
+  employee?: Employee;
+};
+export type EmployeeLeaveType = {
+  id?: number;
+  isDeleted?: boolean;
+  name?: string | null;
+  isPaid?: boolean;
+};
+export type EmployeeLeaveSummary = {
+  id?: number;
+  isDeleted?: boolean;
+  employeeId?: number;
+  employee?: Employee;
+  remainingLeaves?: number;
+  employeeLeaveTypeId?: number | null;
+  employeeLeaveTypes?: EmployeeLeaveType;
+  totalLeaves?: number;
+};
+export type Employee = {
+  id?: number;
+  createdBy?: string;
+  createdOn?: string;
+  lastModifiedBy?: string | null;
+  lastModifiedOn?: string;
+  isDeleted?: boolean;
+  photoURL?: string | null;
+  employeeNumber?: number;
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  email: string;
+  alternateEmail?: string | null;
+  phoneNumber?: number | null;
+  alternateNumber?: number | null;
+  employeeDepartmentId?: number | null;
+  employeeDesignationId?: number | null;
+  employeeReportToId?: number | null;
+  userId?: string;
+  roleId?: string;
+  employeeCategoryId?: number | null;
+  employeePersonalDetailsId?: number | null;
+  employeeWorkInformationId?: number | null;
+  employeeInsuranceDetailsId?: number | null;
+  employeeAddressesId?: number | null;
+  employeeIdentityInfoId?: number | null;
+  employeeDepartment?: EmployeeDepartment;
+  employeeDesignation?: EmployeeDesignation;
+  employeeReportTo?: Employee;
+  applicationUser?: ApplicationUser;
+  applicationRole?: ApplicationRole;
+  employeeCategory?: EmployeeCategory;
+  employeePersonalDetails?: EmployeePersonalDetails;
+  employeeWorkInformation?: EmployeeWorkInformation;
+  employeeInsuranceDetails?: EmployeeInsuranceDetail;
+  employeeAddresses?: EmployeeAddress;
+  employeeIdentityInfos?: EmployeeIdentityInfo;
+  employeeEducationDetail?: EmployeeEducationDetail[] | null;
+  employeeRelationshipDetails?: EmployeeRelationshipDetail[] | null;
+  employeeDocuments?: EmployeeDocuments[] | null;
+  employeeLeaves?: EmployeeLeaveSummary[] | null;
+};
+export type EmployeeSalary = {
+  id?: number;
+  isDeleted?: boolean;
+  employeeId?: number | null;
+  employee?: Employee;
+  salaryType?: SalaryType;
+  salaryStatus?: SalaryStatus;
+  isApprovedByDepartmentHead?: boolean;
+  isApprovedByHRHead?: boolean;
+  currentSalary?: number;
+  expectedToBeSalary?: number;
+  basic?: number;
+  hrAllowances?: number;
+  bonus?: number;
+  gratuity?: number;
+  pf?: number;
+  esi?: number;
+  pt?: number;
+  updatedBy?: number | null;
+  updatedDateTime?: string | null;
+};
+export type EmployeeSalaryDataModel = {
+  salaryid?: number;
+  employeeId?: number | null;
+  employeeName?: string | null;
+  managerName?: string | null;
+  salaryType?: SalaryType;
+  salaryStatus?: SalaryStatus;
+  isApprovedByDepartmentHead?: boolean;
+  isApprovedByHRHead?: boolean;
+  currentSalary?: number;
+  expectedToBeSalary?: number;
+  updatedBy?: number | null;
+  updatedByUserName?: string | null;
+  updatedDateTime?: string | null;
 };
 export type EmployeeLeaveModel = {
   id?: number;
@@ -661,6 +947,24 @@ export type DropdownModel = {
   category?: string | null;
   id?: number;
   name?: string | null;
+};
+export type EmployeeReportToModel = {
+  name?: string | null;
+  id?: number;
+};
+export type EmployeeTeamMemberList = {
+  name?: string | null;
+  email?: string | null;
+  avatar?: string | null;
+  employeeNumber?: number;
+  designation?: string | null;
+  employeeId?: number;
+};
+export type Criterion = {
+  field?: string | null;
+  operator?: string | null;
+  value?: any | null;
+  nextOperator?: string | null;
 };
 export type ProjectModel = {
   id?: number;
@@ -721,6 +1025,21 @@ export enum FileType {
   Csv = "CSV",
   Other = "Other",
 }
+export enum RelationWithEmployee {
+  Colleague = "Colleague",
+  Supervisor = "Supervisor",
+  Subordinate = "Subordinate",
+  Manager = "Manager",
+  Mentor = "Mentor",
+  Friend = "Friend",
+  FamilyMember = "FamilyMember",
+  Other = "Other",
+}
+export enum SalaryStatus {
+  Approved = "Approved",
+  Pending = "Pending",
+  Rejected = "Rejected",
+}
 export enum LeaveStatus {
   Approved = "Approved",
   Pending = "Pending",
@@ -737,6 +1056,28 @@ export const {
   useGetApiEmployeesQuery,
   useLazyGetApiEmployeesQuery,
   usePostApiEmployeesMutation,
+  useGetApiEmployeesByIdQuery,
+  useLazyGetApiEmployeesByIdQuery,
+  usePutApiEmployeesByIdMutation,
+  useDeleteApiEmployeesByIdMutation,
+  useGetApiEmployeesPartialByEmployeeIdQuery,
+  useLazyGetApiEmployeesPartialByEmployeeIdQuery,
+  usePutApiEmployeesSalaryApproveBySalaryIdMutation,
+  usePutApiEmployeesSalaryRejectBySalaryIdMutation,
+  useGetApiEmployeesSalaryPendingSalaryRequestQuery,
+  useLazyGetApiEmployeesSalaryPendingSalaryRequestQuery,
+  useGetApiEmployeesSalaryDashboardQuery,
+  useLazyGetApiEmployeesSalaryDashboardQuery,
+  useGetApiEmployeesLeavesCurrentQuery,
+  useLazyGetApiEmployeesLeavesCurrentQuery,
+  usePostApiEmployeesLeavesAddLeaveMutation,
+  usePutApiEmployeesLeavesUpdateLeaveMutation,
+  useDeleteApiEmployeesLeavesCancelLeaveMutation,
+  usePutApiEmployeesApproveByLeaveIdMutation,
+  usePutApiEmployeesRejectByLeaveIdMutation,
+  usePostApiEmployeesSettingsAddDropdownItemMutation,
+  useDeleteApiEmployeesSettingsDeleteDropdownItemByIdAndDropdownNameMutation,
+  usePutApiEmployeesSettingsUpdateDropdownItemMutation,
   useGetApiEmployeesCategoriesQuery,
   useLazyGetApiEmployeesCategoriesQuery,
   useGetApiEmployeesDepartmentsQuery,
@@ -745,14 +1086,10 @@ export const {
   useLazyGetApiEmployeesDesignationsQuery,
   useGetApiEmployeesSitesQuery,
   useLazyGetApiEmployeesSitesQuery,
-  useGetApiEmployeesReportToEMployeeListQuery,
-  useLazyGetApiEmployeesReportToEMployeeListQuery,
+  useGetApiEmployeesReportToEmployeeListQuery,
+  useLazyGetApiEmployeesReportToEmployeeListQuery,
   useGetApiEmployeesTeamMembersListQuery,
   useLazyGetApiEmployeesTeamMembersListQuery,
-  useGetApiEmployeesByIdQuery,
-  useLazyGetApiEmployeesByIdQuery,
-  usePutApiEmployeesByIdMutation,
-  useDeleteApiEmployeesByIdMutation,
   useGetApiEmployeesCheckEmailExistsQuery,
   useLazyGetApiEmployeesCheckEmailExistsQuery,
   usePostApiEmployeesSendEmailMutation,
@@ -761,20 +1098,10 @@ export const {
   usePostApiEmployeesAddNewDepartmentMutation,
   usePostApiEmployeesAddNewSiteMutation,
   usePostApiEmployeesAddNewDesignationMutation,
-  useGetApiEmployeesLeavesCurrentQuery,
-  useLazyGetApiEmployeesLeavesCurrentQuery,
-  usePostApiEmployeesLeavesAddLeaveMutation,
-  usePutApiEmployeesLeavesUpdateLeaveMutation,
-  useDeleteApiEmployeesLeavesCancelLeaveMutation,
-  usePutApiEmployeesApproveByLeaveIdMutation,
-  usePutApiEmployeesRejectByLeaveIdMutation,
   usePostApiEmployeesDocumnetUploadMutation,
   useDeleteApiEmployeesDocumentByFileNameMutation,
   useGetApiEmployeesDownloadByFileNameQuery,
   useLazyGetApiEmployeesDownloadByFileNameQuery,
-  usePostApiEmployeesSettingsAddDropdownItemMutation,
-  useDeleteApiEmployeesSettingsDeleteDropdownItemByIdAndDropdownNameMutation,
-  usePutApiEmployeesSettingsUpdateDropdownItemMutation,
   useGetApiEmployeesProjectByEmployeeIdQuery,
   useLazyGetApiEmployeesProjectByEmployeeIdQuery,
   useGetApiProjectByProjectIdEmployeesQuery,
