@@ -428,7 +428,7 @@ function WorkInfoTab({ UserRole }) {
 									label="Salary Type"
 									value={field.value ?? ''}
 									fullWidth
-									required
+									// required
 									error={!!errors.employeeWorkInformation?.salaryType}
 									helperText={errors.employeeWorkInformation?.salaryType?.message as string}
 								>
@@ -459,7 +459,7 @@ function WorkInfoTab({ UserRole }) {
 									type="number"
 									value={field.value ?? ''}
 									className="mx-4"
-									required
+									// required
 									InputProps={{
 										inputProps: {
 											min: 1,
@@ -491,7 +491,7 @@ function WorkInfoTab({ UserRole }) {
 												startAdornment: <InputAdornment position="start">₹</InputAdornment>
 											}}
 											fullWidth
-											required
+											// required
 											error={!!errors.employeeWorkInformation?.basic}
 											helperText={errors.employeeWorkInformation?.basic?.message as string}
 										/>
@@ -513,7 +513,7 @@ function WorkInfoTab({ UserRole }) {
 												startAdornment: <InputAdornment position="start">₹</InputAdornment>
 											}}
 											fullWidth
-											required
+											// required
 											error={!!errors.employeeWorkInformation?.hrAllowances}
 											helperText={errors.employeeWorkInformation?.hrAllowances?.message as string}
 										/>
@@ -563,7 +563,7 @@ function WorkInfoTab({ UserRole }) {
 											startAdornment: <InputAdornment position="start">₹</InputAdornment>
 										}}
 										fullWidth
-										required
+										// required
 										error={!!errors.employeeWorkInformation?.gratuity}
 										helperText={errors.employeeWorkInformation?.gratuity?.message as string}
 									/>
@@ -585,7 +585,7 @@ function WorkInfoTab({ UserRole }) {
 											startAdornment: <InputAdornment position="start">₹</InputAdornment>
 										}}
 										fullWidth
-										required
+										// required
 										error={!!errors.employeeWorkInformation?.pf}
 										helperText={errors.employeeWorkInformation?.pf?.message as string}
 									/>
