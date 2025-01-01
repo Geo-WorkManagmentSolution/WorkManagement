@@ -5,6 +5,7 @@ import { Navigate } from 'react-router';
 import { authRoles } from 'src/app/auth';
 import DropDownForm from './tabs/DropDownForm';
 import PermissionManager from './tabs/PermissionManager';
+import CSVIntegration from './tabs/CSVIntegrationTab';
 
 const SettingsApp = lazy(() => import('./SettingsApp'));
 const DefaultLeaveForm = lazy(() => import('./tabs/DefaultLeaveForm'));
@@ -34,6 +35,11 @@ const SettingsAppRoute: FuseRouteItemType = {
 			path: 'holidays',
 			element: <HolidayForm />
 		},
+		{
+			path: 'integration/csv',
+			element: <CSVIntegration />
+		},
+
 		{
 			path: '',
 			element: <Navigate to="dropdown" />

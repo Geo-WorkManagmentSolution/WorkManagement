@@ -46,6 +46,23 @@ const SettingsAppNavigation: FuseNavItemType = {
 					end: true
 				}
 			]
+		},
+		{
+			id: 'apps.settings.integration',
+			icon: 'heroicons-outline:calendar-days',
+			title: 'Integration',
+			type: 'collapse',
+			// url: '/apps/settings/account',
+			subtitle: 'Add , Remove or Update Integration',
+			children: [
+				{
+					id: 'apps.settings.leave-management.csv-integration',
+					title: 'Import CSV',
+					type: 'item',
+					url: '/apps/settings/integration/csv',
+					end: true
+				}
+			]
 		}
 	]
 };
