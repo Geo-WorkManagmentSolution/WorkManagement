@@ -58,7 +58,7 @@ namespace WorkManagement.API.Controllers
         
         // GET: api/employees/5
         [HttpGet("{id}")]
-        //[PermissionAuth(PermissionActionEnum.EmployeeModule_View)]
+        [PermissionAuth(PermissionActionEnum.EmployeeModule_View)]
         public async Task<ActionResult<EmployeeModel>> GetEmployee(int id)
         {
             string userRole = this.User.FindFirst(ClaimTypes.Role).Value;
