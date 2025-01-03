@@ -132,6 +132,7 @@ function PersonalInfoTab({UserRole}) {
 				name="employeePersonalDetails.dateOfBirth"
 				render={({ field: { value, onChange } }) => (
 					<DatePicker
+					format='dd/MM/yyyy'
 						value={new Date(value) || null}
 						onChange={(val) => {
 							onChange(val?.toISOString());

@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button, TextField, Box, InputAdornment, Drawer, Typography, Select, MenuItem, FormControl, InputLabel, FormHelperText, Autocomplete, Checkbox } from '@mui/material';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
-import { useAppDispatch } from 'app/store/hooks';
+import { useAppDispatch, useAppSelector } from 'app/store/hooks';
 import { showMessage } from '@fuse/core/FuseMessage/fuseMessageSlice';
 import { DatePicker } from '@mui/x-date-pickers';
 import TaskPrioritySelector from './TaskPrioritySelector';
@@ -61,6 +61,10 @@ function TaskForm({ projectId, taskId, open, onClose, taskData }: TaskFormProps)
 		{ id: taskId || 0 },
 		{ skip: !taskId }
 	);
+
+	const user= useAppSelector((state) => state.user);
+	console.log(user.permissions);
+	
 
 	const {
 		control,
@@ -268,6 +272,7 @@ function TaskForm({ projectId, taskId, open, onClose, taskData }: TaskFormProps)
 							control={control}
 							render={({ field }) => (
 								<DatePicker
+								format='dd/MM/yyyy'
 									label="Start Date"
 									value={field.value ? new Date(field.value) : null}
 									onChange={(date) => field.onChange(date?.toISOString())}
@@ -290,6 +295,7 @@ function TaskForm({ projectId, taskId, open, onClose, taskData }: TaskFormProps)
 							control={control}
 							render={({ field }) => (
 								<DatePicker
+								format='dd/MM/yyyy'
 									label="End Date"
 									value={field.value ? new Date(field.value) : null}
 									onChange={(date) => field.onChange(date?.toISOString())}

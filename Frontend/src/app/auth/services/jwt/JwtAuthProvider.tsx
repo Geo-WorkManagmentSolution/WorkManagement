@@ -2,8 +2,10 @@ import React, { createContext, useState, useEffect, useCallback, useMemo } from 
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import jwtDecode, { JwtPayload } from 'jwt-decode';
 import { PartialDeep } from 'type-fest';
+import { useDispatch } from 'react-redux';
 import { User } from '../../user';
 import config from './jwtAuthConfig';
+import {setUser, setUserPermissions } from '../../user/store/userSlice';
 
 export type JwtAuthStatus = 'configuring' | 'authenticated' | 'unauthenticated';
 
@@ -65,33 +67,35 @@ export type JwtAuthProviderProps = {
 };
 
 function JwtAuthProvider(props: JwtAuthProviderProps) {
-	const [user, setUser] = useState<User>(null);
+	const [user, setUsers] = useState<User>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
 	const [authStatus, setAuthStatus] = useState('configuring');
 
 	const { children } = props;
+	const dispatch = useDispatch();
 
 	/**
 	 * Handle sign-in success
 	 */
-	const handleSignInSuccess = useCallback((userData: User, accessToken: string, permissions: any[]) => {
-		setSession(accessToken);
+	const handleSignInSuccess = useCallback(
+		(userData: User, accessToken: string, permissions: any[]) => {
+			setSession(accessToken);
+			setIsAuthenticated(true);
 
-		setIsAuthenticated(true);
+			const userWithPermissions = {
+				...userData,
+				permissions
+			};
 
-		// Include permissions in the user data
-		const userWithPermissions = {
-			...userData,
-			data: {
-				...userData.data,
-				 permissions
-			}
-		};
-		console.log("userDataWithPermissions ", userWithPermissions);
-		
-		setUser(userWithPermissions);
-	}, []);
+			dispatch(setUser(userWithPermissions));
+			dispatch(setUserPermissions(permissions));
+
+			setUsers(userWithPermissions);
+			console.log('Sign-in successful:', userWithPermissions);
+		},
+		[dispatch]
+	);
 
 	/**
 	 * Handle sign-up success
@@ -101,7 +105,7 @@ function JwtAuthProvider(props: JwtAuthProviderProps) {
 
 		setIsAuthenticated(true);
 
-		setUser(userData);
+		setUsers(userData);
 	}, []);
 
 	/**
@@ -111,7 +115,7 @@ function JwtAuthProvider(props: JwtAuthProviderProps) {
 		resetSession();
 
 		setIsAuthenticated(false);
-		setUser(null);
+		setUsers(null);
 
 		handleError(error);
 	}, []);
@@ -123,7 +127,7 @@ function JwtAuthProvider(props: JwtAuthProviderProps) {
 		resetSession();
 
 		setIsAuthenticated(false);
-		setUser(null);
+		setUsers(null);
 
 		handleError(error);
 	}, []);
@@ -134,7 +138,7 @@ function JwtAuthProvider(props: JwtAuthProviderProps) {
 	const handleError = useCallback((_error: AxiosError) => {
 		resetSession();
 		setIsAuthenticated(false);
-		setUser(null);
+		setUsers(null);
 	}, []);
 
 	// Set session
@@ -186,7 +190,7 @@ function JwtAuthProvider(props: JwtAuthProviderProps) {
 
 					const userData = response?.data;
 
-					handleSignInSuccess(userData, accessToken, []); //passing empty array for permissions
+					handleSignInSuccess(userData, accessToken, []); // passing empty array for permissions
 
 					return true;
 				} catch (error) {
@@ -224,18 +228,25 @@ function JwtAuthProvider(props: JwtAuthProviderProps) {
 		handleFailure: (T: AxiosError) => void
 	): Promise<User | AxiosError> => {
 		try {
-			const response: AxiosResponse<{ user: User; accessToken: string; permissions: any[] }> = await axios.post(url, data);
+			const response: AxiosResponse<{ user: User; accessToken: string; permissions: any[] }> = await axios.post(
+				url,
+				data
+			);
 			const userData = response?.data?.user;
 			const accessToken = response?.data?.accessToken;
-			const permissions = response?.data?.permissions;
-			console.log("permissions got is  ", permissions);
-			
+			const permissions = response?.data?.permissions || [];
+			console.log('Response data:', response.data);
+
+			if (!userData || !accessToken) {
+				throw new Error('Invalid response from server');
+			}
+
 			handleSuccess(userData, accessToken, permissions);
 
 			return userData;
 		} catch (error) {
+			console.error('Request error:', error);
 			const axiosError = error as AxiosError;
-
 			handleFailure(axiosError);
 			throw axiosError;
 		}
@@ -256,7 +267,7 @@ function JwtAuthProvider(props: JwtAuthProviderProps) {
 		resetSession();
 
 		setIsAuthenticated(false);
-		setUser(null);
+		setUsers(null);
 	}, []);
 
 	/**
@@ -268,7 +279,7 @@ function JwtAuthProvider(props: JwtAuthProviderProps) {
 
 			const updatedUserData = response?.data;
 
-			setUser(updatedUserData);
+			setUsers(updatedUserData);
 
 			return null;
 		} catch (error) {
@@ -364,4 +375,3 @@ function JwtAuthProvider(props: JwtAuthProviderProps) {
 }
 
 export default JwtAuthProvider;
-

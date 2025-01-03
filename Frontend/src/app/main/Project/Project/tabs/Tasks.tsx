@@ -11,6 +11,8 @@ import { TaskDashboardModel, TaskModel, useGetApiProjectProjectTasksByProjectIdQ
 import TaskForm from './helperComponents/TaskForm';
 import TaskPriorityCell from '../TaskPriorityCell';
 import TaskStatusCell from '../TaskStatusCell';
+import { format } from 'date-fns';
+
 
 function Tasks() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -58,11 +60,13 @@ function Tasks() {
       },
       {
         accessorKey: 'startDate',
-        header: 'Start Date'
+        header: 'Start Date',
+      accessorFn: (row) => format(new Date(row.startDate), 'dd/MM/yyyy')
       },
       {
         accessorKey: 'endDate',
-        header: 'End Date'
+        header: 'End Date',
+        accessorFn: (row) => format(new Date(row.endDate), 'dd/MM/yyyy')
       },
       {
         accessorKey: 'status',

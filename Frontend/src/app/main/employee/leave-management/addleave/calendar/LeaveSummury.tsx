@@ -74,12 +74,12 @@ function LeaveSummary({ openDialoge, onSave, onDelete, refetchEvents, eventColor
 			{
 				accessorKey: 'startDate',
 				header: 'From',
-				accessorFn: (row) => new Date(row.startDate || '').toLocaleDateString()
+				accessorFn: (row) => new Date(row.startDate || '').toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })
 			},
 			{
 				accessorKey: 'endDate',
 				header: 'To',
-				accessorFn: (row) => new Date(row.endDate || '').toLocaleDateString()
+				accessorFn: (row) => new Date(row.endDate || '').toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })
 			},
 			{
 				accessorKey: 'name',

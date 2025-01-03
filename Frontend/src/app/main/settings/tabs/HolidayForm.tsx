@@ -7,9 +7,8 @@ import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { useForm, Controller } from 'react-hook-form';
 import { showMessage } from '@fuse/core/FuseMessage/fuseMessageSlice';
 import { useDispatch } from 'react-redux';
-import {
-	EmployeeHoliday
-} from '../../employee/leave-management/LeavesApi';
+import { format } from 'date-fns';
+import { EmployeeHoliday } from '../../employee/leave-management/LeavesApi';
 import { useGetApiLeavesSettingsHolidaysByYearQuery, usePostApiLeavesSettingsHolidaysMutation } from '../SettingsApi';
 
 function HolidayForm() {
@@ -165,12 +164,13 @@ function HolidayForm() {
 			{
 				accessorKey: 'startDate',
 				header: 'Start Date',
-				accessorFn: (row) => new Date(row.startDate).toLocaleDateString()
+
+				accessorFn: (row) => format(new Date(row.startDate), 'dd/MM/yyyy')
 			},
 			{
 				accessorKey: 'endDate',
 				header: 'End Date',
-				accessorFn: (row) => new Date(row.endDate).toLocaleDateString()
+				accessorFn: (row) => format(new Date(row.endDate), 'dd/MM/yyyy')
 			}
 		],
 		[]
@@ -205,9 +205,9 @@ function HolidayForm() {
 							{[...Array(20)].map((_, i) => (
 								<MenuItem
 									key={i}
-									value={new Date().getFullYear() + i}
+									value={new Date().getFullYear() - 3 + i}
 								>
-									{new Date().getFullYear() + i}
+									{new Date().getFullYear() - 3 + i}
 								</MenuItem>
 							))}
 						</TextField>
@@ -234,11 +234,14 @@ function HolidayForm() {
 							rules={{
 								required: 'Start date is required',
 								validate: (value) =>
-									!value || !control._formValues.endDate || value <= control._formValues.endDate ||
+									!value ||
+									!control._formValues.endDate ||
+									value <= control._formValues.endDate ||
 									'Start date cannot be after end date'
 							}}
 							render={({ field }) => (
 								<DatePicker
+									format="dd/MM/yyyy"
 									{...field}
 									label="Start Date"
 									value={field.value || null}
@@ -252,8 +255,12 @@ function HolidayForm() {
 									}}
 									onChange={(date) => {
 										field.onChange(date);
+
 										if (control._formValues.endDate && date > control._formValues.endDate) {
-											setError('endDate', { type: 'manual', message: 'End date cannot be before start date' });
+											setError('endDate', {
+												type: 'manual',
+												message: 'End date cannot be before start date'
+											});
 										} else {
 											clearErrors('endDate');
 										}
@@ -267,11 +274,14 @@ function HolidayForm() {
 							rules={{
 								required: 'End date is required',
 								validate: (value) =>
-									!value || !control._formValues.startDate || value >= control._formValues.startDate ||
+									!value ||
+									!control._formValues.startDate ||
+									value >= control._formValues.startDate ||
 									'End date cannot be before start date'
 							}}
 							render={({ field }) => (
 								<DatePicker
+									format="dd/MM/yyyy"
 									{...field}
 									label="End Date"
 									value={field.value || null}
@@ -285,8 +295,12 @@ function HolidayForm() {
 									}}
 									onChange={(date) => {
 										field.onChange(date);
+
 										if (control._formValues.startDate && date < control._formValues.startDate) {
-											setError('startDate', { type: 'manual', message: 'Start date cannot be after end date' });
+											setError('startDate', {
+												type: 'manual',
+												message: 'Start date cannot be after end date'
+											});
 										} else {
 											clearErrors('startDate');
 										}
@@ -366,8 +380,3 @@ function HolidayForm() {
 }
 
 export default HolidayForm;
-
-
-
-
-
