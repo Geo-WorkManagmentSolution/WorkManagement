@@ -247,39 +247,39 @@ namespace WorkManagement.Service
         //}
 
         public async Task<List<EmployeeReportToModel>> GetReportToEmployeeList(int? departmentId, int? employeeId)
-{
-    if (departmentId == null && employeeId == null)
-    {
-        return new List<EmployeeReportToModel>();
-    }
-
-    if (employeeId.HasValue)
-    {
-        var employee = await _dbContext.Employees.FirstOrDefaultAsync(e => e.Id == employeeId.Value);
-        if (employee != null)
         {
-            departmentId = employee.EmployeeDepartmentId;
-        }
-    }
-
-    if (departmentId.HasValue)
-    {
-        var data = await _dbContext.Employees
-            .Where(e => !e.IsDeleted && 
-                        e.EmployeeDepartmentId == departmentId &&
-                        e.Id != employeeId)
-            .Select(e => new EmployeeReportToModel
+            if (departmentId == null && employeeId == null)
             {
-                Name = e.FirstName + " " + e.LastName,
-                Id = e.Id,
-            })
-            .ToListAsync();
-
-        return data;
-    }
-
-    return new List<EmployeeReportToModel>();
-}
+                return new List<EmployeeReportToModel>();
+            }
+        
+            if (employeeId.HasValue)
+            {
+                var employee = await _dbContext.Employees.FirstOrDefaultAsync(e => e.Id == employeeId.Value);
+                if (employee != null)
+                {
+                    departmentId = employee.EmployeeDepartmentId;
+                }
+            }
+        
+            if (departmentId.HasValue)
+            {
+                var data = await _dbContext.Employees
+                    .Where(e => !e.IsDeleted && 
+                                e.EmployeeDepartmentId == departmentId &&
+                                e.Id != employeeId)
+                    .Select(e => new EmployeeReportToModel
+                    {
+                        Name = e.FirstName + " " + e.LastName,
+                        Id = e.Id,
+                    })
+                    .ToListAsync();
+        
+                return data;
+            }
+        
+            return new List<EmployeeReportToModel>();
+        }
 
         public async Task<EmployeeDesignation> AddNewDesignation(EmployeeDesignation employeeDesignation)
         {
@@ -296,7 +296,7 @@ namespace WorkManagement.Service
 
 
 
-        public async Task<EmployeeModel> GetEmployeeByIdAsync(int id)
+        public async Task<EmployeeModel> GetEmployeeByIdAsync(string userRole, string loggedUserId, int id)
         {
             //var Employee = await _dbContext.Employees
             //    .AsNoTracking()
@@ -309,6 +309,32 @@ namespace WorkManagement.Service
             //    .SingleOrDefaultAsync(x => x.Id == id);
             //var EmployeeModel = mapper.Map<EmployeeModel>(Employee);
             //return EmployeeModel;
+
+            var targetEmployeeId = CheckValidEmployeeId(loggedUserId);
+            if (targetEmployeeId == -1 && userRole != "HR Admin")
+            {
+                throw new Exception("Invalid User data");
+            }
+
+            if(userRole == "Manager")
+            {
+                var employee = _dbContext.Employees.FirstOrDefault(s => s.Id == id);
+                if(employee!= null)
+                {
+                    if(employee.EmployeeReportToId != targetEmployeeId && targetEmployeeId != id)
+                    {
+                        throw new Exception("User has no access to read employee info.");
+                    }
+                }
+            }
+
+            if(userRole == "Employee")
+            {
+                if(targetEmployeeId != id)
+                {
+                    throw new Exception("User has no access to read employee info.");
+                }
+            }
 
             var employeeData = (from e in _dbContext.Employees.Where(s => s.Id == id)
                                 select new EmployeeModel
@@ -1722,6 +1748,11 @@ namespace WorkManagement.Service
 
                 var employeeLeave = _dbContext.EmployeeLeaves.FirstOrDefault(x => x.Id == employeeLeaveData.Id);
 
+                if (DateTime.Compare(employeeLeave.StartDate, DateTime.Now) < 0)
+                {
+                    throw new Exception("This leave is in past. Can not update leave data");
+                }
+
                 if (employeeLeave != null)
                 {
                     employeeLeave.Status = employeeLeaveData.Status;
@@ -1762,14 +1793,17 @@ namespace WorkManagement.Service
 
                 var employeeLeave = _dbContext.EmployeeLeaves.FirstOrDefault(x => x.Id == employeeLeaveId);
 
+                if (DateTime.Compare(employeeLeave.StartDate, DateTime.Now) < 0)
+                {
+                    throw new Exception("This leave is in past. Can not delete leave data");
+                }
+
                 var leaveSummary = await _dbContext.EmployeeLeaveSummary.FirstAsync(x => x.EmployeeId == employeeId && x.EmployeeLeaveTypeId == employeeLeave.EmployeeLeaveTypeId);
                 leaveSummary.RemainingLeaves += employeeLeave.LeaveDays;
 
-                var defaultLeaves = await _dbContext.EmployeeDefaultLeave.FirstAsync(x => x.EmployeeLeaveTypeId == employeeLeave.EmployeeLeaveTypeId);
-
-                if (leaveSummary.RemainingLeaves > defaultLeaves.TotalLeaves)
+                if (leaveSummary.RemainingLeaves > leaveSummary.TotalLeaves)
                 {
-                    leaveSummary.RemainingLeaves = defaultLeaves.TotalLeaves;
+                    leaveSummary.RemainingLeaves = leaveSummary.TotalLeaves;
                 }
 
                 _dbContext.EmployeeLeaves.Remove(employeeLeave);
@@ -2286,7 +2320,7 @@ namespace WorkManagement.Service
 
                 }
 
-                SendPendingSalaryRequestEmailToEmployee(employee.Email, employeeSalaryInfoEmail);
+                //SendPendingSalaryRequestEmailToEmployee(employee.Email, employeeSalaryInfoEmail);
             }
         }
 
@@ -2299,6 +2333,13 @@ namespace WorkManagement.Service
             var emailModel = new EmailModel<WelcomeModel>();
             emailModel.From = "naupul30@gmail.com";
             emailModel.To = user.UserName;
+            emailModel.Subject = "Welcome to Geo!";
+            emailModel.repModel = WelcomeModelCredentials;
+            _emailService.SendWelcomeMail(emailModel);
+
+            emailModel = new EmailModel<WelcomeModel>();
+            emailModel.From = "naupul30@gmail.com";
+            emailModel.To = "hrgdr@geogroup.in";
             emailModel.Subject = "Welcome to Geo!";
             emailModel.repModel = WelcomeModelCredentials;
             _emailService.SendWelcomeMail(emailModel);
