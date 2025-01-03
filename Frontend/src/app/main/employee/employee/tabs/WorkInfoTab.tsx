@@ -662,6 +662,7 @@ function WorkInfoTab({ UserRole }) {
 						name="employeeWorkInformation.hireDate"
 						render={({ field: { value, onChange } }) => (
 							<DatePicker
+							format='dd/MM/yyyy'
 								value={value ? new Date(value) : null}
 								onChange={(val) => {
 									onChange(val?.toISOString());
@@ -693,6 +694,7 @@ function WorkInfoTab({ UserRole }) {
 						name="employeeWorkInformation.confirmationDate"
 						render={({ field: { value, onChange } }) => (
 							<DatePicker
+								format='dd/MM/yyyy'
 								value={new Date(value)}
 								onChange={(val) => {
 									onChange(val?.toISOString());

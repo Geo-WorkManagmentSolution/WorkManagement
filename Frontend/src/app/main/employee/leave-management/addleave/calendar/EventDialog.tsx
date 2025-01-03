@@ -228,6 +228,7 @@ export default function EventDialog({
 								control={control}
 								render={({ field }) => (
 									<DatePicker
+											format='dd/MM/yyyy'
 										className="mt-8 mb-16 w-full"
 										label="From"
 										value={new Date(field.value)}
@@ -239,6 +240,7 @@ export default function EventDialog({
 												error: !!dateError
 											}
 										}}
+									
 									/>
 								)}
 							/>
@@ -247,6 +249,7 @@ export default function EventDialog({
 								control={control}
 								render={({ field }) => (
 									<DatePicker
+										format='dd/MM/yyyy'
 										className="mt-8 mb-16 w-full"
 										label="To"
 										value={new Date(field.value)}
