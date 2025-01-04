@@ -152,9 +152,16 @@ try
     // Run pending migrations in DB
     using (var scope = app.Services.CreateScope()) // this will use `IServiceScopeFactory` internally
     {
+        try {
+            var db = scope.ServiceProvider.GetService<WorkManagementDbContext>();
+            await db.Database.MigrateAsync();
+        }
+        catch (Exception e)
+        {
 
-        var db = scope.ServiceProvider.GetService<WorkManagementDbContext>();
-        await db.Database.MigrateAsync();
+            Log.Error(e, "An error occurred in migration");
+
+        }
     }
 
     //should be changed in future

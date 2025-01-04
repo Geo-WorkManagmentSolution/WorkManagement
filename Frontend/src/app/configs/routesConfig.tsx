@@ -40,17 +40,17 @@ const routes: FuseRoutesType = [
 				path: '401',
 				element: <Error401Page />
 			},
-			{
-				path: '401',
-                element: <Error401Page />,
-                settings: { layout: layoutConfigOnlyMain },
-                auth: null
-			},{
-				path: '403',
-                element: <Error401Page />,
-                settings: { layout: layoutConfigOnlyMain },
-                auth: null
-			},
+			// {
+			// 	path: '401',
+            //     element: <Error401Page />,
+            //     settings: { layout: layoutConfigOnlyMain },
+            //     auth: null
+			// },{
+			// 	path: '403',
+            //     element: <Error401Page />,
+            //     settings: { layout: layoutConfigOnlyMain },
+            //     auth: null
+			// },
 			{
 				path: '404',
 				element: <Error404Page />,

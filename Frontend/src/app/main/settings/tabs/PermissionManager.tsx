@@ -175,6 +175,7 @@ export default function PermissionManager() {
                             />
                           }
                           label={permission.description || permission.name}
+                          // label={` ${permission.description} || ${permission.name}`}
                           labelPlacement="start"
                           sx={{
                             display: 'flex',
