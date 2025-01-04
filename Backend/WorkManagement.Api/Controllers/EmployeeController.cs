@@ -58,10 +58,12 @@ namespace WorkManagement.API.Controllers
         
         // GET: api/employees/5
         [HttpGet("{id}")]
-        //[PermissionAuth(PermissionActionEnum.EmployeeModule_View)]
+        [PermissionAuth(PermissionActionEnum.EmployeeModule_View)]
         public async Task<ActionResult<EmployeeModel>> GetEmployee(int id)
         {
-            var employee = await employeeService.GetEmployeeByIdAsync(id);
+            string userRole = this.User.FindFirst(ClaimTypes.Role).Value;
+            string loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var employee = await employeeService.GetEmployeeByIdAsync(userRole, loggedUserId,id);
             if (employee == null)
             {
                 return NotFound();

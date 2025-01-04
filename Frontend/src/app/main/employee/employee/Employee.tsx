@@ -60,7 +60,10 @@ const schema = yup.object().shape({
 	employeeWorkInformation: yup.object().shape({
 		salaryType: yup.string().when('$isNew', {
 			is: false,
-			then: (schema) => schema.required('Salary Type is required'),
+			then: (schema) =>
+				schema.notRequired(),
+
+				//  schema.required('Salary Type is required'),
 			otherwise: (schema) => schema.notRequired()
 		}),
 		hireDate: yup.date().required('Hire Date is required'),
@@ -68,16 +71,22 @@ const schema = yup.object().shape({
 			is: false,
 			then: (schema) =>
 				schema
-					.required('Salary is required')
+					// .required('Salary is required')
+					.nullable()
+					
 					.typeError('Salary must be a number')
-					.positive('Salary must be greater than zero'),
+					.min(0, 'Salary must be non-negative'),
+					// .positive('Salary must be greater than zero'),
 			otherwise: (schema) => schema.notRequired()
 		}),
 		useDefaultLeaves: yup.boolean().required(),
 		basic: yup.number().when('salaryType', {
 			is: (value) => value === 'OnRoll',
 			then: () =>
-				yup.number().required('Basic is required for OnRoll employees').min(0, 'Basic must be non-negative'),
+				yup.number()
+			// .required('Basic is required for OnRoll employees')
+			.nullable()
+			.min(0, 'Basic must be non-negative'),
 			otherwise: () => yup.number().notRequired()
 		}),
 		hrAllowances: yup.number().when('salaryType', {
@@ -85,7 +94,8 @@ const schema = yup.object().shape({
 			then: () =>
 				yup
 					.number()
-					.required('HR Allowances is required for OnRoll employees')
+					// .required('HR Allowances is required for OnRoll employees')
+					.nullable()
 					.min(0, 'HR Allowances must be non-negative'),
 			otherwise: () => yup.number().notRequired()
 		}),
@@ -94,13 +104,15 @@ const schema = yup.object().shape({
 			then: () =>
 				yup
 					.number()
-					.required('Gratuity is required for OnRoll employees')
+					// .required('Gratuity is required for OnRoll employees')
 					.min(0, 'Gratuity must be non-negative'),
 			otherwise: () => yup.number().notRequired()
 		}),
 		pf: yup.number().when('salaryType', {
 			is: (value) => value === 'OnRoll',
-			then: () => yup.number().required('PF is required for OnRoll employees').min(0, 'PF must be non-negative'),
+			then: () => yup.number()
+			// .required('PF is required for OnRoll employees')
+			.min(0, 'PF must be non-negative'),
 			otherwise: () => yup.number().notRequired()
 		}),
 		bonus: yup.number().min(0, 'Bonus must be non-negative').notRequired(),

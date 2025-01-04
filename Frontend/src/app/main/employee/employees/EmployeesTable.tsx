@@ -3,7 +3,16 @@ import { useMemo } from 'react';
 import { type MRT_ColumnDef } from 'material-react-table';
 import DataTable from 'app/shared-components/data-table/DataTable';
 import FuseLoading from '@fuse/core/FuseLoading';
-import { Button, DialogActions, DialogContent, DialogContentText, DialogTitle, ListItemIcon, MenuItem, Paper } from '@mui/material';
+import {
+	Button,
+	DialogActions,
+	DialogContent,
+	DialogContentText,
+	DialogTitle,
+	ListItemIcon,
+	MenuItem,
+	Paper
+} from '@mui/material';
 import * as React from 'react';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { Link } from 'react-router-dom';
@@ -11,6 +20,7 @@ import Typography from '@mui/material/Typography';
 import { useAppDispatch } from 'app/store/hooks';
 import { closeDialog, openDialog } from '@fuse/core/FuseDialog/fuseDialogSlice';
 
+import { format } from 'date-fns';
 import { EmployeeDashboardDataModel, useDeleteApiEmployeesByIdMutation, useGetApiEmployeesQuery } from '../EmployeeApi';
 
 function EmployeesTable() {
@@ -27,7 +37,7 @@ function EmployeesTable() {
 		refetch();
 	}, [refetch]);
 
-	const handleRemoveEmployee =  (id: number) => {
+	const handleRemoveEmployee = (id: number) => {
 		dispatch(
 			openDialog({
 				children: (
@@ -36,24 +46,21 @@ function EmployeesTable() {
 							Are you sure you want to delete this Employee ?
 						</DialogTitle>
 						<DialogContent>
-						<DialogContentText id="alert-dialog-description">
-													You are going to remove selected Employee. Are you sure you want to
-													continue?
-												</DialogContentText>
+							<DialogContentText id="alert-dialog-description">
+								You are going to remove selected Employee. Are you sure you want to continue?
+							</DialogContentText>
 						</DialogContent>
-						<DialogActions className='p-16'>
+						<DialogActions className="p-16">
 							<Button
 								onClick={() => {
 									dispatch(closeDialog());
 								}}
-								
-								
 								color="warning"
 							>
 								Cancel
 							</Button>
 							<Button
-								onClick={ async() => {
+								onClick={async () => {
 									dispatch(closeDialog());
 
 									await removeEmployees({ id });
@@ -131,7 +138,7 @@ function EmployeesTable() {
 			{
 				accessorKey: 'hireDate',
 				header: 'Hire Date',
-				accessorFn: (row) => `${row?.hireDate}`
+				accessorFn: (row) => format(new Date(row.hireDate), 'dd/MM/yyyy')
 			}
 		],
 		[]

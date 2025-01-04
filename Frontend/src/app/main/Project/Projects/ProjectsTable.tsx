@@ -57,13 +57,12 @@ function ProjectsTable() {
 			{
 				accessorKey: 'StartDate',
 				header: 'Start Date',
-				accessorFn: (row) => new Date(row.startDate || '').toLocaleDateString()
+				accessorFn: (row) => new Date(row.startDate || '').toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })
 			},
 			{
 				accessorKey: 'EndDate',
 				header: 'End Date',
-				accessorFn: (row) => `${row.endDate}`
-			},
+				accessorFn: (row) => new Date(row.endDate || '').toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })			},
 			{
 				accessorKey: 'status',
 				header: 'Project Status',
@@ -92,7 +91,7 @@ function ProjectsTable() {
 			{
 				accessorKey: 'workOrderDate',
 				header: 'Work Order Date',
-				accessorFn: (row) => `${row.workOrderDate}`
+				accessorFn: (row) => new Date(row.workOrderDate || '').toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })
 			}
 		],
 		[]

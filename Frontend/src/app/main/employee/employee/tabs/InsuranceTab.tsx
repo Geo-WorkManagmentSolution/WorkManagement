@@ -110,6 +110,8 @@ function IdentityInfoTab({UserRole}) {
             name="employeeInsuranceDetails.dateOfJoining"
             render={({ field: { value, onChange } }) => (
               <DatePicker
+
+              format='dd/MM/yyyy'
                 disabled
                 value={new Date(value)}
                 onChange={(val) => {
@@ -142,6 +144,7 @@ function IdentityInfoTab({UserRole}) {
             name="employeeInsuranceDetails.dateOfBirth"
             render={({ field: { value, onChange } }) => (
               <DatePicker
+              format='dd/MM/yyyy'
                 disabled
                 value={new Date(value)}
                 onChange={(val) => {

@@ -71,6 +71,7 @@ function BasicProjectInfoTab() {
             name="startDate"
             render={({ field: { value, onChange } }) => (
               <DatePicker
+              	format='dd/MM/yyyy'
                 value={new Date(value)}
                 onChange={(val) => {
                   onChange(val?.toISOString());
@@ -102,6 +103,7 @@ function BasicProjectInfoTab() {
             name="endDate"
             render={({ field: { value, onChange } }) => (
               <DatePicker
+              	format='dd/MM/yyyy'
                 value={value ? new Date(value) : null}
                 onChange={(val) => {
                   onChange(val ? val.toISOString() : null);
@@ -226,6 +228,7 @@ function BasicProjectInfoTab() {
             name="workOrderDate"
             render={({ field: { value, onChange } }) => (
               <DatePicker
+              	format='dd/MM/yyyy'
                 value={value ? new Date(value) : null}
                 onChange={(val) => {
                   onChange(val ? val.toISOString() : null);

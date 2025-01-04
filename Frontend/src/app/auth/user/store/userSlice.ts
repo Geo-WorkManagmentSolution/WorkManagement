@@ -21,8 +21,8 @@ function updateRedirectUrl(user: PartialDeep<User>) {
  */
 export const setUser = createAsyncThunk<User, User>('user/setUser', async (user) => {
 	updateRedirectUrl(user);
-
-	return user;
+  console.log('Setting user:', user);
+  return user;
 });
 
 /**
@@ -103,14 +103,11 @@ export const userSlice = createSlice({
 	},
 	extraReducers: (builder) => {
 		builder.addCase(setUser.fulfilled, (state, action) => {
-			const user = action.payload as PartialDeep<User>;
-			const newUser = _.defaults(user, state);
-
-			if (_.isEqual(state, newUser)) {
-				return undefined;
-			}
-
-			return action.payload;
+			console.log('setUser fulfilled:', action.payload);
+			return {
+				...action.payload,
+				permissions: action.payload.permissions || []
+			};
 		});
 		builder.addCase(resetUser.fulfilled, (state) => {
 			if (!_.isEqual(state, initialState)) {
@@ -140,6 +137,9 @@ export const selectUserShortcuts = (state: RootState) => state.user?.data?.short
 
 export const selectUserSettings = (state: RootState) => state.user?.data?.settings;
 
+export const selectUserPermissions = (state: RootState) => state.user?.permissions || [];
+
 export type userSliceType = typeof userSlice;
 
 export default userSlice.reducer;
+
