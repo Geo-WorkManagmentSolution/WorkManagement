@@ -70,12 +70,41 @@ const injectedRtkApi = api.injectEndpoints({
         params: { employeeId: queryArg.employeeId },
       }),
     }),
+    putApiEmployeesLeaveUpdateApproveByLeaveId: build.mutation<
+      PutApiEmployeesLeaveUpdateApproveByLeaveIdApiResponse,
+      PutApiEmployeesLeaveUpdateApproveByLeaveIdApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/LeaveUpdateApprove/${queryArg.leaveId}`,
+        method: "PUT",
+        params: { employeeId: queryArg.employeeId },
+      }),
+    }),
+    putApiEmployeesLeaveUpdateRejectByLeaveId: build.mutation<
+      PutApiEmployeesLeaveUpdateRejectByLeaveIdApiResponse,
+      PutApiEmployeesLeaveUpdateRejectByLeaveIdApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/LeaveUpdateReject/${queryArg.leaveId}`,
+        method: "PUT",
+        params: { employeeId: queryArg.employeeId },
+      }),
+    }),
     getApiEmployeesSalaryPendingSalaryRequest: build.query<
       GetApiEmployeesSalaryPendingSalaryRequestApiResponse,
       GetApiEmployeesSalaryPendingSalaryRequestApiArg
     >({
       query: (queryArg) => ({
         url: `/api/Employees/Salary/PendingSalaryRequest`,
+        params: { employeeId: queryArg.employeeId },
+      }),
+    }),
+    getApiEmployeesLeavePendingLeaveRequest: build.query<
+      GetApiEmployeesLeavePendingLeaveRequestApiResponse,
+      GetApiEmployeesLeavePendingLeaveRequestApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/Leave/PendingLeaveRequest`,
         params: { employeeId: queryArg.employeeId },
       }),
     }),
@@ -387,9 +416,26 @@ export type PutApiEmployeesSalaryRejectBySalaryIdApiArg = {
   salaryId: number;
   employeeId?: number;
 };
+export type PutApiEmployeesLeaveUpdateApproveByLeaveIdApiResponse =
+  /** status 200 OK */ EmployeeLeaveUpdatesTable;
+export type PutApiEmployeesLeaveUpdateApproveByLeaveIdApiArg = {
+  leaveId: number;
+  employeeId?: number;
+};
+export type PutApiEmployeesLeaveUpdateRejectByLeaveIdApiResponse =
+  /** status 200 OK */ EmployeeLeaveUpdatesTable;
+export type PutApiEmployeesLeaveUpdateRejectByLeaveIdApiArg = {
+  leaveId: number;
+  employeeId?: number;
+};
 export type GetApiEmployeesSalaryPendingSalaryRequestApiResponse =
   /** status 200 OK */ EmployeeSalaryDataModel[];
 export type GetApiEmployeesSalaryPendingSalaryRequestApiArg = {
+  employeeId?: number;
+};
+export type GetApiEmployeesLeavePendingLeaveRequestApiResponse =
+  /** status 200 OK */ EmployeeLeaveDataModel[];
+export type GetApiEmployeesLeavePendingLeaveRequestApiArg = {
   employeeId?: number;
 };
 export type GetApiEmployeesSalaryDashboardApiResponse =
@@ -627,7 +673,7 @@ export type EmployeeDocumentsModel = {
 };
 export type EmployeeLeaveSummaryModel = {
   employeeLeaveSummaryId?: number;
-  id?: number;
+  id?: number | null;
   employeeLeaveType?: string | null;
   totalLeaves?: number;
   remainingLeaves?: number;
@@ -854,6 +900,7 @@ export type Employee = {
   alternateEmail?: string | null;
   phoneNumber?: number | null;
   alternateNumber?: number | null;
+  jobLevelLeaveType?: number | null;
   employeeDepartmentId?: number | null;
   employeeDesignationId?: number | null;
   employeeReportToId?: number | null;
@@ -902,6 +949,33 @@ export type EmployeeSalary = {
   updatedBy?: number | null;
   updatedDateTime?: string | null;
 };
+export type EmployeeLeavesDeatils = {
+  id?: number;
+  isDeleted?: boolean;
+  employeeId?: number;
+  employee?: Employee;
+  remainingLeaves?: number;
+  employeeLeaveTypeId?: number | null;
+  employeeLeaveTypes?: EmployeeLeaveType;
+  totalLeaves?: number;
+};
+export type EmployeeLeaveUpdatesTable = {
+  id?: number;
+  isDeleted?: boolean;
+  employeeId?: number | null;
+  employee?: Employee;
+  managerName?: string | null;
+  status?: LeaveStatus;
+  isApprovedByDepartmentHead?: boolean;
+  isApprovedByHRHead?: boolean;
+  jobLevelLeaveType?: number | null;
+  useDefultLeaves?: boolean | null;
+  employeeLeaveSummaryId?: number[] | null;
+  employeeLeaveUpdateTableId?: number | null;
+  updatedNewLeaves?: EmployeeLeavesDeatils[] | null;
+  updatedBy?: number | null;
+  updatedDateTime?: string | null;
+};
 export type EmployeeSalaryDataModel = {
   salaryid?: number;
   employeeId?: number | null;
@@ -913,6 +987,21 @@ export type EmployeeSalaryDataModel = {
   isApprovedByHRHead?: boolean;
   currentSalary?: number;
   expectedToBeSalary?: number;
+  updatedBy?: number | null;
+  updatedByUserName?: string | null;
+  updatedDateTime?: string | null;
+};
+export type EmployeeLeaveDataModel = {
+  leaveId?: number;
+  employeeId?: number | null;
+  employeeName?: string | null;
+  managerName?: string | null;
+  jobLevelLeaveType?: number | null;
+  leaveStatus?: LeaveStatus;
+  isApprovedByDepartmentHead?: boolean;
+  isApprovedByHRHead?: boolean;
+  currentLeaves?: EmployeeLeaveSummaryModel[] | null;
+  updatedNewLeaves?: EmployeeLeaveSummaryModel[] | null;
   updatedBy?: number | null;
   updatedByUserName?: string | null;
   updatedDateTime?: string | null;
@@ -1064,8 +1153,12 @@ export const {
   useLazyGetApiEmployeesPartialByEmployeeIdQuery,
   usePutApiEmployeesSalaryApproveBySalaryIdMutation,
   usePutApiEmployeesSalaryRejectBySalaryIdMutation,
+  usePutApiEmployeesLeaveUpdateApproveByLeaveIdMutation,
+  usePutApiEmployeesLeaveUpdateRejectByLeaveIdMutation,
   useGetApiEmployeesSalaryPendingSalaryRequestQuery,
   useLazyGetApiEmployeesSalaryPendingSalaryRequestQuery,
+  useGetApiEmployeesLeavePendingLeaveRequestQuery,
+  useLazyGetApiEmployeesLeavePendingLeaveRequestQuery,
   useGetApiEmployeesSalaryDashboardQuery,
   useLazyGetApiEmployeesSalaryDashboardQuery,
   useGetApiEmployeesLeavesCurrentQuery,

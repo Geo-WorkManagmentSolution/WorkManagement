@@ -85,5 +85,9 @@ namespace WorkManagement.Domain.Contracts
         public int CheckValidEmployeeId(string loggedUserId);
         public Task<List<EmployeeSalaryDataModel>> GetAllPenidngSalaryRequestList(string loggedUserId);
         public Task<List<EmployeeSalaryDataModel>> GetEmployeeSalaryRequestList(string loggedUserId, int employeeId);
+        public  Task<EmployeeLeaveUpdatesTable> ApproveLeaveUpdate(int leaveId, string loggedUserId, int employeeId);
+        public  Task<EmployeeLeaveUpdatesTable> RejectLeaveUpdate(int leaveId, string loggedUserId, int employeeId);
+        public  Task<List<EmployeeLeaveDataModel>> GetEmployeeLeaveRequestList(string loggedUserId, int employeeId);
+        public  Task<List<EmployeeLeaveDataModel>> GetAllPenidngLeaveRequestList(string loggedUserId);
     }
 }

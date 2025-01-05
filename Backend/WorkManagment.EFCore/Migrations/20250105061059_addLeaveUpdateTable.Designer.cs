@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WorkManagmentSolution.EFCore;
 
@@ -11,9 +12,11 @@ using WorkManagmentSolution.EFCore;
 namespace WorkManagement.EFCore.Migrations
 {
     [DbContext(typeof(WorkManagementDbContext))]
-    partial class WorkManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250105061059_addLeaveUpdateTable")]
+    partial class addLeaveUpdateTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -268,12 +271,12 @@ namespace WorkManagement.EFCore.Migrations
                         {
                             Id = new Guid("8e445865-a24d-4543-a6c6-9443d048cdb9"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "5c3f0105-8f22-40fe-ac50-aa32920d2922",
+                            ConcurrencyStamp = "e0f01ce8-c7a8-4b00-8306-97904418b7b4",
                             Email = "admin1@admin.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin",
-                            PasswordHash = "AQAAAAIAAYagAAAAEPw7ZM9I433BiDHCBWI4LLvWqQkpSG/YiYzU6XH7nazQ84M3ovtp6Igg79GbHbe2cw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGSWyGWB/xZRys8OjekOntSR3mkwINFYDsBsIcnd5EYJCIq6J9FcLv2ZnXf/hxDhrA==",
                             PhoneNumberConfirmed = false,
                             Shortcuts = "[]",
                             TwoFactorEnabled = false,
@@ -661,6 +664,7 @@ namespace WorkManagement.EFCore.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ManagerName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("Status")

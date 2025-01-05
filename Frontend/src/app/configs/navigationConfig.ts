@@ -90,6 +90,13 @@ const navigationConfig: FuseNavItemType[] = [
                                 type: 'item',
 								// auth:PermissionActionEnum.LeaveModuleEmployeeLeaveHistory ,
                                 url: '/apps/employees/leave-management/leave-history'
+							},
+							{
+								id: 'applicationmanagement.employees.leave-management.leave-Updates-request',
+                                title: 'Leave Update Requests',
+                                type: 'item',
+								// auth:PermissionActionEnum.LeaveModuleEmployeeLeaveHistory ,
+                                url: '/apps/employees/leave-management/leave-Updates-request'
 							}
 						]
 					}
