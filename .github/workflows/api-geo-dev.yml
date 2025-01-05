@@ -27,7 +27,6 @@ jobs:
       working-directory: ${{ env.FRONTEND_WORKING_DIRECTORY }}
     - name: Copy Build files to backend
       run: cp -r ./${{ env.AZURE_WEBAPP_FRONTEND_PACKAGE_PATH }} ./${{ env.AZURE_WEBAPP_API_WWWROOT_PATH }}
-    
   build-backend:
     runs-on: ubuntu-latest
     needs: build-frontend
