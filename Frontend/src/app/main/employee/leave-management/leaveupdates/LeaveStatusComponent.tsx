@@ -1,23 +1,38 @@
-import { Chip } from '@mui/material';
+import React from 'react';
+import { Typography } from '@mui/material';
 import { LeaveStatus } from '../../EmployeeApi';
 
-function LeaveStatusComponent({ status }: { status: LeaveStatus }) {
-  let color: 'success' | 'warning' | 'error' = 'warning';
-  let label = 'Pending';
-
-  switch (status) {
-    case LeaveStatus.Approved:
-      color = 'success';
-      label = 'Approved';
-      break;
-    case LeaveStatus.Rejected:
-      color = 'error';
-      label = 'Rejected';
-      break;
-  }
-
-  return <Chip label={label} color={color} size="small" />;
+interface SalaryStatusComponentProps {
+  status: LeaveStatus;
 }
 
-export default LeaveStatusComponent;
+const SalaryStatusComponent: React.FC<SalaryStatusComponentProps> = ({ status }) => {
+  const getStatusColor = () => {
+    switch (status) {
+      case LeaveStatus.Approved:
+        return 'success.main';
+      case LeaveStatus.Rejected:
+        return 'error.main';
+      case LeaveStatus.Pending:
+      default:
+        return 'info.main';
+    }
+  };
 
+  return (
+    <Typography
+      variant="body1"
+      sx={{
+        textAlign: 'center',
+        backgroundColor: getStatusColor(),
+        color: 'common.white',
+        padding: '2px 4px',
+        borderRadius: '4px'
+      }}
+    >
+      {status}
+    </Typography>
+  );
+};
+
+export default SalaryStatusComponent;
