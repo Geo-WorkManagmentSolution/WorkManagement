@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -8,11 +9,14 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WorkManagement.EFCore.Migrations
 {
     /// <inheritdoc />
-    public partial class Init_Db : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AlterDatabase()
+                .Annotation("MySql:CharSet", "utf8mb4");
+
             migrationBuilder.CreateSequence<int>(
                 name: "EmployeeNumber",
                 startValue: 1000L);
@@ -21,262 +25,325 @@ namespace WorkManagement.EFCore.Migrations
                 name: "AspNetRoles",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    Name = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    NormalizedName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ConcurrencyStamp = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetRoles", x => x.Id);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "AspNetUsers",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Shortcuts = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    Shortcuts = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UserName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    NormalizedUserName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Email = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    NormalizedEmail = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    EmailConfirmed = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    PasswordHash = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    SecurityStamp = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ConcurrencyStamp = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    PhoneNumber = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     AccessFailedCount = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "EmployeeAddresses",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserAddressLine1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserAddressLine2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserCity = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserCountry = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserState = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    UserAddressLine1 = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UserAddressLine2 = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UserCity = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UserCountry = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UserState = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     UserAddressPinCode = table.Column<long>(type: "bigint", nullable: true),
-                    MailingAddressLine1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MailingAddressLine2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MailingCity = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MailingCountry = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MailingState = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MailingAddressLine1 = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    MailingAddressLine2 = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    MailingCity = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    MailingCountry = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    MailingState = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     MailingAddressPinCode = table.Column<long>(type: "bigint", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_EmployeeAddresses", x => x.Id);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "EmployeeCategories",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_EmployeeCategories", x => x.Id);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "EmployeeDepartments",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_EmployeeDepartments", x => x.Id);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "EmployeeDesignations",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_EmployeeDesignations", x => x.Id);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "EmployeeHolidays",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsFloater = table.Column<bool>(type: "bit", nullable: false),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsFloater = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_EmployeeHolidays", x => x.Id);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "EmployeeIdentityInfos",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UID = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BankAccountNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BankName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Branch = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IFSC = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AccountHolderName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PAN = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ProvidentFundNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    EmployeeStateInsuranceNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BiometricCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    UID = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    BankAccountNumber = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    BankName = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Branch = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IFSC = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    AccountHolderName = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    PAN = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ProvidentFundNumber = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    EmployeeStateInsuranceNumber = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    BiometricCode = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_EmployeeIdentityInfos", x => x.Id);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "EmployeeLeaveType",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsPaid = table.Column<bool>(type: "bit", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsPaid = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_EmployeeLeaveType", x => x.Id);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "EmployeePersonalDetails",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Gender = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    DateOfBirth = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    Gender = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     MaritalStatus = table.Column<int>(type: "int", nullable: true),
                     bloodGroup = table.Column<int>(type: "int", nullable: true),
                     RelationWithEmployee = table.Column<int>(type: "int", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_EmployeePersonalDetails", x => x.Id);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "JobLevelLeave",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    JobLevel = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    JobLevel = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_JobLevelLeave", x => x.Id);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "PermissionCategories",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Description = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     Value = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_PermissionCategories", x => x.Id);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "Projects",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ProjectName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ProjectNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ProjectDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    WorkOrderNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    WorkOrderName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    WorkOrderAmount = table.Column<double>(type: "float", nullable: true),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    ProjectName = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ProjectNumber = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ProjectDescription = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    WorkOrderNumber = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    WorkOrderName = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    WorkOrderAmount = table.Column<double>(type: "double", nullable: true),
                     PeriodOfWorkInMonths = table.Column<int>(type: "int", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: true),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    WorkOrderDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedOn = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    LastModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    LastModifiedOn = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    StartDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    WorkOrderDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    CreatedOn = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
+                    LastModifiedOn = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Projects", x => x.Id);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "Sites",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Sites", x => x.Id);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    RoleId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    ClaimType = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ClaimValue = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
@@ -287,17 +354,20 @@ namespace WorkManagement.EFCore.Migrations
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "AspNetUserClaims",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    UserId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    ClaimType = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ClaimValue = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
@@ -308,16 +378,20 @@ namespace WorkManagement.EFCore.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    LoginProvider = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ProviderKey = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ProviderDisplayName = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UserId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
                 },
                 constraints: table =>
                 {
@@ -328,14 +402,15 @@ namespace WorkManagement.EFCore.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "AspNetUserRoles",
                 columns: table => new
                 {
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    UserId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    RoleId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
                 },
                 constraints: table =>
                 {
@@ -352,16 +427,20 @@ namespace WorkManagement.EFCore.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "AspNetUserTokens",
                 columns: table => new
                 {
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    UserId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    LoginProvider = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Name = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Value = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
@@ -372,45 +451,49 @@ namespace WorkManagement.EFCore.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "EmployeeInsuranceDetails",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     EmployeeDesignationId = table.Column<int>(type: "int", nullable: true),
-                    SerialNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DateOfJoining = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Age = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    GrossSalary = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TotalSIWider = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Comprehensive = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Risk = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    SerialNumber = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    DateOfJoining = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DateOfBirth = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    Age = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    GrossSalary = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    TotalSIWider = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    Comprehensive = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    Risk = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_EmployeeInsuranceDetails", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_EmployeeInsuranceDetails_EmployeeDesignations_EmployeeDesignationId",
+                        name: "FK_EmployeeInsuranceDetails_EmployeeDesignations_EmployeeDesign~",
                         column: x => x.EmployeeDesignationId,
                         principalTable: "EmployeeDesignations",
                         principalColumn: "Id");
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "EmployeeDefaultLeave",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     EmployeeLeaveTypeId = table.Column<int>(type: "int", nullable: true),
                     JobLevelLeaveId = table.Column<int>(type: "int", nullable: true),
                     TotalLeaves = table.Column<int>(type: "int", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -425,16 +508,19 @@ namespace WorkManagement.EFCore.Migrations
                         column: x => x.JobLevelLeaveId,
                         principalTable: "JobLevelLeave",
                         principalColumn: "Id");
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "PermissionActions",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Description = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     Value = table.Column<int>(type: "int", nullable: false),
                     PermissionCategoryId = table.Column<int>(type: "int", nullable: true)
                 },
@@ -446,31 +532,36 @@ namespace WorkManagement.EFCore.Migrations
                         column: x => x.PermissionCategoryId,
                         principalTable: "PermissionCategories",
                         principalColumn: "Id");
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "ProjectTasks",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Title = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Description = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Notes = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     Status = table.Column<int>(type: "int", nullable: true),
                     Priority = table.Column<int>(type: "int", nullable: true),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    EstimatedHours = table.Column<double>(type: "float", nullable: true),
-                    RemainingHours = table.Column<double>(type: "float", nullable: true),
-                    CompletedHours = table.Column<double>(type: "float", nullable: true),
-                    AssignedEmployees = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StartDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    EndDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    EstimatedHours = table.Column<double>(type: "double", nullable: true),
+                    RemainingHours = table.Column<double>(type: "double", nullable: true),
+                    CompletedHours = table.Column<double>(type: "double", nullable: true),
+                    AssignedEmployees = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     ProjectId = table.Column<int>(type: "int", nullable: true),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedOn = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    LastModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    LastModifiedOn = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    CreatedBy = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    CreatedOn = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
+                    LastModifiedOn = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -480,21 +571,24 @@ namespace WorkManagement.EFCore.Migrations
                         column: x => x.ProjectId,
                         principalTable: "Projects",
                         principalColumn: "Id");
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "WorkOrderDocuments",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    FileName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FilePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    FileName = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    FilePath = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     FileSize = table.Column<int>(type: "int", nullable: true),
-                    FileContent = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    FileContent = table.Column<byte[]>(type: "longblob", nullable: true),
                     FileType = table.Column<int>(type: "int", nullable: true),
                     ProjectId = table.Column<int>(type: "int", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -504,34 +598,37 @@ namespace WorkManagement.EFCore.Migrations
                         column: x => x.ProjectId,
                         principalTable: "Projects",
                         principalColumn: "Id");
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "EmployeeWorkInformations",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Designation = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Designation = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     SalaryType = table.Column<int>(type: "int", nullable: true),
-                    HireDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ConfirmationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    TotalPreviousExperience = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    UseDefaultLeaves = table.Column<bool>(type: "bit", nullable: false),
-                    Salary = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Basic = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    HRAllowances = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Bonus = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Gratuity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    PF = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    ESI = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    PT = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    HireDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    ConfirmationDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    TotalPreviousExperience = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    UseDefaultLeaves = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    Salary = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    Basic = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    HRAllowances = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    Bonus = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    Gratuity = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    PF = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    ESI = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    PT = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
                     SiteId = table.Column<int>(type: "int", nullable: true),
-                    Bond = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    PreviousDateOfJoiningInGDR = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    PreviousDateOfLeavingInGDR = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    GRPHead = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Bond = table.Column<decimal>(type: "decimal(65,30)", nullable: true),
+                    PreviousDateOfJoiningInGDR = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    PreviousDateOfLeavingInGDR = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    GRPHead = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -541,17 +638,18 @@ namespace WorkManagement.EFCore.Migrations
                         column: x => x.SiteId,
                         principalTable: "Sites",
                         principalColumn: "Id");
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "RolePermissions",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    RoleId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     PermissionActionId = table.Column<int>(type: "int", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -568,39 +666,46 @@ namespace WorkManagement.EFCore.Migrations
                         principalTable: "PermissionActions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "Employees",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    PhotoURL = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    PhotoURL = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     EmployeeNumber = table.Column<int>(type: "int", nullable: false, defaultValueSql: "NEXT VALUE FOR EmployeeNumber"),
-                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MiddleName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AlternateEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FirstName = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    MiddleName = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    LastName = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Email = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    AlternateEmail = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     PhoneNumber = table.Column<long>(type: "bigint", nullable: true),
                     AlternateNumber = table.Column<long>(type: "bigint", nullable: true),
                     EmployeeDepartmentId = table.Column<int>(type: "int", nullable: true),
                     EmployeeDesignationId = table.Column<int>(type: "int", nullable: true),
                     EmployeeReportToId = table.Column<int>(type: "int", nullable: true),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    RoleId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     EmployeeCategoryId = table.Column<int>(type: "int", nullable: true),
                     EmployeePersonalDetailsId = table.Column<int>(type: "int", nullable: true),
                     EmployeeWorkInformationId = table.Column<int>(type: "int", nullable: true),
                     EmployeeInsuranceDetailsId = table.Column<int>(type: "int", nullable: true),
                     EmployeeAddressesId = table.Column<int>(type: "int", nullable: true),
                     EmployeeIdentityInfoId = table.Column<int>(type: "int", nullable: true),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedOn = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    LastModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    LastModifiedOn = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    CreatedBy = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    CreatedOn = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
+                    LastModifiedOn = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -662,21 +767,24 @@ namespace WorkManagement.EFCore.Migrations
                         column: x => x.EmployeeReportToId,
                         principalTable: "Employees",
                         principalColumn: "Id");
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "EmployeeDocuments",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    FileName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FilePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    FileName = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    FilePath = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     FileSize = table.Column<int>(type: "int", nullable: true),
-                    FileContent = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    FileContent = table.Column<byte[]>(type: "longblob", nullable: true),
                     FileType = table.Column<int>(type: "int", nullable: true),
                     EmployeeId = table.Column<int>(type: "int", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -686,21 +794,26 @@ namespace WorkManagement.EFCore.Migrations
                         column: x => x.EmployeeId,
                         principalTable: "Employees",
                         principalColumn: "Id");
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "EmployeeEducationDetails",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PassingYear = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DegreeCertificateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    University = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    grade = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Type = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    PassingYear = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    DegreeCertificateDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    University = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    grade = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     EmployeeId = table.Column<int>(type: "int", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -710,23 +823,26 @@ namespace WorkManagement.EFCore.Migrations
                         column: x => x.EmployeeId,
                         principalTable: "Employees",
                         principalColumn: "Id");
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "EmployeeLeaves",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     EmployeeId = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Reason = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LeaveDays = table.Column<double>(type: "float", nullable: false),
+                    Description = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Reason = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    StartDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    LeaveDays = table.Column<double>(type: "double", nullable: false),
                     EmployeeLeaveTypeId = table.Column<int>(type: "int", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -743,19 +859,20 @@ namespace WorkManagement.EFCore.Migrations
                         principalTable: "Employees",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "EmployeeLeaveSummary",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     EmployeeId = table.Column<int>(type: "int", nullable: false),
-                    RemainingLeaves = table.Column<double>(type: "float", nullable: false),
+                    RemainingLeaves = table.Column<double>(type: "double", nullable: false),
                     EmployeeLeaveTypeId = table.Column<int>(type: "int", nullable: true),
                     TotalLeaves = table.Column<int>(type: "int", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -771,20 +888,24 @@ namespace WorkManagement.EFCore.Migrations
                         principalTable: "Employees",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "EmployeeRelationshipDetails",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     EmployeeId = table.Column<int>(type: "int", nullable: true),
                     RelationshipType = table.Column<int>(type: "int", nullable: true),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Name = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Email = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    PhoneNumber = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -794,31 +915,32 @@ namespace WorkManagement.EFCore.Migrations
                         column: x => x.EmployeeId,
                         principalTable: "Employees",
                         principalColumn: "Id");
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "EmployeeSalaries",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     EmployeeId = table.Column<int>(type: "int", nullable: true),
                     SalaryType = table.Column<int>(type: "int", nullable: true),
                     SalaryStatus = table.Column<int>(type: "int", nullable: true),
-                    IsApprovedByDepartmentHead = table.Column<bool>(type: "bit", nullable: false),
-                    IsApprovedByHRHead = table.Column<bool>(type: "bit", nullable: false),
-                    CurrentSalary = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    ExpectedToBeSalary = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Basic = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    HRAllowances = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Bonus = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Gratuity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    PF = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    ESI = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    PT = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    IsApprovedByDepartmentHead = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    IsApprovedByHRHead = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    CurrentSalary = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    ExpectedToBeSalary = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    Basic = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    HRAllowances = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    Bonus = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    Gratuity = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    PF = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    ESI = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    PT = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
                     UpdatedBy = table.Column<int>(type: "int", nullable: true),
-                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    UpdatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -828,21 +950,22 @@ namespace WorkManagement.EFCore.Migrations
                         column: x => x.EmployeeId,
                         principalTable: "Employees",
                         principalColumn: "Id");
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "ProjectEmployees",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     EmployeeId = table.Column<int>(type: "int", nullable: false),
                     ProjectId = table.Column<int>(type: "int", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedOn = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    LastModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    LastModifiedOn = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    CreatedBy = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    CreatedOn = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
+                    LastModifiedOn = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -859,7 +982,8 @@ namespace WorkManagement.EFCore.Migrations
                         principalTable: "Projects",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
@@ -869,7 +993,6 @@ namespace WorkManagement.EFCore.Migrations
                     { new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7"), null, "HR Admin", "HR ADMIN" },
                     { new Guid("2800e45a-293d-4c8e-8b91-2f57cce4b963"), null, "Manager", "MANAGER" },
                     { new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210"), null, "admin", "ADMIN" },
-                    { new Guid("611c6e4c-c1fc-49a4-847e-fb9608f460c0"), null, "SuperUser", "SUPERUSER" },
                     { new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f"), null, "Employee", "EMPLOYEE" },
                     { new Guid("f794ec58-bf79-4ca0-a897-021e0657ca42"), null, "HR", "HR" }
                 });
@@ -877,7 +1000,7 @@ namespace WorkManagement.EFCore.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "Shortcuts", "TwoFactorEnabled", "UserName" },
-                values: new object[] { new Guid("8e445865-a24d-4543-a6c6-9443d048cdb9"), 0, "c209a901-e315-4d8e-b46b-92de9e972b8a", "admin1@admin.com", false, false, null, null, "admin", "AQAAAAIAAYagAAAAEN5heEDTdGRJQLgtFgqKwflGVxFwOXjYOYPvp4mvW3TZfgr8NPc0YuGHzXsYpzULOg==", null, false, null, "[]", false, "admin1@admin.com" });
+                values: new object[] { new Guid("8e445865-a24d-4543-a6c6-9443d048cdb9"), 0, "1e1f5777-07f9-4300-a9bf-e78f58a6f46d", "admin1@admin.com", false, false, null, null, "admin", "AQAAAAIAAYagAAAAEGyrI3ofdUWNCYq/kzmWwcKi3ouV5tvBE8BRHHJHf/s20+Pmwa9kpEo4P7MBsYyqvQ==", null, false, null, "[]", false, "admin1@admin.com" });
 
             migrationBuilder.InsertData(
                 table: "EmployeeCategories",
@@ -985,34 +1108,30 @@ namespace WorkManagement.EFCore.Migrations
                 values: new object[,]
                 {
                     { 1, "Project Dashboard", "ProjectModule_Dashboard", 1, 10 },
-                    { 2, "Project Add", "ProjectModule_Add", 1, 7 },
-                    { 3, "Project Delete", "ProjectModule_Delete", 1, 9 },
-                    { 4, "Project Update", "ProjectModule_Update", 1, 8 },
-                    { 5, "Add Employees to Project", "ProjectModule_Employee_Add", 1, 10 },
-                    { 6, "Delete Employees to Project", "ProjectModule_Employee_Delete", 1, 7 },
-                    { 7, "Update Employees to Project", "ProjectModule_Employee_Update", 1, 9 },
-                    { 8, "Add Tasks to Project", "ProjectModule_Link_Add", 1, 8 },
-                    { 9, "Delete Tasks to Project", "ProjectModule_Link_Delete", 1, 8 },
-                    { 10, "Update Tasks to Project", "ProjectModule_Link_Update", 1, 8 },
-                    { 11, "Add Leaves", "LeaveModule_Add", 4, 17 },
-                    { 12, "Delete Leaves", "LeaveModule_Delete", 4, 18 },
-                    { 13, "Update Leaves", "LeaveModule_Update", 4, 19 },
-                    { 14, "Approve/Reject Leaves", "LeaveModule_Approvals", 4, 20 },
-                    { 15, "Leave History Dashboard", "LeaveModule_Employee_LeaveHistory", 4, 21 },
-                    { 16, "Update Dropdown values", "SettingModule_DropDownSettings", 5, 22 },
-                    { 17, "Add Leave Types", "SettingModule_LeaveType_Add", 5, 23 },
-                    { 18, "Update Leave Types", "SettingModule_LeaveType_Update", 5, 24 },
-                    { 19, "Delete Leave Types", "SettingModule_LeaveType_Delete", 5, 25 },
-                    { 20, "Add Public Holidays", "SettingModule_Holidays_Add", 5, 26 },
-                    { 21, "Update Public Holidays", "SettingModule_Holidays_Update", 5, 27 },
-                    { 22, "Delete Public Holidays", "SettingModule_Holidays_Delete", 5, 28 },
-                    { 23, "Add Employee", "EmployeeModule_Add", 2, 1 },
-                    { 24, "Updated Employee", "EmployeeModule_Update", 2, 2 },
-                    { 25, "Delete Employee", "EmployeeModule_Delete", 2, 3 },
-                    { 26, "Employee Salary Update", "EmployeeModule_Salary_Update", 2, 4 },
-                    { 27, "Employee Leave Update", "EmployeeModule_Leave_Update", 2, 5 },
-                    { 28, "Employee Dashboard", "EmployeeModule_Dashboard", 2, 6 },
-                    { 29, "IntegrationModule_UploadCSV", "IntegrationModule_UploadCSV", 3, 29 }
+                    { 2, "Add Project", "ProjectModule_Add", 1, 7 },
+                    { 3, "Delete Project", "ProjectModule_Delete", 1, 9 },
+                    { 4, "Update Project", "ProjectModule_Update", 1, 8 },
+                    { 5, "View Project", "ProjectModule_View", 1, 33 },
+                    { 6, "Project Task", "ProjectModule_Task", 1, 34 },
+                    { 7, "Project Employees", "ProjectModule_Employee", 1, 35 },
+                    { 8, "Add Employee", "EmployeeModule_Add", 2, 1 },
+                    { 9, "Updated Employee", "EmployeeModule_Update", 2, 2 },
+                    { 10, "Delete Employee", "EmployeeModule_Delete", 2, 3 },
+                    { 11, "View Employee", "EmployeeModule_View", 2, 30 },
+                    { 12, "Employee Salary Update", "EmployeeModule_Salary_Update", 2, 4 },
+                    { 13, "View Employee Salary History", "EmployeeModule_Salary_History_View", 2, 31 },
+                    { 14, "Employee Salary Approve/Reject", "EmployeeModule_Salary_Approve_Reject", 2, 32 },
+                    { 15, "Employee Leave Update", "EmployeeModule_Leave_Update", 2, 5 },
+                    { 16, "Employee Dashboard", "EmployeeModule_Dashboard", 2, 6 },
+                    { 17, "IntegrationModule_UploadCSV", "IntegrationModule_UploadCSV", 3, 29 },
+                    { 18, "Add Leaves", "LeaveModule_Add", 4, 17 },
+                    { 19, "Delete Leaves", "LeaveModule_Delete", 4, 18 },
+                    { 20, "Update Leaves", "LeaveModule_Update", 4, 19 },
+                    { 21, "Approve/Reject Leaves", "LeaveModule_Approvals", 4, 20 },
+                    { 22, "Leave History Dashboard", "LeaveModule_Employee_LeaveHistory", 4, 21 },
+                    { 23, "Update Dropdown values", "SettingModule_DropDownSettings_Update", 5, 22 },
+                    { 24, "Update Default Leaves", "SettingModule_DefaultLeaves_Update", 5, 23 },
+                    { 25, "Update Public Holidays", "SettingModule_Holidays_Update", 5, 27 }
                 });
 
             migrationBuilder.InsertData(
@@ -1020,21 +1139,56 @@ namespace WorkManagement.EFCore.Migrations
                 columns: new[] { "Id", "IsDeleted", "PermissionActionId", "RoleId" },
                 values: new object[,]
                 {
-                    { 1, false, 1, new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f") },
-                    { 2, false, 2, new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f") },
-                    { 3, false, 3, new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f") },
-                    { 4, false, 4, new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f") },
-                    { 5, false, 5, new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f") },
-                    { 6, false, 6, new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f") },
-                    { 7, false, 7, new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f") },
-                    { 8, false, 8, new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f") },
-                    { 9, false, 9, new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f") },
-                    { 10, false, 10, new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f") },
-                    { 11, false, 11, new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f") },
-                    { 12, false, 12, new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f") },
-                    { 13, false, 13, new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f") },
-                    { 14, false, 14, new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f") },
-                    { 15, false, 15, new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f") }
+                    { 1, false, 1, new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7") },
+                    { 2, false, 2, new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7") },
+                    { 3, false, 3, new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7") },
+                    { 4, false, 4, new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7") },
+                    { 5, false, 5, new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7") },
+                    { 6, false, 6, new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7") },
+                    { 7, false, 7, new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7") },
+                    { 8, false, 8, new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7") },
+                    { 9, false, 9, new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7") },
+                    { 10, false, 10, new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7") },
+                    { 11, false, 11, new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7") },
+                    { 12, false, 12, new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7") },
+                    { 13, false, 13, new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7") },
+                    { 14, false, 14, new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7") },
+                    { 15, false, 15, new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7") },
+                    { 16, false, 16, new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7") },
+                    { 17, false, 17, new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7") },
+                    { 18, false, 18, new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7") },
+                    { 19, false, 19, new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7") },
+                    { 20, false, 20, new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7") },
+                    { 21, false, 21, new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7") },
+                    { 22, false, 22, new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7") },
+                    { 23, false, 23, new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7") },
+                    { 24, false, 24, new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7") },
+                    { 25, false, 25, new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7") },
+                    { 26, false, 1, new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210") },
+                    { 27, false, 2, new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210") },
+                    { 28, false, 3, new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210") },
+                    { 29, false, 4, new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210") },
+                    { 30, false, 5, new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210") },
+                    { 31, false, 6, new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210") },
+                    { 32, false, 7, new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210") },
+                    { 33, false, 8, new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210") },
+                    { 34, false, 9, new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210") },
+                    { 35, false, 10, new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210") },
+                    { 36, false, 11, new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210") },
+                    { 37, false, 12, new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210") },
+                    { 38, false, 13, new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210") },
+                    { 39, false, 14, new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210") },
+                    { 40, false, 15, new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210") },
+                    { 41, false, 16, new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210") },
+                    { 42, false, 17, new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210") },
+                    { 43, false, 18, new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210") },
+                    { 44, false, 19, new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210") },
+                    { 45, false, 20, new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210") },
+                    { 46, false, 21, new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210") },
+                    { 47, false, 22, new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210") },
+                    { 48, false, 23, new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210") },
+                    { 49, false, 24, new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210") },
+                    { 50, false, 25, new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210") }
                 });
 
             migrationBuilder.CreateIndex(
@@ -1046,8 +1200,7 @@ namespace WorkManagement.EFCore.Migrations
                 name: "RoleNameIndex",
                 table: "AspNetRoles",
                 column: "NormalizedName",
-                unique: true,
-                filter: "[NormalizedName] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserClaims_UserId",
@@ -1073,8 +1226,7 @@ namespace WorkManagement.EFCore.Migrations
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
-                unique: true,
-                filter: "[NormalizedUserName] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_EmployeeDefaultLeave_EmployeeLeaveTypeId",

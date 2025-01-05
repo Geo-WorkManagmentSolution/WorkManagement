@@ -54,9 +54,8 @@ try
 
 
 
-
     builder.Services.AddDbContext<WorkManagementDbContext>(options =>
-        options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+        options.UseMySql(configuration.GetConnectionString("DefaultConnection"), ServerVersion.AutoDetect(configuration.GetConnectionString("DefaultConnection"))));
 
     builder.Services.Configure<IdentityOptions>(opts =>
     {
@@ -177,6 +176,10 @@ try
     // Configure the HTTP request pipeline.
     if (!app.Environment.IsDevelopment())
         app.UseHttpsRedirection();
+
+
+    app.UseDefaultFiles();
+    app.UseStaticFiles();
 
     app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 
