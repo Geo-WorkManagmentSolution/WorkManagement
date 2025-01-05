@@ -42,10 +42,7 @@ jobs:
       run: npm run build
       working-directory: ${{ env.FRONTEND_WORKING_DIRECTORY }}
     - name: Copy Build files to backend
-      uses: canastro/copy-action@0.0.2
-      with:
-        source: ${{ env.AZURE_WEBAPP_FRONTEND_PACKAGE_PATH }}
-        target: ${{ env.AZURE_WEBAPP_API_WWWROOT_PATH }}
+      run: cp -r ${{ env.AZURE_WEBAPP_FRONTEND_PACKAGE_PATH }} ${{ env.AZURE_WEBAPP_API_WWWROOT_PATH }}
     - name: Publish Artifacts
       uses: actions/upload-artifact@v3
       with:
