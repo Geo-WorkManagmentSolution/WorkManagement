@@ -12,7 +12,7 @@ using WorkManagmentSolution.EFCore;
 namespace WorkManagement.EFCore.Migrations
 {
     [DbContext(typeof(WorkManagementDbContext))]
-    [Migration("20250105100708_init")]
+    [Migration("20250105165240_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -24,9 +24,6 @@ namespace WorkManagement.EFCore.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
-
-            modelBuilder.HasSequence<int>("EmployeeNumber")
-                .StartsAt(1000L);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
@@ -269,12 +266,12 @@ namespace WorkManagement.EFCore.Migrations
                         {
                             Id = new Guid("8e445865-a24d-4543-a6c6-9443d048cdb9"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "1e1f5777-07f9-4300-a9bf-e78f58a6f46d",
+                            ConcurrencyStamp = "b46a8270-3934-4884-add8-a38a47646b14",
                             Email = "admin1@admin.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin",
-                            PasswordHash = "AQAAAAIAAYagAAAAEGyrI3ofdUWNCYq/kzmWwcKi3ouV5tvBE8BRHHJHf/s20+Pmwa9kpEo4P7MBsYyqvQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAELdgb7EutFh6DzPA8K1Wgd8OLzwCDkNCetDulFt2w7tSCtI216RXvMB6Iax6YDw6RA==",
                             PhoneNumberConfirmed = false,
                             Shortcuts = "[]",
                             TwoFactorEnabled = false,
@@ -1654,9 +1651,7 @@ namespace WorkManagement.EFCore.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("EmployeeNumber")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValueSql("NEXT VALUE FOR EmployeeNumber");
+                        .HasColumnType("int");
 
                     b.Property<int?>("EmployeePersonalDetailsId")
                         .HasColumnType("int");

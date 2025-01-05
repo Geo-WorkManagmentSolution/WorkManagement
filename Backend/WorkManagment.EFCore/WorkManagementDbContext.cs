@@ -2,12 +2,16 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System;
 using System.Security.Claims;
 using WorkManagement.Domain.Entity;
 using WorkManagement.Domain.Entity.EmployeeLeaveTables;
 using WorkManagement.Domain.Extentions;
 using WorkManagement.Domain.Models;
 using WorkManagementSolution.Employee;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WorkManagmentSolution.EFCore
 {
@@ -77,14 +81,8 @@ namespace WorkManagmentSolution.EFCore
             //        mutableEntityType.SetQueryFilter(lambdaExpression);
             //    }
             //}
-
-            modelBuilder.HasSequence<int>("EmployeeNumber")
-            .StartsAt(1000)
-            .IncrementsBy(1);
-
             modelBuilder.Entity<Employee>()
-                .Property(o => o.EmployeeNumber)
-                .HasDefaultValueSql("NEXT VALUE FOR EmployeeNumber");
+                .Property(o => o.EmployeeNumber);
 
 
             modelBuilder.Entity<JobLevelLeave>().HasData(

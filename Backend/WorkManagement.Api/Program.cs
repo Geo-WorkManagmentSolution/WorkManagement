@@ -169,7 +169,6 @@ try
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Work Management API v1");
-        c.RoutePrefix = string.Empty;  // Set Swagger UI at apps root
     });
 
 
@@ -187,13 +186,16 @@ try
     app.UseAuthorization();
 
     // Other middleware configurations...
-    app.MapControllers();
-
+    app.UseEndpoints(endpoints =>
+    {
+        endpoints.MapControllers();
+        endpoints.MapFallbackToFile("{**slug}", "index.html");
+    });
     app.UseMiddleware<ErrorHandlingMiddleware>();
     //app.Map("/", async context =>
     //{
     //    await context.Response.WriteAsync("Api is Up & running!");
-    //});
+    //}); 
     app.Run();
 }
 catch (Exception ex)
