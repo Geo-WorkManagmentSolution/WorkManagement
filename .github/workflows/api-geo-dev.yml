@@ -7,13 +7,28 @@ env:
   AZURE_API_WEBAPP_NAME: api-geo-dev1
   AZURE_UI_WEBAPP_NAME: ui-geo-dev1
   AZURE_WEBAPP_API_PACKAGE_PATH: Backend/WorkManagement.Api/publish
-  AZURE_WEBAPP_API_WWWROOT_PATH: Backend/WorkManagement.Api/publish/wwwroot
+  AZURE_WEBAPP_API_WWWROOT_PATH: Backend/WorkManagement.Api/wwwroot
   AZURE_WEBAPP_FRONTEND_PACKAGE_PATH: Frontend/build
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 8.0.x
   WORKING_DIRECTORY: Backend/WorkManagement.Api
   FRONTEND_WORKING_DIRECTORY: Frontend
 jobs:
+  build-frontend:
+    runs-on: ubuntu-latest
+    needs: build-backend
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup Node.js environment
+      uses: actions/setup-node@v4.1.0
+    - name: Install dependencies
+      run: npm install
+      working-directory: ${{ env.FRONTEND_WORKING_DIRECTORY }}
+    - name: Build React app
+      run: npm run build
+      working-directory: ${{ env.FRONTEND_WORKING_DIRECTORY }}
+    - name: Copy Build files to backend
+      run: cp -r ./${{ env.AZURE_WEBAPP_FRONTEND_PACKAGE_PATH }} ./${{ env.AZURE_WEBAPP_API_WWWROOT_PATH }}
   build-backend:
     runs-on: ubuntu-latest
     steps:
@@ -28,23 +43,8 @@ jobs:
       run: dotnet build "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-restore
     - name: Publish
       run: dotnet publish "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-build --output "${{ env.AZURE_WEBAPP_API_PACKAGE_PATH }}"
-  build-frontend:
-    runs-on: ubuntu-latest
-    needs: build-backend
-    steps:
-    - uses: actions/checkout@v4
-    - name: Setup Node.js environment
-      uses: actions/setup-node@v4.1.0
-    - name: Install dependencies
-      run: npm install
-      working-directory: ${{ env.FRONTEND_WORKING_DIRECTORY }}
-    - name: Build React app
-      run: npm run build
-      working-directory: ${{ env.FRONTEND_WORKING_DIRECTORY }}
     - name: List files
-      run: ls -R
-    - name: Copy Build files to backend
-      run: cp -r ./${{ env.AZURE_WEBAPP_FRONTEND_PACKAGE_PATH }} ./${{ env.AZURE_WEBAPP_API_WWWROOT_PATH }}
+      run: ls -d */
     - name: Publish Artifacts
       uses: actions/upload-artifact@v3
       with:
