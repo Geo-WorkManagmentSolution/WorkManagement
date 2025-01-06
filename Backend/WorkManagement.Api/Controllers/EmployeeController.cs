@@ -55,7 +55,18 @@ namespace WorkManagement.API.Controllers
             return Ok(employees);
         }
 
-        
+        [HttpGet("allDeletedEmployees")]
+        [PermissionAuth(PermissionActionEnum.EmployeeModule_Dashboard)]
+        public async Task<ActionResult<IEnumerable<EmployeeDashboardDataModel>>> GetDeletedEmployees()
+        {
+            var userRole = this.User.FindFirst(ClaimTypes.Role).Value;
+            string loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var employees = await employeeService.GetAllDeletedEmployeesAsync(loggedUserId, userRole);
+            return Ok(employees);
+        }
+
+
         // GET: api/employees/5
         [HttpGet("{id}")]
         [PermissionAuth(PermissionActionEnum.EmployeeModule_View)]
@@ -64,6 +75,21 @@ namespace WorkManagement.API.Controllers
             string userRole = this.User.FindFirst(ClaimTypes.Role).Value;
             string loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var employee = await employeeService.GetEmployeeByIdAsync(userRole, loggedUserId,id);
+            if (employee == null)
+            {
+                return NotFound();
+            }
+            return Ok(employee);
+        }
+
+        // GET: api/employees/5
+        [HttpGet("deletedEmployee/{employeeId}")]
+        [PermissionAuth(PermissionActionEnum.EmployeeModule_View)]
+        public async Task<ActionResult<EmployeeModel>> GetDeletedEmployee(int id)
+        {
+            string userRole = this.User.FindFirst(ClaimTypes.Role).Value;
+            string loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var employee = await employeeService.GetDeletedEmployeeByIdAsync(userRole, loggedUserId, id);
             if (employee == null)
             {
                 return NotFound();
