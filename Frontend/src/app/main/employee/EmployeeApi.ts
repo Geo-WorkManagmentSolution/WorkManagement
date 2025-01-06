@@ -965,6 +965,7 @@ export type EmployeeLeaveUpdatesTable = {
   employeeId?: number | null;
   employee?: Employee;
   managerName?: string | null;
+  employeeNumber?: number | null;
   status?: LeaveStatus;
   isApprovedByDepartmentHead?: boolean;
   isApprovedByHRHead?: boolean;
@@ -995,6 +996,7 @@ export type EmployeeLeaveDataModel = {
   leaveId?: number;
   employeeId?: number | null;
   employeeName?: string | null;
+  employeeNumber?: number | null;
   managerName?: string | null;
   jobLevelLeaveType?: number | null;
   leaveStatus?: LeaveStatus;

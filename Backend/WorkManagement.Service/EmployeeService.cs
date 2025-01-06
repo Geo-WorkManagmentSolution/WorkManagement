@@ -1185,6 +1185,7 @@ namespace WorkManagement.Service
                         var leaveInfo = new EmployeeLeaveUpdateModel
                         {
                             EmployeeId = employeeData.Id,
+                            EmployeeNumber=employeeData.EmployeeNumber,
                             JobLevelLeaveType = employee.JobLevelLeaveType,
                             useDefultLeaves=employee.EmployeeWorkInformation.UseDefaultLeaves,
                             EmployeeLeaves = employee.EmployeeLeaves
@@ -1501,83 +1502,7 @@ namespace WorkManagement.Service
         #region Leave management
 
 
-        //public async Task<List<EmployeeLeaveSummaryModel>> GetEmployeeLeaves(string loggedUserId)
-        //{
-        //    try
-        //    {
-        //        var employeeId = CheckValidEmployeeId(loggedUserId);
-        //        /*if (employeeId == -1)
-        //        {
-        //            throw new Exception("Invalid User data");
-        //        }*/
-
-
-        //        //var defaultLeaves = await _dbContext.EmployeeDefaultLeave.Include(x => x.EmployeeLeaveTypes).ToListAsync();
-
-        //        var defaultLeaves = (from ed in _dbContext.EmployeeDefaultLeave
-        //                             select new EmployeeLeaveSummaryModel
-        //                             {
-        //                                 Id = ed.EmployeeLeaveTypeId.HasValue ? ed.EmployeeLeaveTypeId.Value : 0,
-        //                                 EmployeeLeaveType = ed.EmployeeLeaveTypes.Name,
-        //                                 TotalLeaves = ed.TotalLeaves,
-        //                                 RemainingLeaves = ed.TotalLeaves
-        //                             }).ToList();
-
-        //        var employeeLeaveData = (from el in _dbContext.EmployeeLeaveSummary.Where(s => s.EmployeeId == employeeId)
-        //                                 select new EmployeeLeaveSummaryModel
-        //                                 {
-        //                                     EmployeeLeaveSummaryId = el.Id,
-        //                                     Id = el.EmployeeLeaveTypeId.HasValue ? el.EmployeeLeaveTypeId.Value : 0,
-        //                                     EmployeeLeaveType = el.EmployeeLeaveTypes.Name,
-        //                                     TotalLeaves = el.TotalLeaves,
-        //                                     RemainingLeaves = el.RemainingLeaves
-        //                                 }).ToList();
-
-        //        if (employeeLeaveData.Count > 0)
-        //        {
-        //            var employeeLeaveHistory = _dbContext.EmployeeLeaves.Where(s => s.EmployeeId == employeeId).ToList();
-        //            var isLeaveMismatch = false;
-        //            if (employeeLeaveHistory.Count > 0)
-        //            {
-        //                foreach(var e in employeeLeaveData)
-        //                {
-        //                    var employeeLeave = employeeLeaveHistory.Where(s => s.EmployeeLeaveTypeId == e.Id).Sum(s => s.LeaveDays);
-        //                    var remainingLeaves = e.TotalLeaves - employeeLeave;
-        //                    if(e.RemainingLeaves != remainingLeaves)
-        //                    {
-        //                        isLeaveMismatch = true;
-        //                        e.RemainingLeaves = remainingLeaves;
-        //                        var employeeLeaveSummary = _dbContext.EmployeeLeaveSummary.FirstOrDefault(s => s.Id == e.EmployeeLeaveSummaryId);
-        //                        if (employeeLeaveSummary != null)
-        //                        {
-        //                            employeeLeaveSummary.RemainingLeaves = remainingLeaves;
-        //                            _dbContext.EmployeeLeaveSummary.Update(employeeLeaveSummary);
-        //                        }
-        //                    }
-        //                }
-
-        //                if (isLeaveMismatch)
-        //                {
-        //                    _dbContext.SaveChanges();
-        //                }
-        //            }
-        //            return employeeLeaveData;
-        //        }
-        //        else
-        //        {
-        //            return defaultLeaves;
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Log the exception (use your preferred logging framework)
-        //        Console.WriteLine(ex.ToString());
-
-        //        // Optionally, rethrow the exception or handle it accordingly
-        //        throw new Exception("An error occurred while fetching the employee leaves.", ex);
-        //    }
-
-        //}
+   
 
 
 
@@ -2262,6 +2187,7 @@ namespace WorkManagement.Service
                                       EmployeeName = es.Employee.FirstName + " " + es.Employee.LastName,
                                       JobLevelLeaveType=es.JobLevelLeaveType,
                                       ManagerName = es.ManagerName,
+                                      EmployeeNumber=es.EmployeeNumber,
                                       LeaveStatus =es.Status,
                                       IsApprovedByDepartmentHead = es.IsApprovedByDepartmentHead,
                                       IsApprovedByHRHead = es.IsApprovedByHRHead,
@@ -2291,6 +2217,7 @@ namespace WorkManagement.Service
                                       EmployeeName = es.Employee.FirstName + " " + es.Employee.LastName,
                                       JobLevelLeaveType = es.JobLevelLeaveType,
                                       ManagerName = es.ManagerName,
+                                      EmployeeNumber = es.EmployeeNumber,
                                       LeaveStatus = es.Status,
                                       IsApprovedByDepartmentHead = es.IsApprovedByDepartmentHead,
                                       IsApprovedByHRHead = es.IsApprovedByHRHead,
@@ -2344,7 +2271,8 @@ namespace WorkManagement.Service
                               {
                                   Id = s.EmployeeLeaveTypeId,
                                   TotalLeaves = s.TotalLeaves,
-                                  RemainingLeaves = s.RemainingLeaves
+                                  RemainingLeaves = s.RemainingLeaves,
+                                  EmployeeLeaveType=s.EmployeeLeaveTypes.Name
                               }).ToList()
                           }).ToList();
 
@@ -2603,8 +2531,8 @@ namespace WorkManagement.Service
                     JobLevelLeaveType = leaveInfo.JobLevelLeaveType,
                     useDefultLeaves = leaveInfo.useDefultLeaves,
                     Status=LeaveStatus.Pending,
-                    EmployeeId=employee.Id
-                  
+                    EmployeeId=employee.Id,
+                  EmployeeNumber=employee.EmployeeNumber
                     
                 };
 

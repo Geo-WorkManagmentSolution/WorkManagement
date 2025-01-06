@@ -17,7 +17,8 @@ namespace WorkManagement.Domain.Entity.EmployeeLeaveTables
              [ForeignKey("EmployeeId")]
             public Employee? Employee { get; set; }
             public string? ManagerName { get; set; }
-            public LeaveStatus? Status { get; set; }
+        public int? EmployeeNumber { get; set; }
+        public LeaveStatus? Status { get; set; }
             public bool IsApprovedByDepartmentHead { get; set; }
             public bool IsApprovedByHRHead { get; set; }
             public int? JobLevelLeaveType { get; set; }

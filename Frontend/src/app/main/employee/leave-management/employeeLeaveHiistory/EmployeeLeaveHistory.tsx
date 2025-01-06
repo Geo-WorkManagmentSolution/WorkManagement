@@ -123,7 +123,6 @@ function EmployeeLeaveHistory() {
 		employeeLoading ||
 		designationsLoading ||
 		leavesLoading
-		// || approveLoading || rejectLoading
 	) {
 		return <FuseLoading />;
 	}

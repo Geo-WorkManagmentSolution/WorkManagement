@@ -14,6 +14,7 @@ namespace WorkManagement.Domain.Models.Employee
         public int LeaveId { get; set; }
         public int? EmployeeId { get; set; }
         public string EmployeeName { get; set; }
+        public int? EmployeeNumber { get; set; }
         public string ManagerName { get; set; }
         public int? JobLevelLeaveType { get; set; }
         public LeaveStatus? LeaveStatus { get; set; }

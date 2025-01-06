@@ -129,9 +129,9 @@ function LeaveUpdateRequest() {
 	const columns = useMemo<MRT_ColumnDef<EmployeeLeaveDataModel>[]>(
 		() => [
 			{
-				accessorKey: 'employeeId',
-				header: 'Employee ID',
-				accessorFn: (row) => `${row.employeeId}`
+				accessorKey: 'employeeNumber',
+				header: 'Employee Number',
+				accessorFn: (row) => `${row.employeeNumber}`
 			},
 			{
 				accessorKey: 'employeeName',
@@ -157,20 +157,6 @@ function LeaveUpdateRequest() {
                   </Button>
                 )
               },
-            //   {
-            //     accessorKey: 'updatedNewLeaves',
-            //     header: 'Updated New Leaves',
-            //     Cell: ({ row }) => (
-            //       <Button
-            //         variant="text"
-            //         color="primary"
-            //         onClick={(e) => handleLeaveInfoClick(e, row.original)}
-            //         startIcon={<FuseSvgIcon size={20}>heroicons-outline:eye</FuseSvgIcon>}
-            //       >
-            //         View Details
-            //       </Button>
-            //     )
-            //   },
 			{
 				accessorKey: 'leaveStatus',
 				header: 'Status',
