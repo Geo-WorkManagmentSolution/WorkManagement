@@ -12,8 +12,8 @@ using WorkManagmentSolution.EFCore;
 namespace WorkManagement.EFCore.Migrations
 {
     [DbContext(typeof(WorkManagementDbContext))]
-    [Migration("20241227153638_Init_Db")]
-    partial class Init_Db
+    [Migration("20250105165240_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,12 +21,9 @@ namespace WorkManagement.EFCore.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.8")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.HasSequence<int>("EmployeeNumber")
-                .StartsAt(1000L);
+            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
@@ -34,16 +31,16 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("ClaimValue")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<Guid>("RoleId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("char(36)");
 
                     b.HasKey("Id");
 
@@ -58,16 +55,16 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("ClaimValue")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("char(36)");
 
                     b.HasKey("Id");
 
@@ -79,16 +76,16 @@ namespace WorkManagement.EFCore.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("ProviderDisplayName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("char(36)");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -100,10 +97,10 @@ namespace WorkManagement.EFCore.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
                     b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("char(36)");
 
                     b.Property<Guid>("RoleId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("char(36)");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -122,16 +119,16 @@ namespace WorkManagement.EFCore.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
                     b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Value")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
@@ -142,26 +139,25 @@ namespace WorkManagement.EFCore.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Name")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("varchar(256)");
 
                     b.Property<string>("NormalizedName")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("varchar(256)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedName")
                         .IsUnique()
-                        .HasDatabaseName("RoleNameIndex")
-                        .HasFilter("[NormalizedName] IS NOT NULL");
+                        .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles", (string)null);
 
@@ -174,21 +170,15 @@ namespace WorkManagement.EFCore.Migrations
                         },
                         new
                         {
-                            Id = new Guid("2800e45a-293d-4c8e-8b91-2f57cce4b963"),
-                            Name = "Manager",
-                            NormalizedName = "MANAGER"
-                        },
-                        new
-                        {
-                            Id = new Guid("611c6e4c-c1fc-49a4-847e-fb9608f460c0"),
-                            Name = "SuperUser",
-                            NormalizedName = "SUPERUSER"
-                        },
-                        new
-                        {
                             Id = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7"),
                             Name = "HR Admin",
                             NormalizedName = "HR ADMIN"
+                        },
+                        new
+                        {
+                            Id = new Guid("2800e45a-293d-4c8e-8b91-2f57cce4b963"),
+                            Name = "Manager",
+                            NormalizedName = "MANAGER"
                         },
                         new
                         {
@@ -208,57 +198,57 @@ namespace WorkManagement.EFCore.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("char(36)");
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("varchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("varchar(256)");
 
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("varchar(256)");
 
                     b.Property<string>("PasswordHash")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Shortcuts")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("varchar(256)");
 
                     b.HasKey("Id");
 
@@ -267,8 +257,7 @@ namespace WorkManagement.EFCore.Migrations
 
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
-                        .HasDatabaseName("UserNameIndex")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+                        .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
 
@@ -277,12 +266,12 @@ namespace WorkManagement.EFCore.Migrations
                         {
                             Id = new Guid("8e445865-a24d-4543-a6c6-9443d048cdb9"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "c209a901-e315-4d8e-b46b-92de9e972b8a",
+                            ConcurrencyStamp = "b46a8270-3934-4884-add8-a38a47646b14",
                             Email = "admin1@admin.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin",
-                            PasswordHash = "AQAAAAIAAYagAAAAEN5heEDTdGRJQLgtFgqKwflGVxFwOXjYOYPvp4mvW3TZfgr8NPc0YuGHzXsYpzULOg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAELdgb7EutFh6DzPA8K1Wgd8OLzwCDkNCetDulFt2w7tSCtI216RXvMB6Iax6YDw6RA==",
                             PhoneNumberConfirmed = false,
                             Shortcuts = "[]",
                             TwoFactorEnabled = false,
@@ -296,14 +285,14 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -336,13 +325,13 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("EmployeeLeaveTypeId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<int?>("JobLevelLeaveId")
                         .HasColumnType("int");
@@ -409,23 +398,23 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("IsFloater")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
 
@@ -503,10 +492,10 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
@@ -515,19 +504,19 @@ namespace WorkManagement.EFCore.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<double>("LeaveDays")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<string>("Reason")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -547,7 +536,7 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
@@ -556,10 +545,10 @@ namespace WorkManagement.EFCore.Migrations
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<double>("RemainingLeaves")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<int>("TotalLeaves")
                         .HasColumnType("int");
@@ -579,17 +568,17 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("IsPaid")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -646,14 +635,14 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("JobLevel")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -686,46 +675,46 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Basic")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<decimal>("Bonus")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<decimal>("CurrentSalary")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<decimal>("ESI")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<int?>("EmployeeId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("ExpectedToBeSalary")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<decimal>("Gratuity")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<decimal>("HRAllowances")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<bool>("IsApprovedByDepartmentHead")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("IsApprovedByHRHead")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<decimal>("PF")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<decimal>("PT")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<int?>("SalaryStatus")
                         .HasColumnType("int");
@@ -737,7 +726,7 @@ namespace WorkManagement.EFCore.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
 
@@ -752,15 +741,15 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int?>("PermissionCategoryId")
                         .HasColumnType("int");
@@ -786,7 +775,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 2,
-                            Description = "Project Add",
+                            Description = "Add Project",
                             Name = "ProjectModule_Add",
                             PermissionCategoryId = 1,
                             Value = 7
@@ -794,7 +783,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 3,
-                            Description = "Project Delete",
+                            Description = "Delete Project",
                             Name = "ProjectModule_Delete",
                             PermissionCategoryId = 1,
                             Value = 9
@@ -802,7 +791,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 4,
-                            Description = "Project Update",
+                            Description = "Update Project",
                             Name = "ProjectModule_Update",
                             PermissionCategoryId = 1,
                             Value = 8
@@ -810,150 +799,30 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 5,
-                            Description = "Add Employees to Project",
-                            Name = "ProjectModule_Employee_Add",
+                            Description = "View Project",
+                            Name = "ProjectModule_View",
                             PermissionCategoryId = 1,
-                            Value = 10
+                            Value = 33
                         },
                         new
                         {
                             Id = 6,
-                            Description = "Delete Employees to Project",
-                            Name = "ProjectModule_Employee_Delete",
+                            Description = "Project Task",
+                            Name = "ProjectModule_Task",
                             PermissionCategoryId = 1,
-                            Value = 7
+                            Value = 34
                         },
                         new
                         {
                             Id = 7,
-                            Description = "Update Employees to Project",
-                            Name = "ProjectModule_Employee_Update",
+                            Description = "Project Employees",
+                            Name = "ProjectModule_Employee",
                             PermissionCategoryId = 1,
-                            Value = 9
+                            Value = 35
                         },
                         new
                         {
                             Id = 8,
-                            Description = "Add Tasks to Project",
-                            Name = "ProjectModule_Link_Add",
-                            PermissionCategoryId = 1,
-                            Value = 8
-                        },
-                        new
-                        {
-                            Id = 9,
-                            Description = "Delete Tasks to Project",
-                            Name = "ProjectModule_Link_Delete",
-                            PermissionCategoryId = 1,
-                            Value = 8
-                        },
-                        new
-                        {
-                            Id = 10,
-                            Description = "Update Tasks to Project",
-                            Name = "ProjectModule_Link_Update",
-                            PermissionCategoryId = 1,
-                            Value = 8
-                        },
-                        new
-                        {
-                            Id = 11,
-                            Description = "Add Leaves",
-                            Name = "LeaveModule_Add",
-                            PermissionCategoryId = 4,
-                            Value = 17
-                        },
-                        new
-                        {
-                            Id = 12,
-                            Description = "Delete Leaves",
-                            Name = "LeaveModule_Delete",
-                            PermissionCategoryId = 4,
-                            Value = 18
-                        },
-                        new
-                        {
-                            Id = 13,
-                            Description = "Update Leaves",
-                            Name = "LeaveModule_Update",
-                            PermissionCategoryId = 4,
-                            Value = 19
-                        },
-                        new
-                        {
-                            Id = 14,
-                            Description = "Approve/Reject Leaves",
-                            Name = "LeaveModule_Approvals",
-                            PermissionCategoryId = 4,
-                            Value = 20
-                        },
-                        new
-                        {
-                            Id = 15,
-                            Description = "Leave History Dashboard",
-                            Name = "LeaveModule_Employee_LeaveHistory",
-                            PermissionCategoryId = 4,
-                            Value = 21
-                        },
-                        new
-                        {
-                            Id = 16,
-                            Description = "Update Dropdown values",
-                            Name = "SettingModule_DropDownSettings",
-                            PermissionCategoryId = 5,
-                            Value = 22
-                        },
-                        new
-                        {
-                            Id = 17,
-                            Description = "Add Leave Types",
-                            Name = "SettingModule_LeaveType_Add",
-                            PermissionCategoryId = 5,
-                            Value = 23
-                        },
-                        new
-                        {
-                            Id = 18,
-                            Description = "Update Leave Types",
-                            Name = "SettingModule_LeaveType_Update",
-                            PermissionCategoryId = 5,
-                            Value = 24
-                        },
-                        new
-                        {
-                            Id = 19,
-                            Description = "Delete Leave Types",
-                            Name = "SettingModule_LeaveType_Delete",
-                            PermissionCategoryId = 5,
-                            Value = 25
-                        },
-                        new
-                        {
-                            Id = 20,
-                            Description = "Add Public Holidays",
-                            Name = "SettingModule_Holidays_Add",
-                            PermissionCategoryId = 5,
-                            Value = 26
-                        },
-                        new
-                        {
-                            Id = 21,
-                            Description = "Update Public Holidays",
-                            Name = "SettingModule_Holidays_Update",
-                            PermissionCategoryId = 5,
-                            Value = 27
-                        },
-                        new
-                        {
-                            Id = 22,
-                            Description = "Delete Public Holidays",
-                            Name = "SettingModule_Holidays_Delete",
-                            PermissionCategoryId = 5,
-                            Value = 28
-                        },
-                        new
-                        {
-                            Id = 23,
                             Description = "Add Employee",
                             Name = "EmployeeModule_Add",
                             PermissionCategoryId = 2,
@@ -961,7 +830,7 @@ namespace WorkManagement.EFCore.Migrations
                         },
                         new
                         {
-                            Id = 24,
+                            Id = 9,
                             Description = "Updated Employee",
                             Name = "EmployeeModule_Update",
                             PermissionCategoryId = 2,
@@ -969,7 +838,7 @@ namespace WorkManagement.EFCore.Migrations
                         },
                         new
                         {
-                            Id = 25,
+                            Id = 10,
                             Description = "Delete Employee",
                             Name = "EmployeeModule_Delete",
                             PermissionCategoryId = 2,
@@ -977,7 +846,15 @@ namespace WorkManagement.EFCore.Migrations
                         },
                         new
                         {
-                            Id = 26,
+                            Id = 11,
+                            Description = "View Employee",
+                            Name = "EmployeeModule_View",
+                            PermissionCategoryId = 2,
+                            Value = 30
+                        },
+                        new
+                        {
+                            Id = 12,
                             Description = "Employee Salary Update",
                             Name = "EmployeeModule_Salary_Update",
                             PermissionCategoryId = 2,
@@ -985,7 +862,23 @@ namespace WorkManagement.EFCore.Migrations
                         },
                         new
                         {
-                            Id = 27,
+                            Id = 13,
+                            Description = "View Employee Salary History",
+                            Name = "EmployeeModule_Salary_History_View",
+                            PermissionCategoryId = 2,
+                            Value = 31
+                        },
+                        new
+                        {
+                            Id = 14,
+                            Description = "Employee Salary Approve/Reject",
+                            Name = "EmployeeModule_Salary_Approve_Reject",
+                            PermissionCategoryId = 2,
+                            Value = 32
+                        },
+                        new
+                        {
+                            Id = 15,
                             Description = "Employee Leave Update",
                             Name = "EmployeeModule_Leave_Update",
                             PermissionCategoryId = 2,
@@ -993,7 +886,7 @@ namespace WorkManagement.EFCore.Migrations
                         },
                         new
                         {
-                            Id = 28,
+                            Id = 16,
                             Description = "Employee Dashboard",
                             Name = "EmployeeModule_Dashboard",
                             PermissionCategoryId = 2,
@@ -1001,11 +894,75 @@ namespace WorkManagement.EFCore.Migrations
                         },
                         new
                         {
-                            Id = 29,
+                            Id = 17,
                             Description = "IntegrationModule_UploadCSV",
                             Name = "IntegrationModule_UploadCSV",
                             PermissionCategoryId = 3,
                             Value = 29
+                        },
+                        new
+                        {
+                            Id = 18,
+                            Description = "Add Leaves",
+                            Name = "LeaveModule_Add",
+                            PermissionCategoryId = 4,
+                            Value = 17
+                        },
+                        new
+                        {
+                            Id = 19,
+                            Description = "Delete Leaves",
+                            Name = "LeaveModule_Delete",
+                            PermissionCategoryId = 4,
+                            Value = 18
+                        },
+                        new
+                        {
+                            Id = 20,
+                            Description = "Update Leaves",
+                            Name = "LeaveModule_Update",
+                            PermissionCategoryId = 4,
+                            Value = 19
+                        },
+                        new
+                        {
+                            Id = 21,
+                            Description = "Approve/Reject Leaves",
+                            Name = "LeaveModule_Approvals",
+                            PermissionCategoryId = 4,
+                            Value = 20
+                        },
+                        new
+                        {
+                            Id = 22,
+                            Description = "Leave History Dashboard",
+                            Name = "LeaveModule_Employee_LeaveHistory",
+                            PermissionCategoryId = 4,
+                            Value = 21
+                        },
+                        new
+                        {
+                            Id = 23,
+                            Description = "Update Dropdown values",
+                            Name = "SettingModule_DropDownSettings_Update",
+                            PermissionCategoryId = 5,
+                            Value = 22
+                        },
+                        new
+                        {
+                            Id = 24,
+                            Description = "Update Default Leaves",
+                            Name = "SettingModule_DefaultLeaves_Update",
+                            PermissionCategoryId = 5,
+                            Value = 23
+                        },
+                        new
+                        {
+                            Id = 25,
+                            Description = "Update Public Holidays",
+                            Name = "SettingModule_Holidays_Update",
+                            PermissionCategoryId = 5,
+                            Value = 27
                         });
                 });
 
@@ -1015,15 +972,15 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("Value")
                         .HasColumnType("int");
@@ -1076,56 +1033,56 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("char(36)");
 
                     b.Property<DateTimeOffset>("CreatedOn")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<Guid?>("LastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("char(36)");
 
                     b.Property<DateTimeOffset>("LastModifiedOn")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("PeriodOfWorkInMonths")
                         .HasColumnType("int");
 
                     b.Property<string>("ProjectDescription")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("ProjectName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("ProjectNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("Status")
                         .HasColumnType("int");
 
                     b.Property<double?>("WorkOrderAmount")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<DateTime?>("WorkOrderDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("WorkOrderName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("WorkOrderNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -1138,25 +1095,25 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("char(36)");
 
                     b.Property<DateTimeOffset>("CreatedOn")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<Guid?>("LastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("char(36)");
 
                     b.Property<DateTimeOffset>("LastModifiedOn")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
@@ -1176,40 +1133,40 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AssignedEmployees")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<double?>("CompletedHours")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("char(36)");
 
                     b.Property<DateTimeOffset>("CreatedOn")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<double?>("EstimatedHours")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<Guid?>("LastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("char(36)");
 
                     b.Property<DateTimeOffset>("LastModifiedOn")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int?>("Priority")
                         .HasColumnType("int");
@@ -1218,17 +1175,17 @@ namespace WorkManagement.EFCore.Migrations
                         .HasColumnType("int");
 
                     b.Property<double?>("RemainingHours")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<DateTime?>("StartDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("Status")
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -1243,16 +1200,16 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<byte[]>("FileContent")
-                        .HasColumnType("varbinary(max)");
+                        .HasColumnType("longblob");
 
                     b.Property<string>("FileName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("FilePath")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int?>("FileSize")
                         .HasColumnType("int");
@@ -1261,7 +1218,7 @@ namespace WorkManagement.EFCore.Migrations
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<int?>("ProjectId")
                         .HasColumnType("int");
@@ -1279,16 +1236,16 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<int>("PermissionActionId")
                         .HasColumnType("int");
 
                     b.Property<Guid>("RoleId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("char(36)");
 
                     b.HasKey("Id");
 
@@ -1304,105 +1261,350 @@ namespace WorkManagement.EFCore.Migrations
                             Id = 1,
                             IsDeleted = false,
                             PermissionActionId = 1,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
                         },
                         new
                         {
                             Id = 2,
                             IsDeleted = false,
                             PermissionActionId = 2,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
                         },
                         new
                         {
                             Id = 3,
                             IsDeleted = false,
                             PermissionActionId = 3,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
                         },
                         new
                         {
                             Id = 4,
                             IsDeleted = false,
                             PermissionActionId = 4,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
                         },
                         new
                         {
                             Id = 5,
                             IsDeleted = false,
                             PermissionActionId = 5,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
                         },
                         new
                         {
                             Id = 6,
                             IsDeleted = false,
                             PermissionActionId = 6,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
                         },
                         new
                         {
                             Id = 7,
                             IsDeleted = false,
                             PermissionActionId = 7,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
                         },
                         new
                         {
                             Id = 8,
                             IsDeleted = false,
                             PermissionActionId = 8,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
                         },
                         new
                         {
                             Id = 9,
                             IsDeleted = false,
                             PermissionActionId = 9,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
                         },
                         new
                         {
                             Id = 10,
                             IsDeleted = false,
                             PermissionActionId = 10,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
                         },
                         new
                         {
                             Id = 11,
                             IsDeleted = false,
                             PermissionActionId = 11,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
                         },
                         new
                         {
                             Id = 12,
                             IsDeleted = false,
                             PermissionActionId = 12,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
                         },
                         new
                         {
                             Id = 13,
                             IsDeleted = false,
                             PermissionActionId = 13,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
                         },
                         new
                         {
                             Id = 14,
                             IsDeleted = false,
                             PermissionActionId = 14,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
                         },
                         new
                         {
                             Id = 15,
                             IsDeleted = false,
                             PermissionActionId = 15,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
+                        },
+                        new
+                        {
+                            Id = 16,
+                            IsDeleted = false,
+                            PermissionActionId = 16,
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
+                        },
+                        new
+                        {
+                            Id = 17,
+                            IsDeleted = false,
+                            PermissionActionId = 17,
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
+                        },
+                        new
+                        {
+                            Id = 18,
+                            IsDeleted = false,
+                            PermissionActionId = 18,
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
+                        },
+                        new
+                        {
+                            Id = 19,
+                            IsDeleted = false,
+                            PermissionActionId = 19,
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
+                        },
+                        new
+                        {
+                            Id = 20,
+                            IsDeleted = false,
+                            PermissionActionId = 20,
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
+                        },
+                        new
+                        {
+                            Id = 21,
+                            IsDeleted = false,
+                            PermissionActionId = 21,
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
+                        },
+                        new
+                        {
+                            Id = 22,
+                            IsDeleted = false,
+                            PermissionActionId = 22,
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
+                        },
+                        new
+                        {
+                            Id = 23,
+                            IsDeleted = false,
+                            PermissionActionId = 23,
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
+                        },
+                        new
+                        {
+                            Id = 24,
+                            IsDeleted = false,
+                            PermissionActionId = 24,
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
+                        },
+                        new
+                        {
+                            Id = 25,
+                            IsDeleted = false,
+                            PermissionActionId = 25,
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
+                        },
+                        new
+                        {
+                            Id = 26,
+                            IsDeleted = false,
+                            PermissionActionId = 1,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 27,
+                            IsDeleted = false,
+                            PermissionActionId = 2,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 28,
+                            IsDeleted = false,
+                            PermissionActionId = 3,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 29,
+                            IsDeleted = false,
+                            PermissionActionId = 4,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 30,
+                            IsDeleted = false,
+                            PermissionActionId = 5,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 31,
+                            IsDeleted = false,
+                            PermissionActionId = 6,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 32,
+                            IsDeleted = false,
+                            PermissionActionId = 7,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 33,
+                            IsDeleted = false,
+                            PermissionActionId = 8,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 34,
+                            IsDeleted = false,
+                            PermissionActionId = 9,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 35,
+                            IsDeleted = false,
+                            PermissionActionId = 10,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 36,
+                            IsDeleted = false,
+                            PermissionActionId = 11,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 37,
+                            IsDeleted = false,
+                            PermissionActionId = 12,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 38,
+                            IsDeleted = false,
+                            PermissionActionId = 13,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 39,
+                            IsDeleted = false,
+                            PermissionActionId = 14,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 40,
+                            IsDeleted = false,
+                            PermissionActionId = 15,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 41,
+                            IsDeleted = false,
+                            PermissionActionId = 16,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 42,
+                            IsDeleted = false,
+                            PermissionActionId = 17,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 43,
+                            IsDeleted = false,
+                            PermissionActionId = 18,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 44,
+                            IsDeleted = false,
+                            PermissionActionId = 19,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 45,
+                            IsDeleted = false,
+                            PermissionActionId = 20,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 46,
+                            IsDeleted = false,
+                            PermissionActionId = 21,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 47,
+                            IsDeleted = false,
+                            PermissionActionId = 22,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 48,
+                            IsDeleted = false,
+                            PermissionActionId = 23,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 49,
+                            IsDeleted = false,
+                            PermissionActionId = 24,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 50,
+                            IsDeleted = false,
+                            PermissionActionId = 25,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
                         });
                 });
 
@@ -1412,23 +1614,23 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AlternateEmail")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<long?>("AlternateNumber")
                         .HasColumnType("bigint");
 
                     b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("char(36)");
 
                     b.Property<DateTimeOffset>("CreatedOn")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int?>("EmployeeAddressesId")
                         .HasColumnType("int");
@@ -1449,9 +1651,7 @@ namespace WorkManagement.EFCore.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("EmployeeNumber")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValueSql("NEXT VALUE FOR EmployeeNumber");
+                        .HasColumnType("int");
 
                     b.Property<int?>("EmployeePersonalDetailsId")
                         .HasColumnType("int");
@@ -1464,36 +1664,36 @@ namespace WorkManagement.EFCore.Migrations
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<Guid?>("LastModifiedBy")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("char(36)");
 
                     b.Property<DateTimeOffset>("LastModifiedOn")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("MiddleName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<long?>("PhoneNumber")
                         .HasColumnType("bigint");
 
                     b.Property<string>("PhotoURL")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<Guid>("RoleId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("char(36)");
 
                     b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("char(36)");
 
                     b.HasKey("Id");
 
@@ -1528,46 +1728,46 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("MailingAddressLine1")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("MailingAddressLine2")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<long?>("MailingAddressPinCode")
                         .HasColumnType("bigint");
 
                     b.Property<string>("MailingCity")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("MailingCountry")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("MailingState")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("UserAddressLine1")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("UserAddressLine2")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<long?>("UserAddressPinCode")
                         .HasColumnType("bigint");
 
                     b.Property<string>("UserCity")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("UserCountry")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("UserState")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -1580,13 +1780,13 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -1619,13 +1819,13 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -1676,19 +1876,19 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("EmployeeId")
                         .HasColumnType("int");
 
                     b.Property<byte[]>("FileContent")
-                        .HasColumnType("varbinary(max)");
+                        .HasColumnType("longblob");
 
                     b.Property<string>("FileName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("FilePath")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int?>("FileSize")
                         .HasColumnType("int");
@@ -1697,7 +1897,7 @@ namespace WorkManagement.EFCore.Migrations
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.HasKey("Id");
 
@@ -1712,28 +1912,28 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("DegreeCertificateDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("EmployeeId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("PassingYear")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Type")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("University")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("grade")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -1748,40 +1948,40 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AccountHolderName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("BankAccountNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("BankName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("BiometricCode")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Branch")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("EmployeeStateInsuranceNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("IFSC")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("PAN")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("ProvidentFundNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("UID")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -1794,37 +1994,37 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Age")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<decimal>("Comprehensive")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<DateTime?>("DateOfBirth")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<DateTime?>("DateOfJoining")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("EmployeeDesignationId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("GrossSalary")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Risk")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("SerialNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<decimal>("TotalSIWider")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.HasKey("Id");
 
@@ -1839,17 +2039,17 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("DateOfBirth")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Gender")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<int?>("MaritalStatus")
                         .HasColumnType("int");
@@ -1871,22 +2071,22 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int?>("EmployeeId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int?>("RelationshipType")
                         .HasColumnType("int");
@@ -1904,55 +2104,55 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Basic")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<decimal?>("Bond")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<decimal>("Bonus")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<DateTime?>("ConfirmationDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Designation")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<decimal>("ESI")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<string>("GRPHead")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<decimal>("Gratuity")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<decimal>("HRAllowances")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<DateTime?>("HireDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<decimal>("PF")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<decimal>("PT")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<DateTime?>("PreviousDateOfJoiningInGDR")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<DateTime?>("PreviousDateOfLeavingInGDR")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<decimal>("Salary")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<int?>("SalaryType")
                         .HasColumnType("int");
@@ -1961,10 +2161,10 @@ namespace WorkManagement.EFCore.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("TotalPreviousExperience")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<bool>("UseDefaultLeaves")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.HasKey("Id");
 
@@ -1979,13 +2179,13 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
