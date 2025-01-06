@@ -14,5 +14,8 @@ namespace WorkManagement.Domain.Contracts
         public Task SendLeaveEmail(EmailModel<LeaveEmailModel> emailModel);
         public Task SendSalaryUpdateEmail(EmailModel<SalaryEmailModel> emailModel);
         public Task SendEmployeeSalaryUpdateEmail(EmailModel<EmployeeSalaryUpdateEmailModel> emailModel);
+        public Task SendLeaveUpdateEmail(EmailModel<EmployeeLeaveRequestEmailModel> emailModel);
+        public Task SendemployeeLeaveUpdateEmail(EmailModel<EmployeeLeaveUpdateEmailModel> emailModel);
+
     }
 }

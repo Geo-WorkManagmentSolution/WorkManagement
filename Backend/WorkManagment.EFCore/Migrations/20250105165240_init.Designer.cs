@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WorkManagmentSolution.EFCore;
 
@@ -11,9 +12,11 @@ using WorkManagmentSolution.EFCore;
 namespace WorkManagement.EFCore.Migrations
 {
     [DbContext(typeof(WorkManagementDbContext))]
-    partial class WorkManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250105165240_init")]
+    partial class init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -624,97 +627,6 @@ namespace WorkManagement.EFCore.Migrations
                             IsPaid = true,
                             Name = "Compensatory Leave"
                         });
-                });
-
-            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.JobLevelLeave", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("EmployeeId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("EmployeeLeaveSummaryId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("EmployeeLeaveUpdateTableId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("EmployeeNumber")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsApprovedByDepartmentHead")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsApprovedByHRHead")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<int?>("JobLevelLeaveType")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ManagerName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("UpdatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool?>("useDefultLeaves")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.ToTable("LeaveUpdateDetails");
-                });
-
-            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeavesDeatils", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("EmployeeId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("EmployeeLeaveTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("EmployeeLeaveUpdateTableId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<double>("RemainingLeaves")
-                        .HasColumnType("float");
-
-                    b.Property<int>("TotalLeaves")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.HasIndex("EmployeeLeaveTypeId");
-
-                    b.HasIndex("EmployeeLeaveUpdateTableId");
-
-                    b.ToTable("UpdateLeaveSummury");
                 });
 
             modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.JobLevelLeave", b =>
@@ -2382,36 +2294,6 @@ namespace WorkManagement.EFCore.Migrations
                     b.Navigation("EmployeeLeaveTypes");
                 });
 
-            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeaveUpdatesTable", b =>
-                {
-                    b.HasOne("WorkManagementSolution.Employee.Employee", "Employee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeId");
-
-                    b.Navigation("Employee");
-                });
-
-            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeavesDeatils", b =>
-                {
-                    b.HasOne("WorkManagementSolution.Employee.Employee", "Employee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeaveType", "EmployeeLeaveTypes")
-                        .WithMany()
-                        .HasForeignKey("EmployeeLeaveTypeId");
-
-                    b.HasOne("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeaveUpdatesTable", null)
-                        .WithMany("UpdatedNewLeaves")
-                        .HasForeignKey("EmployeeLeaveUpdateTableId");
-
-                    b.Navigation("Employee");
-
-                    b.Navigation("EmployeeLeaveTypes");
-                });
-
             modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeSalary", b =>
                 {
                     b.HasOne("WorkManagementSolution.Employee.Employee", "Employee")
@@ -2607,11 +2489,6 @@ namespace WorkManagement.EFCore.Migrations
             modelBuilder.Entity("WorkManagement.Domain.Entity.ApplicationRole", b =>
                 {
                     b.Navigation("RolePermissions");
-                });
-
-            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeaveUpdatesTable", b =>
-                {
-                    b.Navigation("UpdatedNewLeaves");
                 });
 
             modelBuilder.Entity("WorkManagement.Domain.Entity.PermissionAction", b =>

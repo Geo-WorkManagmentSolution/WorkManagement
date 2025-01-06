@@ -54,9 +54,8 @@ try
 
 
 
-
     builder.Services.AddDbContext<WorkManagementDbContext>(options =>
-        options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+        options.UseMySql(configuration.GetConnectionString("DefaultConnection"), ServerVersion.AutoDetect(configuration.GetConnectionString("DefaultConnection"))));
 
     builder.Services.Configure<IdentityOptions>(opts =>
     {
@@ -152,9 +151,16 @@ try
     // Run pending migrations in DB
     using (var scope = app.Services.CreateScope()) // this will use `IServiceScopeFactory` internally
     {
+        try {
+            var db = scope.ServiceProvider.GetService<WorkManagementDbContext>();
+            await db.Database.MigrateAsync();
+        }
+        catch (Exception e)
+        {
 
-        var db = scope.ServiceProvider.GetService<WorkManagementDbContext>();
-        await db.Database.MigrateAsync();
+            Log.Error(e, "An error occurred in migration");
+
+        }
     }
 
     //should be changed in future
@@ -163,7 +169,6 @@ try
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Work Management API v1");
-        c.RoutePrefix = string.Empty;  // Set Swagger UI at apps root
     });
 
 
@@ -171,19 +176,26 @@ try
     if (!app.Environment.IsDevelopment())
         app.UseHttpsRedirection();
 
+
+    app.UseDefaultFiles();
+    app.UseStaticFiles();
+
     app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 
     app.UseAuthentication();
     app.UseAuthorization();
 
     // Other middleware configurations...
-    app.MapControllers();
-
+    app.UseEndpoints(endpoints =>
+    {
+        endpoints.MapControllers();
+        endpoints.MapFallbackToFile("{**slug}", "index.html");
+    });
     app.UseMiddleware<ErrorHandlingMiddleware>();
     //app.Map("/", async context =>
     //{
     //    await context.Response.WriteAsync("Api is Up & running!");
-    //});
+    //}); 
     app.Run();
 }
 catch (Exception ex)

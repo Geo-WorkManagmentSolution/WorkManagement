@@ -12,8 +12,8 @@ using WorkManagmentSolution.EFCore;
 namespace WorkManagement.EFCore.Migrations
 {
     [DbContext(typeof(WorkManagementDbContext))]
-    [Migration("20241227153638_Init_Db")]
-    partial class Init_Db
+    [Migration("20250105075421_allowNullToManager")]
+    partial class allowNullToManager
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -174,21 +174,15 @@ namespace WorkManagement.EFCore.Migrations
                         },
                         new
                         {
-                            Id = new Guid("2800e45a-293d-4c8e-8b91-2f57cce4b963"),
-                            Name = "Manager",
-                            NormalizedName = "MANAGER"
-                        },
-                        new
-                        {
-                            Id = new Guid("611c6e4c-c1fc-49a4-847e-fb9608f460c0"),
-                            Name = "SuperUser",
-                            NormalizedName = "SUPERUSER"
-                        },
-                        new
-                        {
                             Id = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7"),
                             Name = "HR Admin",
                             NormalizedName = "HR ADMIN"
+                        },
+                        new
+                        {
+                            Id = new Guid("2800e45a-293d-4c8e-8b91-2f57cce4b963"),
+                            Name = "Manager",
+                            NormalizedName = "MANAGER"
                         },
                         new
                         {
@@ -277,12 +271,12 @@ namespace WorkManagement.EFCore.Migrations
                         {
                             Id = new Guid("8e445865-a24d-4543-a6c6-9443d048cdb9"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "c209a901-e315-4d8e-b46b-92de9e972b8a",
+                            ConcurrencyStamp = "5c3f0105-8f22-40fe-ac50-aa32920d2922",
                             Email = "admin1@admin.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin",
-                            PasswordHash = "AQAAAAIAAYagAAAAEN5heEDTdGRJQLgtFgqKwflGVxFwOXjYOYPvp4mvW3TZfgr8NPc0YuGHzXsYpzULOg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPw7ZM9I433BiDHCBWI4LLvWqQkpSG/YiYzU6XH7nazQ84M3ovtp6Igg79GbHbe2cw==",
                             PhoneNumberConfirmed = false,
                             Shortcuts = "[]",
                             TwoFactorEnabled = false,
@@ -640,6 +634,94 @@ namespace WorkManagement.EFCore.Migrations
                         });
                 });
 
+            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeaveUpdatesTable", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("EmployeeLeaveSummaryId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("EmployeeLeaveUpdateTableId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsApprovedByDepartmentHead")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsApprovedByHRHead")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("JobLevelLeaveType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ManagerName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool?>("useDefultLeaves")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("LeaveUpdateDetails");
+                });
+
+            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeavesDeatils", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("EmployeeLeaveTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("EmployeeLeaveUpdateTableId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<double>("RemainingLeaves")
+                        .HasColumnType("float");
+
+                    b.Property<int>("TotalLeaves")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("EmployeeLeaveTypeId");
+
+                    b.HasIndex("EmployeeLeaveUpdateTableId");
+
+                    b.ToTable("UpdateLeaveSummury");
+                });
+
             modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.JobLevelLeave", b =>
                 {
                     b.Property<int>("Id")
@@ -786,7 +868,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 2,
-                            Description = "Project Add",
+                            Description = "Add Project",
                             Name = "ProjectModule_Add",
                             PermissionCategoryId = 1,
                             Value = 7
@@ -794,7 +876,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 3,
-                            Description = "Project Delete",
+                            Description = "Delete Project",
                             Name = "ProjectModule_Delete",
                             PermissionCategoryId = 1,
                             Value = 9
@@ -802,7 +884,7 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 4,
-                            Description = "Project Update",
+                            Description = "Update Project",
                             Name = "ProjectModule_Update",
                             PermissionCategoryId = 1,
                             Value = 8
@@ -810,150 +892,30 @@ namespace WorkManagement.EFCore.Migrations
                         new
                         {
                             Id = 5,
-                            Description = "Add Employees to Project",
-                            Name = "ProjectModule_Employee_Add",
+                            Description = "View Project",
+                            Name = "ProjectModule_View",
                             PermissionCategoryId = 1,
-                            Value = 10
+                            Value = 33
                         },
                         new
                         {
                             Id = 6,
-                            Description = "Delete Employees to Project",
-                            Name = "ProjectModule_Employee_Delete",
+                            Description = "Project Task",
+                            Name = "ProjectModule_Task",
                             PermissionCategoryId = 1,
-                            Value = 7
+                            Value = 34
                         },
                         new
                         {
                             Id = 7,
-                            Description = "Update Employees to Project",
-                            Name = "ProjectModule_Employee_Update",
+                            Description = "Project Employees",
+                            Name = "ProjectModule_Employee",
                             PermissionCategoryId = 1,
-                            Value = 9
+                            Value = 35
                         },
                         new
                         {
                             Id = 8,
-                            Description = "Add Tasks to Project",
-                            Name = "ProjectModule_Link_Add",
-                            PermissionCategoryId = 1,
-                            Value = 8
-                        },
-                        new
-                        {
-                            Id = 9,
-                            Description = "Delete Tasks to Project",
-                            Name = "ProjectModule_Link_Delete",
-                            PermissionCategoryId = 1,
-                            Value = 8
-                        },
-                        new
-                        {
-                            Id = 10,
-                            Description = "Update Tasks to Project",
-                            Name = "ProjectModule_Link_Update",
-                            PermissionCategoryId = 1,
-                            Value = 8
-                        },
-                        new
-                        {
-                            Id = 11,
-                            Description = "Add Leaves",
-                            Name = "LeaveModule_Add",
-                            PermissionCategoryId = 4,
-                            Value = 17
-                        },
-                        new
-                        {
-                            Id = 12,
-                            Description = "Delete Leaves",
-                            Name = "LeaveModule_Delete",
-                            PermissionCategoryId = 4,
-                            Value = 18
-                        },
-                        new
-                        {
-                            Id = 13,
-                            Description = "Update Leaves",
-                            Name = "LeaveModule_Update",
-                            PermissionCategoryId = 4,
-                            Value = 19
-                        },
-                        new
-                        {
-                            Id = 14,
-                            Description = "Approve/Reject Leaves",
-                            Name = "LeaveModule_Approvals",
-                            PermissionCategoryId = 4,
-                            Value = 20
-                        },
-                        new
-                        {
-                            Id = 15,
-                            Description = "Leave History Dashboard",
-                            Name = "LeaveModule_Employee_LeaveHistory",
-                            PermissionCategoryId = 4,
-                            Value = 21
-                        },
-                        new
-                        {
-                            Id = 16,
-                            Description = "Update Dropdown values",
-                            Name = "SettingModule_DropDownSettings",
-                            PermissionCategoryId = 5,
-                            Value = 22
-                        },
-                        new
-                        {
-                            Id = 17,
-                            Description = "Add Leave Types",
-                            Name = "SettingModule_LeaveType_Add",
-                            PermissionCategoryId = 5,
-                            Value = 23
-                        },
-                        new
-                        {
-                            Id = 18,
-                            Description = "Update Leave Types",
-                            Name = "SettingModule_LeaveType_Update",
-                            PermissionCategoryId = 5,
-                            Value = 24
-                        },
-                        new
-                        {
-                            Id = 19,
-                            Description = "Delete Leave Types",
-                            Name = "SettingModule_LeaveType_Delete",
-                            PermissionCategoryId = 5,
-                            Value = 25
-                        },
-                        new
-                        {
-                            Id = 20,
-                            Description = "Add Public Holidays",
-                            Name = "SettingModule_Holidays_Add",
-                            PermissionCategoryId = 5,
-                            Value = 26
-                        },
-                        new
-                        {
-                            Id = 21,
-                            Description = "Update Public Holidays",
-                            Name = "SettingModule_Holidays_Update",
-                            PermissionCategoryId = 5,
-                            Value = 27
-                        },
-                        new
-                        {
-                            Id = 22,
-                            Description = "Delete Public Holidays",
-                            Name = "SettingModule_Holidays_Delete",
-                            PermissionCategoryId = 5,
-                            Value = 28
-                        },
-                        new
-                        {
-                            Id = 23,
                             Description = "Add Employee",
                             Name = "EmployeeModule_Add",
                             PermissionCategoryId = 2,
@@ -961,7 +923,7 @@ namespace WorkManagement.EFCore.Migrations
                         },
                         new
                         {
-                            Id = 24,
+                            Id = 9,
                             Description = "Updated Employee",
                             Name = "EmployeeModule_Update",
                             PermissionCategoryId = 2,
@@ -969,7 +931,7 @@ namespace WorkManagement.EFCore.Migrations
                         },
                         new
                         {
-                            Id = 25,
+                            Id = 10,
                             Description = "Delete Employee",
                             Name = "EmployeeModule_Delete",
                             PermissionCategoryId = 2,
@@ -977,7 +939,15 @@ namespace WorkManagement.EFCore.Migrations
                         },
                         new
                         {
-                            Id = 26,
+                            Id = 11,
+                            Description = "View Employee",
+                            Name = "EmployeeModule_View",
+                            PermissionCategoryId = 2,
+                            Value = 30
+                        },
+                        new
+                        {
+                            Id = 12,
                             Description = "Employee Salary Update",
                             Name = "EmployeeModule_Salary_Update",
                             PermissionCategoryId = 2,
@@ -985,7 +955,23 @@ namespace WorkManagement.EFCore.Migrations
                         },
                         new
                         {
-                            Id = 27,
+                            Id = 13,
+                            Description = "View Employee Salary History",
+                            Name = "EmployeeModule_Salary_History_View",
+                            PermissionCategoryId = 2,
+                            Value = 31
+                        },
+                        new
+                        {
+                            Id = 14,
+                            Description = "Employee Salary Approve/Reject",
+                            Name = "EmployeeModule_Salary_Approve_Reject",
+                            PermissionCategoryId = 2,
+                            Value = 32
+                        },
+                        new
+                        {
+                            Id = 15,
                             Description = "Employee Leave Update",
                             Name = "EmployeeModule_Leave_Update",
                             PermissionCategoryId = 2,
@@ -993,7 +979,7 @@ namespace WorkManagement.EFCore.Migrations
                         },
                         new
                         {
-                            Id = 28,
+                            Id = 16,
                             Description = "Employee Dashboard",
                             Name = "EmployeeModule_Dashboard",
                             PermissionCategoryId = 2,
@@ -1001,11 +987,75 @@ namespace WorkManagement.EFCore.Migrations
                         },
                         new
                         {
-                            Id = 29,
+                            Id = 17,
                             Description = "IntegrationModule_UploadCSV",
                             Name = "IntegrationModule_UploadCSV",
                             PermissionCategoryId = 3,
                             Value = 29
+                        },
+                        new
+                        {
+                            Id = 18,
+                            Description = "Add Leaves",
+                            Name = "LeaveModule_Add",
+                            PermissionCategoryId = 4,
+                            Value = 17
+                        },
+                        new
+                        {
+                            Id = 19,
+                            Description = "Delete Leaves",
+                            Name = "LeaveModule_Delete",
+                            PermissionCategoryId = 4,
+                            Value = 18
+                        },
+                        new
+                        {
+                            Id = 20,
+                            Description = "Update Leaves",
+                            Name = "LeaveModule_Update",
+                            PermissionCategoryId = 4,
+                            Value = 19
+                        },
+                        new
+                        {
+                            Id = 21,
+                            Description = "Approve/Reject Leaves",
+                            Name = "LeaveModule_Approvals",
+                            PermissionCategoryId = 4,
+                            Value = 20
+                        },
+                        new
+                        {
+                            Id = 22,
+                            Description = "Leave History Dashboard",
+                            Name = "LeaveModule_Employee_LeaveHistory",
+                            PermissionCategoryId = 4,
+                            Value = 21
+                        },
+                        new
+                        {
+                            Id = 23,
+                            Description = "Update Dropdown values",
+                            Name = "SettingModule_DropDownSettings_Update",
+                            PermissionCategoryId = 5,
+                            Value = 22
+                        },
+                        new
+                        {
+                            Id = 24,
+                            Description = "Update Default Leaves",
+                            Name = "SettingModule_DefaultLeaves_Update",
+                            PermissionCategoryId = 5,
+                            Value = 23
+                        },
+                        new
+                        {
+                            Id = 25,
+                            Description = "Update Public Holidays",
+                            Name = "SettingModule_Holidays_Update",
+                            PermissionCategoryId = 5,
+                            Value = 27
                         });
                 });
 
@@ -1304,105 +1354,350 @@ namespace WorkManagement.EFCore.Migrations
                             Id = 1,
                             IsDeleted = false,
                             PermissionActionId = 1,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
                         },
                         new
                         {
                             Id = 2,
                             IsDeleted = false,
                             PermissionActionId = 2,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
                         },
                         new
                         {
                             Id = 3,
                             IsDeleted = false,
                             PermissionActionId = 3,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
                         },
                         new
                         {
                             Id = 4,
                             IsDeleted = false,
                             PermissionActionId = 4,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
                         },
                         new
                         {
                             Id = 5,
                             IsDeleted = false,
                             PermissionActionId = 5,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
                         },
                         new
                         {
                             Id = 6,
                             IsDeleted = false,
                             PermissionActionId = 6,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
                         },
                         new
                         {
                             Id = 7,
                             IsDeleted = false,
                             PermissionActionId = 7,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
                         },
                         new
                         {
                             Id = 8,
                             IsDeleted = false,
                             PermissionActionId = 8,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
                         },
                         new
                         {
                             Id = 9,
                             IsDeleted = false,
                             PermissionActionId = 9,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
                         },
                         new
                         {
                             Id = 10,
                             IsDeleted = false,
                             PermissionActionId = 10,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
                         },
                         new
                         {
                             Id = 11,
                             IsDeleted = false,
                             PermissionActionId = 11,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
                         },
                         new
                         {
                             Id = 12,
                             IsDeleted = false,
                             PermissionActionId = 12,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
                         },
                         new
                         {
                             Id = 13,
                             IsDeleted = false,
                             PermissionActionId = 13,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
                         },
                         new
                         {
                             Id = 14,
                             IsDeleted = false,
                             PermissionActionId = 14,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
                         },
                         new
                         {
                             Id = 15,
                             IsDeleted = false,
                             PermissionActionId = 15,
-                            RoleId = new Guid("d48a7bcd-43f2-415f-b854-3392c9445e6f")
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
+                        },
+                        new
+                        {
+                            Id = 16,
+                            IsDeleted = false,
+                            PermissionActionId = 16,
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
+                        },
+                        new
+                        {
+                            Id = 17,
+                            IsDeleted = false,
+                            PermissionActionId = 17,
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
+                        },
+                        new
+                        {
+                            Id = 18,
+                            IsDeleted = false,
+                            PermissionActionId = 18,
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
+                        },
+                        new
+                        {
+                            Id = 19,
+                            IsDeleted = false,
+                            PermissionActionId = 19,
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
+                        },
+                        new
+                        {
+                            Id = 20,
+                            IsDeleted = false,
+                            PermissionActionId = 20,
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
+                        },
+                        new
+                        {
+                            Id = 21,
+                            IsDeleted = false,
+                            PermissionActionId = 21,
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
+                        },
+                        new
+                        {
+                            Id = 22,
+                            IsDeleted = false,
+                            PermissionActionId = 22,
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
+                        },
+                        new
+                        {
+                            Id = 23,
+                            IsDeleted = false,
+                            PermissionActionId = 23,
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
+                        },
+                        new
+                        {
+                            Id = 24,
+                            IsDeleted = false,
+                            PermissionActionId = 24,
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
+                        },
+                        new
+                        {
+                            Id = 25,
+                            IsDeleted = false,
+                            PermissionActionId = 25,
+                            RoleId = new Guid("186d7b12-af9a-4956-a112-0795ac4d60e7")
+                        },
+                        new
+                        {
+                            Id = 26,
+                            IsDeleted = false,
+                            PermissionActionId = 1,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 27,
+                            IsDeleted = false,
+                            PermissionActionId = 2,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 28,
+                            IsDeleted = false,
+                            PermissionActionId = 3,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 29,
+                            IsDeleted = false,
+                            PermissionActionId = 4,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 30,
+                            IsDeleted = false,
+                            PermissionActionId = 5,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 31,
+                            IsDeleted = false,
+                            PermissionActionId = 6,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 32,
+                            IsDeleted = false,
+                            PermissionActionId = 7,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 33,
+                            IsDeleted = false,
+                            PermissionActionId = 8,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 34,
+                            IsDeleted = false,
+                            PermissionActionId = 9,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 35,
+                            IsDeleted = false,
+                            PermissionActionId = 10,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 36,
+                            IsDeleted = false,
+                            PermissionActionId = 11,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 37,
+                            IsDeleted = false,
+                            PermissionActionId = 12,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 38,
+                            IsDeleted = false,
+                            PermissionActionId = 13,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 39,
+                            IsDeleted = false,
+                            PermissionActionId = 14,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 40,
+                            IsDeleted = false,
+                            PermissionActionId = 15,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 41,
+                            IsDeleted = false,
+                            PermissionActionId = 16,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 42,
+                            IsDeleted = false,
+                            PermissionActionId = 17,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 43,
+                            IsDeleted = false,
+                            PermissionActionId = 18,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 44,
+                            IsDeleted = false,
+                            PermissionActionId = 19,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 45,
+                            IsDeleted = false,
+                            PermissionActionId = 20,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 46,
+                            IsDeleted = false,
+                            PermissionActionId = 21,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 47,
+                            IsDeleted = false,
+                            PermissionActionId = 22,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 48,
+                            IsDeleted = false,
+                            PermissionActionId = 23,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 49,
+                            IsDeleted = false,
+                            PermissionActionId = 24,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
+                        },
+                        new
+                        {
+                            Id = 50,
+                            IsDeleted = false,
+                            PermissionActionId = 25,
+                            RoleId = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210")
                         });
                 });
 
@@ -1468,6 +1763,9 @@ namespace WorkManagement.EFCore.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<int?>("JobLevelLeaveType")
+                        .HasColumnType("int");
 
                     b.Property<Guid?>("LastModifiedBy")
                         .HasColumnType("uniqueidentifier");
@@ -2094,6 +2392,36 @@ namespace WorkManagement.EFCore.Migrations
                     b.Navigation("EmployeeLeaveTypes");
                 });
 
+            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeaveUpdatesTable", b =>
+                {
+                    b.HasOne("WorkManagementSolution.Employee.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId");
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeavesDeatils", b =>
+                {
+                    b.HasOne("WorkManagementSolution.Employee.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeaveType", "EmployeeLeaveTypes")
+                        .WithMany()
+                        .HasForeignKey("EmployeeLeaveTypeId");
+
+                    b.HasOne("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeaveUpdatesTable", null)
+                        .WithMany("UpdatedNewLeaves")
+                        .HasForeignKey("EmployeeLeaveUpdateTableId");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("EmployeeLeaveTypes");
+                });
+
             modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeSalary", b =>
                 {
                     b.HasOne("WorkManagementSolution.Employee.Employee", "Employee")
@@ -2289,6 +2617,11 @@ namespace WorkManagement.EFCore.Migrations
             modelBuilder.Entity("WorkManagement.Domain.Entity.ApplicationRole", b =>
                 {
                     b.Navigation("RolePermissions");
+                });
+
+            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeaveUpdatesTable", b =>
+                {
+                    b.Navigation("UpdatedNewLeaves");
                 });
 
             modelBuilder.Entity("WorkManagement.Domain.Entity.PermissionAction", b =>
