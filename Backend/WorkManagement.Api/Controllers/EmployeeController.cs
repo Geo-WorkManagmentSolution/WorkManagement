@@ -85,11 +85,11 @@ namespace WorkManagement.API.Controllers
         // GET: api/employees/5
         [HttpGet("deletedEmployee/{employeeId}")]
         [PermissionAuth(PermissionActionEnum.EmployeeModule_View)]
-        public async Task<ActionResult<EmployeeModel>> GetDeletedEmployee(int id)
+        public async Task<ActionResult<EmployeeModel>> GetDeletedEmployee(int employeeId)
         {
             string userRole = this.User.FindFirst(ClaimTypes.Role).Value;
             string loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var employee = await employeeService.GetDeletedEmployeeByIdAsync(userRole, loggedUserId, id);
+            var employee = await employeeService.GetDeletedEmployeeByIdAsync(userRole, loggedUserId, employeeId);
             if (employee == null)
             {
                 return NotFound();

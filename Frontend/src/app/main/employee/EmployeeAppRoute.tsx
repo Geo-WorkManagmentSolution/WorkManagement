@@ -12,6 +12,8 @@ import EmployeeSalaryHistory from './salary-managment/EmployeeSalaryHistory';
 import LeaveUpdateRequests from './leave-management/leaveupdates/LeaveUpdateRequests';
 import LeaveUpdateEmployees from './leave-management/leaveUpdateHistory/LeaveUpdateEmployees';
 import LeaveUpdateHistory from './leave-management/leaveUpdateHistory/LeaveUpdateHistory';
+import DeletedEmployeeDashboard from './deletedEmployees/DeletedEmployeeDashboard';
+import DeletedEmployee from './deletedEmployees/deletedEmployee/DeletedEmployee';
 // import Employees from './employees/Employees';
 
 const EmployeeApp = lazy(() => import('./EmployeeApp'));
@@ -57,6 +59,19 @@ const EmployeeAppRoute: FuseRouteItemType = {
 					element: <Employee />
 				}
 				
+			]
+		},
+		{
+			path:'past-employees',
+			children:[
+				{
+					path: '',
+					element:<DeletedEmployeeDashboard />
+				},
+				{
+					path: ':employeeId',
+                    element:<DeletedEmployee/>
+				}
 			]
 		},
 		{

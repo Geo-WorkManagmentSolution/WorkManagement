@@ -17,6 +17,12 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.employeeModel,
       }),
     }),
+    getApiEmployeesAllDeletedEmployees: build.query<
+      GetApiEmployeesAllDeletedEmployeesApiResponse,
+      GetApiEmployeesAllDeletedEmployeesApiArg
+    >({
+      query: () => ({ url: `/api/Employees/allDeletedEmployees` }),
+    }),
     getApiEmployeesById: build.query<
       GetApiEmployeesByIdApiResponse,
       GetApiEmployeesByIdApiArg
@@ -40,6 +46,15 @@ const injectedRtkApi = api.injectEndpoints({
       query: (queryArg) => ({
         url: `/api/Employees/${queryArg.id}`,
         method: "DELETE",
+      }),
+    }),
+    getApiEmployeesDeletedEmployeeByEmployeeId: build.query<
+      GetApiEmployeesDeletedEmployeeByEmployeeIdApiResponse,
+      GetApiEmployeesDeletedEmployeeByEmployeeIdApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/api/Employees/deletedEmployee/${queryArg.employeeId}`,
+        params: { id: queryArg.id },
       }),
     }),
     getApiEmployeesPartialByEmployeeId: build.query<
@@ -386,6 +401,9 @@ export type PostApiEmployeesApiResponse = /** status 200 OK */ EmployeeModel;
 export type PostApiEmployeesApiArg = {
   employeeModel: EmployeeModel;
 };
+export type GetApiEmployeesAllDeletedEmployeesApiResponse =
+  /** status 200 OK */ EmployeeDashboardDataModel[];
+export type GetApiEmployeesAllDeletedEmployeesApiArg = void;
 export type GetApiEmployeesByIdApiResponse = /** status 200 OK */ EmployeeModel;
 export type GetApiEmployeesByIdApiArg = {
   id: number;
@@ -398,6 +416,12 @@ export type PutApiEmployeesByIdApiArg = {
 export type DeleteApiEmployeesByIdApiResponse = unknown;
 export type DeleteApiEmployeesByIdApiArg = {
   id: number;
+};
+export type GetApiEmployeesDeletedEmployeeByEmployeeIdApiResponse =
+  /** status 200 OK */ EmployeeModel;
+export type GetApiEmployeesDeletedEmployeeByEmployeeIdApiArg = {
+  id?: number;
+  employeeId: string;
 };
 export type GetApiEmployeesPartialByEmployeeIdApiResponse =
   /** status 200 OK */ SalaryEmployeeDashboardModel;
@@ -1147,10 +1171,14 @@ export const {
   useGetApiEmployeesQuery,
   useLazyGetApiEmployeesQuery,
   usePostApiEmployeesMutation,
+  useGetApiEmployeesAllDeletedEmployeesQuery,
+  useLazyGetApiEmployeesAllDeletedEmployeesQuery,
   useGetApiEmployeesByIdQuery,
   useLazyGetApiEmployeesByIdQuery,
   usePutApiEmployeesByIdMutation,
   useDeleteApiEmployeesByIdMutation,
+  useGetApiEmployeesDeletedEmployeeByEmployeeIdQuery,
+  useLazyGetApiEmployeesDeletedEmployeeByEmployeeIdQuery,
   useGetApiEmployeesPartialByEmployeeIdQuery,
   useLazyGetApiEmployeesPartialByEmployeeIdQuery,
   usePutApiEmployeesSalaryApproveBySalaryIdMutation,

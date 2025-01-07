@@ -21,7 +21,6 @@ function updateRedirectUrl(user: PartialDeep<User>) {
  */
 export const setUser = createAsyncThunk<User, User>('user/setUser', async (user) => {
 	updateRedirectUrl(user);
-  console.log('Setting user:', user);
   return user;
 });
 
@@ -103,7 +102,6 @@ export const userSlice = createSlice({
 	},
 	extraReducers: (builder) => {
 		builder.addCase(setUser.fulfilled, (state, action) => {
-			console.log('setUser fulfilled:', action.payload);
 			return {
 				...action.payload,
 				permissions: action.payload.permissions || []

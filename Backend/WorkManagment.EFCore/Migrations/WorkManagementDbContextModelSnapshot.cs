@@ -263,12 +263,12 @@ namespace WorkManagement.EFCore.Migrations
                         {
                             Id = new Guid("8e445865-a24d-4543-a6c6-9443d048cdb9"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "b46a8270-3934-4884-add8-a38a47646b14",
+                            ConcurrencyStamp = "0633035e-19f0-4f86-99b4-f8c87dc8ac63",
                             Email = "admin1@admin.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin",
-                            PasswordHash = "AQAAAAIAAYagAAAAELdgb7EutFh6DzPA8K1Wgd8OLzwCDkNCetDulFt2w7tSCtI216RXvMB6Iax6YDw6RA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAECtmLPUgbC0TrvBhb6LelICMa6+3+aOr8hAInSkKCf3h6Ozung7pSOpfJkcZV3MAIA==",
                             PhoneNumberConfirmed = false,
                             Shortcuts = "[]",
                             TwoFactorEnabled = false,
@@ -626,7 +626,7 @@ namespace WorkManagement.EFCore.Migrations
                         });
                 });
 
-            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.JobLevelLeave", b =>
+            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeaveUpdatesTable", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -638,7 +638,7 @@ namespace WorkManagement.EFCore.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("EmployeeLeaveSummaryId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int?>("EmployeeLeaveUpdateTableId")
                         .HasColumnType("int");
@@ -647,10 +647,10 @@ namespace WorkManagement.EFCore.Migrations
                         .HasColumnType("int");
 
                     b.Property<bool>("IsApprovedByDepartmentHead")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("IsApprovedByHRHead")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
@@ -659,7 +659,7 @@ namespace WorkManagement.EFCore.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ManagerName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int?>("Status")
                         .HasColumnType("int");
@@ -668,10 +668,10 @@ namespace WorkManagement.EFCore.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<bool?>("useDefultLeaves")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.HasKey("Id");
 
@@ -686,7 +686,7 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
@@ -698,10 +698,10 @@ namespace WorkManagement.EFCore.Migrations
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<double>("RemainingLeaves")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<int>("TotalLeaves")
                         .HasColumnType("int");
@@ -1756,6 +1756,9 @@ namespace WorkManagement.EFCore.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
+
+                    b.Property<int?>("JobLevelLeaveType")
+                        .HasColumnType("int");
 
                     b.Property<Guid?>("LastModifiedBy")
                         .HasColumnType("char(36)");

@@ -45,6 +45,13 @@ const navigationConfig: FuseNavItemType[] = [
 						url: '/apps/employees/employeesSearch/new'
 					},
 					{
+						id: 'applicationmanagement.employees.past-employees',
+						title: 'Past Employees',
+						type: 'item',
+						// auth:PermissionActionEnum.EmployeeModuleAdd,
+						url: '/apps/employees/past-employees'
+					},
+					{
 						id: 'applicationmanagement.employees.salarymanagment',
 						title: 'Salary Management',
 						type: 'collapse',
