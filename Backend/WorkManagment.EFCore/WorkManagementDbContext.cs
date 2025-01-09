@@ -81,8 +81,13 @@ namespace WorkManagmentSolution.EFCore
             //        mutableEntityType.SetQueryFilter(lambdaExpression);
             //    }
             //}
+            modelBuilder.HasSequence<int>("EmployeeNumber")
+         .StartsAt(1000)
+         .IncrementsBy(1);
+
             modelBuilder.Entity<Employee>()
-                .Property(o => o.EmployeeNumber);
+                .Property(o => o.EmployeeNumber)
+                .HasDefaultValueSql("NEXT VALUE FOR EmployeeNumber");
 
 
             modelBuilder.Entity<JobLevelLeave>().HasData(

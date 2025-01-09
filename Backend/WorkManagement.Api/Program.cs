@@ -55,7 +55,7 @@ try
 
 
     builder.Services.AddDbContext<WorkManagementDbContext>(options =>
-        options.UseMySql(configuration.GetConnectionString("DefaultConnection"), ServerVersion.AutoDetect(configuration.GetConnectionString("DefaultConnection"))));
+        options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
     builder.Services.Configure<IdentityOptions>(opts =>
     {
@@ -169,6 +169,7 @@ try
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Work Management API v1");
+        c.RoutePrefix = string.Empty;  // Set Swagger UI at apps root
     });
 
 
@@ -177,20 +178,12 @@ try
         app.UseHttpsRedirection();
 
 
-    app.UseDefaultFiles();
-    app.UseStaticFiles();
-
     app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 
     app.UseAuthentication();
     app.UseAuthorization();
 
-    // Other middleware configurations...
-    app.UseEndpoints(endpoints =>
-    {
-        endpoints.MapControllers();
-        endpoints.MapFallbackToFile("{**slug}", "index.html");
-    });
+    app.MapControllers();
     app.UseMiddleware<ErrorHandlingMiddleware>();
     //app.Map("/", async context =>
     //{
