@@ -317,6 +317,133 @@ namespace WorkManagement.Service
 
         }
 
+       public async Task SendLeaveUpdateEmail(EmailModel<EmployeeLeaveRequestEmailModel> emailModel)
+        {
+            try
+            {
+                var sender = new SmtpSender(() => new SmtpClient("smtp.gmail.com")
+                {
+                    UseDefaultCredentials = false,
+                    Port = _smtpsettings.Value.Port,
+                    Credentials = new NetworkCredential(_smtpsettings.Value.Sender, _smtpsettings.Value.Password),
+                    EnableSsl = true,
+                    DeliveryMethod = SmtpDeliveryMethod.Network
+                });
 
+                Email.DefaultSender = sender;
+                Email.DefaultRenderer = new RazorRenderer();
+                string EmailTemplatepath = "";
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    EmailTemplatepath = "EmailTemplate/ManagerLeaveUpdate_EmailTemplate.cshtml";
+                }
+                else
+                {
+                    EmailTemplatepath = "EmailTemplate\\ManagerLeaveUpdate_EmailTemplate.cshtml";
+                }
+
+                var email = await Email
+                           .From(emailModel.From)
+                           .To(emailModel.To)
+                           .Subject(emailModel.Subject)
+                           .UsingTemplateFromFile(EmailTemplatepath, emailModel.repModel)
+                           .SendAsync();
+                Log.Information("Leave update email sent successfully.");
+
+
+            }
+            catch (Exception ex)
+            {
+                Log.Information(ex.Message);
+            }
+
+        }
+
+       public async Task SendemployeeLeaveUpdateEmail(EmailModel<EmployeeLeaveUpdateEmailModel> emailModel)
+        {
+            try
+            {
+                var sender = new SmtpSender(() => new SmtpClient("smtp.gmail.com")
+                {
+                    UseDefaultCredentials = false,
+                    Port = _smtpsettings.Value.Port,
+                    Credentials = new NetworkCredential(_smtpsettings.Value.Sender, _smtpsettings.Value.Password),
+                    EnableSsl = true,
+                    DeliveryMethod = SmtpDeliveryMethod.Network
+                });
+
+                Email.DefaultSender = sender;
+                Email.DefaultRenderer = new RazorRenderer();
+
+                if (emailModel.repModel.ApprovalStatus == "Approve")
+                {
+                    string EmailTemplatepath = "";
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                    {
+                        EmailTemplatepath = "EmailTemplate/EmployeeLeaveUpdateApprove_EmailTemplate.cshtml";
+                    }
+                    else
+                    {
+                        EmailTemplatepath = "EmailTemplate\\EmployeeLeaveUpdateApprove_EmailTemplate.cshtml";
+                    }
+                    var email = await Email
+                          .From(emailModel.From)
+                          .To(emailModel.To)
+                          .Subject(emailModel.Subject)
+                          .UsingTemplateFromFile(@"EmailTemplate\EmployeeLeaveUpdateApprove_EmailTemplate   .cshtml", emailModel.repModel)
+                          .SendAsync();
+                    Log.Information("Leave approval email to employee sent successfully.");
+                }
+
+                if (emailModel.repModel.ApprovalStatus == "Reject")
+                {
+                    string EmailTemplatepath = "";
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                    {
+                        EmailTemplatepath = "EmailTemplate/EmployeeLeveUpdateReject_EmailTemplate.cshtml";
+                    }
+                    else
+                    {
+                        EmailTemplatepath = "EmailTemplate\\EmployeeLeveUpdateReject_EmailTemplate.cshtml";
+                    }
+                    var email = await Email
+                          .From(emailModel.From)
+                          .To(emailModel.To)
+                          .Subject(emailModel.Subject)
+                          .UsingTemplateFromFile(@"EmailTemplate\EmployeeLeveUpdateReject_EmailTemplate.cshtml", emailModel.repModel)
+                          .SendAsync();
+                    Log.Information("Leave approval email to employee sent successfully.");
+                }
+
+                if (emailModel.repModel.ApprovalStatus == "Pending")
+                {
+                    string EmailTemplatepath = "";
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                    {
+                        EmailTemplatepath = "EmailTemplate/EmployeeLeaveUpdate_EmailTemplate.cshtml";
+                    }
+                    else
+                    {
+                        EmailTemplatepath = "EmailTemplate\\EmployeeLeaveUpdate_EmailTemplate.cshtml";
+                    }
+
+                    var email = await Email
+                          .From(emailModel.From)
+                          .To(emailModel.To)
+                          .Subject(emailModel.Subject)
+                          .UsingTemplateFromFile(EmailTemplatepath, emailModel.repModel)
+                          .SendAsync();
+                    Log.Information("leave update email to employee sent successfully.");
+                }
+
+
+
+
+            }
+            catch (Exception ex)
+            {
+                Log.Information(ex.Message);
+            }
+        }
     }
 }

@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WorkManagement.EFCore.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class inital : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -686,6 +686,7 @@ namespace WorkManagement.EFCore.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     PhoneNumber = table.Column<long>(type: "bigint", nullable: true),
                     AlternateNumber = table.Column<long>(type: "bigint", nullable: true),
+                    JobLevelLeaveType = table.Column<int>(type: "int", nullable: true),
                     EmployeeDepartmentId = table.Column<int>(type: "int", nullable: true),
                     EmployeeDesignationId = table.Column<int>(type: "int", nullable: true),
                     EmployeeReportToId = table.Column<int>(type: "int", nullable: true),
@@ -950,6 +951,39 @@ namespace WorkManagement.EFCore.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "LeaveUpdateDetails",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    EmployeeId = table.Column<int>(type: "int", nullable: true),
+                    ManagerName = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    EmployeeNumber = table.Column<int>(type: "int", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: true),
+                    IsApprovedByDepartmentHead = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    IsApprovedByHRHead = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    JobLevelLeaveType = table.Column<int>(type: "int", nullable: true),
+                    useDefultLeaves = table.Column<bool>(type: "tinyint(1)", nullable: true),
+                    EmployeeLeaveSummaryId = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    EmployeeLeaveUpdateTableId = table.Column<int>(type: "int", nullable: true),
+                    UpdatedBy = table.Column<int>(type: "int", nullable: true),
+                    UpdatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LeaveUpdateDetails", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LeaveUpdateDetails_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "Employees",
+                        principalColumn: "Id");
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "ProjectEmployees",
                 columns: table => new
                 {
@@ -981,6 +1015,41 @@ namespace WorkManagement.EFCore.Migrations
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
+            migrationBuilder.CreateTable(
+                name: "UpdateLeaveSummury",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    EmployeeId = table.Column<int>(type: "int", nullable: false),
+                    RemainingLeaves = table.Column<double>(type: "double", nullable: false),
+                    EmployeeLeaveTypeId = table.Column<int>(type: "int", nullable: true),
+                    TotalLeaves = table.Column<int>(type: "int", nullable: false),
+                    EmployeeLeaveUpdateTableId = table.Column<int>(type: "int", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UpdateLeaveSummury", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UpdateLeaveSummury_EmployeeLeaveType_EmployeeLeaveTypeId",
+                        column: x => x.EmployeeLeaveTypeId,
+                        principalTable: "EmployeeLeaveType",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_UpdateLeaveSummury_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "Employees",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UpdateLeaveSummury_LeaveUpdateDetails_EmployeeLeaveUpdateTab~",
+                        column: x => x.EmployeeLeaveUpdateTableId,
+                        principalTable: "LeaveUpdateDetails",
+                        principalColumn: "Id");
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
@@ -996,7 +1065,7 @@ namespace WorkManagement.EFCore.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "Shortcuts", "TwoFactorEnabled", "UserName" },
-                values: new object[] { new Guid("8e445865-a24d-4543-a6c6-9443d048cdb9"), 0, "b46a8270-3934-4884-add8-a38a47646b14", "admin1@admin.com", false, false, null, null, "admin", "AQAAAAIAAYagAAAAELdgb7EutFh6DzPA8K1Wgd8OLzwCDkNCetDulFt2w7tSCtI216RXvMB6Iax6YDw6RA==", null, false, null, "[]", false, "admin1@admin.com" });
+                values: new object[] { new Guid("8e445865-a24d-4543-a6c6-9443d048cdb9"), 0, "0633035e-19f0-4f86-99b4-f8c87dc8ac63", "admin1@admin.com", false, false, null, null, "admin", "AQAAAAIAAYagAAAAECtmLPUgbC0TrvBhb6LelICMa6+3+aOr8hAInSkKCf3h6Ozung7pSOpfJkcZV3MAIA==", null, false, null, "[]", false, "admin1@admin.com" });
 
             migrationBuilder.InsertData(
                 table: "EmployeeCategories",
@@ -1340,6 +1409,11 @@ namespace WorkManagement.EFCore.Migrations
                 column: "SiteId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_LeaveUpdateDetails_EmployeeId",
+                table: "LeaveUpdateDetails",
+                column: "EmployeeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PermissionActions_PermissionCategoryId",
                 table: "PermissionActions",
                 column: "PermissionCategoryId");
@@ -1368,6 +1442,21 @@ namespace WorkManagement.EFCore.Migrations
                 name: "IX_RolePermissions_RoleId",
                 table: "RolePermissions",
                 column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UpdateLeaveSummury_EmployeeId",
+                table: "UpdateLeaveSummury",
+                column: "EmployeeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UpdateLeaveSummury_EmployeeLeaveTypeId",
+                table: "UpdateLeaveSummury",
+                column: "EmployeeLeaveTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UpdateLeaveSummury_EmployeeLeaveUpdateTableId",
+                table: "UpdateLeaveSummury",
+                column: "EmployeeLeaveUpdateTableId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_WorkOrderDocuments_ProjectId",
@@ -1427,22 +1516,31 @@ namespace WorkManagement.EFCore.Migrations
                 name: "RolePermissions");
 
             migrationBuilder.DropTable(
+                name: "UpdateLeaveSummury");
+
+            migrationBuilder.DropTable(
                 name: "WorkOrderDocuments");
 
             migrationBuilder.DropTable(
                 name: "JobLevelLeave");
 
             migrationBuilder.DropTable(
-                name: "EmployeeLeaveType");
-
-            migrationBuilder.DropTable(
-                name: "Employees");
-
-            migrationBuilder.DropTable(
                 name: "PermissionActions");
 
             migrationBuilder.DropTable(
+                name: "EmployeeLeaveType");
+
+            migrationBuilder.DropTable(
+                name: "LeaveUpdateDetails");
+
+            migrationBuilder.DropTable(
                 name: "Projects");
+
+            migrationBuilder.DropTable(
+                name: "PermissionCategories");
+
+            migrationBuilder.DropTable(
+                name: "Employees");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -1470,9 +1568,6 @@ namespace WorkManagement.EFCore.Migrations
 
             migrationBuilder.DropTable(
                 name: "EmployeeWorkInformations");
-
-            migrationBuilder.DropTable(
-                name: "PermissionCategories");
 
             migrationBuilder.DropTable(
                 name: "EmployeeDesignations");

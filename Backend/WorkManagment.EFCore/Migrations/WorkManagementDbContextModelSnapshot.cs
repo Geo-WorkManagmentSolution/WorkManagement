@@ -263,12 +263,12 @@ namespace WorkManagement.EFCore.Migrations
                         {
                             Id = new Guid("8e445865-a24d-4543-a6c6-9443d048cdb9"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "b46a8270-3934-4884-add8-a38a47646b14",
+                            ConcurrencyStamp = "0633035e-19f0-4f86-99b4-f8c87dc8ac63",
                             Email = "admin1@admin.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin",
-                            PasswordHash = "AQAAAAIAAYagAAAAELdgb7EutFh6DzPA8K1Wgd8OLzwCDkNCetDulFt2w7tSCtI216RXvMB6Iax6YDw6RA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAECtmLPUgbC0TrvBhb6LelICMa6+3+aOr8hAInSkKCf3h6Ozung7pSOpfJkcZV3MAIA==",
                             PhoneNumberConfirmed = false,
                             Shortcuts = "[]",
                             TwoFactorEnabled = false,
@@ -624,6 +624,97 @@ namespace WorkManagement.EFCore.Migrations
                             IsPaid = true,
                             Name = "Compensatory Leave"
                         });
+                });
+
+            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeaveUpdatesTable", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("EmployeeLeaveSummaryId")
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("EmployeeLeaveUpdateTableId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("EmployeeNumber")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsApprovedByDepartmentHead")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsApprovedByHRHead")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int?>("JobLevelLeaveType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ManagerName")
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedDateTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool?>("useDefultLeaves")
+                        .HasColumnType("tinyint(1)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("LeaveUpdateDetails");
+                });
+
+            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeavesDeatils", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("EmployeeLeaveTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("EmployeeLeaveUpdateTableId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<double>("RemainingLeaves")
+                        .HasColumnType("double");
+
+                    b.Property<int>("TotalLeaves")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("EmployeeLeaveTypeId");
+
+                    b.HasIndex("EmployeeLeaveUpdateTableId");
+
+                    b.ToTable("UpdateLeaveSummury");
                 });
 
             modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.JobLevelLeave", b =>
@@ -1666,6 +1757,9 @@ namespace WorkManagement.EFCore.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<int?>("JobLevelLeaveType")
+                        .HasColumnType("int");
+
                     b.Property<Guid?>("LastModifiedBy")
                         .HasColumnType("char(36)");
 
@@ -2291,6 +2385,36 @@ namespace WorkManagement.EFCore.Migrations
                     b.Navigation("EmployeeLeaveTypes");
                 });
 
+            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeaveUpdatesTable", b =>
+                {
+                    b.HasOne("WorkManagementSolution.Employee.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId");
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeavesDeatils", b =>
+                {
+                    b.HasOne("WorkManagementSolution.Employee.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeaveType", "EmployeeLeaveTypes")
+                        .WithMany()
+                        .HasForeignKey("EmployeeLeaveTypeId");
+
+                    b.HasOne("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeaveUpdatesTable", null)
+                        .WithMany("UpdatedNewLeaves")
+                        .HasForeignKey("EmployeeLeaveUpdateTableId");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("EmployeeLeaveTypes");
+                });
+
             modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeSalary", b =>
                 {
                     b.HasOne("WorkManagementSolution.Employee.Employee", "Employee")
@@ -2486,6 +2610,11 @@ namespace WorkManagement.EFCore.Migrations
             modelBuilder.Entity("WorkManagement.Domain.Entity.ApplicationRole", b =>
                 {
                     b.Navigation("RolePermissions");
+                });
+
+            modelBuilder.Entity("WorkManagement.Domain.Entity.EmployeeLeaveTables.EmployeeLeaveUpdatesTable", b =>
+                {
+                    b.Navigation("UpdatedNewLeaves");
                 });
 
             modelBuilder.Entity("WorkManagement.Domain.Entity.PermissionAction", b =>

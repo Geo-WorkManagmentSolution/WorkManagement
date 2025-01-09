@@ -353,6 +353,7 @@ export type Employee = {
   alternateEmail?: string | null;
   phoneNumber?: number | null;
   alternateNumber?: number | null;
+  jobLevelLeaveType?: number | null;
   employeeDepartmentId?: number | null;
   employeeDesignationId?: number | null;
   employeeReportToId?: number | null;

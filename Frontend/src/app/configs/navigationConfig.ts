@@ -45,6 +45,13 @@ const navigationConfig: FuseNavItemType[] = [
 						url: '/apps/employees/employeesSearch/new'
 					},
 					{
+						id: 'applicationmanagement.employees.past-employees',
+						title: 'Past Employees',
+						type: 'item',
+						// auth:PermissionActionEnum.EmployeeModuleAdd,
+						url: '/apps/employees/past-employees'
+					},
+					{
 						id: 'applicationmanagement.employees.salarymanagment',
 						title: 'Salary Management',
 						type: 'collapse',
@@ -90,6 +97,20 @@ const navigationConfig: FuseNavItemType[] = [
                                 type: 'item',
 								// auth:PermissionActionEnum.LeaveModuleEmployeeLeaveHistory ,
                                 url: '/apps/employees/leave-management/leave-history'
+							},
+							{
+								id: 'applicationmanagement.employees.leave-management.leave-Updates-request',
+                                title: 'Leave Update Requests',
+                                type: 'item',
+								// auth:PermissionActionEnum.LeaveModuleEmployeeLeaveHistory ,
+                                url: '/apps/employees/leave-management/leave-Updates-request'
+							},
+							{
+								id: 'applicationmanagement.employees.leave-management.leave-Update-history',
+                                title: 'Leave Update History',
+                                type: 'item',
+								// auth:PermissionActionEnum.LeaveModuleEmployeeLeaveHistory ,
+                                url: '/apps/employees/leave-management/leave-Update-history'
 							}
 						]
 					}
