@@ -376,7 +376,7 @@ export type EmployeeDocumentsModel = {
 };
 export type EmployeeLeaveSummaryModel = {
   employeeLeaveSummaryId?: number;
-  id?: number;
+  id?: number | null;
   employeeLeaveType?: string | null;
   totalLeaves?: number;
   remainingLeaves?: number;

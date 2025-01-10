@@ -353,7 +353,7 @@ namespace WorkManagement.Service
             try
             {
                 var project = await _dbContext.Projects.FindAsync(projectId);
-                var employee = await _dbContext.Employees.FindAsync(employeeId);
+                var employee = _dbContext.Employees.FirstOrDefault(s=>s.Id == employeeId && !s.IsDeleted);
 
                 if (project == null || employee == null)
                 {

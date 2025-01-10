@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WorkManagement.Domain.Entity.EmployeeLeaveTables;
+using WorkManagement.Domain.Models.Employee;
 
 namespace WorkManagement.Domain.Models.Email
 {
@@ -55,6 +57,28 @@ namespace WorkManagement.Domain.Models.Email
         public string HRManagerName { get; set; }
         public decimal? CurrentSalary { get; set; }
         public decimal? ExpectedToBeSalary { get; set; }
+        public DateTime UpdatedDate { get; set; }
+    }
+    public class EmployeeLeaveRequestEmailModel {
+
+        public int JobLevelLeaveType { get; set; }
+        public string EmployeeName { get; set; }
+        public string ApprovalStatus { get; set; }
+        public string ManagerName { get; set; }
+        public string ManagerEmail { get; set; }
+        public List<EmployeeLeaveSummaryModel> CurruntLeaves { get; set; }
+        public List<EmployeeLeaveSummaryModel> UpadetdLeaves { get; set; }
+        public DateTime UpdatedDate { get; set; }
+
+    }
+    public class EmployeeLeaveUpdateEmailModel
+    {
+        public string EmployeeName { get; set; }
+        public string ApprovalStatus { get; set; }
+        public string ManagerName { get; set; }
+        public string HRManagerName { get; set; }
+        public List<EmployeeLeaveSummaryModel> CurruntLeaves { get; set; }
+        public List<EmployeeLeaveSummaryModel> UpadetdLeaves { get; set; }
         public DateTime UpdatedDate { get; set; }
     }
 }

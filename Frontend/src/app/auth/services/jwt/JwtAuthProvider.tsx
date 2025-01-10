@@ -92,7 +92,6 @@ function JwtAuthProvider(props: JwtAuthProviderProps) {
 			dispatch(setUserPermissions(permissions));
 
 			setUsers(userWithPermissions);
-			console.log('Sign-in successful:', userWithPermissions);
 		},
 		[dispatch]
 	);
@@ -235,7 +234,6 @@ function JwtAuthProvider(props: JwtAuthProviderProps) {
 			const userData = response?.data?.user;
 			const accessToken = response?.data?.accessToken;
 			const permissions = response?.data?.permissions || [];
-			console.log('Response data:', response.data);
 
 			if (!userData || !accessToken) {
 				throw new Error('Invalid response from server');
