@@ -5,6 +5,7 @@ import { RouteObject } from 'react-router-dom';
 import { User } from 'src/app/auth/user';
 import { DeepPartial } from 'react-hook-form';
 import { PartialDeep } from 'type-fest';
+import { PermissionActionEnum } from 'src/app/main/settings/PermissionsApi';
 import EventEmitter from './EventEmitter';
 
 type TreeNode = {
@@ -365,39 +366,72 @@ class FuseUtils {
 	/**
 	 * The hasPermission function checks if a user has permission to access a resource.
 	 */
-	static hasPermission(authArr: string[] | string | undefined, userRole: User['role']): boolean {
+	static hasPermission(authArr: string[] | string | undefined, userRole: User['role'], userPermissions?: string[]): boolean {
+		// console.log("Checking permissions...");
+		// console.log("Auth array:", authArr);
+		// console.log("User role:", userRole);
+		// console.log("User permissions:", userPermissions);
+	
 		/**
 		 * If auth array is not defined
 		 * Pass and allow
 		 */
 		if (authArr === null || authArr === undefined) {
+			// console.log("Auth array is null or undefined, allowing access.");
 			return true;
 		}
-
-		if (Array.isArray(authArr) && authArr?.length === 0) {
+	
+		if (Array.isArray(authArr) && authArr.length === 0) {
 			/**
 			 * if auth array is empty means,
 			 * allow only user role is guest (null or empty[])
 			 */
-			return !userRole || userRole.length === 0;
+			const isGuest = !userRole || (Array.isArray(userRole) && userRole.length === 0);
+			// console.log("Auth array is empty. Is user a guest?:", isGuest);
+			return isGuest;
 		}
-
+	
 		/**
 		 * Check if user has grants
 		 */
-		/*
-            Check if user role is array,
-            */
-		if (userRole && Array.isArray(authArr) && Array.isArray(userRole)) {
-			return authArr.some((r: string) => userRole.indexOf(r) >= 0);
+		let hasPermission = false;
+	
+		if (userRole && Array.isArray(authArr)) {
+			// Separate role checks and permission checks
+			const roleChecks = authArr.filter((item) => !Object.values(PermissionActionEnum).includes(item as PermissionActionEnum));
+	
+			// console.log("Role checks:", roleChecks);
+	
+			// Check if any of the auth items are in the user's role
+			const hasRolePermission = roleChecks.some((r: string) => 
+				Array.isArray(userRole) ? userRole.includes(r) : userRole === r
+			);
+			// console.log("User has role permission:", hasRolePermission);
+	
+			// Update hasPermission flag if user has role permission
+			if (hasRolePermission) {
+				hasPermission = true;
+			}
+	
+			// Check if any of the auth items are in the user's permissions
+			
+			// Update hasPermission flag if user has action permission
 		}
+		if(typeof authArr === 'string'){
+			// console.log("ab chalane");
+			
+			const permissionChecks = Object.values(PermissionActionEnum);
+			// console.log("Permission checks:", permissionChecks);
+			const hasActionPermission = userPermissions ? permissionChecks.some((a: string) => userPermissions.includes(a)) : false;
+			// console.log("User has action permission:", hasActionPermission);
+			return hasActionPermission;
 
-		if (typeof userRole === 'string' && Array.isArray(authArr)) {
-			return authArr?.includes?.(userRole);
 		}
-
-		return false;
+	
+		// console.log("User has permission:", hasPermission);
+		return hasPermission;
 	}
+	
 
 	/**
 	 * The filterArrayByString function filters an array of objects by a search string.

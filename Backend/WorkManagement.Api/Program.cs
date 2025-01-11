@@ -184,13 +184,13 @@ try
 
     app.UseAuthentication();
     app.UseAuthorization();
-
+    app.MapControllers();
     // Other middleware configurations...
-    app.UseEndpoints(endpoints =>
-    {
-        endpoints.MapControllers();
-        endpoints.MapFallbackToFile("{**slug}", "index.html");
-    });
+    //app.UseEndpoints(endpoints =>
+    //{
+    //    endpoints.MapControllers();
+    //    endpoints.MapFallbackToFile("{**slug}", "index.html");
+    //});
     app.UseMiddleware<ErrorHandlingMiddleware>();
     //app.Map("/", async context =>
     //{

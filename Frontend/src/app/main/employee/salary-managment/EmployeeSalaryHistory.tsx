@@ -78,44 +78,9 @@ function EmployeeSalaryHistory() {
 		data: pendingSalaries,
 		refetch
 	} = useGetApiEmployeesSalaryPendingSalaryRequestQuery({ employeeId: parsedEmployeeId });
-	const [approveSalary, { isLoading: approveLoading }] = usePutApiEmployeesSalaryApproveBySalaryIdMutation();
-	const [rejectSalary, { isLoading: rejectLoading }] = usePutApiEmployeesSalaryRejectBySalaryIdMutation();
 	const { isLoading: employeeLoading, data: SalaryEmployeeDashboardModel } =
 		useGetApiEmployeesPartialByEmployeeIdQuery({ employeeId: parsedEmployeeId });
-	// const handleSalaryAction = async (action: 'approve' | 'reject', salaryId: number, employeeId: number) => {
-	// 	try {
-	// 		if (action === 'approve') {
-	// 			await approveSalary({ salaryId, employeeId }).unwrap();
-	// 		} else {
-	// 			await rejectSalary({ salaryId, employeeId }).unwrap();
-	// 		}
-
-	// 		dispatch(
-	// 			showMessage({
-	// 				message: `Salary ${action === 'approve' ? 'approved' : 'rejected'} successfully`,
-	// 				autoHideDuration: 8000,
-	// 				anchorOrigin: {
-	// 					vertical: 'top',
-	// 					horizontal: 'right'
-	// 				},
-	// 				variant: 'success'
-	// 			})
-	// 		);
-	// 		refetch();
-	// 	} catch (error) {
-	// 		dispatch(
-	// 			showMessage({
-	// 				message: `Failed to ${action} salary`,
-	// 				autoHideDuration: 8000,
-	// 				anchorOrigin: {
-	// 					vertical: 'top',
-	// 					horizontal: 'right'
-	// 				},
-	// 				variant: 'error'
-	// 			})
-	// 		);
-	// 	}
-	// };
+	
 
     useEffect(()=>{
         refetch();
@@ -247,36 +212,7 @@ function EmployeeSalaryHistory() {
 					enableRowSelection={false}
 					data={pendingSalaries || []}
 					columns={columns}
-					// renderRowActionMenuItems={({ closeMenu, row, table }) => [
-					// 	<MenuItem
-					// 		key={`approve-${row.original.employeeId}`}
-					// 		onClick={() => {
-					// 			handleSalaryAction('approve', row.original.salaryid, row.original.employeeId);
-					// 			closeMenu();
-					// 			table.resetRowSelection();
-					// 		}}
-					// 		disabled={row.original.salaryStatus === SalaryStatus.Approved}
-					// 	>
-					// 		<ListItemIcon>
-					// 			<FuseSvgIcon>heroicons-outline:check</FuseSvgIcon>
-					// 		</ListItemIcon>
-					// 		Approve
-					// 	</MenuItem>,
-					// 	<MenuItem
-					// 		key={`reject-${row.original.employeeId}`}
-					// 		onClick={() => {
-					// 			handleSalaryAction('reject', row.original.salaryid, row.original.employeeId);
-					// 			closeMenu();
-					// 			table.resetRowSelection();
-					// 		}}
-					// 		disabled={row.original.salaryStatus === SalaryStatus.Rejected}
-					// 	>
-					// 		<ListItemIcon>
-					// 			<FuseSvgIcon>heroicons-outline:x-mark</FuseSvgIcon>
-					// 		</ListItemIcon>
-					// 		Reject
-					// 	</MenuItem>
-					// ]}
+				
 				/>
 			</Paper>
 		</div>

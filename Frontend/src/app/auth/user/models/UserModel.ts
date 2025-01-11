@@ -13,9 +13,10 @@ function UserModel(data: PartialDeep<User>): User {
       photoURL: '',
       email: '',
       shortcuts: [],
-      settings: {}
+      settings: {},
+      permissionsName: [] // Add this line
+
     },
-    permissions: [] // Add this line
   });
 }
 

@@ -71,7 +71,7 @@ function JwtAuthProvider(props: JwtAuthProviderProps) {
 	const [isLoading, setIsLoading] = useState(true);
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
 	const [authStatus, setAuthStatus] = useState('configuring');
-
+	const [permissionsName, setPermissionsName] = useState<string[]>([]);
 	const { children } = props;
 	const dispatch = useDispatch();
 
@@ -80,21 +80,28 @@ function JwtAuthProvider(props: JwtAuthProviderProps) {
 	 */
 	const handleSignInSuccess = useCallback(
 		(userData: User, accessToken: string, permissions: any[]) => {
-			setSession(accessToken);
-			setIsAuthenticated(true);
-
-			const userWithPermissions = {
-				...userData,
-				permissions
-			};
-
-			dispatch(setUser(userWithPermissions));
-			dispatch(setUserPermissions(permissions));
-
-			setUsers(userWithPermissions);
+		  setSession(accessToken);
+		  setIsAuthenticated(true);
+	
+		  let newPermissionsName: string[] = [];
+		  if (permissions.length > 0) {
+			newPermissionsName = permissions.flatMap((category) =>
+			  category.actions.map((action) => action.name)
+			);
+		  }
+	
+		  const userWithPermissions = {
+			...userData,
+			permissionsName: newPermissionsName,
+		  };
+	
+		  dispatch(setUser(userWithPermissions));
+		  dispatch(setUserPermissions(newPermissionsName));
+		  setUsers(userWithPermissions);
 		},
 		[dispatch]
-	);
+	  );
+	
 
 	/**
 	 * Handle sign-up success
@@ -178,31 +185,31 @@ function JwtAuthProvider(props: JwtAuthProviderProps) {
 	useEffect(() => {
 		const attemptAutoLogin = async () => {
 			const accessToken = getAccessToken();
-
+		
 			if (isTokenValid(accessToken)) {
-				try {
-					setIsLoading(true);
-
-					const response: AxiosResponse<User> = await axios.get(config.getUserUrl, {
-						headers: { Authorization: `Bearer ${accessToken}` }
-					});
-
-					const userData = response?.data;
-
-					handleSignInSuccess(userData, accessToken, []); // passing empty array for permissions
-
-					return true;
-				} catch (error) {
-					const axiosError = error as AxiosError;
-
-					handleSignInFailure(axiosError);
-					return false;
-				}
-			} else {
-				resetSession();
+			  try {
+				setIsLoading(true);
+		
+				const response: AxiosResponse<User> = await axios.get(config.getUserUrl, {
+				  headers: { Authorization: `Bearer ${accessToken}` }
+				});
+		
+				const userData = response?.data;
+		
+				handleSignInSuccess(userData, accessToken, userData.permissionsName || []);
+				return true;
+			  } catch (error) {
+				console.log("error in auto login: ", error);
+		
+				const axiosError = error as AxiosError;
+				handleSignInFailure(axiosError);
 				return false;
+			  }
+			} else {
+			  resetSession();
+			  return false;
 			}
-		};
+		  };
 
 		if (!isAuthenticated) {
 			attemptAutoLogin().then((signedIn) => {
@@ -234,6 +241,9 @@ function JwtAuthProvider(props: JwtAuthProviderProps) {
 			const userData = response?.data?.user;
 			const accessToken = response?.data?.accessToken;
 			const permissions = response?.data?.permissions || [];
+			
+			// console.log("permissions:", permissions);
+			
 
 			if (!userData || !accessToken) {
 				throw new Error('Invalid response from server');

@@ -33,6 +33,7 @@ const navigationConfig: FuseNavItemType[] = [
 						id: 'applicationmanagement.employees.search',
 						title: 'Employee Dashboard',
 						type: 'item',
+						auth:PermissionActionEnum.EmployeeModuleDashboard,
 						url: '/apps/employees',
 						end: true
 					},
@@ -41,14 +42,15 @@ const navigationConfig: FuseNavItemType[] = [
 						id: 'applicationmanagement.employees.new',
 						title: 'Add Employee',
 						type: 'item',
-						// auth:PermissionActionEnum.EmployeeModuleAdd,
+						auth:PermissionActionEnum.EmployeeModuleAdd,
+						// hasPermission:false,
 						url: '/apps/employees/employeesSearch/new'
 					},
 					{
 						id: 'applicationmanagement.employees.past-employees',
 						title: 'Past Employees',
 						type: 'item',
-						// auth:PermissionActionEnum.EmployeeModuleAdd,
+						
 						url: '/apps/employees/past-employees'
 					},
 					{
@@ -60,6 +62,7 @@ const navigationConfig: FuseNavItemType[] = [
 								id: 'applicationmanagement.employees.salaryApproval',
 								title: 'Salary Approval',
 								type: 'item',
+								// auth:PermissionActionEnum.EmployeeModuleSalaryApproveReject,
 								url: '/apps/employees/salary-management/salary-approval',
 							},
 							{

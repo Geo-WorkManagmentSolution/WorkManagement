@@ -61,6 +61,7 @@ class FuseAuthorization extends Component<FuseAuthorizationProps, State> {
 	}
 
 	static getDerivedStateFromProps(props: FuseAuthorizationProps) {
+
 		const { location, userRole } = props;
 		const { pathname } = location;
 
@@ -110,6 +111,8 @@ class FuseAuthorization extends Component<FuseAuthorizationProps, State> {
 		  User must be on unAuthorized page or just logged in
 		  Redirect to dashboard or loginRedirectUrl
 			*/
+			
+			
 			setTimeout(() => navigate(redirectUrl), 0);
 			resetSessionRedirectUrl();
 		}

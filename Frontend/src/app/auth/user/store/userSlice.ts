@@ -34,7 +34,8 @@ export const resetUser = createAsyncThunk('user/resetUser', async () => {
 /**
  * The initial state of the user slice.
  */
-const initialState: User = userModel({});
+const initialState: User = userModel({
+  });
 
 /**
  * The User slice
@@ -102,10 +103,10 @@ export const userSlice = createSlice({
 	},
 	extraReducers: (builder) => {
 		builder.addCase(setUser.fulfilled, (state, action) => {
-			return {
-				...action.payload,
-				permissions: action.payload.permissions || []
-			};
+		  return {
+			...action.payload,
+			permissionsName: action.payload.permissionsName || []
+		  };
 		});
 		builder.addCase(resetUser.fulfilled, (state) => {
 			if (!_.isEqual(state, initialState)) {
@@ -135,7 +136,7 @@ export const selectUserShortcuts = (state: RootState) => state.user?.data?.short
 
 export const selectUserSettings = (state: RootState) => state.user?.data?.settings;
 
-export const selectUserPermissions = (state: RootState) => state.user?.permissions || [];
+export const selectUserPermissions = (state: RootState) => state.user?.permissionsName ;
 
 export type userSliceType = typeof userSlice;
 

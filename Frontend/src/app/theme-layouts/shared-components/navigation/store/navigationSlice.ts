@@ -2,7 +2,7 @@ import { createEntityAdapter, createSelector, createSlice, PayloadAction, WithSl
 import { AppThunk, RootState } from 'app/store/store';
 import { PartialDeep } from 'type-fest';
 import { FuseFlatNavItemType, FuseNavItemType } from '@fuse/core/FuseNavigation/types/FuseNavItemType';
-import { selectUserRole } from 'src/app/auth/user/store/userSlice';
+import { selectUserPermissions, selectUserRole } from 'src/app/auth/user/store/userSlice';
 import FuseNavigationHelper from '@fuse/utils/FuseNavigationHelper';
 import i18next from 'i18next';
 import FuseNavItemModel from '@fuse/core/FuseNavigation/models/FuseNavItemModel';
@@ -111,23 +111,48 @@ declare module 'app/store/lazyLoadedSlices' {
 export const { setNavigation, resetNavigation } = navigationSlice.actions;
 
 export const selectNavigation = createSelector(
-	[selectNavigationAll, selectUserRole, selectCurrentLanguageId],
-	(navigationSimple, userRole) => {
-		const navigation = FuseNavigationHelper.unflattenNavigation(navigationSimple);
-
+    [selectNavigationAll, selectUserRole, selectUserPermissions, selectCurrentLanguageId],
+    (navigationSimple, userRole, userPermissions) => {
+        const navigation = FuseNavigationHelper.unflattenNavigation(navigationSimple);
+		console.log("navigation",navigation);
+		
 		function setAdditionalData(data: FuseNavItemType[]): FuseNavItemType[] {
-			return data?.map((item) => ({
-				hasPermission: Boolean(FuseUtils.hasPermission(item?.auth, userRole)),
-				...item,
-				...(item?.translate && item?.title ? { title: i18next.t(`navigation:${item?.translate}`) } : {}),
-				...(item?.children ? { children: setAdditionalData(item?.children) } : {})
-			}));
+			console.log("Setting additional data for navigation items...");
+			// console.log("Input data:", data);
+		
+			return data?.map((item) => {
+				const hasPermission = Boolean(FuseUtils.hasPermission(item?.auth, userRole, userPermissions));
+				// console.log(`Processing item: ${item?.title || "Unnamed Item"}`);
+				// console.log("Item permissions:", item?.auth);
+				// console.log("User role:", userRole);
+				// console.log("User permissions:", userPermissions);
+				// console.log("Has permission:", hasPermission);
+		
+				const translatedTitle = item?.translate && item?.title ? i18next.t(`navigation:${item?.translate}`) : item?.title;
+				// console.log("Translated title (if applicable):", translatedTitle);
+		
+				const children = item?.children ? setAdditionalData(item?.children) : undefined;
+				// console.log("Children (if applicable):", children);
+		
+				const newItem = {
+					hasPermission,
+					...item,
+					...(translatedTitle ? { title: translatedTitle } : {}),
+					...(children ? { children } : {}),
+				};
+				// console.log("Updated item:", newItem);
+				
+				return newItem;
+			});
 		}
+		
 
-		const translatedValues = setAdditionalData(navigation);
+        const translatedValues = setAdditionalData(navigation);
+		console.log("tranlated navigation",translatedValues);
+		
 
-		return translatedValues;
-	}
+        return translatedValues;
+    }
 );
 
 export const selectFlatNavigation = createSelector([selectNavigation], (navigation) => {

@@ -10,15 +10,8 @@ export type User = {
     shortcuts?: string[];
     settings?: Partial<FuseSettingsConfigType>;
     loginRedirectUrl?: string;
-
+    permissionsName: string[]
   };
-  permissions?: {
-	permissionCategoryName: string;
-	permissionCategoryId: string;
-	actions: {
-	  name: string;
-	  id: string;
-	}[];
-  }[];
+ 
 };
 

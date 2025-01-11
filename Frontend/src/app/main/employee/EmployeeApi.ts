@@ -54,7 +54,6 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: (queryArg) => ({
         url: `/api/Employees/deletedEmployee/${queryArg.employeeId}`,
-        params: { id: queryArg.id },
       }),
     }),
     getApiEmployeesPartialByEmployeeId: build.query<
@@ -420,8 +419,7 @@ export type DeleteApiEmployeesByIdApiArg = {
 export type GetApiEmployeesDeletedEmployeeByEmployeeIdApiResponse =
   /** status 200 OK */ EmployeeModel;
 export type GetApiEmployeesDeletedEmployeeByEmployeeIdApiArg = {
-  id?: number;
-  employeeId: string;
+  employeeId: number;
 };
 export type GetApiEmployeesPartialByEmployeeIdApiResponse =
   /** status 200 OK */ SalaryEmployeeDashboardModel;
