@@ -548,6 +548,7 @@ useEffect(() => {
 					</div>
 					<div className={`${tabValue !== 'Summary View' ? 'hidden' : ''} w-full`}>
 						<LeaveSummary
+							currentLeaves={currentLeaves}
 							openDialoge={openEventDialog}
 							onSave={handleSaveEvent}
 							onDelete={handleDeleteEvent}

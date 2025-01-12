@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { FormControl, MenuItem, Paper, Select, SelectChangeEvent, Typography } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, FormControl, MenuItem, Paper, Select, SelectChangeEvent, Typography } from '@mui/material';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { MRT_ColumnDef } from 'material-react-table';
 import DataTable from 'app/shared-components/data-table/DataTable';
@@ -9,6 +9,8 @@ import {
 	EmployeeLeaveHistoryDto,
 	LeaveStatus
 } from '../../LeavesApi';
+import { EmployeeLeaveSummaryModel } from '../../../EmployeeApi';
+import { GridExpandMoreIcon } from '@mui/x-data-grid';
 
 interface LeaveSummaryProps {
 	openDialoge: (event: EmployeeLeaveHistoryDto) => void;
@@ -16,9 +18,10 @@ interface LeaveSummaryProps {
 	onDelete: (eventId: number) => Promise<void>;
 	refetchEvents: () => Promise<void>;
 	eventColors: Record<number, string>;
+	currentLeaves: EmployeeLeaveSummaryModel[]; 
 }
 
-function LeaveSummary({ openDialoge, onSave, onDelete, refetchEvents, eventColors }: LeaveSummaryProps) {
+function LeaveSummary({ openDialoge, onSave, onDelete, refetchEvents, eventColors,currentLeaves }: LeaveSummaryProps) {
 	const [upcomingOptions, setUpcomingOptions] = useState('Upcoming Leaves');
 	const [pastOptions, setPastOptions] = useState('Past Leaves');
 	const pastOptionsArray = ['Past Leaves', 'Past Holidays', 'Past Leave and Holidays'];
@@ -170,6 +173,84 @@ function LeaveSummary({ openDialoge, onSave, onDelete, refetchEvents, eventColor
 
 	return (
 		<>
+
+
+
+<Accordion expanded>
+    <AccordionSummary
+        expandIcon={<GridExpandMoreIcon />}
+        aria-controls="panel1-content"
+        id="panel1-header"
+	
+    >
+        <Typography>Leave Details</Typography>
+    </AccordionSummary>
+    <AccordionDetails>
+        {/* <Paper
+            className="shadow-1 rounded-xl rounded-b-0 w-full h-full p-20"
+            elevation={0}
+        > */}
+            <div className="flex justify-around gap-16">
+                {currentLeaves && currentLeaves.length > 0 ? (
+                    currentLeaves.map((eachData: EmployeeLeaveSummaryModel) => (
+                        <div key={eachData.id} className="grid grid-cols-1">
+                            <Paper className="flex flex-col flex-auto shadow-md rounded-xl overflow-hidden bg-white p-6 w-224">
+                                <div className="flex items-center px-8 pt-8">
+                                    <Typography
+                                        className="px-12 text-lg font-medium tracking-tight leading-6 truncate"
+                                        color="text.secondary"
+                                    >
+                                        {eachData.employeeLeaveType} :
+                                    </Typography>
+                                    {/* <IconButton aria-label="more">
+                                        <FuseSvgIcon>heroicons-outline:ellipsis-vertical</FuseSvgIcon>
+                                    </IconButton> */}
+                                </div>
+                                <div className="text-center mt-16">
+                                    <Typography className={`text-7xl sm:text-8xl font-bold tracking-tight leading-none `} style={{ color: `${eventColors[eachData.id]}` }}>
+                                        {eachData.remainingLeaves}
+                                    </Typography>
+                                    <Typography className="text-lg font-medium text-yellow-600" style={{ color: `${eventColors[eachData.id]}` }}>
+                                        Remaining Leaves
+                                    </Typography>
+                                </div>
+                                <Typography
+                                    className="flex items-baseline justify-center w-full mt-20 mb-24 space-x-8"
+                                    color="text.secondary"
+                                >
+                                    <span className="truncate">Booked Leaves :</span>
+                                    <b>{eachData.totalLeaves - eachData.remainingLeaves}</b>
+                                </Typography>
+                                <Typography
+                                    className="flex items-baseline justify-center w-full mb-24 space-x-8"
+                                    color="text.secondary"
+                                >
+                                    <span className="truncate">Opening Balance :</span>
+                                    <b>{eachData.totalLeaves}</b>
+                                </Typography>
+                            </Paper>
+                        </div>
+                    ))
+                ) : (
+                    <Typography>No leave data available.</Typography>
+                )}
+            </div>
+        {/* </Paper> */}
+    </AccordionDetails>
+</Accordion>
+
+
+
+
+
+
+
+
+
+
+
+
+
 		<Paper
 			elevation={3}
 			className="w-full p-5 mb-10"
