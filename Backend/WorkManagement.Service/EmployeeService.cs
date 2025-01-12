@@ -1992,13 +1992,13 @@ namespace WorkManagement.Service
 
                 if (employeeLeave != null)
                 {
-                    employeeLeave.Status = employeeLeaveData.Status;
+                     //employeeLeave.Status = employeeLeaveData.Status;
                     employeeLeave.Description = string.IsNullOrEmpty(employeeLeaveData.Description) ? "" : employeeLeaveData.Description;
                     employeeLeave.Reason = string.IsNullOrEmpty(employeeLeaveData.Reason) ? "" : employeeLeaveData.Reason;
-                    employeeLeave.StartDate = employeeLeaveData.StartDate.HasValue ? employeeLeaveData.StartDate.Value : DateTime.Now;
-                    employeeLeave.EndDate = employeeLeaveData.EndDate.HasValue ? employeeLeaveData.EndDate.Value : DateTime.Now;
-                    employeeLeave.LeaveDays = employeeLeaveData.LeaveDays;
-                    employeeLeave.EmployeeLeaveTypeId = employeeLeaveData.EmployeeLeaveTypeId;
+                    //employeeLeave.StartDate = employeeLeaveData.StartDate.HasValue ? employeeLeaveData.StartDate.Value : DateTime.Now;
+                    //employeeLeave.EndDate = employeeLeaveData.EndDate.HasValue ? employeeLeaveData.EndDate.Value : DateTime.Now;
+                    //employeeLeave.LeaveDays = employeeLeaveData.LeaveDays;
+                    //employeeLeave.EmployeeLeaveTypeId = employeeLeaveData.EmployeeLeaveTypeId;
 
                     _dbContext.EmployeeLeaves.Update(employeeLeave);
                 }
@@ -2030,9 +2030,14 @@ namespace WorkManagement.Service
 
                 var employeeLeave = _dbContext.EmployeeLeaves.FirstOrDefault(x => x.Id == employeeLeaveId);
 
-                if (DateTime.Compare(employeeLeave.StartDate, DateTime.Now) < 0)
+                //if (DateTime.Compare(employeeLeave.StartDate, DateTime.Now) < 0)
+                //{
+                //    throw new Exception("This leave is in past. Can not delete leave data");
+                //}
+                if(employeeLeave.Status == LeaveStatus.Rejected || employeeLeave.Status == LeaveStatus.Rejected)
                 {
-                    throw new Exception("This leave is in past. Can not delete leave data");
+                    throw new Exception($"Leave Cannot be Canceled while leave is ${employeeLeave.Status}");
+
                 }
 
                 var leaveSummary = await _dbContext.EmployeeLeaveSummary.FirstAsync(x => x.EmployeeId == employeeId && x.EmployeeLeaveTypeId == employeeLeave.EmployeeLeaveTypeId);

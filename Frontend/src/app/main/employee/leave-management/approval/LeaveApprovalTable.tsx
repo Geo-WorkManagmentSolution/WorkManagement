@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unstable-nested-components */
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { type MRT_ColumnDef } from 'material-react-table';
 import DataTable from 'app/shared-components/data-table/DataTable';
 import FuseLoading from '@fuse/core/FuseLoading';
@@ -29,6 +29,9 @@ function LeaveApprovalTable() {
 		refetch();
 	};
 
+	useEffect(()=>{
+		refetch();
+	},[refetch])
 	const columns = useMemo<MRT_ColumnDef<EmployeeLeaveModel>[]>(
 		() => [
 			{

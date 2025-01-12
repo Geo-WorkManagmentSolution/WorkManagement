@@ -221,8 +221,10 @@ function LeaveSummary({ openDialoge, onSave, onDelete, refetchEvents, eventColor
 								<FuseSvgIcon size={20}>heroicons-outline:pencil-square</FuseSvgIcon>
 								<span className="ml-2">Update</span>
 							</MenuItem>,
+							
 							<MenuItem
 								key="delete"
+								disabled={row.original.status === LeaveStatus.Approved || row.original.status === LeaveStatus.Rejected}
 								onClick={() => {
 									handleDelete(row.original.employeeLeaveId);
 									closeMenu();

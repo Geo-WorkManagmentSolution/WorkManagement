@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { type MRT_ColumnDef } from 'material-react-table';
 import DataTable from 'app/shared-components/data-table/DataTable';
 import FuseLoading from '@fuse/core/FuseLoading';
@@ -141,6 +141,11 @@ function SalaryApprovalTable() {
 		],
 		[]
 	);
+
+useEffect(()=>{
+	refetch()
+},[refetch])
+
 
 	if (isLoading || approveLoading || rejectLoading) {
 		return <FuseLoading />;
