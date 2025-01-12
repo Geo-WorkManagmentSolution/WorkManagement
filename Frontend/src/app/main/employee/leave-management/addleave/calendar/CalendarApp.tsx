@@ -28,82 +28,89 @@ import {
 	EmployeeLeaveModel
 } from '../../LeavesApi';
 
+
 const Root = styled(FusePageSimple)(({ theme }) => ({
-	'& .container': {
-		maxWidth: '100%!important'
-	},
-	'& a': {
-		color: `${theme.palette.text.primary}!important`,
-		textDecoration: 'none!important'
-	},
-	'&  .fc-media-screen': {
-		minHeight: '100%',
-		width: '100%'
-	},
-	'& .fc': {
-		height: '800px'
-	},
-	'& .fc-scrollgrid, & .fc-theme-standard td, & .fc-theme-standard th': {
-		borderColor: `${theme.palette.divider}!important`
-	},
-	'&  .fc-scrollgrid-section > td': {
-		border: 0
-	},
-	'& .fc-daygrid-day': {
-		'&:last-child': {
-			borderRight: 0
-		}
-	},
-	'& .fc-col-header-cell': {
-		borderWidth: '0 1px 0 1px',
-		padding: '8px 0 0 0',
-		'& .fc-col-header-cell-cushion': {
-			color: theme.palette.text.secondary,
-			fontWeight: 500,
-			fontSize: 12,
-			textTransform: 'uppercase'
-		}
-	},
-	'& .fc-view ': {
-		'& > .fc-scrollgrid': {
-			border: 0
-		}
-	},
-	'& .fc-daygrid-day.fc-day-today': {
-		backgroundColor: 'transparent!important',
-		'& .fc-daygrid-day-number': {
-			borderRadius: '100%',
-			backgroundColor: `${theme.palette.secondary.main}!important`,
-			color: `${theme.palette.secondary.contrastText}!important`
-		}
-	},
-	'& .fc-daygrid-day-top': {
-		justifyContent: 'center',
-		'& .fc-daygrid-day-number': {
-			color: theme.palette.text.secondary,
-			fontWeight: 500,
-			fontSize: 12,
-			display: 'inline-flex',
-			alignItems: 'center',
-			justifyContent: 'center',
-			width: 26,
-			height: 26,
-			margin: '4px 0',
-			borderRadius: '50%',
-			float: 'none',
-			lineHeight: 1
-		}
-	},
-	'& .fc-h-event': {
-		background: 'initial'
-	},
-	'& .fc-event': {
-		border: 0,
-		padding: '0 ',
-		fontSize: 12,
-		margin: '0 6px 4px 6px!important'
-	}
+    '& .container': {
+        maxWidth: '100%!important'
+    },
+    '& a': {
+        color: `${theme.palette.text.primary}!important`,
+        textDecoration: 'none!important'
+    },
+    '& .fc-media-screen': {
+        minHeight: '100%',
+        width: '100%'
+    },
+    '& .fc': {
+        height: '800px'
+    },
+    '& .fc-scrollgrid, & .fc-theme-standard td, & .fc-theme-standard th': {
+        borderColor: `${theme.palette.divider}!important`
+    },
+    '& .fc-scrollgrid-section > td': {
+        border: 0
+    },
+    '& .fc-daygrid-day': {
+        '&:last-child': {
+            borderRight: 0
+        }
+    },
+    '& .fc-col-header-cell': {
+        borderWidth: '0 1px 0 1px',
+        padding: '8px 0 0 0',
+        '& .fc-col-header-cell-cushion': {
+            color: theme.palette.text.secondary,
+            fontWeight: 500,
+            fontSize: 18,
+            textTransform: 'uppercase'
+        }
+    },
+    '& .fc-view ': {
+        '& > .fc-scrollgrid': {
+            border: 0
+        }
+    },
+    '& .fc-daygrid-day.fc-day-today': {
+        backgroundColor: 'transparent!important',
+        '& .fc-daygrid-day-number': {
+            borderRadius: '100%',
+			padding: '8px',
+            backgroundColor: `${theme.palette.secondary.main}!important`,
+            color: `${theme.palette.secondary.contrastText}!important`
+        }
+    },
+    '& .fc-daygrid-day-top': {
+        justifyContent: 'center',
+        '& .fc-daygrid-day-number': {
+            color: theme.palette.text.secondary,
+            fontWeight: 500,
+            fontSize: 16,
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 26,
+            height: 26,
+            margin: '4px 0',
+            borderRadius: '50%',
+            float: 'none',
+            lineHeight: 1,
+        }
+    },
+    '& .fc-h-event': {
+        background: 'initial'
+    },
+    '& .fc-event': {
+        border: 0,
+        padding: '0 ',
+        fontSize: 12,
+        margin: '0 6px 4px 6px!important'
+    },
+    // Add custom styles for Sundays
+    '& .fc-day-sunday': {
+        backgroundColor: '#95ccff',
+    }
 }));
+
 
 export default function CalendarApp() {
 	const [selectedEvent, setSelectedEvent] = useState<EmployeeLeaveModel | null>(null);
@@ -145,6 +152,11 @@ export default function CalendarApp() {
 		}
 	}, [currentLeaves]);
 
+useEffect(() => {
+	refetchCurrentLeaves();
+},[refetchCurrentLeaves])
+
+
 	const openEventDialog = (event: EmployeeLeaveHistoryDto) => {
 		setIsNewEvent(false);
 
@@ -185,7 +197,7 @@ export default function CalendarApp() {
 		if (typeof eventData.name === 'string' && eventData.name.startsWith('Holiday')) {
 			return;
 		}
-
+		
 		setIsNewEvent(false);
 		setSelectedEvent({
 			id: eventData.employeeLeaveId,
@@ -194,7 +206,7 @@ export default function CalendarApp() {
 			reason: eventData.reason || '',
 			startDate: eventData.startDate || new Date().toISOString(),
 			endDate: eventData.endDate,
-			//  leaveDays: eventData.leaveDays,
+			 leaveDays: eventData.leaveDays,
 			employeeLeaveTypeId: eventData.leaveTypeId
 		});
 		setAnchorEl(clickInfo.jsEvent.target as HTMLElement);
@@ -461,6 +473,14 @@ export default function CalendarApp() {
 		[calendarEvents]
 	);
 
+	//For sunday highlight
+	const dayCellClassNames = ({ date }) => {
+		if (date.getDay() === 0) { // 0 represents Sunday
+			return 'fc-day-sunday sunday';
+		}
+		return '';
+	};
+	
 	const showCalendar = () => {
 		setTabValue('Calendar View');
 		setTimeout(refreshCalendar, 0);
@@ -510,6 +530,7 @@ export default function CalendarApp() {
 					<div className={`${tabValue !== 'Calendar View' ? 'hidden' : ''} w-full`}>
 						<FullCalendar
 							plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+							dayCellClassNames={dayCellClassNames}
 							headerToolbar={false}
 							initialView="dayGridMonth"
 							editable
@@ -527,6 +548,7 @@ export default function CalendarApp() {
 					</div>
 					<div className={`${tabValue !== 'Summary View' ? 'hidden' : ''} w-full`}>
 						<LeaveSummary
+							currentLeaves={currentLeaves}
 							openDialoge={openEventDialog}
 							onSave={handleSaveEvent}
 							onDelete={handleDeleteEvent}

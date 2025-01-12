@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { type MRT_ColumnDef } from 'material-react-table';
 import DataTable from 'app/shared-components/data-table/DataTable';
 import FuseLoading from '@fuse/core/FuseLoading';
@@ -114,6 +114,10 @@ function LeaveUpdateRequest() {
 		}
 	};
 
+	useEffect(()=>{
+			refetch();
+		},[refetch])
+		
 	const handleLeaveInfoClick = async (event, leave) => {
 		setAnchorEl(event.currentTarget);
 		setSelectedLeave(leave);

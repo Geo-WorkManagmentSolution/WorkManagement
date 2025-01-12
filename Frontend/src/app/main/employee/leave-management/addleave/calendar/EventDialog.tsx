@@ -31,7 +31,19 @@ const eventSchema = z.object({
 	status: z.nativeEnum(LeaveStatus),
 	leaveDays: z.number().min(0.5)
 });
-
+const isSunday = (date: Date) => date.getDay() === 0;
+const countSundays = (start: Date, end: Date) => {
+	let count = 0;
+	const current = new Date(start);
+	while (current <= end) {
+	  if (isSunday(current)) {
+		count++;
+	  }
+	  current.setDate(current.getDate() + 1);
+	}
+	return count;
+  };
+  
 export default function EventDialog({
 	event,
 	isNewEvent,
@@ -93,32 +105,42 @@ export default function EventDialog({
 	useEffect(() => {
 		const start = new Date(startDate);
 		const end = new Date(endDate);
-
+	
 		const localStart = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate()));
 		const localEnd = new Date(Date.UTC(end.getUTCFullYear(), end.getUTCMonth(), end.getUTCDate()));
-
+	
 		if (localStart > localEnd) {
-			setDateError("'From' date cannot be after 'To' date");
+		  setDateError("'From' date cannot be after 'To' date");
 		} else {
-			setDateError(null);
+		  setDateError(null);
 		}
-
+	
 		const timeDiff = Math.abs(localEnd.getTime() - localStart.getTime());
-		const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
-		setTotalDays(diffDays);
-
-		const selectedLeaveType = currentLeaves?.find((leave) => leave.id === employeeLeaveTypeId);
-
-		if (selectedLeaveType && diffDays > selectedLeaveType.remainingLeaves && isNewEvent) {
-			setLeaveBalanceError(
-				`Insufficient leave balance. You have ${selectedLeaveType.remainingLeaves} days available.`
-			);
-		} else {
-			setLeaveBalanceError(null);
+		let diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
+	
+		// Check for Sundays
+		if (diffDays === 1 && isSunday(localStart)) {
+		  setDateError("You are applying leave on a Sunday.");
+		} else if (diffDays > 1) {
+		  const sundaysCount = countSundays(localStart, localEnd);
+		  diffDays -= sundaysCount;
 		}
-
+	
+		setTotalDays(diffDays);
+	
+		const selectedLeaveType = currentLeaves?.find((leave) => leave.id === employeeLeaveTypeId);
+	
+		if (selectedLeaveType && diffDays > selectedLeaveType.remainingLeaves && isNewEvent) {
+		  setLeaveBalanceError(
+			`Insufficient leave balance. You have ${selectedLeaveType.remainingLeaves} days available.`
+		  );
+		} else {
+		  setLeaveBalanceError(null);
+		}
+	
 		setValue('leaveDays', diffDays);
-	}, [startDate, endDate, employeeLeaveTypeId, currentLeaves, setValue]);
+	  }, [startDate, endDate, employeeLeaveTypeId, currentLeaves, setValue, isNewEvent]);
+	
 
 	const handleSave = (data: EmployeeLeaveModel) => {
 		if (dateError || leaveBalanceError) {
@@ -141,6 +163,7 @@ export default function EventDialog({
 	};
 
 	const handleUpdate = () => {
+		
 		const data = {
 			id: event?.id || 0,
 			startDate,
@@ -354,6 +377,7 @@ export default function EventDialog({
 							Balance : {leaveBalance[employeeLeaveTypeId] || ''}
 						</Typography>
 					</div>
+					{isNewEvent && (
 					<div className="flex items-center space-x-2">
 						<FuseSvgIcon
 							className="sm:inline-flex"
@@ -361,8 +385,8 @@ export default function EventDialog({
 						>
 							heroicons-outline:information-circle
 						</FuseSvgIcon>
-						<Typography>Total Days Selected : {totalDays}</Typography>
-					</div>
+						<Typography>Leave Days : {totalDays}</Typography>
+					</div>)}
 				</div>
 
 				<div className="flex justify-between mt-10">
