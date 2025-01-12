@@ -4,10 +4,10 @@ on:
     branches:
     - main
 env:
-  AZURE_API_WEBAPP_NAME: geo-d
-  AZURE_WEBAPP_API_PACKAGE_PATH: Backend/WorkManagement.Api/publish
-  AZURE_WEBAPP_API_WWWROOT_PATH: Backend/WorkManagement.Api/wwwroot
-  AZURE_WEBAPP_FRONTEND_PACKAGE_PATH: Frontend/build
+  AZURE_API_WEBAPP_NAME: api-geo-dev
+  AZURE_UI_WEBAPP_NAME: ui-geo-dev
+  WEBAPP_API_PACKAGE_PATH: ./Backend/WorkManagement.Api/publish/
+  FRONTEND_PACKAGE_PATH: ./Frontend/build/
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 8.0.x
   WORKING_DIRECTORY: Backend/WorkManagement.Api
@@ -25,11 +25,36 @@ jobs:
     - name: Build React app
       run: npm run build
       working-directory: ${{ env.FRONTEND_WORKING_DIRECTORY }}
-    - name: Copy Build files to backend
-      run: cp -r ./${{ env.AZURE_WEBAPP_FRONTEND_PACKAGE_PATH }} ./${{ env.AZURE_WEBAPP_API_WWWROOT_PATH }}
-  build-backend:
+    - name: Publish Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: frontend
+        path: ${{ env.FRONTEND_PACKAGE_PATH }}
+  deploy-frontend:
     runs-on: ubuntu-latest
     needs: build-frontend
+    steps:
+    - name: Download artifact from build job
+      uses: actions/download-artifact@v3
+      with:
+        name: frontend
+        path: ${{ env.FRONTEND_PACKAGE_PATH }}
+    - name: Deploy to SmartAsp frontend
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      with:
+        server: win1123.site4now.net
+        username: shahnaupul-ui
+        password: shahnaupul-ui
+        dry-run: true
+        local-dir: ${{ env.FRONTEND_PACKAGE_PATH }}
+        exclude: |
+          **/web.config*
+    - name: Delete artifacts
+      uses: geekyeggo/delete-artifact@v5
+      with:
+          name: frontend  
+  build-backend:
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - name: Setup .NET SDK
@@ -41,14 +66,12 @@ jobs:
     - name: Build
       run: dotnet build "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-restore
     - name: Publish
-      run: dotnet publish "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-build --output "${{ env.AZURE_WEBAPP_API_PACKAGE_PATH }}"
-    - name: List files
-      run: ls -d */
+      run: dotnet publish "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-build --output "${{ env.WEBAPP_API_PACKAGE_PATH }} --selfcontaied"
     - name: Publish Artifacts
       uses: actions/upload-artifact@v3
       with:
         name: webapp
-        path: ${{ env.AZURE_WEBAPP_API_PACKAGE_PATH }}
+        path: ${{ env.WEBAPP_API_PACKAGE_PATH }}
   deploy-backend:
     runs-on: ubuntu-latest
     needs: build-backend
@@ -57,13 +80,16 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: webapp
-        path: ${{ env.AZURE_WEBAPP_API_PACKAGE_PATH }}
-    - name: Deploy to Azure WebApp
-      uses: azure/webapps-deploy@v2
+        path: ${{ env.WEBAPP_API_PACKAGE_PATH }}
+    - name: Deploy to SmartAsp backend
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
-        app-name: ${{ env.AZURE_API_WEBAPP_NAME }}
-        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-        package: ${{ env.AZURE_WEBAPP_API_PACKAGE_PATH }}
+        server: win1123.site4now.net
+        username: shahnaupul-api
+        password: shahnaupul-api
+        local-dir: ${{ env.WEBAPP_API_PACKAGE_PATH }}
+        exclude: |
+          **/web.config*
     - name: Delete artifacts
       uses: geekyeggo/delete-artifact@v5
       with:

@@ -84,8 +84,13 @@ namespace WorkManagmentSolution.EFCore
             //        mutableEntityType.SetQueryFilter(lambdaExpression);
             //    }
             //}
+            modelBuilder.HasSequence<int>("EmployeeNumber")
+         .StartsAt(1000)
+         .IncrementsBy(1);
+
             modelBuilder.Entity<Employee>()
-                .Property(o => o.EmployeeNumber);
+                .Property(o => o.EmployeeNumber)
+                .HasDefaultValueSql("NEXT VALUE FOR EmployeeNumber");
 
 
             modelBuilder.Entity<JobLevelLeave>().HasData(
@@ -212,7 +217,7 @@ namespace WorkManagmentSolution.EFCore
                     UserName = "admin1@admin.com",
                     NormalizedUserName = "admin",
                     Email = "admin1@admin.com",
-                    PasswordHash = hasher.HashPassword(null, "admin@admin.com"),
+                    PasswordHash = "AQAAAAIAAYagAAAAEKsYEI4zcVV/7kJsO8JAZtK2atGS6KoGfRDZ4aUgwBH5TjerJ+S9k/rDxu3FtcDmOQ==",
                     Shortcuts = new List<string>()
                 }
             );
