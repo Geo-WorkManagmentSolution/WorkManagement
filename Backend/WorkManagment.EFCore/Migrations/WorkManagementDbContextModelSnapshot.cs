@@ -268,12 +268,12 @@ namespace WorkManagement.EFCore.Migrations
                         {
                             Id = new Guid("8e445865-a24d-4543-a6c6-9443d048cdb9"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "f85ef350-36a3-4d5b-8423-bfd91ad8317e",
+                            ConcurrencyStamp = "68f004fc-c3fd-4bd6-af3b-3307116895be",
                             Email = "admin1@admin.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedUserName = "admin",
-                            PasswordHash = "AQAAAAIAAYagAAAAEK4Ww4lbNzT+RwjD1bKS9zaDWE7489n0eweoWOigM9HRGqrdA7U6VHTqSGBP4IdDkQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKsYEI4zcVV/7kJsO8JAZtK2atGS6KoGfRDZ4aUgwBH5TjerJ+S9k/rDxu3FtcDmOQ==",
                             PhoneNumberConfirmed = false,
                             Shortcuts = "[]",
                             TwoFactorEnabled = false,
@@ -637,13 +637,13 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("EmployeeId")
                         .HasColumnType("int");
 
                     b.Property<string>("EmployeeLeaveSummaryId")
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("EmployeeLeaveUpdateTableId")
                         .HasColumnType("int");
@@ -652,19 +652,19 @@ namespace WorkManagement.EFCore.Migrations
                         .HasColumnType("int");
 
                     b.Property<bool>("IsApprovedByDepartmentHead")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsApprovedByHRHead")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("bit");
 
                     b.Property<int?>("JobLevelLeaveType")
                         .HasColumnType("int");
 
                     b.Property<string>("ManagerName")
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("Status")
                         .HasColumnType("int");
@@ -673,10 +673,10 @@ namespace WorkManagement.EFCore.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedDateTime")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime2");
 
                     b.Property<bool?>("useDefultLeaves")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -691,7 +691,7 @@ namespace WorkManagement.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
@@ -703,10 +703,10 @@ namespace WorkManagement.EFCore.Migrations
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("bit");
 
                     b.Property<double>("RemainingLeaves")
-                        .HasColumnType("double");
+                        .HasColumnType("float");
 
                     b.Property<int>("TotalLeaves")
                         .HasColumnType("int");
