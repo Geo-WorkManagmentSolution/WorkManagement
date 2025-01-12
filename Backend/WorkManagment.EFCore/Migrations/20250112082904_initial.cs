@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WorkManagement.EFCore.Migrations
 {
     /// <inheritdoc />
-    public partial class inital : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -836,22 +836,20 @@ namespace WorkManagement.EFCore.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     EmployeeId = table.Column<int>(type: "int", nullable: true),
-                    ManagerName = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ManagerName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     EmployeeNumber = table.Column<int>(type: "int", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: true),
-                    IsApprovedByDepartmentHead = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    IsApprovedByHRHead = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    IsApprovedByDepartmentHead = table.Column<bool>(type: "bit", nullable: false),
+                    IsApprovedByHRHead = table.Column<bool>(type: "bit", nullable: false),
                     JobLevelLeaveType = table.Column<int>(type: "int", nullable: true),
-                    useDefultLeaves = table.Column<bool>(type: "tinyint(1)", nullable: true),
-                    EmployeeLeaveSummaryId = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    useDefultLeaves = table.Column<bool>(type: "bit", nullable: true),
+                    EmployeeLeaveSummaryId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     EmployeeLeaveUpdateTableId = table.Column<int>(type: "int", nullable: true),
                     UpdatedBy = table.Column<int>(type: "int", nullable: true),
-                    UpdatedDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -861,8 +859,7 @@ namespace WorkManagement.EFCore.Migrations
                         column: x => x.EmployeeId,
                         principalTable: "Employees",
                         principalColumn: "Id");
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
+                });
 
             migrationBuilder.CreateTable(
                 name: "ProjectEmployees",
@@ -900,13 +897,13 @@ namespace WorkManagement.EFCore.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     EmployeeId = table.Column<int>(type: "int", nullable: false),
-                    RemainingLeaves = table.Column<double>(type: "double", nullable: false),
+                    RemainingLeaves = table.Column<double>(type: "float", nullable: false),
                     EmployeeLeaveTypeId = table.Column<int>(type: "int", nullable: true),
                     TotalLeaves = table.Column<int>(type: "int", nullable: false),
                     EmployeeLeaveUpdateTableId = table.Column<int>(type: "int", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -923,12 +920,11 @@ namespace WorkManagement.EFCore.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_UpdateLeaveSummury_LeaveUpdateDetails_EmployeeLeaveUpdateTab~",
+                        name: "FK_UpdateLeaveSummury_LeaveUpdateDetails_EmployeeLeaveUpdateTableId",
                         column: x => x.EmployeeLeaveUpdateTableId,
                         principalTable: "LeaveUpdateDetails",
                         principalColumn: "Id");
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
+                });
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
@@ -945,11 +941,7 @@ namespace WorkManagement.EFCore.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "Shortcuts", "TwoFactorEnabled", "UserName" },
-<<<<<<<< HEAD:Backend/WorkManagment.EFCore/Migrations/20250107053020_inital.cs
-                values: new object[] { new Guid("8e445865-a24d-4543-a6c6-9443d048cdb9"), 0, "0633035e-19f0-4f86-99b4-f8c87dc8ac63", "admin1@admin.com", false, false, null, null, "admin", "AQAAAAIAAYagAAAAECtmLPUgbC0TrvBhb6LelICMa6+3+aOr8hAInSkKCf3h6Ozung7pSOpfJkcZV3MAIA==", null, false, null, "[]", false, "admin1@admin.com" });
-========
-                values: new object[] { new Guid("8e445865-a24d-4543-a6c6-9443d048cdb9"), 0, "f85ef350-36a3-4d5b-8423-bfd91ad8317e", "admin1@admin.com", false, false, null, null, "admin", "AQAAAAIAAYagAAAAEK4Ww4lbNzT+RwjD1bKS9zaDWE7489n0eweoWOigM9HRGqrdA7U6VHTqSGBP4IdDkQ==", null, false, null, "[]", false, "admin1@admin.com" });
->>>>>>>> e6a9d80ab346f7d9b97f3a56439dabde7a58e768:Backend/WorkManagment.EFCore/Migrations/20250109171412_init.cs
+                values: new object[] { new Guid("8e445865-a24d-4543-a6c6-9443d048cdb9"), 0, "833b959e-ca9e-4848-bedd-d319ffda4218", "admin1@admin.com", false, false, null, null, "admin", "AQAAAAIAAYagAAAAEKsYEI4zcVV/7kJsO8JAZtK2atGS6KoGfRDZ4aUgwBH5TjerJ+S9k/rDxu3FtcDmOQ==", null, false, null, "[]", false, "admin1@admin.com" });
 
             migrationBuilder.InsertData(
                 table: "EmployeeCategories",
