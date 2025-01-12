@@ -55,7 +55,18 @@ namespace WorkManagement.API.Controllers
             return Ok(employees);
         }
 
-        
+        [HttpGet("allDeletedEmployees")]
+        [PermissionAuth(PermissionActionEnum.EmployeeModule_Dashboard)]
+        public async Task<ActionResult<IEnumerable<EmployeeDashboardDataModel>>> GetDeletedEmployees()
+        {
+            var userRole = this.User.FindFirst(ClaimTypes.Role).Value;
+            string loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var employees = await employeeService.GetAllDeletedEmployeesAsync(loggedUserId, userRole);
+            return Ok(employees);
+        }
+
+
         // GET: api/employees/5
         [HttpGet("{id}")]
         [PermissionAuth(PermissionActionEnum.EmployeeModule_View)]
@@ -64,6 +75,21 @@ namespace WorkManagement.API.Controllers
             string userRole = this.User.FindFirst(ClaimTypes.Role).Value;
             string loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var employee = await employeeService.GetEmployeeByIdAsync(userRole, loggedUserId,id);
+            if (employee == null)
+            {
+                return NotFound();
+            }
+            return Ok(employee);
+        }
+
+        // GET: api/employees/5
+        [HttpGet("deletedEmployee/{employeeId}")]
+        [PermissionAuth(PermissionActionEnum.EmployeeModule_View)]
+        public async Task<ActionResult<EmployeeModel>> GetDeletedEmployee(int employeeId)
+        {
+            string userRole = this.User.FindFirst(ClaimTypes.Role).Value;
+            string loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var employee = await employeeService.GetDeletedEmployeeByIdAsync(userRole, loggedUserId, employeeId);
             if (employee == null)
             {
                 return NotFound();
@@ -154,6 +180,33 @@ namespace WorkManagement.API.Controllers
             return Ok(employeeSalary);
         }
 
+        [HttpPut("LeaveUpdateApprove/{leaveId}")]
+        public async Task<ActionResult<EmployeeLeaveUpdatesTable>> ApproveLeaveUpdate(int leaveId, int employeeId)
+        {
+            try
+            {
+                var loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var employeeLeave = await employeeService.ApproveLeaveUpdate(leaveId, loggedUserId, employeeId);
+                return Ok(employeeLeave);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
+        }
+
+        [HttpPut("LeaveUpdateReject/{leaveId}")]
+        public async Task<ActionResult<EmployeeLeaveUpdatesTable>> RejectLeaveUpdate(int leaveId, int employeeId)
+        {
+            var loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var employeeLeave = await employeeService.RejectLeaveUpdate(leaveId, loggedUserId, employeeId);
+            return Ok(employeeLeave);
+        }
+
+
+
+
+
         [HttpGet("Salary/PendingSalaryRequest")]
         //[PermissionAuth(PermissionActionEnum.EmployeeModule_Salary_History_View)]
         public async Task<ActionResult<IEnumerable<EmployeeSalaryDataModel>>> GetEmployeePendingSalaryRequest([FromQuery] int? employeeId = null)
@@ -171,6 +224,22 @@ namespace WorkManagement.API.Controllers
             return Ok(salaryRequests);
         }
 
+        [HttpGet("Leave/PendingLeaveRequest")]
+      public async Task<ActionResult<IEnumerable<EmployeeLeaveDataModel>>> GetEmployeePendingLeaveRequest([FromQuery] int? employeeId = null)
+        {
+            List<EmployeeLeaveDataModel> salaryRequests = new List<EmployeeLeaveDataModel>();
+            var loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (employeeId.HasValue)
+            { // Fetch data based on employeeId
+                salaryRequests = await employeeService.GetEmployeeLeaveRequestList(loggedUserId, employeeId.Value);
+            }
+            else
+            {
+                salaryRequests = await employeeService.GetAllPenidngLeaveRequestList(loggedUserId);
+            }
+            return Ok(salaryRequests);
+        }
+
         [HttpGet("SalaryDashboard")]
         public async Task<ActionResult<IEnumerable<SalaryEmployeeDashboardModel>>> GetEmployeesForSalaryDashboard()
         {
@@ -181,7 +250,7 @@ namespace WorkManagement.API.Controllers
             return Ok(employees);
         }
 
-
+      
 
         // GET api/employee/leaves/current
         [HttpGet("leaves/current")]

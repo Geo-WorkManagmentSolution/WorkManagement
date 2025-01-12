@@ -1,0 +1,66 @@
+﻿@using WorkManagement.Domain.Models.Email
+@model EmployeeLeaveUpdateEmailModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Leave Update Notification- Leave Status: @Model.ApprovalStatus</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        .container {
+            margin: 0 auto;
+            max-width: 600px;
+            padding: 20px;
+            border: 1px solid #ccc;
+        }
+
+        .header {
+            background-color: #f4f4f4;
+            padding: 10px;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #555;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                Leave Update Approved
+            </h1>
+        </div>
+        <div class="content">
+            <p>Dear @Model.EmployeeName,</p>
+            <p>We are pleased to inform you that your request for a Leave Update has been approved.</p>
+           
+            <!--<p>We appreciate your hard work and dedication to the company. If you have any questions, please feel free to contact your manager, @Model.ManagerName.</p>
+                -->
+            <!--    <p>Congratulations on your well-deserved increment!</p>-->
+            <p>Thank you for your patience.</p>
+        </div>
+        <div class="footer">
+            <p>Best regards,</p>
+            <p>HR Department</p>
+        </div>
+    </div>
+</body>
+</html>

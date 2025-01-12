@@ -111,6 +111,58 @@ namespace WorkManagement.Service
 
         }
 
+        public async Task<List<EmployeeDashboardDataModel>> GetAllDeletedEmployeesAsync(string loggedUserId, string userRole)
+        {
+            try
+            {
+                var targetEmployeeId = CheckValidEmployeeId(loggedUserId);
+                if (targetEmployeeId == -1 && userRole != "HR Admin")
+                {
+                    throw new Exception("Invalid User data");
+                }
+
+                var employeeData = new List<EmployeeDashboardDataModel>();
+
+                //var Employee = await _dbContext.Employees.ToListAsync();
+                //return mapper.Map<List<EmployeeModel>>(Employee);
+
+                employeeData = (from e in _dbContext.Employees.Where(s => s.IsDeleted)
+                                select new EmployeeDashboardDataModel
+                                {
+                                    Id = e.Id,
+                                    EmployeeNumber = e.EmployeeNumber,
+                                    FirstName = e.FirstName,
+                                    MiddleName = e.MiddleName,
+                                    LastName = e.LastName,
+                                    Email = e.Email,
+                                    PhoneNumber = e.PhoneNumber,
+                                    Gender = e.EmployeePersonalDetails == null ? "" : e.EmployeePersonalDetails.Gender.ToUpper(),
+                                    DepartmentName = e.EmployeeDepartment == null ? "" : e.EmployeeDepartment.Name,
+                                    DesignationName = e.EmployeeDesignation == null ? "" : e.EmployeeDesignation.Name,
+                                    CategoryName = e.EmployeeCategory == null ? "" : e.EmployeeCategory.Name,
+                                    Site = e.EmployeeWorkInformation == null ? "" : (e.EmployeeWorkInformation.Site == null ? "" : e.EmployeeWorkInformation.Site.Name),
+                                    HireDate = e.EmployeeWorkInformation == null ? "" : (e.EmployeeWorkInformation.HireDate.HasValue ? e.EmployeeWorkInformation.HireDate.Value.ToString("yyyy-MM-dd") : ""),
+                                }).ToList();
+
+
+
+
+                if (employeeData != null)
+                {
+                    return employeeData;
+                }
+                else
+                {
+                    return new List<EmployeeDashboardDataModel>();
+                }
+            }
+            catch (Exception ex)
+            {
+                return new List<EmployeeDashboardDataModel>();
+            }
+
+        }
+
         public async Task<List<EmployeeCategory>> GetEmployeeCategories()
         {
             return await _dbContext.EmployeeCategories.ToListAsync();
@@ -255,7 +307,7 @@ namespace WorkManagement.Service
         
             if (employeeId.HasValue)
             {
-                var employee = await _dbContext.Employees.FirstOrDefaultAsync(e => e.Id == employeeId.Value);
+                var employee = await _dbContext.Employees.FirstOrDefaultAsync(e => e.Id == employeeId.Value && !e.IsDeleted);
                 if (employee != null)
                 {
                     departmentId = employee.EmployeeDepartmentId;
@@ -294,8 +346,6 @@ namespace WorkManagement.Service
             return site;
         }
 
-
-
         public async Task<EmployeeModel> GetEmployeeByIdAsync(string userRole, string loggedUserId, int id)
         {
             //var Employee = await _dbContext.Employees
@@ -318,7 +368,7 @@ namespace WorkManagement.Service
 
             if(userRole == "Manager")
             {
-                var employee = _dbContext.Employees.FirstOrDefault(s => s.Id == id);
+                var employee = _dbContext.Employees.FirstOrDefault(s => s.Id == id && !s.IsDeleted);
                 if(employee!= null)
                 {
                     if(employee.EmployeeReportToId != targetEmployeeId && targetEmployeeId != id)
@@ -336,7 +386,266 @@ namespace WorkManagement.Service
                 }
             }
 
-            var employeeData = (from e in _dbContext.Employees.Where(s => s.Id == id)
+            var employeeData = (from e in _dbContext.Employees.Where(s => s.Id == id && !s.IsDeleted)
+                                select new EmployeeModel
+                                {
+                                    Id = e.Id,
+                                    PhotoURL = e.PhotoURL,
+                                    EmployeeNumber = e.EmployeeNumber,
+                                    FirstName = e.FirstName,
+                                    MiddleName = e.MiddleName,
+                                    LastName = e.LastName,
+                                    Email = e.Email,
+                                    AlternateEmail = e.AlternateEmail,
+                                    PhoneNumber = e.PhoneNumber,
+                                    AlternateNumber = e.AlternateNumber,
+                                    EmployeeCategoryId = e.EmployeeCategoryId,
+                                    EmployeeDepartmentId = e.EmployeeDepartmentId,
+                                    EmployeeDesignationId = e.EmployeeDesignationId,
+                                    EmployeeReportToId = e.EmployeeReportToId,
+                                    RoleId = e.RoleId,
+                                    UserId = e.UserId,
+                                    IsDeleted = e.IsDeleted,
+                                    EmployeePersonalDetails = new EmployeePersonalDetailsModel
+                                    {
+                                        DateOfBirth = e.EmployeePersonalDetails == null ? "" : (e.EmployeePersonalDetails.DateOfBirth.HasValue ? e.EmployeePersonalDetails.DateOfBirth.Value.ToString("yyyy-MM-dd") : ""),
+                                        Gender = e.EmployeePersonalDetails == null ? "" : e.EmployeePersonalDetails.Gender,
+                                        MaritalStatus = e.EmployeePersonalDetails == null ? null : e.EmployeePersonalDetails.MaritalStatus,
+                                        bloodGroup = e.EmployeePersonalDetails == null ? null : e.EmployeePersonalDetails.bloodGroup,
+                                    },
+                                    EmployeeWorkInformation = new EmployeeWorkInformationModel
+                                    {
+                                        Designation = e.EmployeeWorkInformation == null ? null : e.EmployeeWorkInformation.Designation,
+                                        SalaryType = e.EmployeeWorkInformation == null ? null : e.EmployeeWorkInformation.SalaryType,
+                                        HireDate = e.EmployeeWorkInformation == null ? null : (e.EmployeeWorkInformation.HireDate.HasValue ? e.EmployeeWorkInformation.HireDate.Value.ToString("yyyy-MM-dd") : ""),
+                                        ConfirmationDate = e.EmployeeWorkInformation == null ? null : (e.EmployeeWorkInformation.ConfirmationDate.HasValue ? e.EmployeeWorkInformation.ConfirmationDate.Value.ToString("yyyy-MM-dd") : ""),
+                                        TotalPreviousExperience = e.EmployeeWorkInformation == null ? 0 : e.EmployeeWorkInformation.TotalPreviousExperience,
+                                        Salary = e.EmployeeWorkInformation == null ? 0 : e.EmployeeWorkInformation.Salary,
+                                        Basic = e.EmployeeWorkInformation == null ? 0 : e.EmployeeWorkInformation.Basic,
+                                        HRAllowances = e.EmployeeWorkInformation == null ? 0 : e.EmployeeWorkInformation.HRAllowances,
+                                        Bonus = e.EmployeeWorkInformation == null ? 0 : e.EmployeeWorkInformation.Bonus,
+                                        Gratuity = e.EmployeeWorkInformation == null ? 0 : e.EmployeeWorkInformation.Gratuity,
+                                        PF = e.EmployeeWorkInformation == null ? 0 : e.EmployeeWorkInformation.PF,
+                                        ESI = e.EmployeeWorkInformation == null ? 0 : e.EmployeeWorkInformation.ESI,
+                                        PT = e.EmployeeWorkInformation == null ? 0 : e.EmployeeWorkInformation.PT,
+                                        SiteId = e.EmployeeWorkInformation == null ? null : e.EmployeeWorkInformation.SiteId,
+                                        GRPHead = e.EmployeeWorkInformation == null ? null : e.EmployeeWorkInformation.GRPHead,
+                                    },
+                                    EmployeeInsuranceDetails = new EmployeeInsuranceDetailModel
+                                    {
+                                        EmployeeDesignationId = e.EmployeeInsuranceDetails == null ? null : e.EmployeeInsuranceDetails.EmployeeDesignationId,
+                                        SerialNumber = e.EmployeeInsuranceDetails == null ? "" : e.EmployeeInsuranceDetails.SerialNumber,
+                                        DateOfJoining = e.EmployeeInsuranceDetails == null ? "" : (e.EmployeeInsuranceDetails.DateOfJoining.HasValue ? e.EmployeeInsuranceDetails.DateOfJoining.Value.ToString("yyyy-MM-dd") : ""),
+                                        DateOfBirth = e.EmployeeInsuranceDetails == null ? "" : (e.EmployeeInsuranceDetails.DateOfBirth.HasValue ? e.EmployeeInsuranceDetails.DateOfJoining.Value.ToString("yyyy-MM-dd") : ""),
+                                        Age = e.EmployeeInsuranceDetails == null ? 0 : e.EmployeeInsuranceDetails.Age,
+                                        GrossSalary = e.EmployeeInsuranceDetails == null ? 0 : e.EmployeeInsuranceDetails.GrossSalary,
+                                        TotalSIWider = e.EmployeeInsuranceDetails == null ? 0 : e.EmployeeInsuranceDetails.TotalSIWider,
+                                        Comprehensive = e.EmployeeInsuranceDetails == null ? 0 : e.EmployeeInsuranceDetails.Comprehensive,
+                                        Risk = e.EmployeeInsuranceDetails == null ? "" : e.EmployeeInsuranceDetails.Risk,
+                                    },
+                                    EmployeeAddresses = new EmployeeAddressModel
+                                    {
+                                        UserAddress = new AddressModel
+                                        {
+                                            AddressLine1 = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.UserAddressLine1,
+                                            AddressLine2 = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.UserAddressLine2,
+                                            City = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.UserCity,
+                                            Country = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.UserCountry,
+                                            State = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.UserState,
+                                            PinCode = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.UserAddressPinCode,
+                                        },
+                                        MailingAddress = new AddressModel
+                                        {
+                                            AddressLine1 = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.MailingAddressLine1,
+                                            AddressLine2 = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.MailingAddressLine2,
+                                            City = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.MailingCity,
+                                            Country = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.MailingCountry,
+                                            State = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.MailingState,
+                                            PinCode = e.EmployeeAddresses == null ? null : e.EmployeeAddresses.MailingAddressPinCode,
+                                        }
+
+                                    },
+                                    EmployeeIdentityInfos = new EmployeeBankingDataModel
+                                    {
+                                        UID = e.EmployeeIdentityInfos == null ? null : e.EmployeeIdentityInfos.UID,
+                                        BankAccountNumber = e.EmployeeIdentityInfos == null ? null : e.EmployeeIdentityInfos.BankAccountNumber,
+                                        BankName = e.EmployeeIdentityInfos == null ? null : e.EmployeeIdentityInfos.BankName,
+                                        Branch = e.EmployeeIdentityInfos == null ? null : e.EmployeeIdentityInfos.Branch,
+                                        IFSC = e.EmployeeIdentityInfos == null ? null : e.EmployeeIdentityInfos.IFSC,
+                                        AccountHolderName = e.EmployeeIdentityInfos == null ? null : e.EmployeeIdentityInfos.AccountHolderName,
+                                        PAN = e.EmployeeIdentityInfos == null ? null : e.EmployeeIdentityInfos.PAN,
+                                        ProvidentFundNumber = e.EmployeeIdentityInfos == null ? null : e.EmployeeIdentityInfos.ProvidentFundNumber,
+                                        EmployeeStateInsuranceNumber = e.EmployeeIdentityInfos == null ? null : e.EmployeeIdentityInfos.EmployeeStateInsuranceNumber,
+                                        BiometricCode = e.EmployeeIdentityInfos == null ? null : e.EmployeeIdentityInfos.BiometricCode,
+                                    },
+                                    EmployeeDocuments = new List<EmployeeDocumentsModel>(),
+                                    EmployeeEducationDetail = new List<EmployeeEducationDetailModel>(),
+                                    EmployeeRelationshipDetails = new List<EmployeeRelationshipDetailModel>(),
+                                });
+
+            if (employeeData != null)
+            {
+                var returnEployeeData = employeeData.FirstOrDefault();
+                var employeeEducationData = (from e in _dbContext.EmployeeEducationDetails.Where(s => s.EmployeeId == returnEployeeData.Id)
+                                             select new EmployeeEducationDetailModel
+                                             {
+                                                 Type = e.Type,
+                                                 PassingYear = e.PassingYear,
+                                                 DegreeCertificateDate = e.DegreeCertificateDate,
+                                                 University = e.University,
+                                                 grade = e.grade
+                                             }).ToList();
+
+                var employeeDocumentData = (from e in _dbContext.EmployeeDocuments.Where(s => s.EmployeeId == returnEployeeData.Id)
+                                            select new EmployeeDocumentsModel
+                                            {
+                                                FileContent = e.FileContent,
+                                                FileName = e.FileName,
+                                                FileSize = e.FileSize,
+                                                FileType = e.FileType
+                                            }).ToList();
+
+
+                if (employeeDocumentData != null)
+                {
+                    if (employeeDocumentData.Count == 0)
+                    {
+                        var documentData = new EmployeeDocumentsModel();
+                        documentData.FileContent = null;
+                        documentData.FileName = "";
+                        documentData.FileName = "";
+                        documentData.FileSize = null;
+                        returnEployeeData.EmployeeDocuments.Add(documentData);
+                    }
+                    else
+                    {
+                        returnEployeeData.EmployeeDocuments = employeeDocumentData;
+                    }
+                }
+                else
+                {
+                    var documentData = new EmployeeDocumentsModel();
+                    documentData.FileContent = null;
+                    documentData.FileName = "";
+                    documentData.FileName = "";
+                    documentData.FileSize = null;
+                    returnEployeeData.EmployeeDocuments.Add(documentData);
+                }
+
+
+
+                if (employeeEducationData != null)
+                {
+                    if (employeeEducationData.Count == 0)
+                    {
+                        var educationData = new EmployeeEducationDetailModel();
+                        educationData.Type = "";
+                        educationData.PassingYear = "";
+                        educationData.University = "";
+                        educationData.grade = "";
+                        educationData.DegreeCertificateDate = null;
+
+                        returnEployeeData.EmployeeEducationDetail.Add(educationData);
+                    }
+                    else
+                    {
+                        returnEployeeData.EmployeeEducationDetail = employeeEducationData;
+                    }
+
+
+                }
+                else
+                {
+                    var educationData = new EmployeeEducationDetailModel();
+                    educationData.Type = "";
+                    educationData.PassingYear = "";
+                    educationData.University = "";
+                    educationData.grade = "";
+                    educationData.DegreeCertificateDate = null;
+
+                    returnEployeeData.EmployeeEducationDetail.Add(educationData);
+
+                }
+
+                var employeeRelationshipData = (from r in _dbContext.EmployeeRelationshipDetails.Where(s => s.EmployeeId == returnEployeeData.Id)
+                                                select new EmployeeRelationshipDetailModel
+                                                {
+                                                    RelationshipType = r.RelationshipType,
+                                                    Name = r.Name,
+                                                    Email = r.Email,
+                                                    PhoneNumber = r.PhoneNumber,
+                                                }).ToList();
+
+                if (employeeRelationshipData != null)
+                {
+                    if (employeeRelationshipData.Count == 0)
+                    {
+                        var relationshipData = new EmployeeRelationshipDetailModel();
+                        relationshipData.RelationshipType = RelationshipType.Parent;
+                        relationshipData.Name = "";
+                        relationshipData.Email = "";
+                        relationshipData.PhoneNumber = "";
+
+                        returnEployeeData.EmployeeRelationshipDetails.Add(relationshipData);
+                    }
+                    else
+                    {
+                        returnEployeeData.EmployeeRelationshipDetails = employeeRelationshipData;
+                    }
+
+                }
+                else
+                {
+                    var relationshipData = new EmployeeRelationshipDetailModel();
+                    relationshipData.RelationshipType = RelationshipType.Parent;
+                    relationshipData.Name = "";
+                    relationshipData.Email = "";
+                    relationshipData.PhoneNumber = "";
+
+                    returnEployeeData.EmployeeRelationshipDetails.Add(relationshipData);
+
+                }
+
+
+
+                return returnEployeeData;
+            }
+            else
+            {
+                return new EmployeeModel();
+            }
+        }
+
+        public async Task<EmployeeModel> GetDeletedEmployeeByIdAsync(string userRole, string loggedUserId, int id)
+        {
+            //var Employee = await _dbContext.Employees
+            //    .AsNoTracking()
+            //    .Include(x => x.EmployeePersonalDetails)
+            //    .Include(x => x.EmployeeWorkInformation)
+            //    .Include(x => x.EmployeeAddresses)
+            //    .Include(x => x.EmployeeIdentityInfos)
+            //    .Include(x => x.EmployeeEducationDetail)
+            //    .Include(x => x.EmployeeDocuments)
+            //    .SingleOrDefaultAsync(x => x.Id == id);
+            //var EmployeeModel = mapper.Map<EmployeeModel>(Employee);
+            //return EmployeeModel;
+
+            var targetEmployeeId = CheckValidEmployeeId(loggedUserId);
+            if (targetEmployeeId == -1 && userRole != "HR Admin")
+            {
+                throw new Exception("Invalid User data");
+            }
+
+            var employee = _dbContext.Employees.FirstOrDefault(s => s.Id == id && s.IsDeleted);
+
+            if (employee == null)
+            {
+                throw new Exception("There is no employee found");
+            }
+
+            
+
+            var employeeData = (from e in _dbContext.Employees.Where(s => s.Id == id && s.IsDeleted)
                                 select new EmployeeModel
                                 {
                                     Id = e.Id,
@@ -901,7 +1210,7 @@ namespace WorkManagement.Service
 
         public async Task<EmployeeModel> UpdateEmployeeAsync(int id, EmployeeModel employee)
         {
-            var employeeData = _dbContext.Employees.FirstOrDefault(s => s.Id == id);
+            var employeeData = _dbContext.Employees.FirstOrDefault(s => s.Id == id && !s.IsDeleted);
             var today = DateTime.Today;
             var age = 0;
             decimal grossSalary = 0;
@@ -1180,6 +1489,19 @@ namespace WorkManagement.Service
                         UpdateSalaryInformation(salaryInfo);
                     }
 
+                    if (employee.JobLevelLeaveType != null || employee.JobLevelLeaveType != 0  || employee.EmployeeLeaves != null)
+                    {
+                        var leaveInfo = new EmployeeLeaveUpdateModel
+                        {
+                            EmployeeId = employeeData.Id,
+                            EmployeeNumber=employeeData.EmployeeNumber,
+                            JobLevelLeaveType = employee.JobLevelLeaveType,
+                            useDefultLeaves=employee.EmployeeWorkInformation.UseDefaultLeaves,
+                            EmployeeLeaves = employee.EmployeeLeaves
+                        };
+                        await UpdateLeaveInformation(leaveInfo);
+                    }
+
                     return employee;
                 }
                 else
@@ -1272,7 +1594,6 @@ namespace WorkManagement.Service
             return fileName;
         }
 
-
         public async Task<bool> DeleteEmployeeFile(int employeeId, string fileName)
         {
             var filePath = GetEmployeeFilePath(employeeId, fileName);
@@ -1295,87 +1616,94 @@ namespace WorkManagement.Service
             return false;
         }
 
-
-
-
-
-
         public async Task<bool> DeleteEmployeeAsync(int id)
         {
             try
             {
                 var employee = await _dbContext.Employees.FindAsync(id);
                 if (employee == null)
+                {
                     return false;
-
-                var employeeReportTo = _dbContext.Employees.Where(s => s.EmployeeReportToId == id).ToList();
-                var employeeEmail = employee.Email;
-                if (employeeReportTo.Any())
+                    throw new Exception("Can not find enmployee data");
+                }
+                else
                 {
-                    foreach (var e in employeeReportTo)
-                    {
-                        e.EmployeeReportToId = null;
-                        _dbContext.Employees.Update(e);
-                    }
-
+                    employee.IsDeleted = true;
+                    _dbContext.Employees.Update(employee);
                     _dbContext.SaveChanges();
+
+
                 }
+                    
+
+                //var employeeReportTo = _dbContext.Employees.Where(s => s.EmployeeReportToId == id).ToList();
+                //var employeeEmail = employee.Email;
+                //if (employeeReportTo.Any())
+                //{
+                //    foreach (var e in employeeReportTo)
+                //    {
+                //        e.EmployeeReportToId = null;
+                //        _dbContext.Employees.Update(e);
+                //    }
+
+                //    _dbContext.SaveChanges();
+                //}
 
 
 
-                var employeeEducation = _dbContext.EmployeeEducationDetails.Where(e => e.EmployeeId == id).ToList();
-                if (employeeEducation.Any())
-                {
-                    foreach (var e in employeeEducation)
-                    {
-                        _dbContext.EmployeeEducationDetails.Remove(e);
-                    }
-                }
+                //var employeeEducation = _dbContext.EmployeeEducationDetails.Where(e => e.EmployeeId == id).ToList();
+                //if (employeeEducation.Any())
+                //{
+                //    foreach (var e in employeeEducation)
+                //    {
+                //        _dbContext.EmployeeEducationDetails.Remove(e);
+                //    }
+                //}
 
-                var employeeRelation = _dbContext.EmployeeRelationshipDetails.Where(e => e.EmployeeId == id).ToList();
-                if (employeeRelation.Any())
-                {
-                    foreach (var e in employeeRelation)
-                    {
-                        _dbContext.EmployeeRelationshipDetails.Remove(e);
-                    }
-                }
+                //var employeeRelation = _dbContext.EmployeeRelationshipDetails.Where(e => e.EmployeeId == id).ToList();
+                //if (employeeRelation.Any())
+                //{
+                //    foreach (var e in employeeRelation)
+                //    {
+                //        _dbContext.EmployeeRelationshipDetails.Remove(e);
+                //    }
+                //}
 
-                var employeeDocuments = _dbContext.EmployeeDocuments.Where(e => e.EmployeeId == id).ToList();
-                if (employeeDocuments.Any())
-                {
-                    foreach (var e in employeeDocuments)
-                    {
-                        _dbContext.EmployeeDocuments.Remove(e);
-                    }
-                }
+                //var employeeDocuments = _dbContext.EmployeeDocuments.Where(e => e.EmployeeId == id).ToList();
+                //if (employeeDocuments.Any())
+                //{
+                //    foreach (var e in employeeDocuments)
+                //    {
+                //        _dbContext.EmployeeDocuments.Remove(e);
+                //    }
+                //}
 
-                var employeeLeave = _dbContext.EmployeeLeaves.Where(e => e.EmployeeId == id).ToList();
-                if (employeeLeave.Any())
-                {
-                    foreach (var e in employeeLeave)
-                    {
-                        _dbContext.EmployeeLeaves.Remove(e);
-                    }
-                }
+                //var employeeLeave = _dbContext.EmployeeLeaves.Where(e => e.EmployeeId == id).ToList();
+                //if (employeeLeave.Any())
+                //{
+                //    foreach (var e in employeeLeave)
+                //    {
+                //        _dbContext.EmployeeLeaves.Remove(e);
+                //    }
+                //}
 
-                var employeeLeaveSummary = _dbContext.EmployeeLeaveSummary.Where(e => e.EmployeeId == id).ToList();
-                if (employeeLeaveSummary.Any())
-                {
-                    foreach (var e in employeeLeaveSummary)
-                    {
-                        _dbContext.EmployeeLeaveSummary.Remove(e);
-                    }
-                }
+                //var employeeLeaveSummary = _dbContext.EmployeeLeaveSummary.Where(e => e.EmployeeId == id).ToList();
+                //if (employeeLeaveSummary.Any())
+                //{
+                //    foreach (var e in employeeLeaveSummary)
+                //    {
+                //        _dbContext.EmployeeLeaveSummary.Remove(e);
+                //    }
+                //}
 
-                _dbContext.Employees.Remove(employee);
-                await _dbContext.SaveChangesAsync();
+                //_dbContext.Employees.Remove(employee);
+                //await _dbContext.SaveChangesAsync();
 
-                var user = await userManager.FindByEmailAsync(employeeEmail);
-                if (user != null)
-                {
-                    await userManager.DeleteAsync(user);
-                }
+                //var user = await userManager.FindByEmailAsync(employeeEmail);
+                //if (user != null)
+                //{
+                //    await userManager.DeleteAsync(user);
+                //}
 
                 return true;
             }
@@ -1452,7 +1780,7 @@ namespace WorkManagement.Service
         public async Task<SalaryEmployeeDashboardModel> EmployeePartialDetailsById(int employeeId)
         {
 
-            var employeeData = (from e in _dbContext.Employees.Where(s => s.Id == employeeId)
+            var employeeData = (from e in _dbContext.Employees.Where(s => s.Id == employeeId && !s.IsDeleted)
                                 select new SalaryEmployeeDashboardModel
                                 {
                                     Id = e.Id,
@@ -1476,96 +1804,10 @@ namespace WorkManagement.Service
 
         }
 
-
-
-
-
-
-
-
-
-
-
         #region Leave management
 
 
-        //public async Task<List<EmployeeLeaveSummaryModel>> GetEmployeeLeaves(string loggedUserId)
-        //{
-        //    try
-        //    {
-        //        var employeeId = CheckValidEmployeeId(loggedUserId);
-        //        /*if (employeeId == -1)
-        //        {
-        //            throw new Exception("Invalid User data");
-        //        }*/
-
-
-        //        //var defaultLeaves = await _dbContext.EmployeeDefaultLeave.Include(x => x.EmployeeLeaveTypes).ToListAsync();
-
-        //        var defaultLeaves = (from ed in _dbContext.EmployeeDefaultLeave
-        //                             select new EmployeeLeaveSummaryModel
-        //                             {
-        //                                 Id = ed.EmployeeLeaveTypeId.HasValue ? ed.EmployeeLeaveTypeId.Value : 0,
-        //                                 EmployeeLeaveType = ed.EmployeeLeaveTypes.Name,
-        //                                 TotalLeaves = ed.TotalLeaves,
-        //                                 RemainingLeaves = ed.TotalLeaves
-        //                             }).ToList();
-
-        //        var employeeLeaveData = (from el in _dbContext.EmployeeLeaveSummary.Where(s => s.EmployeeId == employeeId)
-        //                                 select new EmployeeLeaveSummaryModel
-        //                                 {
-        //                                     EmployeeLeaveSummaryId = el.Id,
-        //                                     Id = el.EmployeeLeaveTypeId.HasValue ? el.EmployeeLeaveTypeId.Value : 0,
-        //                                     EmployeeLeaveType = el.EmployeeLeaveTypes.Name,
-        //                                     TotalLeaves = el.TotalLeaves,
-        //                                     RemainingLeaves = el.RemainingLeaves
-        //                                 }).ToList();
-
-        //        if (employeeLeaveData.Count > 0)
-        //        {
-        //            var employeeLeaveHistory = _dbContext.EmployeeLeaves.Where(s => s.EmployeeId == employeeId).ToList();
-        //            var isLeaveMismatch = false;
-        //            if (employeeLeaveHistory.Count > 0)
-        //            {
-        //                foreach(var e in employeeLeaveData)
-        //                {
-        //                    var employeeLeave = employeeLeaveHistory.Where(s => s.EmployeeLeaveTypeId == e.Id).Sum(s => s.LeaveDays);
-        //                    var remainingLeaves = e.TotalLeaves - employeeLeave;
-        //                    if(e.RemainingLeaves != remainingLeaves)
-        //                    {
-        //                        isLeaveMismatch = true;
-        //                        e.RemainingLeaves = remainingLeaves;
-        //                        var employeeLeaveSummary = _dbContext.EmployeeLeaveSummary.FirstOrDefault(s => s.Id == e.EmployeeLeaveSummaryId);
-        //                        if (employeeLeaveSummary != null)
-        //                        {
-        //                            employeeLeaveSummary.RemainingLeaves = remainingLeaves;
-        //                            _dbContext.EmployeeLeaveSummary.Update(employeeLeaveSummary);
-        //                        }
-        //                    }
-        //                }
-
-        //                if (isLeaveMismatch)
-        //                {
-        //                    _dbContext.SaveChanges();
-        //                }
-        //            }
-        //            return employeeLeaveData;
-        //        }
-        //        else
-        //        {
-        //            return defaultLeaves;
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Log the exception (use your preferred logging framework)
-        //        Console.WriteLine(ex.ToString());
-
-        //        // Optionally, rethrow the exception or handle it accordingly
-        //        throw new Exception("An error occurred while fetching the employee leaves.", ex);
-        //    }
-
-        //}
+   
 
 
 
@@ -1652,11 +1894,6 @@ namespace WorkManagement.Service
                 throw new Exception("An error occurred while fetching the employee leaves.", ex);
             }
         }
-
-
-
-
-
 
         public async Task<EmployeeLeaveModel> AddLeave(EmployeeLeaveModel employeeLeaveData, string loggedUserId)
         {
@@ -1923,12 +2160,10 @@ namespace WorkManagement.Service
             }
 
             // Find Employee ID
-            var employee = _dbContext.Employees.FirstOrDefault(x => x.UserId == userGuid);
+            var employee = _dbContext.Employees.FirstOrDefault(x => x.UserId == userGuid && !x.IsDeleted);
             if (employee == null)
             {
                 return -1;
-                throw new Exception("User was not found");
-
             }
 
             return employee.Id;
@@ -1944,7 +2179,7 @@ namespace WorkManagement.Service
                 return employeeSalary;
             }
 
-            var employee = _dbContext.Employees.Include(e=>e.EmployeeWorkInformation).FirstOrDefault(s => s.Id == employeeId);
+            var employee = _dbContext.Employees.Include(e=>e.EmployeeWorkInformation).FirstOrDefault(s => s.Id == employeeId && !s.IsDeleted);
             if (employee != null)
             {
                 employeeSalary = _dbContext.EmployeeSalaries.FirstOrDefault(s => s.Id == salaryId && s.EmployeeId == employeeId);
@@ -2055,7 +2290,7 @@ namespace WorkManagement.Service
                 return employeeSalary;
             }
 
-            var employee = _dbContext.Employees.FirstOrDefault(s => s.Id == employeeId);
+            var employee = _dbContext.Employees.FirstOrDefault(s => s.Id == employeeId && !s.IsDeleted);
             if (employee != null)
             {
                 employeeSalary = _dbContext.EmployeeSalaries.FirstOrDefault(s => s.Id == salaryId && s.EmployeeId == employeeId);
@@ -2191,12 +2426,12 @@ namespace WorkManagement.Service
             var targetEmployeeId = CheckValidEmployeeId(loggedUserId);
             if (targetEmployeeId == -1)
             {
-                throw new Exception("Invalid User data");
+                
                 return returnData;
             }
 
             returnData = (from es in _dbContext.EmployeeSalaries.Where(s => s.EmployeeId == employeeId)
-                          join e in _dbContext.Employees on es.UpdatedBy equals e.Id into employee_default
+                          join e in _dbContext.Employees.Where(s=>!s.IsDeleted) on es.UpdatedBy equals e.Id into employee_default
                           from ed in employee_default.DefaultIfEmpty()
                           select new EmployeeSalaryDataModel
                           {
@@ -2221,13 +2456,496 @@ namespace WorkManagement.Service
 
         }
 
+
+        public async Task<List<EmployeeLeaveDataModel>> GetAllPenidngLeaveRequestList(string loggedUserId)
+        {
+            var returnData = new List<EmployeeLeaveDataModel>();
+            var targetEmployeeId = CheckValidEmployeeId(loggedUserId);
+            if (targetEmployeeId == -1)
+            {
+                //throw new Exception("Invalid User data");
+                return returnData;
+            }
+
+            var HRHeadRole = roleManager.Roles.FirstOrDefault(x => x.Name == "HR Admin");
+            var HRHeadEmployee = new Employee();
+            if (HRHeadRole != null)
+            {
+                HRHeadEmployee = _dbContext.Employees.FirstOrDefault(s => s.RoleId == HRHeadRole.Id);
+                if (HRHeadEmployee.Id == targetEmployeeId)
+                {
+
+                    returnData = (from es in _dbContext.LeaveUpdateDetails.Where(s => s.Status== LeaveStatus.Pending && s.EmployeeId.HasValue)
+                                  join e in _dbContext.Employees on es.UpdatedBy equals e.Id into employee_default
+                                  from ed in employee_default.DefaultIfEmpty()
+                                  select new EmployeeLeaveDataModel
+                                  {
+                                      LeaveId = es.Id,
+                                      EmployeeId = es.EmployeeId,
+                                      EmployeeName = es.Employee.FirstName + " " + es.Employee.LastName,
+                                      JobLevelLeaveType=es.JobLevelLeaveType,
+                                      ManagerName = es.ManagerName,
+                                      EmployeeNumber=es.EmployeeNumber,
+                                      LeaveStatus =es.Status,
+                                      IsApprovedByDepartmentHead = es.IsApprovedByDepartmentHead,
+                                      IsApprovedByHRHead = es.IsApprovedByHRHead,
+                                      UpdatedDateTime = (es.UpdatedDateTime.HasValue ? es.UpdatedDateTime.Value.ToString("yyyy-MM-dd") : ""),
+                                      UpdatedBy = es.UpdatedBy,
+                                      UpdatedByUserName = (ed == null) ? "" : ed.FirstName + " " + ed.LastName,
+                                      UpdatedNewLeaves = es.UpdatedNewLeaves.Select(s => new EmployeeLeaveSummaryModel
+                                      {
+                                          Id = s.EmployeeLeaveTypeId.HasValue ? s.EmployeeLeaveTypeId.Value : -1,
+                                          TotalLeaves = s.TotalLeaves,
+                                          RemainingLeaves = s.RemainingLeaves,
+                                          EmployeeLeaveType = _dbContext.EmployeeLeaveType.FirstOrDefault(el => el.Id == s.EmployeeLeaveTypeId).Name
+                                      }).ToList()
+                                  }).ToList();
+                }
+                else
+                {
+                    var employeeData = _dbContext.Employees.Where(s => s.EmployeeReportToId == targetEmployeeId);
+                    returnData = (from es in _dbContext.LeaveUpdateDetails.Where(s => s.Status == LeaveStatus.Pending && s.EmployeeId.HasValue)
+                                  join er in employeeData on es.EmployeeId equals er.Id
+                                  join e in _dbContext.Employees on es.UpdatedBy equals e.Id into employee_default
+                                  from ed in employee_default.DefaultIfEmpty()
+                                  select new EmployeeLeaveDataModel
+                                  {
+                                      LeaveId = es.Id,
+                                      EmployeeId = es.EmployeeId,
+                                      EmployeeName = es.Employee.FirstName + " " + es.Employee.LastName,
+                                      JobLevelLeaveType = es.JobLevelLeaveType,
+                                      ManagerName = es.ManagerName,
+                                      EmployeeNumber = es.EmployeeNumber,
+                                      LeaveStatus = es.Status,
+                                      IsApprovedByDepartmentHead = es.IsApprovedByDepartmentHead,
+                                      IsApprovedByHRHead = es.IsApprovedByHRHead,
+                                      UpdatedDateTime = (es.UpdatedDateTime.HasValue ? es.UpdatedDateTime.Value.ToString("yyyy-MM-dd") : ""),
+                                      UpdatedBy = es.UpdatedBy,
+                                      UpdatedByUserName = (ed == null) ? "" : ed.FirstName + " " + ed.LastName,
+                                      UpdatedNewLeaves = es.UpdatedNewLeaves.Select(s => new EmployeeLeaveSummaryModel
+                                      {
+                                          Id = s.EmployeeLeaveTypeId.HasValue ? s.EmployeeLeaveTypeId.Value : -1,
+                                          TotalLeaves = s.TotalLeaves,
+                                          RemainingLeaves = s.RemainingLeaves
+                                      }).ToList()
+                                  }).ToList();
+                }
+            }
+
+
+            return returnData;
+
+
+
+        }
+
+        public async Task<List<EmployeeLeaveDataModel>> GetEmployeeLeaveRequestList(string loggedUserId, int employeeId)
+        {
+            var returnData = new List<EmployeeLeaveDataModel>();
+            var targetEmployeeId = CheckValidEmployeeId(loggedUserId);
+            if (targetEmployeeId == -1)
+            {
+                
+                return returnData;
+            }
+
+            returnData = (from es in _dbContext.LeaveUpdateDetails.Where(s => s.EmployeeId == employeeId)
+                          join e in _dbContext.Employees on es.UpdatedBy equals e.Id into employee_default
+                          from ed in employee_default.DefaultIfEmpty()
+                          select new EmployeeLeaveDataModel
+                          {
+                              LeaveId = es.Id,
+                              EmployeeId = es.EmployeeId,
+                              EmployeeName = es.Employee.FirstName + " " + es.Employee.LastName,
+                              JobLevelLeaveType = es.JobLevelLeaveType,
+                              ManagerName = es.ManagerName,
+                              LeaveStatus = es.Status,
+                              IsApprovedByDepartmentHead = es.IsApprovedByDepartmentHead,
+                              IsApprovedByHRHead = es.IsApprovedByHRHead,
+                              UpdatedDateTime = (es.UpdatedDateTime.HasValue ? es.UpdatedDateTime.Value.ToString("yyyy-MM-dd") : ""),
+                              UpdatedBy = es.UpdatedBy,
+                              UpdatedByUserName = (ed == null) ? "" : ed.FirstName + " " + ed.LastName,
+                              UpdatedNewLeaves = es.UpdatedNewLeaves.Select(s => new EmployeeLeaveSummaryModel
+                              {
+                                  Id = s.EmployeeLeaveTypeId.HasValue ? s.EmployeeLeaveTypeId.Value : -1,
+                                  TotalLeaves = s.TotalLeaves,
+                                  RemainingLeaves = s.RemainingLeaves,
+                                  EmployeeLeaveType=s.EmployeeLeaveTypes.Name
+                              }).ToList()
+                          }).ToList();
+
+            return returnData;
+
+
+
+        }
+
+        public async Task<EmployeeLeaveUpdatesTable> ApproveLeaveUpdate(int leaveId, string loggedUserId, int employeeId)
+        {
+            var employeeleave = new EmployeeLeaveUpdatesTable();
+            var targetEmployeeId = CheckValidEmployeeId(loggedUserId);
+            if (targetEmployeeId == -1)
+            {
+                return employeeleave;
+            }
+
+            var employee = await _dbContext.Employees.Include(e => e.EmployeeWorkInformation).FirstOrDefaultAsync(s => s.Id == employeeId);
+            if (employee != null)
+            {
+                employeeleave = _dbContext.LeaveUpdateDetails.FirstOrDefault(s => s.Id == leaveId && s.EmployeeId == employeeId);
+                if (employeeleave != null)
+                {
+                    if (employeeleave.Status == LeaveStatus.Approved)
+                    {
+                        return employeeleave;
+                    }
+                    else if (employeeleave.Status == LeaveStatus.Pending)
+                    {
+                        employeeleave.UpdatedBy = targetEmployeeId;
+                        employeeleave.UpdatedDateTime = DateTime.Now;
+                        if (employee.EmployeeReportToId == targetEmployeeId)
+                        {
+                            employeeleave.IsApprovedByDepartmentHead = true;
+                        }
+
+                        if (!employeeleave.IsApprovedByHRHead)
+                        {
+                            var HRHeadRole = roleManager.Roles.FirstOrDefault(x => x.Name == "HR Admin");
+                            var HRHeadEmployee = new Employee();
+                            if (HRHeadRole != null)
+                            {
+                                HRHeadEmployee = _dbContext.Employees.FirstOrDefault(s => s.RoleId == HRHeadRole.Id);
+                                if (HRHeadEmployee.Id == targetEmployeeId)
+                                {
+                                    employeeleave.IsApprovedByHRHead = true;
+                                }
+                            }
+                        }
+
+                        if (employeeleave.IsApprovedByDepartmentHead && employeeleave.IsApprovedByHRHead)
+                        {
+                            employeeleave.Status = LeaveStatus.Approved;
+                        }
+                    }
+
+                    _dbContext.LeaveUpdateDetails.Update(employeeleave);
+                    _dbContext.SaveChanges();
+                }
+
+                employeeleave = _dbContext.LeaveUpdateDetails.FirstOrDefault(s => s.Id == leaveId && s.EmployeeId == employeeId);
+                if (employeeleave != null)
+                {
+                    var isHRHeadApprove = employeeleave.IsApprovedByHRHead;
+                    var isDepartmentHeadApprove = employeeleave.IsApprovedByDepartmentHead;
+
+                    if (isHRHeadApprove && isDepartmentHeadApprove)
+                    {
+                        var employeeWorkInfo = _dbContext.EmployeeWorkInformations.FirstOrDefault(s => s.Id == employee.EmployeeWorkInformationId);
+                        if (employeeWorkInfo != null)
+                        {
+
+
+
+                            employee.JobLevelLeaveType = employeeleave.JobLevelLeaveType.HasValue ? employeeleave.JobLevelLeaveType.Value : 1;
+
+                            var defaultLeaves = (from ed in _dbContext.EmployeeDefaultLeave.Where(s => s.JobLevelLeaveId == employee.JobLevelLeaveType)
+                                                 select new EmployeeLeaveSummaryModel
+                                                 {
+                                                     Id = ed.EmployeeLeaveTypeId.HasValue ? ed.EmployeeLeaveTypeId.Value : 0,
+                                                     EmployeeLeaveType = ed.EmployeeLeaveTypes.Name,
+                                                     TotalLeaves = ed.TotalLeaves,
+                                                     RemainingLeaves = ed.TotalLeaves
+                                                 }).ToList();
+                            var employeeLeaveSummaries = await _dbContext.EmployeeLeaveSummary
+                              .Where(s => s.EmployeeId == employeeId)
+                                     .ToListAsync();
+
+                            _dbContext.EmployeeLeaveSummary.RemoveRange(employeeLeaveSummaries);
+                            
+
+                            employee.EmployeeLeaves = new List<EmployeeLeaveSummary>();
+                            if (employeeleave.useDefultLeaves == true)
+                            {
+
+                                if (defaultLeaves.Any())
+                                {
+                                    //if (employee.EmployeeWorkInformation.UseDefaultLeaves)
+                                    //{
+
+                                    foreach (var leave in defaultLeaves)
+                                    {
+                                        var employeeLeave = new EmployeeLeaveSummary();
+                                        employeeLeave.EmployeeId = employeeId;
+                                        employeeLeave.EmployeeLeaveTypeId = leave.Id;
+                                        employeeLeave.RemainingLeaves = leave.RemainingLeaves;
+                                        employeeLeave.TotalLeaves = leave.TotalLeaves;
+
+                                        employee.EmployeeLeaves.Add(employeeLeave);
+                                    }
+
+
+                                }
+                                else
+                                {
+
+
+                                    foreach (var leave in employeeleave.UpdatedNewLeaves)
+                                    {
+                                        var employeeLeave = new EmployeeLeaveSummary();
+                                        employeeLeave.EmployeeId = employeeId;
+                                        employeeLeave.EmployeeLeaveTypeId = leave.Id;
+                                        employeeLeave.RemainingLeaves = leave.TotalLeaves;
+
+                                        employeeLeave.TotalLeaves = leave.TotalLeaves;
+
+                                        employee.EmployeeLeaves.Add(employeeLeave);
+                                    }
+
+
+
+                                }
+
+
+
+                                _dbContext.EmployeeWorkInformations.Update(employeeWorkInfo);
+
+                                _dbContext.SaveChanges();
+
+                                var employeeLeaveInfoEmail = new EmployeeLeaveUpdateEmailModel();
+                                employeeLeaveInfoEmail.EmployeeName = employee.FirstName + " " + employee.LastName;
+                                employeeLeaveInfoEmail.ApprovalStatus = "Approve";
+                                var reportToEmployee = _dbContext.Employees.FirstOrDefault(s => s.Id == employee.EmployeeReportToId);
+
+                                if (reportToEmployee != null)
+                                {
+                                    employeeLeaveInfoEmail.ManagerName = reportToEmployee.FirstName;
+                                }
+
+
+                                var curruntleaves = new List<EmployeeLeaveSummaryModel>();
+                                
+
+
+
+                                //employeeSalaryInfoEmail.UpadetdLeaves = 
+                                employeeLeaveInfoEmail.UpdatedDate = DateTime.Now;
+
+                                SendPendingLeaveRequestEmailToEmployee(employee.Email, employeeLeaveInfoEmail);
+                            }
+                        }
+                    }
+
+                }
+
+
+                
+            }
+            return employeeleave;
+        }
+
+
+
+        public async Task<EmployeeLeaveUpdatesTable> RejectLeaveUpdate(int leaveId, string loggedUserId, int employeeId)
+        {
+            var employeeLeave = new EmployeeLeaveUpdatesTable();
+            var targetEmployeeId = CheckValidEmployeeId(loggedUserId);
+            if (targetEmployeeId == -1)
+            {
+                return employeeLeave;
+            }
+
+            var employee = _dbContext.Employees.FirstOrDefault(s => s.Id == employeeId);
+            if (employee != null)
+            {
+                employeeLeave = _dbContext.LeaveUpdateDetails.FirstOrDefault(s => s.Id == leaveId && s.EmployeeId == employeeId);
+                if (employeeLeave != null)
+                {
+                    if (employeeLeave.Status == LeaveStatus.Rejected)
+                    {
+                        return employeeLeave;
+                    }
+                    else if (employeeLeave.Status == LeaveStatus.Pending)
+                    {
+                        employeeLeave.UpdatedBy = targetEmployeeId;
+                        employeeLeave.UpdatedDateTime = DateTime.Now;
+                        if (employee.EmployeeReportToId == targetEmployeeId)
+                        {
+                            employeeLeave.IsApprovedByDepartmentHead = false;
+                        }
+
+                        var HRHeadRole = roleManager.Roles.FirstOrDefault(x => x.Name == "HR Admin");
+                        var HRHeadEmployee = new Employee();
+                        if (HRHeadRole != null)
+                        {
+                            HRHeadEmployee = _dbContext.Employees.FirstOrDefault(s => s.RoleId == HRHeadRole.Id);
+                            if (HRHeadEmployee.Id == targetEmployeeId)
+                            {
+                                employeeLeave.IsApprovedByHRHead = false;
+                            }
+                        }
+
+                        employeeLeave.Status = LeaveStatus.Rejected;
+                    }
+
+                    _dbContext.LeaveUpdateDetails.Update(employeeLeave);
+                    _dbContext.SaveChanges();
+
+                    var employeeLeaveInfoEmail = new EmployeeLeaveUpdateEmailModel();
+                    employeeLeaveInfoEmail.EmployeeName = employee.FirstName + " " + employee.LastName;
+                    employeeLeaveInfoEmail.ApprovalStatus = "Reject";
+                    var reportToEmployee = _dbContext.Employees.FirstOrDefault(s => s.Id == employee.EmployeeReportToId);
+
+                    if (reportToEmployee != null)
+                    {
+                        employeeLeaveInfoEmail.ManagerName = reportToEmployee.FirstName;
+                    }
+
+
+                    //employeeSalaryInfoEmail.CurrentSalary = employeeSalary.CurrentSalary;
+                    //employeeSalaryInfoEmail.ExpectedToBeSalary = employeeSalary.ExpectedToBeSalary;
+                    employeeLeaveInfoEmail.UpdatedDate = DateTime.Now;
+
+                    SendPendingLeaveRequestEmailToEmployee(employee.Email, employeeLeaveInfoEmail);
+                }
+            }
+
+
+            return employeeLeave;
+        }
+
         #endregion
 
         #region Private methods
 
+
+        private async Task UpdateLeaveInformation(EmployeeLeaveUpdateModel leaveInfo)
+        {
+            var existingLeaves = new List<EmployeeLeaveSummaryModel>();
+            var employee = await _dbContext.Employees.FirstOrDefaultAsync(s => s.Id == leaveInfo.EmployeeId);
+            if (employee != null)
+            {
+                var LeaveUpdateData = new EmployeeLeaveUpdatesTable
+                {
+                    JobLevelLeaveType = leaveInfo.JobLevelLeaveType,
+                    useDefultLeaves = leaveInfo.useDefultLeaves,
+                    Status=LeaveStatus.Pending,
+                    EmployeeId=employee.Id,
+                  EmployeeNumber=employee.EmployeeNumber
+                    
+                };
+
+                var existingLeaveIds = await _dbContext.EmployeeLeaveSummary
+                    .Where(s => s.EmployeeId == leaveInfo.EmployeeId)
+                    .Select(s => s.Id)
+                    .ToListAsync();
+                LeaveUpdateData.EmployeeLeaveSummaryId = existingLeaveIds;
+
+                if (leaveInfo.EmployeeLeaves != null && leaveInfo.EmployeeLeaves.Any())
+                {
+                    var newLeaves = new List<EmployeeLeavesDeatils>();
+                    foreach (var leaves in leaveInfo.EmployeeLeaves)
+                    {
+                        var UpdatedLeaves = new EmployeeLeavesDeatils
+                        {
+                            EmployeeId = leaveInfo.EmployeeId,
+                            EmployeeLeaveTypeId = leaves.Id,
+                            TotalLeaves = leaves.TotalLeaves,
+                            RemainingLeaves = leaves.RemainingLeaves
+                        };
+                        newLeaves.Add(UpdatedLeaves);
+                        _dbContext.UpdateLeaveSummury.Add(UpdatedLeaves);
+                    }
+                    LeaveUpdateData.UpdatedNewLeaves = newLeaves;
+                }
+                LeaveUpdateData.EmployeeLeaveSummaryId = existingLeaveIds;
+                _dbContext.LeaveUpdateDetails.Add(LeaveUpdateData);
+                
+
+               
+
+                var pendinLeaveRequestEmailList = new List<EmployeeLeaveRequestEmailModel>();
+                var pendingRequestEmailModel = new EmployeeLeaveRequestEmailModel();
+
+                var reportToEmployee = await _dbContext.Employees.FirstOrDefaultAsync(s => s.Id == employee.EmployeeReportToId);
+                if (reportToEmployee != null)
+                {
+                    pendingRequestEmailModel = new EmployeeLeaveRequestEmailModel
+                    {
+                        EmployeeName = employee.FirstName + " " + employee.LastName,
+                        ApprovalStatus = "Pending",
+                        ManagerName = reportToEmployee.FirstName,
+                        ManagerEmail = reportToEmployee.Email,
+                        CurruntLeaves = existingLeaves,
+                        UpadetdLeaves = leaveInfo.EmployeeLeaves,
+                        UpdatedDate = DateTime.Now
+                    };
+                    pendinLeaveRequestEmailList.Add(pendingRequestEmailModel);
+                    LeaveUpdateData.ManagerName = reportToEmployee.FirstName + " " + reportToEmployee.MiddleName + " " + reportToEmployee.LastName;
+                }
+                
+
+                var HRHeadRole = roleManager.Roles.FirstOrDefault(x => x.Name == "HR Admin");
+                Employee HRHeadEmployee = null;
+                if (HRHeadRole != null)
+                {
+                    HRHeadEmployee = await _dbContext.Employees.FirstOrDefaultAsync(s => s.RoleId == HRHeadRole.Id);
+                    if (HRHeadEmployee != null)
+                    {
+                        pendingRequestEmailModel = new EmployeeLeaveRequestEmailModel
+                        {
+                            EmployeeName = employee.FirstName + " " + employee.LastName,
+                            ApprovalStatus = "Pending",
+                            ManagerName = HRHeadEmployee.FirstName,
+                            ManagerEmail = HRHeadEmployee.Email,
+                            CurruntLeaves = existingLeaves,
+                            UpadetdLeaves = leaveInfo.EmployeeLeaves,
+                            UpdatedDate = DateTime.Now
+                        };
+                        pendinLeaveRequestEmailList.Add(pendingRequestEmailModel);
+                        
+                    }
+
+                }
+
+                var employeeLeaveInfoEmail = new EmployeeLeaveUpdateEmailModel
+                {
+                    EmployeeName = employee.FirstName + " " + employee.LastName,
+                    ApprovalStatus = "Pending",
+                    ManagerName = reportToEmployee?.FirstName,
+                    HRManagerName = HRHeadEmployee?.FirstName,
+                    CurruntLeaves = existingLeaves,
+                    UpadetdLeaves = leaveInfo.EmployeeLeaves,
+                    UpdatedDate = DateTime.Now
+                };
+
+                foreach (var leaveEmail in pendinLeaveRequestEmailList)
+                {
+                    SendPendingLeaveRequestEmailToManager(leaveEmail.ManagerEmail, leaveEmail);
+                }
+            }
+            try
+            {
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or handle it as necessary
+                Console.WriteLine($"Error saving changes: {ex.Message}");
+                throw; // Optionally rethrow the exception if needed
+            }
+        }
+
+
+
+
+
+
+
+
+
         private void UpdateSalaryInformation(EmployeeSalaryUpdateModel salaryInfo)
         {
-            var employee = _dbContext.Employees.FirstOrDefault(s => s.Id == salaryInfo.EmployeeId);
+            var employee = _dbContext.Employees.FirstOrDefault(s => s.Id == salaryInfo.EmployeeId && !s.IsDeleted);
             if (employee != null)
             {
                 EmployeeSalary employeeSalary = new EmployeeSalary();
@@ -2377,6 +3095,33 @@ namespace WorkManagement.Service
             emailModel.repModel = pendingRequestEmailModel;
             _emailService.SendEmployeeSalaryUpdateEmail(emailModel);
         }
+
+
+        private async Task SendPendingLeaveRequestEmailToManager(string userEmail, EmployeeLeaveRequestEmailModel pendingRequestEmailModel)
+        {
+
+            var emailModel = new EmailModel<EmployeeLeaveRequestEmailModel>();
+            emailModel.From = "naupul30@gmail.com";
+            emailModel.To = userEmail;
+            emailModel.Subject = $"Leave update request from: {pendingRequestEmailModel.EmployeeName}";
+            emailModel.repModel = pendingRequestEmailModel;
+            _emailService.SendLeaveUpdateEmail(emailModel);
+        }
+
+        private async Task SendPendingLeaveRequestEmailToEmployee(string userEmail, EmployeeLeaveUpdateEmailModel pendingRequestEmailModel)
+        {
+
+            var emailModel = new EmailModel<EmployeeLeaveUpdateEmailModel>();
+            emailModel.From = "naupul30@gmail.com";
+            emailModel.To = userEmail;
+            emailModel.Subject = $"Leave update information";
+            emailModel.repModel = pendingRequestEmailModel;
+            _emailService.SendemployeeLeaveUpdateEmail(emailModel);
+        }
+
+
+
+
 
         #endregion
 

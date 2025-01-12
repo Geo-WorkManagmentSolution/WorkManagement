@@ -10,6 +10,7 @@ using WorkManagement.Domain.Entity;
 using WorkManagement.Domain.Entity.EmployeeLeaveTables;
 using WorkManagement.Domain.Extentions;
 using WorkManagement.Domain.Models;
+using WorkManagement.Domain.Models.Employee;
 using WorkManagementSolution.Employee;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -58,6 +59,8 @@ namespace WorkManagmentSolution.EFCore
         public virtual DbSet<PermissionAction> PermissionActions { get; set; }
         public virtual DbSet<PermissionCategory> PermissionCategories { get; set; }
         public virtual DbSet<EmployeeSalary> EmployeeSalaries { get; set; }
+        public virtual DbSet<EmployeeLeaveUpdatesTable> LeaveUpdateDetails { get; set; }
+        public virtual DbSet<EmployeeLeavesDeatils> UpdateLeaveSummury { get; set; }
 
 
         public IHttpContextAccessor HttpContextAccessor { get; }
@@ -81,8 +84,13 @@ namespace WorkManagmentSolution.EFCore
             //        mutableEntityType.SetQueryFilter(lambdaExpression);
             //    }
             //}
+            modelBuilder.HasSequence<int>("EmployeeNumber")
+         .StartsAt(1000)
+         .IncrementsBy(1);
+
             modelBuilder.Entity<Employee>()
-                .Property(o => o.EmployeeNumber);
+                .Property(o => o.EmployeeNumber)
+                .HasDefaultValueSql("NEXT VALUE FOR EmployeeNumber");
 
 
             modelBuilder.Entity<JobLevelLeave>().HasData(

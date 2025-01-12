@@ -28,8 +28,8 @@ namespace WorkManagement.Domain.Models.Employee
     public class EmployeeLeaveSummaryModel
     {
         public int EmployeeLeaveSummaryId { get; set; }
-        public int Id { get; set; }
-        public string EmployeeLeaveType { get; set; }
+        public int? Id { get; set; }
+        public string? EmployeeLeaveType { get; set; }
         public int TotalLeaves { get; set; }
         public double RemainingLeaves { get; set; }
     }

@@ -38,7 +38,9 @@ namespace WorkManagement.Domain.Contracts
         #region Employee Dashboard
 
         public Task<List<EmployeeDashboardDataModel>> GetAllEmployeesAsync(string loggedUserId,string userRole);
+        public Task<List<EmployeeDashboardDataModel>> GetAllDeletedEmployeesAsync(string? loggedUserId, string userRole);
         public Task<EmployeeModel> GetEmployeeByIdAsync(string userRole, string loggedUserId, int id);
+        public Task<EmployeeModel> GetDeletedEmployeeByIdAsync(string userRole, string loggedUserId, int id);
         public Task<EmployeeModel> CreateEmployeeAsync(EmployeeModel employee);
         public Task<EmployeeModel> UpdateEmployeeAsync(int id, EmployeeModel employee);
         public Task<bool> DeleteEmployeeAsync(int id);
@@ -85,5 +87,9 @@ namespace WorkManagement.Domain.Contracts
         public int CheckValidEmployeeId(string loggedUserId);
         public Task<List<EmployeeSalaryDataModel>> GetAllPenidngSalaryRequestList(string loggedUserId);
         public Task<List<EmployeeSalaryDataModel>> GetEmployeeSalaryRequestList(string loggedUserId, int employeeId);
+        public  Task<EmployeeLeaveUpdatesTable> ApproveLeaveUpdate(int leaveId, string loggedUserId, int employeeId);
+        public  Task<EmployeeLeaveUpdatesTable> RejectLeaveUpdate(int leaveId, string loggedUserId, int employeeId);
+        public  Task<List<EmployeeLeaveDataModel>> GetEmployeeLeaveRequestList(string loggedUserId, int employeeId);
+        public  Task<List<EmployeeLeaveDataModel>> GetAllPenidngLeaveRequestList(string loggedUserId);
     }
 }

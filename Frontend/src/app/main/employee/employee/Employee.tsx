@@ -200,16 +200,7 @@ function Employee() {
 		}
 	}, [Employee, methods]);
 
-	React.useEffect(() => {
-		const subscription = methods.watch((value, { name, type }) => {
-			if (type === 'change') {
-				console.log('Changed field:', name);
-				console.log('Current values:', value);
-				console.log('Current errors:', methods.formState.errors);
-			}
-		});
-		return () => subscription.unsubscribe();
-	}, [methods]);
+	
 
 	if (isLoading) {
 		return <FuseLoading />;
