@@ -4,8 +4,6 @@ on:
     branches:
     - main
 env:
-  AZURE_API_WEBAPP_NAME: api-geo-dev
-  AZURE_UI_WEBAPP_NAME: ui-geo-dev
   WEBAPP_API_PACKAGE_PATH: ./Backend/WorkManagement.Api/publish/
   FRONTEND_PACKAGE_PATH: ./Frontend/build/
   CONFIGURATION: Release
@@ -45,7 +43,6 @@ jobs:
         server: win1123.site4now.net
         username: shahnaupul-ui
         password: shahnaupul-ui
-        dry-run: true
         local-dir: ${{ env.FRONTEND_PACKAGE_PATH }}
         exclude: |
           **/web.config*
@@ -66,7 +63,7 @@ jobs:
     - name: Build
       run: dotnet build "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-restore
     - name: Publish
-      run: dotnet publish "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-build --output "${{ env.WEBAPP_API_PACKAGE_PATH }} --selfcontaied"
+      run: dotnet publish "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} -r win-x86 --self-contained true --no-build --output "${{ env.WEBAPP_API_PACKAGE_PATH }}"
     - name: Publish Artifacts
       uses: actions/upload-artifact@v3
       with:
